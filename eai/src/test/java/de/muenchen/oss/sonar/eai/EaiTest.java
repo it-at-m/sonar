@@ -1,4 +1,4 @@
-package de.muenchen.oss.refarch.eai;
+package de.muenchen.oss.sonar.eai;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 

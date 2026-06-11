@@ -1,4 +1,4 @@
-package de.muenchen.oss.refarch.eai.archunit.rules;
+package de.muenchen.oss.sonar.eai.archunit.rules;
 
 import com.tngtech.archunit.core.domain.JavaClass;
 import com.tngtech.archunit.core.domain.JavaMethod;

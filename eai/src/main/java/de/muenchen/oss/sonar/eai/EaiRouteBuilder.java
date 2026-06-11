@@ -1,4 +1,4 @@
-package de.muenchen.oss.refarch.eai;
+package de.muenchen.oss.sonar.eai;
 
 import lombok.RequiredArgsConstructor;
 import org.apache.camel.LoggingLevel;
