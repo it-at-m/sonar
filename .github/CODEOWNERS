@@ -2,5 +2,5 @@
 * @it-at-m/sonar-maintainer
 
 # Protect CODEOWNERS file itself against modification
-/.github/CODEOWNERS @it-at-m/refarch-admin
+/.github/CODEOWNERS @it-at-m/sonar-admin
 

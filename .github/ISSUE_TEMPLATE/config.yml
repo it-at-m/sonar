@@ -1,14 +1,11 @@
 blank_issues_enabled: false
 contact_links:
-  - name: 📄 RefArch - Documentation
-    url: https://github.com/it-at-m/refarch/issues/new/choose
-    about: Open an issue in refarch if the topic is related to the web documentation
   - name: 💡 Discussions - Ideas
-    url: https://github.com/it-at-m/refarch-templates/discussions/categories/ideas
+    url: https://github.com/it-at-m/sonar/discussions/categories/ideas
     about: Feel free to share ideas for the project that are to vague to create a dedicated issue beforehand
   - name: ⁉ Discussions - Q&A
-    url: https://github.com/it-at-m/refarch-templates/discussions/categories/q-a
+    url: https://github.com/it-at-m/sonar/discussions/categories/q-a
     about: Please ask questions here
   - name: 🗨 Discussions - General
-    url: https://github.com/it-at-m/refarch-templates/discussions/categories/general
+    url: https://github.com/it-at-m/sonar/discussions/categories/general
     about: Discuss more general topics here
