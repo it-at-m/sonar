@@ -18,7 +18,6 @@ on:
         required: true
         options: # Add or modify paths according to your project structure
           - backend
-          - eai
 
 jobs:
   release-maven-artifact:
