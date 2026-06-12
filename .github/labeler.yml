@@ -15,12 +15,6 @@
 "Template: Backend":
   - changed-files:
     - any-glob-to-any-file: ['backend/**']
-"Template: EAI":
-  - changed-files:
-    - any-glob-to-any-file: ['eai/**']
 "Template: Frontend":
   - changed-files:
     - any-glob-to-any-file: ['frontend/**']
-"Template: Webcomponent":
-  - changed-files:
-    - any-glob-to-any-file: ['webcomponent/**']

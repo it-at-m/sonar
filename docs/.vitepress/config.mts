@@ -3,9 +3,9 @@ import { withMermaid } from "vitepress-plugin-mermaid";
 
 // https://vitepress.dev/reference/site-config
 const vitepressConfig = defineConfig({
-  base: "/", // needs to be changed if delivered via sub path (e.g. "/docs/" for example.com/docs)
-  title: "RefArch Docs Template",
-  description: "Documentation template from the RefArch Templates",
+  base: "/sonar/", // needs to be changed if delivered via sub path (e.g. "/docs/" for example.com/docs)
+  title: "Sonar Docs",
+  description: "Documentation for Sonar",
   head: [
     [
       "link",

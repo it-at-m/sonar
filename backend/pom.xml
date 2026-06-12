@@ -9,13 +9,13 @@
         <relativePath/>
     </parent>
 
-    <groupId>de.muenchen.oss.refarch</groupId>
-    <artifactId>refarch-backend</artifactId>
+    <groupId>de.muenchen.oss.sonar</groupId>
+    <artifactId>sonar-backend</artifactId>
     <version>0.0.1-SNAPSHOT</version>
 
-    <name>refarch-backend</name>
-    <description>This is the default starting project for a backend project based on the reference architecture of it@M</description>
-    <url>https://github.com/it-at-m/refarch-templates</url>
+    <name>sonar-backend</name>
+    <description>New Backend for the old Application SonAbr</description>
+    <url>https://github.com/it-at-m/sonar</url>
     <licenses>
         <license>
             <name>MIT</name>
@@ -24,9 +24,9 @@
         </license>
     </licenses>
     <scm>
-        <url>https://github.com/it-at-m/refarch-templates.git</url>
-        <connection>scm:git:https://github.com/it-at-m/refarch-templates.git</connection>
-        <developerConnection>scm:git:https://github.com/it-at-m/refarch-templates.git</developerConnection>
+        <url>https://github.com/it-at-m/sonar.git</url>
+        <connection>scm:git:https://github.com/it-at-m/sonar.git</connection>
+        <developerConnection>scm:git:https://github.com/it-at-m/sonar.git</developerConnection>
         <tag>HEAD</tag>
     </scm>
     <developers>

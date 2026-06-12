@@ -1,5 +1,5 @@
 name: 📄 Documentation change (not web documentation)
-description: Suggest a documentation change for this project (should not be used for topics related to the web documentation, see 'RefArch - Documentation' below)
+description: Suggest a documentation change for this project
 title: "[Documentation] "
 labels: ["Type: Documentation"]
 body:
@@ -21,8 +21,6 @@ body:
       options:
         - frontend
         - backend
-        - eai
-        - webcomponent
         - Other
     validations:
       required: true
