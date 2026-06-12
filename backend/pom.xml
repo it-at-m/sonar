@@ -11,7 +11,7 @@
 
     <groupId>de.muenchen.oss.sonar</groupId>
     <artifactId>sonar-backend</artifactId>
-    <version>0.0.1</version>
+    <version>0.0.2-SNAPSHOT</version>
 
     <name>sonar-backend</name>
     <description>New Backend for the old Application SonAbr</description>
@@ -27,7 +27,7 @@
         <url>https://github.com/it-at-m/sonar.git</url>
         <connection>scm:git:https://github.com/it-at-m/sonar.git</connection>
         <developerConnection>scm:git:https://github.com/it-at-m/sonar.git</developerConnection>
-        <tag>sonar-backend-0.0.1</tag>
+        <tag>HEAD</tag>
     </scm>
     <developers>
         <developer>
