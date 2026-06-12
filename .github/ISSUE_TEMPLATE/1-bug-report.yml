@@ -58,8 +58,6 @@ body:
       options:
         - frontend
         - backend
-        - eai
-        - webcomponent
     validations:
       required: false
   - type: input

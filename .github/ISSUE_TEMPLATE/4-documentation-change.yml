@@ -21,8 +21,6 @@ body:
       options:
         - frontend
         - backend
-        - eai
-        - webcomponent
         - Other
     validations:
       required: true
