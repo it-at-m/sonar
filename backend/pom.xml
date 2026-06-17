@@ -11,7 +11,7 @@
 
     <groupId>de.muenchen.oss.sonar</groupId>
     <artifactId>sonar-backend</artifactId>
-    <version>0.0.2-SNAPSHOT</version>
+    <version>0.0.3-SNAPSHOT</version>
 
     <name>sonar-backend</name>
     <description>New Backend for the old Application SonAbr</description>
