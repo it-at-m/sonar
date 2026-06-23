@@ -6,7 +6,7 @@
     <v-list>
       <v-list-item to="/">
         <v-list-item-title>
-          {{ t("views.index.navText") }}
+          Get Started
         </v-list-item-title>
       </v-list-item>
       <v-list-item
@@ -14,7 +14,7 @@
         to="/get-started"
       >
         <v-list-item-title>
-          {{ t("views.getStarted.navText") }}
+          Get Started
         </v-list-item-title>
       </v-list-item>
     </v-list>
@@ -22,7 +22,6 @@
 </template>
 
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
 
 import useHasAnyRole from "@/composables/useHasAnyRole";
 import { Role } from "@/types/Role";
@@ -30,5 +29,4 @@ import { Role } from "@/types/Role";
 const showDrawer = defineModel<boolean>({ required: true });
 const showGetStarted = useHasAnyRole([Role.READER, Role.WRITER]);
 
-const { t } = useI18n();
 </script>

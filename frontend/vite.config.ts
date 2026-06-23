@@ -1,7 +1,5 @@
-import { dirname, resolve } from "node:path";
 import { fileURLToPath, URL } from "node:url";
 
-import VueI18nPlugin from "@intlify/unplugin-vue-i18n/vite";
 import vue from "@vitejs/plugin-vue";
 import UnpluginFonts from "unplugin-fonts/vite";
 import { defineConfig } from "vite";
@@ -46,12 +44,6 @@ export default defineConfig(({ mode }) => {
         },
       }),
       vueDevTools(),
-      VueI18nPlugin({
-        include: resolve(
-          dirname(fileURLToPath(import.meta.url)),
-          "./src/locales/*.json"
-        ),
-      }),
       {
         ...EncodeBracketsPlugin(),
         apply: "serve", // Ensures plugin is only applied during serve, see https://vite.dev/guide/using-plugins#conditional-application

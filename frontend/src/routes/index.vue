@@ -8,23 +8,23 @@
           height="200"
         />
         <p v-if="isWriter">
-          {{ t("views.index.isWriterText") }}
+          writer-Rolle vorhanden
         </p>
         <p v-else>
-          {{ t("views.index.isNotWriterText") }}
+          writer-Rolle fehlt
         </p>
       </v-col>
 
       <v-col class="mb-4">
         <h1 class="text-display-medium font-weight-bold mb-3">
-          {{ t("views.index.header") }}
+          Willkommen bei Sonar
         </h1>
         <p>
-          {{ t("views.index.apiGatewayStatus") }}
+          Das API-Gateway ist:
           <span :class="apiGwStatus">{{ apiGwStatus }}</span>
         </p>
         <p>
-          {{ t("views.index.backendStatus") }}
+          Das Backend ist:
           <span :class="backendStatus">{{ backendStatus }}</span>
         </p>
       </v-col>
@@ -36,7 +36,6 @@
 import type { HealthState } from "@/types/HealthState";
 
 import { onMounted, ref } from "vue";
-import { useI18n } from "vue-i18n";
 
 import { ApiFactory } from "@/api/ApiFactory.ts";
 import { ActuatorApi } from "@/api/generated/refarch-backend";
@@ -45,8 +44,6 @@ import useHasAnyRole from "@/composables/useHasAnyRole";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 import { Role } from "@/types/Role";
-
-const { t } = useI18n();
 
 const isWriter = useHasAnyRole(Role.WRITER);
 

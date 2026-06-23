@@ -21,19 +21,16 @@
         variant="text"
         v-bind="props"
       >
-        {{ t("common.actions.close") }}
+        Schließen
       </v-btn>
     </template>
   </v-snackbar-queue>
 </template>
 
 <script setup lang="ts">
-import { useI18n } from "vue-i18n";
 
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 
 const snackbarStore = useSnackbarStore();
-
-const { t } = useI18n();
 </script>

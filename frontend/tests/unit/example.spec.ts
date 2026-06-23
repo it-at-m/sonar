@@ -4,7 +4,6 @@ import { describe, expect, test, vi } from "vitest";
 import { nextTick } from "vue";
 
 import TheSnackbarQueue from "@/components/TheSnackbarQueue.vue";
-import i18n from "@/plugins/i18n";
 import { useSnackbarStore } from "@/stores/snackbar";
 
 describe("TheSnackbarQueue.vue", () => {
@@ -16,8 +15,7 @@ describe("TheSnackbarQueue.vue", () => {
           createTestingPinia({
             createSpy: vi.fn,
             stubActions: false,
-          }),
-          i18n,
+          })
         ],
       },
     });
