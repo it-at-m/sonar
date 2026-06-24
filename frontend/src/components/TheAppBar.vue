@@ -11,8 +11,7 @@
         />
         <router-link to="/">
           <v-toolbar-title class="font-weight-bold">
-            <span class="text-white">{{ t("app.name.part1") }}</span>
-            <span class="text-secondary">{{ t("app.name.part2") }}</span>
+            <span class="text-white">Sonar</span>
           </v-toolbar-title>
         </router-link>
       </v-col>
@@ -26,7 +25,7 @@
           flat
           variant="solo-inverted"
           hide-details
-          :label="t('common.actions.search')"
+          label="Suchen"
           clearable
           :prepend-inner-icon="mdiMagnify"
           theme="dark"
@@ -62,7 +61,6 @@
 import { mdiApps, mdiMagnify } from "@mdi/js";
 import { AppSwitcher } from "@muenchen/appswitcher-vue";
 import { ref } from "vue";
-import { useI18n } from "vue-i18n";
 
 import Ad2ImageAvatar from "@/components/common/Ad2ImageAvatar.vue";
 import { APPSWITCHER_URL } from "@/constants";
@@ -71,7 +69,6 @@ import { useUserInfoStore } from "@/stores/userinfo";
 
 const userInfoStore = useUserInfoStore();
 const snackbarStore = useSnackbarStore();
-const { t } = useI18n();
 
 const query = ref<string>("");
 

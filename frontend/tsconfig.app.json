@@ -18,6 +18,6 @@
     "allowSyntheticDefaultImports": true,
     "noUncheckedSideEffectImports": true,
     "noUncheckedIndexedAccess": true,
-    "types": ["unplugin-fonts/client", "@intlify/unplugin-vue-i18n/messages"]
+    "types": ["unplugin-fonts/client"]
   }
 }

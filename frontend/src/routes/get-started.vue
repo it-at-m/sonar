@@ -2,17 +2,15 @@
   <v-container class="fill-height d-flex align-center flex-wrap">
     <v-row class="text-center">
       <v-col>
-        <h1 class="text-display-medium font-weight-bold mb-10">
-          {{ t("views.getStarted.header") }}
-        </h1>
-        <h3>{{ t("views.getStarted.docsText") }}</h3>
+        <h1 class="text-display-medium font-weight-bold mb-10">Get Started</h1>
+        <h3>Dokumentation für die RefArch ist hier zu finden:</h3>
         <div>
           <a
             href="https://refarch.oss.muenchen.de/templates"
             target="_blank"
             rel="noopener noreferrer"
             @click="documentationClicked = true"
-            >{{ t("views.getStarted.docsLinks.templates") }}</a
+            >Dokumentation RefArch-Templates</a
           >
         </div>
         <div>
@@ -21,15 +19,15 @@
             target="_blank"
             rel="noopener noreferrer"
             @click="documentationClicked = true"
-            >{{ t("views.getStarted.docsLinks.main") }}</a
+            >Dokumentation RefArch</a
           >
         </div>
       </v-col>
     </v-row>
     <yes-no-dialog
       v-model="saveLeaveDialog"
-      :dialogtitle="t('views.getStarted.saveLeave.title')"
-      :dialogtext="t('views.getStarted.saveLeave.text')"
+      dialogtitle="Wirklich verlassen?"
+      dialogtext="Wollen Sie wirklich nicht die Dokumentation anschauen?"
       @no="cancel"
       @yes="leave"
     />
@@ -38,13 +36,10 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
-import { useI18n } from "vue-i18n";
 
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import { useSaveLeave } from "@/composables/saveLeave";
 import { Role } from "@/types/Role";
-
-const { t } = useI18n();
 
 definePage({
   meta: {
