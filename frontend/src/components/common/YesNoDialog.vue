@@ -53,7 +53,6 @@
 </template>
 
 <script setup lang="ts">
-
 /**
  * The YesNo dialog is a generic dialog for yes/no queries to the user.
  * For example, it can be used to confirm the deletion of an entity.

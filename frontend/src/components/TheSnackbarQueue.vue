@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 

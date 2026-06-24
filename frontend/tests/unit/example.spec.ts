@@ -15,7 +15,7 @@ describe("TheSnackbarQueue.vue", () => {
           createTestingPinia({
             createSpy: vi.fn,
             stubActions: false,
-          })
+          }),
         ],
       },
     });

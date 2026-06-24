@@ -7,12 +7,8 @@
           class="my-3"
           height="200"
         />
-        <p v-if="isWriter">
-          writer-Rolle vorhanden
-        </p>
-        <p v-else>
-          writer-Rolle fehlt
-        </p>
+        <p v-if="isWriter">writer-Rolle vorhanden</p>
+        <p v-else>writer-Rolle fehlt</p>
       </v-col>
 
       <v-col class="mb-4">
