@@ -2,9 +2,7 @@
   <v-container class="fill-height d-flex align-center flex-wrap">
     <v-row class="text-center">
       <v-col>
-        <h1 class="text-display-medium font-weight-bold mb-10">
-          Get Started
-        </h1>
+        <h1 class="text-display-medium font-weight-bold mb-10">Get Started</h1>
         <h3>Dokumentation für die RefArch ist hier zu finden:</h3>
         <div>
           <a
