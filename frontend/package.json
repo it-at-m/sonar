@@ -2,7 +2,7 @@
   "_comment": "TEMPORARY TRANSITIVE DEPENDENCY OVERRIDES FOR SECURITY FIXES",
   "overrides": {
     "jsdom": {
-      "undici" : "7.28.0"
+      "undici": "7.28.0"
     }
   },
   "name": "sonar-frontend",
