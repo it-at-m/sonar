@@ -1,11 +1,1 @@
 blank_issues_enabled: false
-contact_links:
-  - name: 💡 Discussions - Ideas
-    url: https://github.com/it-at-m/sonar/discussions/categories/ideas
-    about: Feel free to share ideas for the project that are to vague to create a dedicated issue beforehand
-  - name: ⁉ Discussions - Q&A
-    url: https://github.com/it-at-m/sonar/discussions/categories/q-a
-    about: Please ask questions here
-  - name: 🗨 Discussions - General
-    url: https://github.com/it-at-m/sonar/discussions/categories/general
-    about: Discuss more general topics here

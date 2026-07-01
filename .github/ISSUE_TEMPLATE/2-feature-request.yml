@@ -1,77 +1,64 @@
-name: ✨ Feature request
-description: Suggest an idea or possible new feature for this project.
+name: ✨ Funktionswunsch
+description: Schlage eine neue Funktion oder Verbesserung vor.
 title: "[Feature] "
 labels: ["Type: Feature"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this feature request!
-        To expedite issue processing, please search open and closed issues before submitting a new one.
-        Please read our [Code of Conduct](../blob/main/.github/CODE_OF_CONDUCT.md).
-  - type: markdown
+        Danke für deinen Vorschlag! Bitte prüfe vorab offene/geschlossene Issues.
+        Bitte beachte unsere [Verhaltensregeln](../CODE_OF_CONDUCT.md).
+  - type: input
+    id: summary
     attributes:
-      value: "## General"
-  - type: dropdown
-    id: template
-    attributes:
-      label: Relevant template
-      multiple: true
-      description: Name(s) of the affected template(s) (if applicable)
-      options:
-        - frontend
-        - backend
-    validations:
-      required: false
-  - type: textarea
-    id: problem-description
-    attributes:
-      label: Problem description (optional)
-      description: A clear and concise description of what the problem is (if related to problem)
-      placeholder: |
-        e.g. I'm always frustrated when ...
-    validations:
-      required: false
-  - type: textarea
-    id: desired-solution
-    attributes:
-      label: Desired solution
-      description: A clear and concise description of what you want to happen
+      label: Kurzbeschreibung
     validations:
       required: true
   - type: textarea
-    id: alternatives
+    id: problem
     attributes:
-      label: Considered alternatives (optional)
-      description: A clear and concise description of any alternative solutions or features you've considered
-    validations:
-      required: false
-  - type: markdown
-    attributes:
-      value: "## Extras"
+      label: Problem/Nutzen
+      description: Beschreibe das Problem oder den erwarteten Mehrwert.
+      placeholder: |
+        Als [Rolle] möchte ich [Ziel], um [Nutzen].
   - type: textarea
-    id: context
+    id: user-story
     attributes:
-      label: Additional context (optional)
-      description: Additional context (references, links, screenshots, ...) that might be helpful
-    validations:
-      required: false
-  - type: markdown
+      label: User Story
+      placeholder: |
+        Als [Rolle] möchte ich [Ziel], um [Nutzen].
+  - type: textarea
+    id: acceptance
     attributes:
-      value: "## Confirmations"
+      label: Akzeptanzkriterien
+      description: Stichpunkte mit überprüfbaren Kriterien.
+  - type: textarea
+    id: non-functional
+    attributes:
+      label: Nicht‑funktionale Anforderungen
+      description: Performance, Sicherheit, Barrierefreiheit, etc.
+  - type: textarea
+    id: impact
+    attributes:
+      label: Auswirkungen auf bestehende Funktionen (optional)
+  - type: textarea
+    id: attachments
+    attributes:
+      label: Mockups / Anhänge / Referenzen (optional)
+  - type: dropdown
+    id: priority
+    attributes:
+      label: Priorität
+      options:
+        - Niedrig
+        - Mittel
+        - Hoch
+        - Kritisch
   - type: checkboxes
     id: check-duplicate
     attributes:
-      label: No duplicate
-      description: By submitting this issue, you confirm to have checked for duplicate issues beforehand.
+      label: Kein Duplikat
+      description: Ich habe nach Duplikaten gesucht.
       options:
-        - label: I confirm that this issue is not a duplicate
-          required: true
-  - type: checkboxes
-    id: conduct
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](../blob/main/.github/CODE_OF_CONDUCT.md).
-      options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: Ich bestätige, dass dieses Issue kein Duplikat ist
           required: true
