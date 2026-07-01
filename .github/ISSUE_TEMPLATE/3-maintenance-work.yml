@@ -1,75 +1,57 @@
-name: ⚙ Maintenance work
-description: Suggest useful or required maintenance work for this project.
-title: "[Maintenance] "
+name: ⚙ Wartung / Technische Schulden
+description: Schlage Wartungsarbeiten oder technische Verbesserungen vor.
+title: "[Wartung] "
 labels: ["Type: Maintenance"]
 body:
   - type: markdown
     attributes:
       value: |
-        Thanks for taking the time to fill out this maintenance work issue!
-        To expedite issue processing, please search open and closed issues before submitting a new one.
-        Please read our [Code of Conduct](../blob/main/.github/CODE_OF_CONDUCT.md).
-  - type: markdown
+        Danke für deinen Vorschlag! Bitte prüfe vorab offene/geschlossene Issues.
+        Bitte beachte unsere [Verhaltensregeln](../CODE_OF_CONDUCT.md).
+  - type: input
+    id: summary
     attributes:
-      value: "## General"
+      label: Kurzbeschreibung
+    validations:
+      required: true
   - type: dropdown
-    id: template
+    id: maintenance-type
     attributes:
-      label: Relevant template
-      multiple: true
-      description: Name(s) of the affected template(s) (if applicable)
+      label: Wartungstyp
       options:
-        - frontend
+        - Abhängigkeiten
+        - Refactoring
+        - Build‑Tooling
+        - CI/CD
+        - Sicherheit
+        - Datenbankmigration
+        - Dokumentationstechnik
+        - Anderes
+    validations:
+      required: true
+  - type: dropdown
+    id: area
+    attributes:
+      label: Betroffener Bereich
+      multiple: true
+      options:
         - backend
-    validations:
-      required: false
-  - type: textarea
-    id: problem-description
-    attributes:
-      label: Problem description (optional)
-      description: A clear and concise description of what the problem is (if related to problem)
-    validations:
-      required: false
-  - type: textarea
-    id: desired-solution
-    attributes:
-      label: Desired solution
-      description: A clear and concise description of what you want to happen
+        - frontend
+        - dokumentation
+        - stack
+        - ci
     validations:
       required: true
   - type: textarea
-    id: alternatives
+    id: motivation
     attributes:
-      label: Considered alternatives (optional)
-      description: A clear and concise description of any alternative solutions you've considered
-    validations:
-      required: false
-  - type: markdown
-    attributes:
-      value: "## Extras"
-  - type: textarea
-    id: context
-    attributes:
-      label: Additional context (optional)
-      description: Additional context (references, links, screenshots, ...) that might be helpful
-    validations:
-      required: false
-  - type: markdown
-    attributes:
-      value: "## Confirmations"
+      label: Motivation / Nutzen
+      description: Warum sollte das umgesetzt werden? (Stabilität, Sicherheit, Wartbarkeit …)
   - type: checkboxes
     id: check-duplicate
     attributes:
-      label: No duplicate
-      description: By submitting this issue, you confirm to have checked for duplicate issues beforehand.
+      label: Kein Duplikat
+      description: Ich habe nach Duplikaten gesucht.
       options:
-        - label: I confirm that this issue is not a duplicate
-          required: true
-  - type: checkboxes
-    id: conduct
-    attributes:
-      label: Code of Conduct
-      description: By submitting this issue, you agree to follow our [Code of Conduct](../blob/main/.github/CODE_OF_CONDUCT.md).
-      options:
-        - label: I agree to follow this project's Code of Conduct
+        - label: Ich bestätige, dass dieses Issue kein Duplikat ist
           required: true
