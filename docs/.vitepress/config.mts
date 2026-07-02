@@ -31,7 +31,14 @@ const vitepressConfig = defineConfig({
     sidebar: [
       { text: "Example", link: "/example" },
       { text: "External link", link: "https://refarch.oss.muenchen.de" },
-      { text: "Naming Conventions", link: "/architecture/naming-conventions" },
+      {
+        text: "Naming Conventions",
+        link: "/architecture/naming_conventions/",
+        collapsed: true,
+        items: [
+          { text: "Tests", link: "/architecture/naming_conventions/tests" },
+        ],
+      },
       {
         text: "Designentscheidungen",
         link: "/architecture/decisions/",
