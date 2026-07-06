@@ -20,17 +20,37 @@ const vitepressConfig = defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "Home", link: "/" },
-      {
-        text: "Docs",
-        items: [
-          { text: "Example", link: "/example" },
-          { text: "External link", link: "https://refarch.oss.muenchen.de" },
-        ],
-      },
+      { text: "Designentscheidungen", link: "/architecture/decisions/" },
+      { text: "Naming Conventions", link: "/architecture/naming_conventions/" },
     ],
     sidebar: [
-      { text: "Example", link: "/example" },
-      { text: "External link", link: "https://refarch.oss.muenchen.de" },
+      {
+        text: "Naming Conventions",
+        link: "/architecture/naming_conventions/",
+        collapsed: true,
+        items: [
+          { text: "Tests", link: "/architecture/naming_conventions/tests" },
+        ],
+      },
+      {
+        text: "Designentscheidungen",
+        link: "/architecture/decisions/",
+        collapsed: true,
+        items: [
+          {
+            text: "Verzicht auf i18n",
+            link: "/architecture/decisions/0001-kein-i18n",
+          },
+          {
+            text: "OpenAPI für Schnittstellen",
+            link: "/architecture/decisions/0002-openapi-fuer-schnittstellen",
+          },
+          {
+            text: "Gendergerechte Sprache",
+            link: "/architecture/decisions/0003-gendergerechte-sprache",
+          },
+        ],
+      },
     ],
     socialLinks: [
       { icon: "github", link: "https://github.com/it-at-m/refarch-templates" },
