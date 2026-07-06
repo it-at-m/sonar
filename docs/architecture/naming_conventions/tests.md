@@ -9,7 +9,7 @@ und then (= ExpectedBehavior, bzw. erwartetes Ergebnis) in CamelCase gehalten we
 auch auf Englisch zu formulieren.
 
 Wir haben uns darauf geeinigt, die zu testenden Methoden im Backend mit `@Nested`, und im Frontend mit
-`describe("xyz", () => {}` zu gruppieren. Im Fall von überladenen Methoden werden diese innerhalb der Methodenklasse
+`describe("xyz", () => {})` zu gruppieren. Im Fall von überladenen Methoden werden diese innerhalb der Methodenklasse
 zusätzlich verschachtelt und ebenfalls mit `@Nested` annotiert, oder in einen neuen `describe()`-Block eingeordnet.
 
 ## Kontext
@@ -66,7 +66,3 @@ describe("wahlvorstandStore.ts", () => {// [!code focus]
   });
 });
 ```
-
-
-
-:::

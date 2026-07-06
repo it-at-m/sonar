@@ -17,7 +17,7 @@
 ### Dokumentation
 - [ ] Links geprüft
 - [ ] Texte auf Rechtschreibung und Grammatik geprüft
-  - [ ] Texte auf gendergerechte Sprache geprüft
+- [ ] Texte auf gendergerechte Sprache geprüft
 
 <!-- Frontend -->
 ### Frontend
