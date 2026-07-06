@@ -1,4 +1,4 @@
-# Namingconventions für Tests
+# Naming Conventions für Tests
 
 Für Tests, Frontend als auch Backend, gelten prinzipiell die gleichen Regeln, welche aber unterschiedlich umzusetzen sind.
 

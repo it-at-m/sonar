@@ -20,17 +20,10 @@ const vitepressConfig = defineConfig({
     // https://vitepress.dev/reference/default-theme-config
     nav: [
       { text: "Home", link: "/" },
-      {
-        text: "Docs",
-        items: [
-          { text: "Example", link: "/example" },
-          { text: "External link", link: "https://refarch.oss.muenchen.de" },
-        ],
-      },
+      { text: "Designentscheidungen", link: "/architecture/decisions/" },
+      { text: "Naming Conventions", link: "/architecture/naming_conventions/" },
     ],
     sidebar: [
-      { text: "Example", link: "/example" },
-      { text: "External link", link: "https://refarch.oss.muenchen.de" },
       {
         text: "Naming Conventions",
         link: "/architecture/naming_conventions/",

@@ -3,24 +3,21 @@
 layout: home
 
 hero:
-  name: "RefArch Docs Template"
-  text: "Starter files for Vitepress-based documentation"
-  tagline: "This is the default template for writing documentation in RefArch applications"
+  name: "Sonar"
+  text: "Projekt-Dokumentation"
+  tagline: "Referenzarchitektur Anwendung"
   actions:
     - theme: brand
-      text: Example
-      link: /example
-    - theme: alt
-      text: ⤴ External link
-      link: https://refarch.oss.muenchen.de
+      text: Designentscheidungen
+      link: /architecture/decisions/
+    - theme: brand
+      text: Naming Conventions
+      link: /architecture/naming_conventions/
 features:
-  - icon: 1️⃣
-    title: Title 1
-    details: Add some interesting information here
-  - icon: 2️⃣
-    title: Title 2
-    details: Add some interesting information here
-  - icon: 3️⃣
-    title: Title 3
-    details: Add some interesting information here
+  - icon: 🧭
+    title: ADRs
+    details: Dokumentierte Architekturentscheidungen
+  - icon: 🧩
+    title: Conventions
+    details: Benennungsregeln und Vorgaben
 ---
