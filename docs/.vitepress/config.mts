@@ -44,9 +44,18 @@ const vitepressConfig = defineConfig({
         link: "/architecture/decisions/",
         collapsed: true,
         items: [
-          { text: "Verzicht auf i18n", link: "/architecture/decisions/0001-kein-i18n" },
-          { text: "OpenAPI für Schnittstellen", link: "/architecture/decisions/0002-openapi-fuer-schnittstellen" },
-          { text: "Gendergerechte Sprache", link: "/architecture/decisions/0003-gendergerechte-sprache" },
+          {
+            text: "Verzicht auf i18n",
+            link: "/architecture/decisions/0001-kein-i18n",
+          },
+          {
+            text: "OpenAPI für Schnittstellen",
+            link: "/architecture/decisions/0002-openapi-fuer-schnittstellen",
+          },
+          {
+            text: "Gendergerechte Sprache",
+            link: "/architecture/decisions/0003-gendergerechte-sprache",
+          },
         ],
       },
     ],

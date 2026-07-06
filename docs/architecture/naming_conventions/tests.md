@@ -14,7 +14,7 @@ zusätzlich verschachtelt und ebenfalls mit `@Nested` annotiert, oder in einen n
 
 ## Kontext
 
-Damit der Gesamtcode im Projekt übersichtlicher und einheitlicher ist, sollen Naming Conventions eingesetzt werden. 
+Damit der Gesamtcode im Projekt übersichtlicher und einheitlicher ist, sollen Naming Conventions eingesetzt werden.
 So wird gewährleistet, dass deren Kontext schneller klar ist, ohne den Code lesen zu müssen und die Wartung
 und Erweiterung des Codes wird erleichtert.
 
@@ -48,10 +48,12 @@ describe("<Dateiname des Testgegenstandes>", () => {
 import { describe, it } from "vitest";
 
 /* Die Description ist der Dateiname des Testgegenstandes */ // [!code focus]
-describe("wahlvorstandStore.ts", () => {// [!code focus]
+describe("wahlvorstandStore.ts", () => {
+  // [!code focus]
 
   /* Die Description ist der Name der Funktion die getested wird */ // [!code focus]
-  describe("isSchriftfuehrerAnwesend", () => { // [!code focus]
+  describe("isSchriftfuehrerAnwesend", () => {
+    // [!code focus]
     /* Beschreibung des Testcases entsprechend des Schemas */ // [!code focus]
     it("givenNoMitgliedExists_thenReturnFalse", () => {}); // [!code focus]
     it("givenAtLeastOneMitgliedMatches_thenReturnTrue", () => {});
@@ -59,7 +61,8 @@ describe("wahlvorstandStore.ts", () => {// [!code focus]
     it("givenNoMitgliedMatchesFunktion_thenReturnFalse", () => {});
   });
 
-  describe("sendWahlvorstand", () => { // [!code focus]
+  describe("sendWahlvorstand", () => {
+    // [!code focus]
     it("givenWahlbezirkIDIsGiven_thenSendWahlvorstand", async () => {});
     it("givenWahlvorstandIsSent_thenSetLastSend", async () => {});
     it("givenWahlbezirkIDIsNotGiven_thenNotSendWahlvorstand", async () => {});

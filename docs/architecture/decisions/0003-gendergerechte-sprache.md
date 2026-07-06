@@ -11,8 +11,9 @@ Die Anwendung wird von einer diversen Nutzer:innenschaft verwendet und durch ein
 ## Entscheidung
 
 Wir verwenden in allen nutzer:innenseitigen Texten (UI, Hilfetexte, fachliche Dokumentation) eine gendergerechte Sprache. Grundregel:
+
 - Primär geschlechtsneutrale Formulierungen (z. B. „Team“, „Leitung“, „Person“, „Mitarbeitende“).
-- Wo neutrale Formen unpassend sind, nutzen wir den Gender-Doppelpunkt ":" (z. B. „Nutzer:innen“, „Mitarbeiter:innen“), da dieser in der Regel Screenreader‑freundlicher ist als „*“ oder „_“.
+- Wo neutrale Formen unpassend sind, nutzen wir den Gender-Doppelpunkt ":" (z. B. „Nutzer:innen“, „Mitarbeiter:innen“), da dieser in der Regel Screenreader‑freundlicher ist als „\*“ oder „\_“.
 - Konsistenz: Innerhalb der Anwendung verwenden wir einheitlich den Doppelpunkt.
 
 ## Vorteile

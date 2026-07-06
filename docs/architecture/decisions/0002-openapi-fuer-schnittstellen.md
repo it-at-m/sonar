@@ -13,6 +13,7 @@ Im Projekt existieren OpenAPI-Spezifikationen und Build-Schritte zur Codegenerie
 ## Entscheidung
 
 Wir verwenden OpenAPI 3 als „Single Source of Truth“ für öffentliche/externe REST-Schnittstellen und generieren Client-Code daraus:
+
 - Pflege der OpenAPI-Spezifikationen im Repository (z. B. unter `backend/api-spec/`).
 - Frontend und weitere Services generieren benötigte Clients automatisiert anhand der OpenAPI-Spezifikationen (z. B. via `openapi-generator`).
 - Handschriftliche Clients werden vermieden; notwendige Anpassungen erfolgen über Generator-Optionen bzw. Templating.
