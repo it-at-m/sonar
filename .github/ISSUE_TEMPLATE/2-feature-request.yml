@@ -8,19 +8,6 @@ body:
       value: |
         Danke für deinen Vorschlag! Bitte prüfe vorab offene/geschlossene Issues.
         Bitte beachte unsere [Verhaltensregeln](../CODE_OF_CONDUCT.md).
-  - type: input
-    id: summary
-    attributes:
-      label: Kurzbeschreibung
-    validations:
-      required: true
-  - type: textarea
-    id: problem
-    attributes:
-      label: Problem/Nutzen
-      description: Beschreibe das Problem oder den erwarteten Mehrwert.
-      placeholder: |
-        Als [Rolle] möchte ich [Ziel], um [Nutzen].
   - type: textarea
     id: user-story
     attributes:
@@ -32,15 +19,6 @@ body:
     attributes:
       label: Akzeptanzkriterien
       description: Stichpunkte mit überprüfbaren Kriterien.
-  - type: textarea
-    id: non-functional
-    attributes:
-      label: Nicht‑funktionale Anforderungen
-      description: Performance, Sicherheit, Barrierefreiheit, etc.
-  - type: textarea
-    id: impact
-    attributes:
-      label: Auswirkungen auf bestehende Funktionen (optional)
   - type: textarea
     id: attachments
     attributes:
@@ -54,11 +32,3 @@ body:
         - Mittel
         - Hoch
         - Kritisch
-  - type: checkboxes
-    id: check-duplicate
-    attributes:
-      label: Kein Duplikat
-      description: Ich habe nach Duplikaten gesucht.
-      options:
-        - label: Ich bestätige, dass dieses Issue kein Duplikat ist
-          required: true
