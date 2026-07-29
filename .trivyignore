@@ -1,0 +1,18 @@
+# CVE-2026-14257 - brace-expansion: DoS via inefficient pattern expansion.
+#
+# Affects: frontend/package-lock.json
+#   node_modules/glob/node_modules/brace-expansion          2.1.3
+#   node_modules/editorconfig/node_modules/brace-expansion  2.1.3
+#
+# Why it is not fixed:
+#   2.1.3 is the newest 2.x release and is still affected. minimatch@9.0.9
+#   requires 2.x and would fail on 5.0.8.
+#
+# Why the risk is accepted:
+#   Dev-only. All brace-expansion instances are marked dev=true.
+#
+# How to remove this entry:
+#   Once @vue/test-utils drops js-beautify@1.x, or glob/editorconfig resolve to
+#   versions using minimatch@^10 (which is compatible with brace-expansion 5.x),
+#   drop this line and re-run the scan.
+CVE-2026-14257
