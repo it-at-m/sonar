@@ -2,7 +2,12 @@
   "_comment": "TEMPORARY TRANSITIVE DEPENDENCY OVERRIDES FOR SECURITY FIXES",
   "overrides": {
     "jsdom": {
-      "undici": "7.28.0"
+      "undici": "7.29.0"
+    },
+    "@cyclonedx/cyclonedx-npm": {
+      "ajv": {
+       "fast-uri": "3.1.4"
+      }
     }
   },
   "name": "sonar-frontend",
