@@ -44,7 +44,7 @@ public class ProjektAdresse extends BaseEntity {
     @Column(nullable = false)
     private boolean sondernutzungErlaubt;
 
-    void deriveTageUnerlaubteNutzung() {
+    /* default */ void deriveTageUnerlaubteNutzung() {
         tageUnerlaubteNutzung = Zeitraum.tageInklusiv(unerlaubteNutzungVon, unerlaubteNutzungBis, tageUnerlaubteNutzung);
     }
 
