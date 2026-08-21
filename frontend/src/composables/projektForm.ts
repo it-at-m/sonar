@@ -45,9 +45,11 @@ export function hasZeitraum(adresse: AdresseForm): boolean {
 }
 
 export function requiredRule(value: unknown): boolean | string {
-  return (
-    (value !== "" && value !== null && value !== undefined) || "Pflichtfeld"
-  );
+  const filled =
+    typeof value === "string"
+      ? value.trim() !== ""
+      : value !== null && value !== undefined;
+  return filled || "Pflichtfeld";
 }
 
 export function tageUnerlaubteNutzung(

@@ -31,6 +31,10 @@ describe("projektForm.ts", () => {
       expect(requiredRule("")).toBe("Pflichtfeld");
     });
 
+    it("givenBlankString_thenReturnMessage", () => {
+      expect(requiredRule("   ")).toBe("Pflichtfeld");
+    });
+
     it("givenNull_thenReturnMessage", () => {
       expect(requiredRule(null)).toBe("Pflichtfeld");
     });
