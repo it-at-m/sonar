@@ -290,15 +290,18 @@ async function save(): Promise<void> {
       color: STATUS_INDICATORS.SUCCESS,
     });
     isSave.value = true;
-    await router.push("/projekte");
   } catch (error) {
     snackbarStore.push({
       text: errorText(error),
       color: STATUS_INDICATORS.ERROR,
     });
+    return;
   } finally {
     saving.value = false;
   }
+
+  // Outside the try, so that a failed navigation is not reported as a failed save.
+  await router.push("/projekte");
 }
 
 function abbrechen(): void {

@@ -25,6 +25,8 @@ public final class Authorities {
     public static final String THEENTITY_CREATE = WRITE;
     public static final String THEENTITY_UPDATE = WRITE;
     public static final String THEENTITY_DELETE = WRITE;
+    public static final String PROJEKT_GET = READ;
+    public static final String PROJEKT_GET_ALL = READ;
     public static final String PROJEKT_CREATE = WRITE;
 
     // Permissions based auth
