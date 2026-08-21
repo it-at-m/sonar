@@ -18,7 +18,7 @@ Wir verwenden OpenAPI 3 als „Single Source of Truth“ für öffentliche/exter
 - Die erzeugte Spezifikation wird unter `backend/api-spec/` versioniert eingecheckt und ist damit der verbindliche Vertrag für alle Konsumenten.
 - Frontend und weitere Services generieren benötigte Clients automatisiert anhand der OpenAPI-Spezifikationen (z. B. via `openapi-generator`).
 - Handschriftliche Clients werden vermieden; notwendige Anpassungen erfolgen über Generator-Optionen bzw. Templating.
-- Änderungen an Schnittstellen erfolgen daher zuerst im Code (Controller und DTOs). Anschließend wird die Spezifikation mit `mvn test -Dtest=OpenApiSpecTest -Dopenapi.generate=true` neu erzeugt und mit eingecheckt; die generierten Clients ziehen automatisch nach.
+- Änderungen an Schnittstellen erfolgen daher zuerst im Code (Controller und DTOs). Anschließend wird die Spezifikation mit `mvn clean test -Dtest=OpenApiSpecTest -Dopenapi.generate=true` neu erzeugt und mit eingecheckt; die generierten Clients ziehen automatisch nach.
 - Alternativ kann die Spezifikation mit `mvn springdoc-openapi:generate` gegen eine bereits laufende Anwendung erzeugt werden (Profil `local`, Port 8086). Beide Wege erzeugen dieselbe Datei; weichen sie voneinander ab, ist `OpenApiSpecTest` maßgeblich.
 - `OpenApiSpecTest` vergleicht die eingecheckte Spezifikation bei jedem Build mit dem Dokument der laufenden Anwendung und lässt den Build fehlschlagen, wenn beide auseinanderlaufen. Der Test benötigt weder Datenbank noch Docker, da das Dokument nur aus Handler-Mappings und DTO-Schemata entsteht.
 
