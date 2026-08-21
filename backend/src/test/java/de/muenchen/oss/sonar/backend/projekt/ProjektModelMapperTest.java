@@ -10,12 +10,10 @@ import de.muenchen.oss.sonar.backend.projekt.model.ProjektView;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
-import lombok.AllArgsConstructor;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mapstruct.factory.Mappers;
 
-@AllArgsConstructor
 class ProjektModelMapperTest {
 
     private static final LocalDate BEGINN = LocalDate.of(2026, 1, 1);
