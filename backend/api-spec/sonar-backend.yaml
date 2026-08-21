@@ -1,9 +1,8 @@
 openapi: 3.0.1
 info:
-  title: refarch-backend
-  description: This is the default starting project for a backend project based on
-    the reference architecture of it@M
-  version: 0.0.1-SNAPSHOT
+  title: sonar-backend
+  description: New Backend for the old Application SonAbr
+  version: 0.0.3-SNAPSHOT
 servers:
 - url: http://localhost:8086
   description: Generated server url
@@ -150,6 +149,152 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TheEntityResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt:
+    get:
+      tags:
+      - projekt-controller
+      summary: Retrieve Projekte with pagination.
+      description: |-
+        Retrieve Projekte with pagination.
+         Fetches a paginated list of Projekte based on the provided page number and size.
+         The optional search criteria are combined with AND and apply to the whole result, not just to
+         the requested page. The same holds for the order, which is applied by the database.
+      operationId: getProjekteByPageAndSize
+      parameters:
+      - name: pageNumber
+        in: query
+        description: "the number of the requested page (default: 0)"
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+          default: 0
+      - name: pageSize
+        in: query
+        description: "the size of the page to retrieve (default: 10, at most 100)"
+        required: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          format: int32
+          default: 10
+      - name: projektnummer
+        in: query
+        description: "part of the Projektnummer to search for, case-insensitive"
+        required: false
+        schema:
+          maxLength: 20
+          minLength: 0
+          type: string
+      - name: abrechnungBeginn
+        in: query
+        description: the exact beginn of the billing period to search for
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: abrechnungEnde
+        in: query
+        description: the exact end of the billing period to search for
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: sortBy
+        in: query
+        description: "the column to order by (default: PROJEKTNUMMER)"
+        required: false
+        schema:
+          type: string
+          enum:
+          - PROJEKTNUMMER
+          - ABRECHNUNG_BEGINN
+          - ABRECHNUNG_ENDE
+      - name: sortDirection
+        in: query
+        description: "the direction to order in (default: DESC)"
+        required: false
+        schema:
+          type: string
+          enum:
+          - ASC
+          - DESC
+      responses:
+        "400":
+          description: "the pagination, search or sort parameters are invalid"
+        "403":
+          description: the user must not read a Projekt
+        "200":
+          description: a page of Projekte represented as DTOs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelProjektResponseDTO"
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - projekt-controller
+      summary: Create a new Projekt.
+      description: |-
+        Create a new Projekt.
+         Creates a new Projekt together with its Adressen in one call.
+         Abrechnungsende must not be before Abrechnungsbeginn.
+         Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
+         Either that period or tageUnerlaubteNutzung is given, never both.
+      operationId: saveProjekt
+      requestBody:
+        description: the details of the Projekt to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjektRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the details of the Projekt are invalid
+        "403":
+          description: the user must not create a Projekt
+        "201":
+          description: the created Projekt as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}:
+    get:
+      tags:
+      - projekt-controller
+      summary: Retrieve a Projekt by its UUID.
+      description: |-
+        Retrieve a Projekt by its UUID.
+         Fetches the Projekt details including all of its Adressen.
+      operationId: getProjekt
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the requested Projekt
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "403":
+          description: the user must not read a Projekt
+        "404":
+          description: no Projekt exists with the given UUID
+        "200":
+          description: the Projekt with the given UUID as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
       security:
       - bearerAuth: []
   /actuator:
@@ -312,6 +457,101 @@ components:
           format: uuid
         textAttribute:
           type: string
+    ProjektAdresseRequestDTO:
+      required:
+      - anzahlMahnungen
+      - bezeichnung
+      type: object
+      properties:
+        bezeichnung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        baunutzung:
+          maxLength: 255
+          minLength: 0
+          type: string
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          minimum: 1
+          type: integer
+          format: int32
+        anzahlMahnungen:
+          minimum: 0
+          type: integer
+          format: int32
+        sondernutzungErlaubt:
+          type: boolean
+    ProjektRequestDTO:
+      required:
+      - abrechnungBeginn
+      - abrechnungEnde
+      - adressen
+      - projektnummer
+      type: object
+      properties:
+        projektnummer:
+          maxLength: 20
+          minLength: 1
+          type: string
+        abrechnungBeginn:
+          type: string
+          format: date
+        abrechnungEnde:
+          type: string
+          format: date
+        adressen:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjektAdresseRequestDTO"
+    ProjektAdresseResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        bezeichnung:
+          type: string
+        baunutzung:
+          type: string
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          type: integer
+          format: int32
+        anzahlMahnungen:
+          type: integer
+          format: int32
+        sondernutzungErlaubt:
+          type: boolean
+    ProjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektnummer:
+          type: string
+        abrechnungBeginn:
+          type: string
+          format: date
+        abrechnungEnde:
+          type: string
+          format: date
+        adressen:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjektAdresseResponseDTO"
     PageMetadata:
       type: object
       properties:
@@ -334,6 +574,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TheEntityResponseDTO"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    PagedModelProjektResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjektResponseDTO"
         page:
           $ref: "#/components/schemas/PageMetadata"
     Link:

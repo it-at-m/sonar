@@ -1,7 +1,5 @@
-import type { HTTPHeaders } from "@/api/generated/refarch-backend";
-
 import { getHeaders } from "@/api/fetch-utils.ts";
-import { BaseAPI, Configuration } from "@/api/generated/refarch-backend";
+import { BaseAPI, Configuration } from "@/api/generated/sonar-backend";
 import { BASE_API_PATH } from "@/constants.ts";
 
 type ApiCtor<T extends BaseAPI> = new (config: Configuration) => T;
@@ -26,12 +24,11 @@ function createConfig(): Configuration {
     middleware: [
       {
         pre: async (context) => {
-          const freshHeaders = convertHeaders(getHeaders());
           return {
             url: context.url,
             init: {
               ...context.init,
-              headers: { ...context.init.headers, ...freshHeaders },
+              headers: mergeHeaders(getHeaders(), context.init.headers),
             },
           };
         },
@@ -57,16 +54,18 @@ function getInstance<T extends BaseAPI>(ApiClass: ApiCtor<T>): T {
 }
 
 /**
- * Converts a Headers object into a simple key-value pair object.
- * @param {Headers} headers - The headers object to be converted.
- * @returns {HTTPHeaders} An object with the same headers.
+ * Merging happens via the Headers API because HTTP header names are case-insensitive. The generated
+ * client writes "Content-Type" while {@link getHeaders} yields lowercase names, so a plain object
+ * spread would keep both keys. fetch would then send them as one invalid header value
+ * "application/json, application/json".
  */
-function convertHeaders(headers: Headers): HTTPHeaders {
-  const httpHeaders: HTTPHeaders = {};
-  headers.forEach((value, key) => {
-    httpHeaders[key] = value;
-  });
-  return httpHeaders;
+function mergeHeaders(
+  defaults: Headers,
+  headers: HeadersInit | undefined
+): Headers {
+  const merged = new Headers(defaults);
+  new Headers(headers).forEach((value, key) => merged.set(key, value));
+  return merged;
 }
 
 export const ApiFactory = {
