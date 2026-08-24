@@ -101,6 +101,15 @@ class ProjektRequestDTOTest {
 
             assertThat(messagesOf(violations)).containsExactly("Das Ende der unerlaubten Nutzung darf nicht vor deren Beginn liegen.");
         }
+
+        @Test
+        void givenInvertedZeitraum_thenViolationOnBis() {
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(projekt(BEGINN, ENDE, adresse(ENDE, BEGINN)));
+
+            assertThat(violations).singleElement()
+                    .extracting(violation -> violation.getPropertyPath().toString())
+                    .isEqualTo("adressen[0].unerlaubteNutzungBis");
+        }
     }
 
     @Nested

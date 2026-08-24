@@ -1,14 +1,13 @@
 package de.muenchen.oss.sonar.backend.projekt.dto;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.AssertTrue;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
+@AbrechnungszeitraumOrdered
 public record ProjektRequestDTO(
         @NotNull @Size(min = 1, max = 20) String projektnummer,
         @NotNull LocalDate abrechnungBeginn,
@@ -21,10 +20,5 @@ public record ProjektRequestDTO(
      */
     public ProjektRequestDTO {
         adressen = adressen == null ? List.of() : List.copyOf(adressen);
-    }
-
-    @JsonIgnore
-    @AssertTrue(message = "Das Ende der Abrechnung darf nicht vor deren Beginn liegen.") public boolean isAbrechnungszeitraumOrdered() {
-        return abrechnungBeginn() == null || abrechnungEnde() == null || !abrechnungEnde().isBefore(abrechnungBeginn());
     }
 }
