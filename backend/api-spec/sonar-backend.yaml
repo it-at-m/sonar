@@ -173,8 +173,6 @@ paths:
       responses:
         "400":
           description: the details of the Projekt are invalid
-        "403":
-          description: the user must not create a Projekt
         "201":
           description: the created Projekt as a DTO
           content:

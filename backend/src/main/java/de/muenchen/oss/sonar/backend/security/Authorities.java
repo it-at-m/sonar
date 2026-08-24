@@ -10,22 +10,12 @@ import org.springframework.security.access.prepost.PreAuthorize;
  */
 @SuppressWarnings("PMD.DataClass")
 public final class Authorities {
-    /**
-     * The two expressions below are named instead of being repeated per constant. Every read grants
-     * the same roles and every write does too, so spelling them out once keeps them from drifting
-     * apart. Both stay compile time constants, which the method security annotations require.
-     */
-    private static final String READ = "hasAnyRole('reader', 'writer')";
-
-    private static final String WRITE = "hasAnyRole('writer')";
-
     // Role based auth (default)
-    public static final String THEENTITY_GET = READ;
-    public static final String THEENTITY_GET_ALL = READ;
-    public static final String THEENTITY_CREATE = WRITE;
-    public static final String THEENTITY_UPDATE = WRITE;
-    public static final String THEENTITY_DELETE = WRITE;
-    public static final String PROJEKT_CREATE = WRITE;
+    public static final String THEENTITY_GET = "hasAnyRole('reader', 'writer')";
+    public static final String THEENTITY_GET_ALL = "hasAnyRole('reader', 'writer')";
+    public static final String THEENTITY_CREATE = "hasAnyRole('writer')";
+    public static final String THEENTITY_UPDATE = "hasAnyRole('writer')";
+    public static final String THEENTITY_DELETE = "hasAnyRole('writer')";
 
     // Permissions based auth
     // public static final String THEENTITY_GET = "hasAuthority('REFARCH_THEENTITY_READ')";

@@ -4,10 +4,7 @@
     temporary
   >
     <v-list>
-      <v-list-item
-        v-if="showProjekte"
-        to="/projekte"
-      >
+      <v-list-item to="/projekte">
         <v-list-item-title> Projekte </v-list-item-title>
       </v-list-item>
       <v-list-item to="/">
@@ -29,5 +26,4 @@ import { Role } from "@/types/Role";
 
 const showDrawer = defineModel<boolean>({ required: true });
 const showGetStarted = useHasAnyRole([Role.READER, Role.WRITER]);
-const showProjekte = useHasAnyRole([Role.READER, Role.WRITER]);
 </script>

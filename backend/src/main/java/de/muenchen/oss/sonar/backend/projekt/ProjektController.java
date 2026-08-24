@@ -41,7 +41,6 @@ public class ProjektController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Projekt are invalid", content = @Content)
-    @ApiResponse(responseCode = "403", description = "the user must not create a Projekt", content = @Content)
     public ProjektResponseDTO saveProjekt(@Valid @RequestBody final ProjektRequestDTO projektRequestDTO) {
         return projektMapper.toDTO(projektService.createProjekt(projektMapper.toCreateCommand(projektRequestDTO)));
     }

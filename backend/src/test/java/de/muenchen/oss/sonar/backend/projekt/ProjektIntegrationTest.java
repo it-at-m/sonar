@@ -126,23 +126,6 @@ class ProjektIntegrationTest {
         }
 
         @Test
-        void givenReaderRole_thenReturnForbidden() {
-            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 3, true);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0004", BEGINN, ENDE, List.of(adresseDTO));
-
-            restTestClient.post()
-                    .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
-                    .body(requestDTO)
-                    .accept(MediaType.APPLICATION_JSON)
-                    .exchange()
-                    .expectStatus().isForbidden();
-
-            assertThat(projektRepository.count()).isEqualTo(1);
-        }
-
-        @Test
         void givenInvertedAbrechnungszeitraum_thenReturnBadRequest() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     "Flurstück 1234/5", "Wohnen", null, null, null, 0, false);

@@ -211,13 +211,6 @@ import {
 import { useSaveLeave } from "@/composables/saveLeave";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
-import { Role } from "@/types/Role";
-
-definePage({
-  meta: {
-    hasAnyRole: [Role.WRITER],
-  },
-});
 
 const router = useRouter();
 const snackbarStore = useSnackbarStore();
@@ -263,9 +256,6 @@ function setTageUnerlaubteNutzung(
 
 function errorText(error: unknown): string {
   if (error instanceof ResponseError) {
-    if (error.response.status === 403) {
-      return "Sie haben nicht die nötigen Rechte, um ein Projekt anzulegen.";
-    }
     if (error.response.status === 400) {
       return "Das Projekt konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben.";
     }
