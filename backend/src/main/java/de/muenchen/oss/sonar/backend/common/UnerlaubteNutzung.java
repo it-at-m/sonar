@@ -5,11 +5,12 @@ import jakarta.validation.constraints.AssertTrue;
 import java.time.LocalDate;
 
 /**
- * The period of unauthorized use of a request DTO, together with the rules it has to satisfy.
+ * The period of 'unerlaubte Nutzung' of a request DTO. The DTO itself together with the rules the
+ * 'unerlaubte Nutzung' has to satisfy.
  * <p>
- * Implemented by every request which carries such a period, so the three rules below are stated
- * once instead of being copied per DTO. A record implementing this interface satisfies the
- * accessors with its components.
+ * Implemented by every request which carries a 'unerlaubte Nutzung', so the three rules below are
+ * stated.
+ * once instead of being copied per DTO.
  * </p>
  */
 public interface UnerlaubteNutzung {
