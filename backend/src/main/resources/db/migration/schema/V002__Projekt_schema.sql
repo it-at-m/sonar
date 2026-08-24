@@ -23,5 +23,3 @@ create table projekt_adresse (
 alter table projekt_adresse
     add constraint fk_projekt_adresse__projekt_id
     foreign key (projekt_id) references projekt (id);
-
-create index idx_projekt_adresse__projekt_id on projekt_adresse (projekt_id);
