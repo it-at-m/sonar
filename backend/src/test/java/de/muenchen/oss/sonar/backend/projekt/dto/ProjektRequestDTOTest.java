@@ -38,39 +38,33 @@ class ProjektRequestDTOTest {
         validatorFactory.close();
     }
 
-    private static ProjektAdresseRequestDTO adresse(final LocalDate von, final LocalDate bis) {
-        return adresse(von, bis, null);
-    }
-
-    private static ProjektAdresseRequestDTO adresse(final LocalDate von, final LocalDate bis, final Integer tage) {
-        return new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", von, bis, tage, 0, false);
-    }
-
-    private static ProjektRequestDTO projekt(final LocalDate beginn, final LocalDate ende, final ProjektAdresseRequestDTO adresse) {
-        return new ProjektRequestDTO("2026-0001", beginn, ende, List.of(adresse));
-    }
-
-    private static Set<String> messagesOf(final Set<? extends ConstraintViolation<?>> violations) {
-        return violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet());
-    }
-
     @Nested
     class Abrechnungszeitraum {
         @Test
         void givenEndeAfterBeginn_thenNoViolation() {
-            assertThat(validator.validate(projekt(BEGINN, ENDE, adresse(null, null)))).isEmpty();
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
         }
 
         @Test
         void givenEndeEqualToBeginn_thenNoViolation() {
-            assertThat(validator.validate(projekt(BEGINN, BEGINN, adresse(null, null)))).isEmpty();
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, BEGINN, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
         }
 
         @Test
         void givenEndeBeforeBeginn_thenViolation() {
-            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(projekt(ENDE, BEGINN, adresse(null, null)));
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", ENDE, BEGINN, List.of(adresseDTO));
 
-            assertThat(messagesOf(violations)).containsExactly("Das Ende der Abrechnung darf nicht vor deren Beginn liegen.");
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
+                    .containsExactly("Das Ende der Abrechnung darf nicht vor deren Beginn liegen.");
         }
     }
 
@@ -78,33 +72,51 @@ class ProjektRequestDTOTest {
     class UnerlaubteNutzung {
         @Test
         void givenCompleteZeitraum_thenNoViolation() {
-            assertThat(validator.validate(projekt(BEGINN, ENDE, adresse(BEGINN, ENDE)))).isEmpty();
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", BEGINN, ENDE, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
         }
 
         @Test
         void givenOnlyBeginn_thenViolation() {
-            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(projekt(BEGINN, ENDE, adresse(BEGINN, null)));
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", BEGINN, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
-            assertThat(messagesOf(violations)).containsExactly("Der Zeitraum der unerlaubten Nutzung ist mit Beginn und Ende anzugeben.");
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
+                    .containsExactly("Der Zeitraum der unerlaubten Nutzung ist mit Beginn und Ende anzugeben.");
         }
 
         @Test
         void givenOnlyEnde_thenViolation() {
-            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(projekt(BEGINN, ENDE, adresse(null, ENDE)));
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", null, ENDE, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
-            assertThat(messagesOf(violations)).containsExactly("Der Zeitraum der unerlaubten Nutzung ist mit Beginn und Ende anzugeben.");
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
+                    .containsExactly("Der Zeitraum der unerlaubten Nutzung ist mit Beginn und Ende anzugeben.");
         }
 
         @Test
         void givenInvertedZeitraum_thenViolation() {
-            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(projekt(BEGINN, ENDE, adresse(ENDE, BEGINN)));
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", ENDE, BEGINN, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
-            assertThat(messagesOf(violations)).containsExactly("Das Ende der unerlaubten Nutzung darf nicht vor deren Beginn liegen.");
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
+                    .containsExactly("Das Ende der unerlaubten Nutzung darf nicht vor deren Beginn liegen.");
         }
 
         @Test
         void givenInvertedZeitraum_thenViolationOnBis() {
-            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(projekt(BEGINN, ENDE, adresse(ENDE, BEGINN)));
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", ENDE, BEGINN, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
 
             assertThat(violations).singleElement()
                     .extracting(violation -> violation.getPropertyPath().toString())
@@ -116,26 +128,37 @@ class ProjektRequestDTOTest {
     class TageUnerlaubteNutzung {
         @Test
         void givenOnlyTage_thenNoViolation() {
-            assertThat(validator.validate(projekt(BEGINN, ENDE, adresse(null, null, 12)))).isEmpty();
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", null, null, 12, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
         }
 
         @Test
         void givenZeitraumAndTage_thenViolation() {
-            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(
-                    projekt(BEGINN, ENDE, adresse(BEGINN, ENDE, 12)));
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", BEGINN, ENDE, 12, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
-            assertThat(messagesOf(violations))
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
                     .containsExactly("Bitte entweder den Zeitraum oder die Anzahl der Tage der unerlaubten Nutzung angeben.");
         }
 
         @Test
         void givenZeroTage_thenViolation() {
-            assertThat(validator.validate(projekt(BEGINN, ENDE, adresse(null, null, 0)))).hasSize(1);
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", null, null, 0, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).hasSize(1);
         }
 
         @Test
         void givenNeitherZeitraumNorTage_thenNoViolation() {
-            assertThat(validator.validate(projekt(BEGINN, ENDE, adresse(null, null, null)))).isEmpty();
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO("Marienplatz 8", "Gastronomie", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
         }
     }
 
