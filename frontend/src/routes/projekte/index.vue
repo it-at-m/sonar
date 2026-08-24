@@ -77,7 +77,18 @@
       :loading="loading"
       item-value="id"
       :no-data-text="noDataText"
-    />
+    >
+      <template #[`item.abrechnungen`]="{ item }">
+        <v-btn
+          v-if="item.id"
+          :aria-label="`Abrechnungen zu Projekt ${item.projektnummer} anzeigen`"
+          density="comfortable"
+          :icon="mdiReceiptTextOutline"
+          :to="`/projekte/${item.id}/abrechnungen`"
+          variant="text"
+        />
+      </template>
+    </v-data-table-server>
   </v-container>
 </template>
 
@@ -88,7 +99,12 @@ import type {
 } from "@/api/generated/sonar-backend";
 import type { ProjektFilter, ProjektSort } from "@/composables/projekteListe";
 
-import { mdiFilterRemove, mdiMagnify, mdiPlus } from "@mdi/js";
+import {
+  mdiFilterRemove,
+  mdiMagnify,
+  mdiPlus,
+  mdiReceiptTextOutline,
+} from "@mdi/js";
 import { watchDebounced } from "@vueuse/core";
 import { computed, onMounted, ref, watch } from "vue";
 
@@ -118,6 +134,7 @@ const headers = [
   { title: "Abrechnung Beginn", key: "abrechnungBeginn" },
   { title: "Abrechnung Ende", key: "abrechnungEnde" },
   { title: "Adressen/Flurnummern", key: "anzahlAdressen", sortable: false },
+  { title: "Abrechnungen", key: "abrechnungen", sortable: false },
 ];
 
 const SORT_BY_OF_COLUMN: Record<string, GetProjekteByPageAndSizeSortByEnum> = {
