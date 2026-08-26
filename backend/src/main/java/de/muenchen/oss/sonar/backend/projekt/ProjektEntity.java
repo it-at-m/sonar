@@ -7,6 +7,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -22,11 +23,12 @@ import lombok.ToString;
 import org.hibernate.annotations.BatchSize;
 
 @Entity
+@Table(name = "projekt")
 @Getter
 @Setter
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class Projekt extends BaseEntity {
+public class ProjektEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -45,14 +47,13 @@ public class Projekt extends BaseEntity {
     @BatchSize(size = 25)
     @Setter(AccessLevel.NONE)
     @ToString.Exclude
-    @NotEmpty private List<ProjektAdresse> adressen = new ArrayList<>();
+    @NotEmpty private List<ProjektAdresseEntity> adressen = new ArrayList<>();
 
-    public List<ProjektAdresse> getAdressen() {
+    public List<ProjektAdresseEntity> getAdressen() {
         return Collections.unmodifiableList(adressen);
     }
 
-    public void addAdresse(final ProjektAdresse adresse) {
-        adresse.deriveTageUnerlaubteNutzung();
+    public void addAdresse(final ProjektAdresseEntity adresse) {
         adressen.add(adresse);
     }
 

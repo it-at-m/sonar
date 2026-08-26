@@ -5,9 +5,8 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.muenchen.oss.sonar.backend.projekt.model.CreateProjektCommand;
-import de.muenchen.oss.sonar.backend.projekt.model.ProjektModelMapper;
-import de.muenchen.oss.sonar.backend.projekt.model.ProjektView;
+import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
+import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -31,7 +30,7 @@ class ProjektServiceTest {
     private ProjektRepository projektRepository;
 
     @Spy
-    private final ProjektModelMapper projektModelMapper = Mappers.getMapper(ProjektModelMapper.class);
+    private final ProjektEntityMapper projektEntityMapper = Mappers.getMapper(ProjektEntityMapper.class);
 
     @InjectMocks
     private ProjektService unitUnderTest;
@@ -39,24 +38,24 @@ class ProjektServiceTest {
     @Nested
     class CreateProjekt {
         @Test
-        void givenCommand_thenReturnSavedProjektView() {
+        void givenProjekt_thenReturnSavedProjekt() {
             // Given
-            final CreateProjektCommand.Adresse adresse = new CreateProjektCommand.Adresse(
-                    "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 1, true);
-            final CreateProjektCommand command = new CreateProjektCommand(DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, List.of(adresse));
+            final ProjektAdresse adresse = new ProjektAdresse(
+                    null, "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 1, true);
+            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, List.of(adresse));
 
             final UUID savedId = UUID.randomUUID();
-            when(projektRepository.save(any(Projekt.class))).thenAnswer(invocation -> {
-                final Projekt toSave = invocation.getArgument(0);
+            when(projektRepository.save(any(ProjektEntity.class))).thenAnswer(invocation -> {
+                final ProjektEntity toSave = invocation.getArgument(0);
                 toSave.setId(savedId);
                 return toSave;
             });
 
             // When
-            final ProjektView result = unitUnderTest.createProjekt(command);
+            final Projekt result = unitUnderTest.createProjekt(projekt);
 
             // Then
-            verify(projektRepository).save(any(Projekt.class));
+            verify(projektRepository).save(any(ProjektEntity.class));
             assertThat(result.id()).isEqualTo(savedId);
             assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
             assertThat(result.adressen()).hasSize(1);

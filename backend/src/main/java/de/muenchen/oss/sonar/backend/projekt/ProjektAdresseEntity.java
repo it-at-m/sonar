@@ -1,9 +1,9 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
 import de.muenchen.oss.sonar.backend.common.BaseEntity;
-import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -14,11 +14,12 @@ import lombok.Setter;
 import lombok.ToString;
 
 @Entity
+@Table(name = "projekt_adresse")
 @Getter
 @Setter
 @ToString(callSuper = true)
 @NoArgsConstructor
-public class ProjektAdresse extends BaseEntity {
+public class ProjektAdresseEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
@@ -43,9 +44,5 @@ public class ProjektAdresse extends BaseEntity {
 
     @Column(nullable = false)
     private boolean sondernutzungErlaubt;
-
-    /* default */ void deriveTageUnerlaubteNutzung() {
-        tageUnerlaubteNutzung = Zeitraum.tageInklusiv(unerlaubteNutzungVon, unerlaubteNutzungBis, tageUnerlaubteNutzung);
-    }
 
 }

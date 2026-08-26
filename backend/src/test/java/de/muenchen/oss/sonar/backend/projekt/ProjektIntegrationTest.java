@@ -63,7 +63,7 @@ class ProjektIntegrationTest {
     }
 
     private void persistProjektWithOneAdresse(final String projektnummer, final LocalDate beginn, final LocalDate ende) {
-        final ProjektAdresse adresse = new ProjektAdresse();
+        final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
         adresse.setBezeichnung("Marienplatz 8");
         adresse.setBaunutzung("Gastronomie");
         adresse.setUnerlaubteNutzungVon(beginn);
@@ -71,7 +71,7 @@ class ProjektIntegrationTest {
         adresse.setAnzahlMahnungen(0);
         adresse.setSondernutzungErlaubt(false);
 
-        final Projekt projekt = new Projekt();
+        final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer(projektnummer);
         projekt.setAbrechnungBeginn(beginn);
         projekt.setAbrechnungEnde(ende);
@@ -80,7 +80,7 @@ class ProjektIntegrationTest {
         projektRepository.save(projekt);
     }
 
-    private void assertPersisted(final UUID projektId, final Consumer<Projekt> assertions) {
+    private void assertPersisted(final UUID projektId, final Consumer<ProjektEntity> assertions) {
         transactionTemplate.executeWithoutResult(
                 status -> assertions.accept(projektRepository.findById(projektId).orElseThrow()));
     }
@@ -115,7 +115,7 @@ class ProjektIntegrationTest {
                 assertThat(projekt.getProjektnummer()).isEqualTo("2026-0002");
                 assertThat(projekt.getAdressen()).hasSize(1);
 
-                final ProjektAdresse adresse = projekt.getAdressen().getFirst();
+                final ProjektAdresseEntity adresse = projekt.getAdressen().getFirst();
                 assertThat(adresse.getBezeichnung()).isEqualTo("Flurstück 1234/5");
                 assertThat(adresse.getBaunutzung()).isEqualTo("Wohnen");
                 assertThat(adresse.getUnerlaubteNutzungVon()).isEqualTo(BEGINN);
@@ -163,7 +163,7 @@ class ProjektIntegrationTest {
             assertThat(responseDTO.adressen().getFirst().tageUnerlaubteNutzung()).isEqualTo(12);
 
             assertPersisted(responseDTO.id(), projekt -> {
-                final ProjektAdresse persisted = projekt.getAdressen().getFirst();
+                final ProjektAdresseEntity persisted = projekt.getAdressen().getFirst();
                 assertThat(persisted.getTageUnerlaubteNutzung()).isEqualTo(12);
                 assertThat(persisted.getUnerlaubteNutzungVon()).isNull();
             });
@@ -175,7 +175,7 @@ class ProjektIntegrationTest {
                     "Flurstück 1234/5", "Wohnen", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", BEGINN, ENDE, List.of(adresseDTO));
 
-            restTestClient.post()
+            final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
                     .body(requestDTO)
@@ -184,7 +184,13 @@ class ProjektIntegrationTest {
                     .expectStatus().isCreated()
                     .expectBody(ProjektResponseDTO.class)
                     .value(projektResponseDTO -> assertThat(
-                            projektResponseDTO.adressen().getFirst().tageUnerlaubteNutzung()).isEqualTo(31));
+                            projektResponseDTO.adressen().getFirst().tageUnerlaubteNutzung()).isEqualTo(31))
+                    .returnResult()
+                    .getResponseBody();
+
+            assertThat(responseDTO).isNotNull();
+            assertPersisted(responseDTO.id(), projekt -> assertThat(
+                    projekt.getAdressen().getFirst().getTageUnerlaubteNutzung()).isEqualTo(31));
         }
 
         @Test

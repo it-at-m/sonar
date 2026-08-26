@@ -5,6 +5,6 @@ import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface ProjektRepository extends CrudRepository<Projekt, UUID> {
+public interface ProjektRepository extends CrudRepository<ProjektEntity, UUID> {
 
 }

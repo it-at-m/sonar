@@ -1,7 +1,7 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
 import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfiguration;
-import de.muenchen.oss.sonar.backend.projekt.dto.ProjektMapper;
+import de.muenchen.oss.sonar.backend.projekt.dto.ProjektDTOMapper;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektRequestDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektResponseDTO;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -26,7 +26,7 @@ import org.springframework.web.bind.annotation.RestController;
 public class ProjektController {
 
     private final ProjektService projektService;
-    private final ProjektMapper projektMapper;
+    private final ProjektDTOMapper projektDTOMapper;
 
     /**
      * Create a new Projekt.
@@ -42,7 +42,7 @@ public class ProjektController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Projekt are invalid", content = @Content)
     public ProjektResponseDTO saveProjekt(@Valid @RequestBody final ProjektRequestDTO projektRequestDTO) {
-        return projektMapper.toDTO(projektService.createProjekt(projektMapper.toCreateCommand(projektRequestDTO)));
+        return projektDTOMapper.toDTO(projektService.createProjekt(projektDTOMapper.toProjekt(projektRequestDTO)));
     }
 
 }
