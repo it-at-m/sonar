@@ -1,16 +1,14 @@
-import type { AdresseForm } from "@/composables/projektForm";
+import type { ProjektAdresseForm } from "@/types/ProjektAdresseForm";
 
 import { describe, expect, it } from "vitest";
 
-import {
-  createAdresse,
-  requiredRule,
-  tageUnerlaubteNutzung,
-  useProjektForm,
-} from "@/composables/projektForm";
+import { useProjektForm } from "@/composables/projektForm";
+import { createProjektAdresse } from "@/util/projektAdresseForm";
 
-function adresseWith(overrides: Partial<AdresseForm>): AdresseForm {
-  return { ...createAdresse(), ...overrides };
+function adresseWith(
+  overrides: Partial<ProjektAdresseForm>
+): ProjektAdresseForm {
+  return { ...createProjektAdresse(), ...overrides };
 }
 
 /**
@@ -26,76 +24,6 @@ function itemAt<T>(items: readonly T[], index = 0): T {
 }
 
 describe("projektForm.ts", () => {
-  describe("requiredRule", () => {
-    it("givenEmptyString_thenReturnMessage", () => {
-      expect(requiredRule("")).toBe("Pflichtfeld");
-    });
-
-    it("givenBlankString_thenReturnMessage", () => {
-      expect(requiredRule("   ")).toBe("Pflichtfeld");
-    });
-
-    it("givenNull_thenReturnMessage", () => {
-      expect(requiredRule(null)).toBe("Pflichtfeld");
-    });
-
-    it("givenZero_thenReturnTrue", () => {
-      expect(requiredRule(0)).toBe(true);
-    });
-  });
-
-  describe("tageUnerlaubteNutzung", () => {
-    it("givenSameDay_thenReturnOne", () => {
-      const adresse = adresseWith({
-        unerlaubteNutzungVon: "2026-01-01",
-        unerlaubteNutzungBis: "2026-01-01",
-      });
-
-      expect(tageUnerlaubteNutzung(adresse)).toBe(1);
-    });
-
-    it("givenPeriodAcrossDstChange_thenCountBothBoundariesInclusive", () => {
-      // 29.03.2026 is the European DST switch, a naive local-time subtraction would lose an hour
-      const adresse = adresseWith({
-        unerlaubteNutzungVon: "2026-03-28",
-        unerlaubteNutzungBis: "2026-03-31",
-      });
-
-      expect(tageUnerlaubteNutzung(adresse)).toBe(4);
-    });
-
-    it("givenIncompleteZeitraum_thenReturnUndefined", () => {
-      const adresse = adresseWith({ unerlaubteNutzungVon: "2026-01-01" });
-
-      expect(tageUnerlaubteNutzung(adresse)).toBeUndefined();
-    });
-
-    it("givenOnlyTage_thenReturnThem", () => {
-      const adresse = adresseWith({ tageUnerlaubteNutzung: 12 });
-
-      expect(tageUnerlaubteNutzung(adresse)).toBe(12);
-    });
-
-    it("givenZeitraumAndTage_thenPreferTheZeitraum", () => {
-      const adresse = adresseWith({
-        unerlaubteNutzungVon: "2026-01-01",
-        unerlaubteNutzungBis: "2026-01-03",
-        tageUnerlaubteNutzung: 99,
-      });
-
-      expect(tageUnerlaubteNutzung(adresse)).toBe(3);
-    });
-
-    it("givenInvertedZeitraum_thenReturnUndefined", () => {
-      const adresse = adresseWith({
-        unerlaubteNutzungVon: "2026-03-31",
-        unerlaubteNutzungBis: "2026-01-01",
-      });
-
-      expect(tageUnerlaubteNutzung(adresse)).toBeUndefined();
-    });
-  });
-
   describe("abrechnungEndeRule", () => {
     it("givenEndeAfterBeginn_thenReturnTrue", () => {
       const { abrechnungBeginn, abrechnungEndeRule } = useProjektForm();
@@ -117,43 +45,6 @@ describe("projektForm.ts", () => {
       const { abrechnungEndeRule } = useProjektForm();
 
       expect(abrechnungEndeRule("2026-01-01")).toBe(true);
-    });
-  });
-
-  describe("unerlaubteNutzungBisRule", () => {
-    it("givenBeginnWithoutEnde_thenReturnMessage", () => {
-      const { unerlaubteNutzungBisRule } = useProjektForm();
-      const adresse = adresseWith({ unerlaubteNutzungVon: "2026-01-01" });
-
-      expect(unerlaubteNutzungBisRule(adresse)("")).toBe(
-        "Bitte das Ende des Zeitraums angeben."
-      );
-    });
-
-    it("givenEndeBeforeBeginn_thenReturnMessage", () => {
-      const { unerlaubteNutzungBisRule } = useProjektForm();
-      const adresse = adresseWith({ unerlaubteNutzungVon: "2026-03-31" });
-
-      expect(unerlaubteNutzungBisRule(adresse)("2026-01-01")).toBe(
-        "Das Ende darf nicht vor dem Beginn liegen."
-      );
-    });
-
-    it("givenEmptyZeitraum_thenReturnTrue", () => {
-      const { unerlaubteNutzungBisRule } = useProjektForm();
-
-      expect(unerlaubteNutzungBisRule(adresseWith({}))("")).toBe(true);
-    });
-  });
-
-  describe("unerlaubteNutzungVonRule", () => {
-    it("givenEndeWithoutBeginn_thenReturnMessage", () => {
-      const { unerlaubteNutzungVonRule } = useProjektForm();
-      const adresse = adresseWith({ unerlaubteNutzungBis: "2026-03-31" });
-
-      expect(unerlaubteNutzungVonRule(adresse)("")).toBe(
-        "Bitte den Beginn des Zeitraums angeben."
-      );
     });
   });
 
