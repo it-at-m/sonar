@@ -6,8 +6,8 @@ import { ref } from "vue";
 import {
   createProjektAdresse,
   isProjektAdresseDirty,
-  toProjektAdresseRequestDTO,
 } from "@/util/projektAdresseForm";
+import { toProjektAdresseRequestDTO } from "@/util/projektAdresseMapper";
 import { endeNotBeforeBeginn } from "@/util/validationRules";
 
 export function useProjektForm() {

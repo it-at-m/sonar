@@ -1,8 +1,4 @@
-import type { ProjektAdresseRequestDTO } from "@/api/generated/sonar-backend";
 import type { ProjektAdresseForm } from "@/types/ProjektAdresseForm";
-import type { ValidationRule } from "@/util/validationRules";
-
-import { endeNotBeforeBeginn } from "@/util/validationRules";
 
 const MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 
@@ -37,28 +33,6 @@ export function tageUnerlaubteNutzung(
   return Math.round((bis - von) / MILLIS_PER_DAY) + 1;
 }
 
-export function unerlaubteNutzungVonRule(
-  adresse: ProjektAdresseForm
-): ValidationRule {
-  return (value: string) =>
-    !!value ||
-    !adresse.unerlaubteNutzungBis ||
-    "Bitte den Beginn des Zeitraums angeben.";
-}
-
-export function unerlaubteNutzungBisRule(
-  adresse: ProjektAdresseForm
-): ValidationRule {
-  return (value: string) => {
-    if (!value) {
-      return (
-        !adresse.unerlaubteNutzungVon || "Bitte das Ende des Zeitraums angeben."
-      );
-    }
-    return endeNotBeforeBeginn(adresse.unerlaubteNutzungVon, value);
-  };
-}
-
 export function isProjektAdresseDirty(adresse: ProjektAdresseForm): boolean {
   return (
     adresse.bezeichnung !== "" ||
@@ -69,25 +43,4 @@ export function isProjektAdresseDirty(adresse: ProjektAdresseForm): boolean {
     adresse.anzahlMahnungen !== 0 ||
     adresse.sondernutzungErlaubt
   );
-}
-
-export function toProjektAdresseRequestDTO(
-  adresse: ProjektAdresseForm
-): ProjektAdresseRequestDTO {
-  return {
-    bezeichnung: adresse.bezeichnung.trim(),
-    baunutzung: adresse.baunutzung.trim() || undefined,
-    unerlaubteNutzungVon: adresse.unerlaubteNutzungVon
-      ? new Date(adresse.unerlaubteNutzungVon)
-      : undefined,
-    unerlaubteNutzungBis: adresse.unerlaubteNutzungBis
-      ? new Date(adresse.unerlaubteNutzungBis)
-      : undefined,
-    // Sending both is rejected: with a period given the backend derives the days from it.
-    tageUnerlaubteNutzung: hasZeitraum(adresse)
-      ? undefined
-      : (adresse.tageUnerlaubteNutzung ?? undefined),
-    anzahlMahnungen: adresse.anzahlMahnungen,
-    sondernutzungErlaubt: adresse.sondernutzungErlaubt,
-  };
 }
