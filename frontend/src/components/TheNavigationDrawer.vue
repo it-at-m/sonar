@@ -4,6 +4,9 @@
     temporary
   >
     <v-list>
+      <v-list-item to="/projekte">
+        <v-list-item-title> Projekte </v-list-item-title>
+      </v-list-item>
       <v-list-item to="/">
         <v-list-item-title> Get Started </v-list-item-title>
       </v-list-item>

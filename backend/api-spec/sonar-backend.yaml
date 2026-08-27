@@ -1,9 +1,8 @@
 openapi: 3.0.1
 info:
-  title: refarch-backend
-  description: This is the default starting project for a backend project based on
-    the reference architecture of it@M
-  version: 0.0.1-SNAPSHOT
+  title: sonar-backend
+  description: New Backend for the old Application SonAbr
+  version: 0.0.3-SNAPSHOT
 servers:
 - url: http://localhost:8086
   description: Generated server url
@@ -150,6 +149,36 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/TheEntityResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt:
+    post:
+      tags:
+      - projekt-controller
+      summary: Create a new Projekt.
+      description: |-
+        Create a new Projekt.
+         Creates a new Projekt together with its Adressen in one call.
+         Abrechnungsende must not be before Abrechnungsbeginn.
+         Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
+         Either that period or tageUnerlaubteNutzung is given, never both.
+      operationId: saveProjekt
+      requestBody:
+        description: the details of the Projekt to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ProjektRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the details of the Projekt are invalid
+        "201":
+          description: the created Projekt as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
       security:
       - bearerAuth: []
   /actuator:
@@ -312,6 +341,101 @@ components:
           format: uuid
         textAttribute:
           type: string
+    ProjektAdresseRequestDTO:
+      required:
+      - anzahlMahnungen
+      - bezeichnung
+      type: object
+      properties:
+        bezeichnung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        baunutzung:
+          maxLength: 255
+          minLength: 0
+          type: string
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          minimum: 1
+          type: integer
+          format: int32
+        anzahlMahnungen:
+          minimum: 0
+          type: integer
+          format: int32
+        sondernutzungErlaubt:
+          type: boolean
+    ProjektRequestDTO:
+      required:
+      - abrechnungBeginn
+      - abrechnungEnde
+      - adressen
+      - projektnummer
+      type: object
+      properties:
+        projektnummer:
+          maxLength: 20
+          minLength: 1
+          type: string
+        abrechnungBeginn:
+          type: string
+          format: date
+        abrechnungEnde:
+          type: string
+          format: date
+        adressen:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjektAdresseRequestDTO"
+    ProjektAdresseResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        bezeichnung:
+          type: string
+        baunutzung:
+          type: string
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          type: integer
+          format: int32
+        anzahlMahnungen:
+          type: integer
+          format: int32
+        sondernutzungErlaubt:
+          type: boolean
+    ProjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektnummer:
+          type: string
+        abrechnungBeginn:
+          type: string
+          format: date
+        abrechnungEnde:
+          type: string
+          format: date
+        adressen:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjektAdresseResponseDTO"
     PageMetadata:
       type: object
       properties:

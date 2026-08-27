@@ -1,7 +1,5 @@
-import type { HTTPHeaders } from "@/api/generated/refarch-backend";
-
-import { getHeaders } from "@/api/fetch-utils.ts";
-import { BaseAPI, Configuration } from "@/api/generated/refarch-backend";
+import { getSecurityHeaders } from "@/api/fetch-utils.ts";
+import { BaseAPI, Configuration } from "@/api/generated/sonar-backend";
 import { BASE_API_PATH } from "@/constants.ts";
 
 type ApiCtor<T extends BaseAPI> = new (config: Configuration) => T;
@@ -26,12 +24,11 @@ function createConfig(): Configuration {
     middleware: [
       {
         pre: async (context) => {
-          const freshHeaders = convertHeaders(getHeaders());
           return {
             url: context.url,
             init: {
               ...context.init,
-              headers: { ...context.init.headers, ...freshHeaders },
+              headers: { ...context.init.headers, ...getSecurityHeaders() },
             },
           };
         },
@@ -46,27 +43,14 @@ function createConfig(): Configuration {
  * @param ApiClass the OpenAPI class to instantiate / retrieve
  */
 function getInstance<T extends BaseAPI>(ApiClass: ApiCtor<T>): T {
-  const existing = instances.get(ApiClass as ApiCtor<BaseAPI>);
+  const existing = instances.get(ApiClass);
   if (existing) {
     return existing as T;
   }
 
   const api = new ApiClass(createConfig());
-  instances.set(ApiClass as ApiCtor<BaseAPI>, api);
+  instances.set(ApiClass, api);
   return api;
-}
-
-/**
- * Converts a Headers object into a simple key-value pair object.
- * @param {Headers} headers - The headers object to be converted.
- * @returns {HTTPHeaders} An object with the same headers.
- */
-function convertHeaders(headers: Headers): HTTPHeaders {
-  const httpHeaders: HTTPHeaders = {};
-  headers.forEach((value, key) => {
-    httpHeaders[key] = value;
-  });
-  return httpHeaders;
 }
 
 export const ApiFactory = {

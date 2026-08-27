@@ -34,7 +34,7 @@ import type { HealthState } from "@/types/HealthState";
 import { onMounted, ref } from "vue";
 
 import { ApiFactory } from "@/api/ApiFactory.ts";
-import { ActuatorApi } from "@/api/generated/refarch-backend";
+import { ActuatorApi } from "@/api/generated/sonar-backend";
 import { checkHealth } from "@/api/healthstate-client";
 import useHasAnyRole from "@/composables/useHasAnyRole";
 import { STATUS_INDICATORS } from "@/constants";
