@@ -13,20 +13,15 @@ class ProjektAdresseTest {
 
     @Test
     void givenZeitraum_thenDeriveTageUnerlaubteNutzung() {
-        // Given: 01.01.2026 until 31.03.2026, both boundaries counted
-        // When
         final ProjektAdresse adresse = new ProjektAdresse(null, "Marienplatz 8", "Gastronomie", BEGINN, ENDE, null, 0, false);
 
-        // Then
         assertThat(adresse.tageUnerlaubteNutzung()).isEqualTo(90);
     }
 
     @Test
     void givenOnlyTage_thenKeepThem() {
-        // When
         final ProjektAdresse adresse = new ProjektAdresse(null, "Marienplatz 8", "Gastronomie", null, null, 12, 0, false);
 
-        // Then
         assertThat(adresse.tageUnerlaubteNutzung()).isEqualTo(12);
         assertThat(adresse.unerlaubteNutzungVon()).isNull();
         assertThat(adresse.unerlaubteNutzungBis()).isNull();
@@ -34,10 +29,8 @@ class ProjektAdresseTest {
 
     @Test
     void givenNeitherZeitraumNorTage_thenTageAreNull() {
-        // When
         final ProjektAdresse adresse = new ProjektAdresse(null, "Marienplatz 8", "Gastronomie", null, null, null, 0, false);
 
-        // Then
         assertThat(adresse.tageUnerlaubteNutzung()).isNull();
     }
 
@@ -46,17 +39,14 @@ class ProjektAdresseTest {
         // Given: what reading a stored Adresse back looks like, period and days both present
         final ProjektAdresse stored = new ProjektAdresse(null, "Marienplatz 8", "Gastronomie", BEGINN, ENDE, null, 0, false);
 
-        // When
         final ProjektAdresse reread = new ProjektAdresse(
                 null, "Marienplatz 8", "Gastronomie", BEGINN, ENDE, stored.tageUnerlaubteNutzung(), 0, false);
 
-        // Then
         assertThat(reread.tageUnerlaubteNutzung()).isEqualTo(stored.tageUnerlaubteNutzung());
     }
 
     @Test
     void givenTageContradictingZeitraum_thenThrow() {
-        // When, Then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> new ProjektAdresse(null, "Marienplatz 8", "Gastronomie", BEGINN, ENDE, 12, 0, false))
                 .withMessageContaining("tageUnerlaubteNutzung");
@@ -64,7 +54,6 @@ class ProjektAdresseTest {
 
     @Test
     void givenInvertedZeitraum_thenThrow() {
-        // When, Then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> new ProjektAdresse(null, "Marienplatz 8", "Gastronomie", ENDE, BEGINN, null, 0, false))
                 .withMessageContaining("unerlaubteNutzungBis");
@@ -72,7 +61,6 @@ class ProjektAdresseTest {
 
     @Test
     void givenIncompleteZeitraum_thenThrow() {
-        // When, Then
         assertThatIllegalArgumentException()
                 .isThrownBy(() -> new ProjektAdresse(null, "Marienplatz 8", "Gastronomie", BEGINN, null, null, 0, false));
         assertThatIllegalArgumentException()

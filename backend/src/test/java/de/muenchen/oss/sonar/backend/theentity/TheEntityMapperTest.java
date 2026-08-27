@@ -21,16 +21,13 @@ class TheEntityMapperTest {
     class ToDTO {
         @Test
         void givenEntity_thenReturnsCorrectDTO() {
-            // Given
             final UUID uuid = UUID.randomUUID();
             final TheEntity theEntity = new TheEntity();
             theEntity.setId(uuid);
             theEntity.setTextAttribute("test");
 
-            // When
             final TheEntityResponseDTO result = theEntityMapper.toDTO(theEntity);
 
-            // Then
             assertNotNull(result);
             assertThat(result).usingRecursiveComparison().isEqualTo(theEntity);
         }
@@ -40,13 +37,10 @@ class TheEntityMapperTest {
     class ToEntity {
         @Test
         void givenRequestDTO_thenReturnsCorrectEntity() {
-            // Given
             final TheEntityRequestDTO requestDTO = new TheEntityRequestDTO("test");
 
-            // When
             final TheEntity result = theEntityMapper.toEntity(requestDTO);
 
-            // Then
             assertThat(result).usingRecursiveComparison().ignoringFields("id").isEqualTo(requestDTO);
         }
     }

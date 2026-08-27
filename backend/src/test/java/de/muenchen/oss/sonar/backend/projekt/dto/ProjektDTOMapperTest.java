@@ -25,16 +25,13 @@ class ProjektDTOMapperTest {
     class ToDTO {
         @Test
         void givenProjekt_thenReturnsCorrectDTO() {
-            // Given
             final ProjektAdresse adresse = new ProjektAdresse(
                     UUID.randomUUID(), "Marienplatz 8", "Gastronomie", BEGINN, ENDE, 90, 2, true);
             final Projekt projekt = new Projekt(
                     UUID.randomUUID(), "2026-0001", BEGINN, ENDE, List.of(adresse));
 
-            // When
             final ProjektResponseDTO result = projektDTOMapper.toDTO(projekt);
 
-            // Then
             assertNotNull(result);
             assertThat(result.id()).isEqualTo(projekt.id());
             assertThat(result.projektnummer()).isEqualTo(projekt.projektnummer());
@@ -58,15 +55,12 @@ class ProjektDTOMapperTest {
     class ToProjekt {
         @Test
         void givenRequestDTO_thenReturnsCorrectProjekt() {
-            // Given
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 1, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
-            // When
             final Projekt result = projektDTOMapper.toProjekt(requestDTO);
 
-            // Then
             assertNotNull(result);
             assertThat(result.id()).isNull();
             assertThat(result.projektnummer()).isEqualTo(requestDTO.projektnummer());

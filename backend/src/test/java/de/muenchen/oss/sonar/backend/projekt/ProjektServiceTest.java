@@ -39,7 +39,6 @@ class ProjektServiceTest {
     class CreateProjekt {
         @Test
         void givenProjekt_thenReturnSavedProjekt() {
-            // Given
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 1, true);
             final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, List.of(adresse));
@@ -51,10 +50,8 @@ class ProjektServiceTest {
                 return toSave;
             });
 
-            // When
             final Projekt result = unitUnderTest.createProjekt(projekt);
 
-            // Then
             verify(projektRepository).save(any(ProjektEntity.class));
             assertThat(result.id()).isEqualTo(savedId);
             assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);

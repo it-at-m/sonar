@@ -25,7 +25,6 @@ class ProjektEntityMapperTest {
     class ToProjekt {
         @Test
         void givenEntity_thenReturnsCorrectProjekt() {
-            // Given
             final ProjektAdresseEntity adresseEntity = new ProjektAdresseEntity();
             adresseEntity.setId(UUID.randomUUID());
             adresseEntity.setBezeichnung("Marienplatz 8");
@@ -43,10 +42,8 @@ class ProjektEntityMapperTest {
             projektEntity.setAbrechnungEnde(ENDE);
             projektEntity.addAdresse(adresseEntity);
 
-            // When
             final Projekt result = projektEntityMapper.toProjekt(projektEntity);
 
-            // Then
             assertNotNull(result);
             assertThat(result.id()).isEqualTo(projektEntity.getId());
             assertThat(result.projektnummer()).isEqualTo(projektEntity.getProjektnummer());
@@ -70,15 +67,12 @@ class ProjektEntityMapperTest {
     class ToEntity {
         @Test
         void givenProjekt_thenReturnsCorrectEntity() {
-            // Given
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 1, false);
             final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, List.of(adresse));
 
-            // When
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 
-            // Then
             assertNotNull(result);
             assertThat(result.getProjektnummer()).isEqualTo(projekt.projektnummer());
             assertThat(result.getAbrechnungBeginn()).isEqualTo(projekt.abrechnungBeginn());
@@ -97,15 +91,12 @@ class ProjektEntityMapperTest {
 
         @Test
         void givenProjektWithId_thenIdIsNotCarriedOver() {
-            // Given
             final ProjektAdresse adresse = new ProjektAdresse(
                     UUID.randomUUID(), "Marienplatz 8", null, null, null, 12, 0, false);
             final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", BEGINN, ENDE, List.of(adresse));
 
-            // When
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 
-            // Then
             assertThat(result.getId()).isNull();
             assertThat(result.getAdressen().getFirst().getId()).isNull();
         }
