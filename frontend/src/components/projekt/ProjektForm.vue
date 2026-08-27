@@ -9,7 +9,7 @@
         md="4"
       >
         <v-text-field
-          v-model="projektnummer"
+          v-model="projekt.projektnummer"
           label="Projektnummer"
           maxlength="20"
           counter
@@ -21,7 +21,7 @@
         md="4"
       >
         <v-text-field
-          v-model="abrechnungBeginn"
+          v-model="projekt.abrechnungBeginn"
           label="Abrechnung Beginn"
           type="date"
           :rules="[requiredRule]"
@@ -32,10 +32,10 @@
         md="4"
       >
         <v-text-field
-          v-model="abrechnungEnde"
+          v-model="projekt.abrechnungEnde"
           label="Abrechnung Ende"
           type="date"
-          :rules="[requiredRule, abrechnungEndeRule]"
+          :rules="[requiredRule, abrechnungEndeRule(projekt.abrechnungBeginn)]"
         />
       </v-col>
     </v-row>
@@ -43,11 +43,11 @@
     <h2 class="text-headline-small mt-4 mb-2">Adressen/Flurnummern</h2>
 
     <projekt-form-adresse-card
-      v-for="(adresse, index) in adressen"
+      v-for="(adresse, index) in projekt.adressen"
       :key="adresse.id"
       :model-value="adresse"
       :position="index + 1"
-      :removable="adressen.length > 1"
+      :removable="projekt.adressen.length > 1"
       @remove="removeAdresse(index)"
     />
 
@@ -86,6 +86,8 @@ import { useTemplateRef } from "vue";
 
 import ProjektFormAdresseCard from "@/components/projekt/ProjektFormAdresseCard.vue";
 import { useProjektForm } from "@/composables/projektForm";
+import { toProjektRequestDTO } from "@/util/projektMapper";
+import { abrechnungEndeRule } from "@/util/projektRules";
 import { requiredRule } from "@/util/validationRules";
 
 defineProps<{ saving: boolean }>();
@@ -97,24 +99,14 @@ const emit = defineEmits<{
 
 const form = useTemplateRef("form");
 
-const {
-  abrechnungBeginn,
-  abrechnungEnde,
-  abrechnungEndeRule,
-  addAdresse,
-  adressen,
-  isDirty,
-  projektnummer,
-  removeAdresse,
-  toRequestDTO,
-} = useProjektForm();
+const { addAdresse, isDirty, projekt, removeAdresse } = useProjektForm();
 
 async function submit(): Promise<void> {
   const validation = await form.value?.validate();
   if (!validation?.valid) {
     return;
   }
-  emit("save", toRequestDTO());
+  emit("save", toProjektRequestDTO(projekt));
 }
 
 defineExpose({ isDirty });
