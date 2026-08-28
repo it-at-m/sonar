@@ -49,6 +49,10 @@ const vitepressConfig = defineConfig({
             text: "Gendergerechte Sprache",
             link: "/architecture/decisions/0003-gendergerechte-sprache",
           },
+          {
+            text: "Offset-Pagination für Listen-Endpunkte",
+            link: "/architecture/decisions/0004-offset-pagination",
+          },
         ],
       },
     ],
