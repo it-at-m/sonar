@@ -36,7 +36,7 @@
     "@muenchen/appswitcher-vue": "3.0.0",
     "@vueuse/core": "14.4.0",
     "pinia": "3.0.4",
-    "vue": "3.5.41",
+    "vue": "3.5.42",
     "vue-router": "5.2.0",
     "vuetify": "4.1.11"
   },
