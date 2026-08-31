@@ -30,7 +30,7 @@ public class ProjektService {
             final LocalDate abrechnungBeginn, final LocalDate abrechnungEnde, final ProjektSortBy sortBy,
             final Sort.Direction direction) {
         final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde);
-        final Sort sort = resolveSort(sortBy, direction);
+        final Sort sort = resolveSortWithInputOrDefaults(sortBy, direction);
         log.info("Get Projekte at Page {} with a PageSize of {} matching {} ordered by {}", pageNumber, pageSize, filter, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
         return projektRepository
@@ -45,7 +45,7 @@ public class ProjektService {
         return projektEntityMapper.toProjekt(projektRepository.save(projektEntity));
     }
 
-    private Sort resolveSort(final ProjektSortBy sortBy, final Sort.Direction direction) {
+    private Sort resolveSortWithInputOrDefaults(final ProjektSortBy sortBy, final Sort.Direction direction) {
         final ProjektSortBy effectiveSortBy = sortBy == null ? DEFAULT_SORT_BY : sortBy;
         final Sort.Direction effectiveDirection = direction == null ? DEFAULT_DIRECTION : direction;
         return Sort.by(effectiveDirection, effectiveSortBy.getEntityAttribute(), TIEBREAKER_ATTRIBUTE);
