@@ -86,3 +86,9 @@ info:
     description: "@project.description@"
   build:
     java.version: "@java.version@"
+
+sonar:
+  geschaeftspartner:
+    client:
+      # SOAP endpoint of the system owning the Geschäftspartner master data. The profiles "local" and "test" answer with canned data and need no endpoint, every other profile must supply one
+      # url: https://example.muenchen.de/v1/geschaeftspartner

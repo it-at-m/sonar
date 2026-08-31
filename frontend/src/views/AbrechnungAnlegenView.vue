@@ -22,7 +22,10 @@
     </v-tabs>
 
     <v-tabs-window v-model="tab">
-      <v-tabs-window-item :value="TABS.BASIS" />
+      <v-tabs-window-item :value="TABS.BASIS">
+        <abrechnung-basisinformationen v-model="abrechnung" />
+      </v-tabs-window-item>
+
       <v-tabs-window-item :value="TABS.BERECHNUNG" />
     </v-tabs-window>
   </v-container>
@@ -32,6 +35,9 @@
 import { mdiArrowLeft } from "@mdi/js";
 import { ref } from "vue";
 
+import AbrechnungBasisinformationen from "@/components/AbrechnungBasisinformationen.vue";
+import { useAbrechnungForm } from "@/composables/abrechnungForm";
+
 const TABS = {
   BASIS: "basis",
   BERECHNUNG: "berechnung",
@@ -40,4 +46,6 @@ const TABS = {
 const { projektId } = defineProps<{ projektId: string }>();
 
 const tab = ref<string>(TABS.BASIS);
+
+const { abrechnung } = useAbrechnungForm();
 </script>
