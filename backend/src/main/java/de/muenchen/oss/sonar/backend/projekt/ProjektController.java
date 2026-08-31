@@ -60,8 +60,8 @@ public class ProjektController {
             @RequestParam(required = false) @Size(max = 20) final String projektnummer,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate abrechnungBeginn,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate abrechnungEnde,
-            @RequestParam(required = false) final ProjektSortBy sortBy,
-            @RequestParam(required = false) final Sort.Direction sortDirection) {
+            @RequestParam(defaultValue = "PROJEKTNUMMER") final ProjektSortBy sortBy,
+            @RequestParam(defaultValue = "DESC") final Sort.Direction sortDirection) {
         final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde);
         return projektService.getAllProjekte(pageNumber, pageSize, filter, sortBy, sortDirection).map(projektDTOMapper::toDTO);
     }

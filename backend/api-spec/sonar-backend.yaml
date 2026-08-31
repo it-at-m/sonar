@@ -210,6 +210,7 @@ paths:
         required: false
         schema:
           type: string
+          default: PROJEKTNUMMER
           enum:
           - PROJEKTNUMMER
           - ABRECHNUNG_BEGINN
@@ -220,6 +221,7 @@ paths:
         required: false
         schema:
           type: string
+          default: DESC
           enum:
           - ASC
           - DESC
