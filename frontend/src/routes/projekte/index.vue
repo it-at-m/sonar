@@ -78,12 +78,17 @@ async function loadPage(): Promise<void> {
   }
 }
 
-watch([filter, sort], () => {
-  page.value = 1;
-});
+watch(
+  [filter, sort],
+  () => {
+    page.value = 1;
+  },
+  { deep: true }
+);
 
 watchDebounced([page, itemsPerPage, filter, sort], () => void loadPage(), {
   debounce: SEARCH_DEBOUNCE_MS,
+  deep: true,
 });
 
 onMounted(() => void loadPage());

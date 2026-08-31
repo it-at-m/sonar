@@ -1,5 +1,5 @@
 export interface ProjektFilter {
-  projektnummer?: string;
-  abrechnungBeginn?: string;
-  abrechnungEnde?: string;
+  projektnummer?: string | null;
+  abrechnungBeginn?: string | null;
+  abrechnungEnde?: string | null;
 }

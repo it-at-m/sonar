@@ -5,7 +5,7 @@
       md="4"
     >
       <v-text-field
-        v-model="projektnummer"
+        v-model="filter.projektnummer"
         label="Projektnummer"
         maxlength="20"
         :prepend-inner-icon="mdiMagnify"
@@ -18,7 +18,7 @@
       md="4"
     >
       <v-text-field
-        v-model="abrechnungBeginn"
+        v-model="filter.abrechnungBeginn"
         label="Abrechnung Beginn"
         type="date"
         clearable
@@ -30,7 +30,7 @@
       md="4"
     >
       <v-text-field
-        v-model="abrechnungEnde"
+        v-model="filter.abrechnungEnde"
         label="Abrechnung Ende"
         type="date"
         clearable
@@ -68,19 +68,6 @@ const filtered = computed(() =>
     filter.value.abrechnungEnde
   )
 );
-
-function filterModel(entityAttribute: keyof ProjektFilter) {
-  return computed({
-    get: () => filter.value[entityAttribute] ?? null,
-    set: (value: string | null) => {
-      filter.value = { ...filter.value, [entityAttribute]: value ?? undefined };
-    },
-  });
-}
-
-const projektnummer = filterModel("projektnummer");
-const abrechnungBeginn = filterModel("abrechnungBeginn");
-const abrechnungEnde = filterModel("abrechnungEnde");
 
 function filterLoeschen(): void {
   filter.value = {};
