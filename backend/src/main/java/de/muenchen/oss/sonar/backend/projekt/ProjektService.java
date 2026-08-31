@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
+import java.time.LocalDate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -25,8 +26,10 @@ public class ProjektService {
     private final ProjektEntityMapper projektEntityMapper;
 
     @Transactional(readOnly = true)
-    public Page<Projekt> getAllProjekte(final int pageNumber, final int pageSize, final ProjektFilter filter,
-            final ProjektSortBy sortBy, final Sort.Direction direction) {
+    public Page<Projekt> getAllProjekte(final int pageNumber, final int pageSize, final String projektnummer,
+            final LocalDate abrechnungBeginn, final LocalDate abrechnungEnde, final ProjektSortBy sortBy,
+            final Sort.Direction direction) {
+        final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde);
         final Sort sort = resolveSort(sortBy, direction);
         log.info("Get Projekte at Page {} with a PageSize of {} matching {} ordered by {}", pageNumber, pageSize, filter, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
