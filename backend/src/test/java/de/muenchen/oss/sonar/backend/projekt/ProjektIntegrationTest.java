@@ -11,7 +11,6 @@ import de.muenchen.oss.sonar.backend.projekt.dto.ProjektRequestDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektResponseDTO;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -56,8 +55,6 @@ class ProjektIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
-    private UUID testProjektId;
-
     @BeforeEach
     public void setUp() {
         projektRepository.deleteAll();
@@ -76,38 +73,7 @@ class ProjektIntegrationTest {
         projekt.setAbrechnungEnde(ENDE);
         projekt.addAdresse(adresse);
 
-        testProjektId = projektRepository.save(projekt).getId();
-    }
-
-    @Nested
-    class GetProjekt {
-        @Test
-        void givenProjektId_thenReturnProjekt() {
-            restTestClient
-                    .get()
-                    .uri("/projekt/{projektId}", testProjektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectHeader().contentType(MediaType.APPLICATION_JSON)
-                    .expectBody(ProjektResponseDTO.class)
-                    .value(projektResponseDTO -> {
-                        assertNotNull(projektResponseDTO);
-                        assertThat(projektResponseDTO.id()).isEqualTo(testProjektId);
-                        assertThat(projektResponseDTO.adressen()).hasSize(1);
-                        assertThat(projektResponseDTO.adressen().getFirst().bezeichnung()).isEqualTo("Marienplatz 8");
-                    });
-        }
-
-        @Test
-        void givenUnknownProjektId_thenReturnNotFound() {
-            restTestClient
-                    .get()
-                    .uri("/projekt/{projektId}", UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
-                    .exchange()
-                    .expectStatus().isNotFound();
-        }
+        projektRepository.save(projekt);
     }
 
     @Nested

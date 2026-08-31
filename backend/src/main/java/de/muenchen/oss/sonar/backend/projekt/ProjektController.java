@@ -12,7 +12,6 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -21,7 +20,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -38,20 +36,6 @@ public class ProjektController {
 
     private final ProjektService projektService;
     private final ProjektDTOMapper projektDTOMapper;
-
-    /**
-     * Retrieve a Projekt by its UUID.
-     * Fetches the Projekt details including all of its Adressen.
-     *
-     * @param projektId the UUID of the requested Projekt
-     * @return the Projekt with the given UUID as a DTO
-     */
-    @GetMapping("{projektId}")
-    @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = "404", description = "no Projekt exists with the given UUID", content = @Content)
-    public ProjektResponseDTO getProjekt(@PathVariable("projektId") final UUID projektId) {
-        return projektDTOMapper.toDTO(projektService.getProjekt(projektId));
-    }
 
     /**
      * Retrieve Projekte with pagination.

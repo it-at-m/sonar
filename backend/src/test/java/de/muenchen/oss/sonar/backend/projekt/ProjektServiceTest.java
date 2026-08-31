@@ -6,14 +6,11 @@ import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
 import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
-import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -48,52 +45,6 @@ class ProjektServiceTest {
 
     @InjectMocks
     private ProjektService unitUnderTest;
-
-    @Nested
-    class GetProjekt {
-        @Test
-        void givenUUID_thenReturnProjekt() {
-            final UUID id = UUID.randomUUID();
-
-            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setBezeichnung("Marienplatz 8");
-            adresse.setBaunutzung("Gastronomie");
-            adresse.setUnerlaubteNutzungVon(BEGINN);
-            adresse.setUnerlaubteNutzungBis(ENDE);
-            adresse.setAnzahlMahnungen(2);
-            adresse.setSondernutzungErlaubt(false);
-
-            final ProjektEntity projektEntity = new ProjektEntity();
-            projektEntity.setId(id);
-            projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
-            projektEntity.setAbrechnungBeginn(BEGINN);
-            projektEntity.setAbrechnungEnde(ENDE);
-            projektEntity.addAdresse(adresse);
-
-            when(projektRepository.findById(id)).thenReturn(Optional.of(projektEntity));
-
-            final Projekt result = unitUnderTest.getProjekt(id);
-
-            verify(projektRepository).findById(id);
-            assertThat(result.id()).isEqualTo(id);
-            assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
-            assertThat(result.abrechnungBeginn()).isEqualTo(BEGINN);
-            assertThat(result.abrechnungEnde()).isEqualTo(ENDE);
-            assertThat(result.adressen()).hasSize(1);
-            assertThat(result.adressen().getFirst().bezeichnung()).isEqualTo("Marienplatz 8");
-        }
-
-        @Test
-        void givenNonExistentUUID_thenThrowNotFoundException() {
-            final UUID id = UUID.randomUUID();
-            when(projektRepository.findById(id)).thenReturn(Optional.empty());
-
-            final Exception exception = Assertions.assertThrows(NotFoundException.class, () -> unitUnderTest.getProjekt(id));
-
-            verify(projektRepository).findById(id);
-            Assertions.assertEquals(String.format("404 NOT_FOUND \"Could not find entity with id %s\"", id), exception.getMessage());
-        }
-    }
 
     @Nested
     class GetProjektePage {

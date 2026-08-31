@@ -263,34 +263,6 @@ paths:
                 $ref: "#/components/schemas/ProjektResponseDTO"
       security:
       - bearerAuth: []
-  /projekt/{projektId}:
-    get:
-      tags:
-      - projekt-controller
-      summary: Retrieve a Projekt by its UUID.
-      description: |-
-        Retrieve a Projekt by its UUID.
-         Fetches the Projekt details including all of its Adressen.
-      operationId: getProjekt
-      parameters:
-      - name: projektId
-        in: path
-        description: the UUID of the requested Projekt
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "404":
-          description: no Projekt exists with the given UUID
-        "200":
-          description: the Projekt with the given UUID as a DTO
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/ProjektResponseDTO"
-      security:
-      - bearerAuth: []
   /actuator:
     get:
       tags:
