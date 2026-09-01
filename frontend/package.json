@@ -6,7 +6,7 @@
     },
     "@cyclonedx/cyclonedx-npm": {
       "ajv": {
-        "fast-uri": "3.1.5"
+        "fast-uri": "3.1.6"
       },
       "xmlbuilder2": {
         "js-yaml": "4.3.2"
