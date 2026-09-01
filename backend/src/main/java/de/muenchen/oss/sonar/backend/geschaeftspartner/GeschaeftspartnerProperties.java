@@ -11,8 +11,8 @@ public class GeschaeftspartnerProperties {
      * SOAP endpoint the client calls.
      * <p>
      * This class is bound in every profile, but the profiles "local" and "test" run against
-     * {@link MockGeschaeftspartnerClient}. A blank value therefore fails when the SOAP client is built,
-     * which happens in exactly those profiles that need it.
+     * {@link MockGeschaeftspartnerClient} and need no endpoint. In every other profile a blank value
+     * wires in {@link UnconfiguredGeschaeftspartnerClient}.
      * </p>
      */
     private String url;
