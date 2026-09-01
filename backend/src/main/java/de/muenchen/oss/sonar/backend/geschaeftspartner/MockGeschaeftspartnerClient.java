@@ -12,7 +12,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class MockGeschaeftspartnerClient implements GeschaeftspartnerClient {
 
-    public static final String UNKNOWN_ID = "00000000";
+    public static final String UNKNOWN_ID = "000";
 
     @Override
     public Optional<GeschaeftspartnerResponseDTO> findById(final String geschaeftspartnerId) {
