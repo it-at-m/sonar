@@ -67,7 +67,7 @@ class GeschaeftspartnerIntegrationTest {
 
         @Test
         void givenUnknownId_thenReturnNotFound() throws Exception {
-            mockMvc.perform(get("/geschaeftspartner/{geschaeftspartnerId}", FakeGeschaeftspartnerClient.UNKNOWN_ID)
+            mockMvc.perform(get("/geschaeftspartner/{geschaeftspartnerId}", MockGeschaeftspartnerClient.UNKNOWN_ID)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer reader"))
                     .andExpect(status().isNotFound());
         }

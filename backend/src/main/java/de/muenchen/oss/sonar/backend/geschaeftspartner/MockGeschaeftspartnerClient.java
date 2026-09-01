@@ -10,7 +10,7 @@ import lombok.extern.slf4j.Slf4j;
  * {@link #UNKNOWN_ID}, which keeps the "not found" path reachable in the running application.
  */
 @Slf4j
-public class FakeGeschaeftspartnerClient implements GeschaeftspartnerClient {
+public class MockGeschaeftspartnerClient implements GeschaeftspartnerClient {
 
     public static final String UNKNOWN_ID = "00000000";
 

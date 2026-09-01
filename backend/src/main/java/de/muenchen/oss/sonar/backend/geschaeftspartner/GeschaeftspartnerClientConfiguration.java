@@ -13,8 +13,8 @@ public class GeschaeftspartnerClientConfiguration {
     /** Canned data, because neither profile has a system to call. */
     @Bean
     @Profile({ "local", "test" })
-    public GeschaeftspartnerClient fakeGeschaeftspartnerClient() {
-        return new FakeGeschaeftspartnerClient();
+    public GeschaeftspartnerClient mockGeschaeftspartnerClient() {
+        return new MockGeschaeftspartnerClient();
     }
 
     /** Built code first from the generated port, so CXF does not fetch the contract at runtime. */

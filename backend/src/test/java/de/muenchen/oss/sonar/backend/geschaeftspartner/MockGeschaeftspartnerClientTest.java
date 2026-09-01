@@ -7,9 +7,9 @@ import java.util.Optional;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class FakeGeschaeftspartnerClientTest {
+class MockGeschaeftspartnerClientTest {
 
-    private final FakeGeschaeftspartnerClient unitUnderTest = new FakeGeschaeftspartnerClient();
+    private final MockGeschaeftspartnerClient unitUnderTest = new MockGeschaeftspartnerClient();
 
     @Nested
     class FindById {
@@ -31,7 +31,7 @@ class FakeGeschaeftspartnerClientTest {
 
         @Test
         void givenTheUnknownId_thenReturnEmpty() {
-            assertThat(unitUnderTest.findById(FakeGeschaeftspartnerClient.UNKNOWN_ID)).isEmpty();
+            assertThat(unitUnderTest.findById(MockGeschaeftspartnerClient.UNKNOWN_ID)).isEmpty();
         }
 
         @Test
