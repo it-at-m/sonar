@@ -16,7 +16,8 @@ public class FakeGeschaeftspartnerClient implements GeschaeftspartnerClient {
 
     @Override
     public Optional<GeschaeftspartnerResponseDTO> findById(final String geschaeftspartnerId) {
-        log.debug("Answering the lookup of Geschaeftspartner {} with canned data", geschaeftspartnerId);
+        log.debug("Answering the lookup of Geschaeftspartner {} with canned data",
+                String.valueOf(geschaeftspartnerId).replace('\n', '_').replace('\r', '_'));
         if (geschaeftspartnerId == null || geschaeftspartnerId.isBlank() || UNKNOWN_ID.equals(geschaeftspartnerId)) {
             return Optional.empty();
         }

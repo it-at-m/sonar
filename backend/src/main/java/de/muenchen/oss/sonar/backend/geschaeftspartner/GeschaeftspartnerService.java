@@ -16,7 +16,7 @@ public class GeschaeftspartnerService {
     private final GeschaeftspartnerClient geschaeftspartnerClient;
 
     public GeschaeftspartnerResponseDTO getGeschaeftspartner(final String geschaeftspartnerId) {
-        log.info("Get Geschaeftspartner with ID {}", geschaeftspartnerId);
+        log.info("Get Geschaeftspartner with ID {}", geschaeftspartnerId.replace('\n', '_').replace('\r', '_'));
         return geschaeftspartnerClient
                 .findById(geschaeftspartnerId)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, geschaeftspartnerId)));
