@@ -38,14 +38,7 @@
 import { ref } from "vue";
 
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
-import { useSaveLeave } from "@/composables/saveLeave";
-import { Role } from "@/types/Role";
-
-definePage({
-  meta: {
-    hasAnyRole: [Role.READER, Role.WRITER],
-  },
-});
+import { useSaveLeave } from "@/composables/saveLeave.ts";
 
 const documentationClicked = ref(false);
 const { cancel, leave, saveLeaveDialog } = useSaveLeave(isDirty);

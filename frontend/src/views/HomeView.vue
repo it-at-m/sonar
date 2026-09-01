@@ -29,17 +29,17 @@
 </template>
 
 <script setup lang="ts">
-import type { HealthState } from "@/types/HealthState";
+import type { HealthState } from "@/types/HealthState.ts";
 
 import { onMounted, ref } from "vue";
 
 import { ApiFactory } from "@/api/ApiFactory.ts";
 import { ActuatorApi } from "@/api/generated/sonar-backend";
-import { checkHealth } from "@/api/healthstate-client";
-import useHasAnyRole from "@/composables/useHasAnyRole";
-import { STATUS_INDICATORS } from "@/constants";
-import { useSnackbarStore } from "@/stores/snackbar";
-import { Role } from "@/types/Role";
+import { checkHealth } from "@/api/healthstate-client.ts";
+import useHasAnyRole from "@/composables/useHasAnyRole.ts";
+import { STATUS_INDICATORS } from "@/constants.ts";
+import { useSnackbarStore } from "@/stores/snackbar.ts";
+import { Role } from "@/types/Role.ts";
 
 const isWriter = useHasAnyRole(Role.WRITER);
 

@@ -27,8 +27,8 @@
 </template>
 
 <script setup lang="ts">
-import type { DataTableSortItem } from "@/types/DataTableSortItem";
-import type { ProjektFilter } from "@/types/ProjektFilter";
+import type { DataTableSortItem } from "@/types/DataTableSortItem.ts";
+import type { ProjektFilter } from "@/types/ProjektFilter.ts";
 
 import { mdiPlus } from "@mdi/js";
 import { watchDebounced } from "@vueuse/core";
@@ -36,10 +36,10 @@ import { computed, onMounted, ref, watch } from "vue";
 
 import ProjektFilterBar from "@/components/projekt/ProjektFilterBar.vue";
 import ProjektTable from "@/components/projekt/ProjektTable.vue";
-import { useProjekteListe } from "@/composables/projekteListe";
-import { STATUS_INDICATORS } from "@/constants";
-import { useSnackbarStore } from "@/stores/snackbar";
-import { toProjektSort } from "@/util/projektSortMapper";
+import { useProjekteListe } from "@/composables/projekteListe.ts";
+import { STATUS_INDICATORS } from "@/constants.ts";
+import { useSnackbarStore } from "@/stores/snackbar.ts";
+import { toProjektSort } from "@/util/projektSortMapper.ts";
 
 const DEFAULT_ITEMS_PER_PAGE = 10;
 const SEARCH_DEBOUNCE_MS = 300;

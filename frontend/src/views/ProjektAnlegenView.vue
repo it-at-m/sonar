@@ -25,16 +25,16 @@ import type { ProjektRequestDTO } from "@/api/generated/sonar-backend";
 import { ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 
-import { ApiFactory } from "@/api/ApiFactory";
+import { ApiFactory } from "@/api/ApiFactory.ts";
 import {
   ProjektControllerApi,
   ResponseError,
 } from "@/api/generated/sonar-backend";
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import ProjektForm from "@/components/projekt/ProjektForm.vue";
-import { useSaveLeave } from "@/composables/saveLeave";
-import { STATUS_INDICATORS } from "@/constants";
-import { useSnackbarStore } from "@/stores/snackbar";
+import { useSaveLeave } from "@/composables/saveLeave.ts";
+import { STATUS_INDICATORS } from "@/constants.ts";
+import { useSnackbarStore } from "@/stores/snackbar.ts";
 
 const router = useRouter();
 const snackbarStore = useSnackbarStore();
