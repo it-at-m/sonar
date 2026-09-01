@@ -152,6 +152,90 @@ paths:
       security:
       - bearerAuth: []
   /projekt:
+    get:
+      tags:
+      - projekt-controller
+      summary: Retrieve Projekte with pagination.
+      description: |-
+        Retrieve Projekte with pagination.
+         Fetches a paginated list of Projekte based on the provided page number and size.
+         The optional search criteria are combined with AND and apply to the whole result, not just to
+         the requested page. The same holds for the order, which is applied by the database.
+      operationId: getProjekteByPageAndSize
+      parameters:
+      - name: pageNumber
+        in: query
+        description: "the number of the requested page (default: 0)"
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+          default: 0
+      - name: pageSize
+        in: query
+        description: "the size of the page to retrieve (default: 10, at most 100)"
+        required: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          format: int32
+          default: 10
+      - name: projektnummer
+        in: query
+        description: "part of the Projektnummer to search for, case-insensitive"
+        required: false
+        schema:
+          maxLength: 20
+          minLength: 0
+          type: string
+      - name: abrechnungBeginn
+        in: query
+        description: the exact beginn of the billing period to search for
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: abrechnungEnde
+        in: query
+        description: the exact end of the billing period to search for
+        required: false
+        schema:
+          type: string
+          format: date
+      - name: sortBy
+        in: query
+        description: "the column to order by (default: PROJEKTNUMMER)"
+        required: false
+        schema:
+          type: string
+          default: PROJEKTNUMMER
+          enum:
+          - PROJEKTNUMMER
+          - ABRECHNUNG_BEGINN
+          - ABRECHNUNG_ENDE
+      - name: sortDirection
+        in: query
+        description: "the direction to order in (default: DESC)"
+        required: false
+        schema:
+          type: string
+          default: DESC
+          enum:
+          - ASC
+          - DESC
+      responses:
+        "400":
+          description: "the pagination, search or sort parameters are invalid"
+        "200":
+          description: a page of Projekte represented as DTOs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelProjektResponseDTO"
+      security:
+      - bearerAuth: []
     post:
       tags:
       - projekt-controller
@@ -458,6 +542,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/TheEntityResponseDTO"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    PagedModelProjektResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjektResponseDTO"
         page:
           $ref: "#/components/schemas/PageMetadata"
     Link:
