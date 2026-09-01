@@ -1,44 +1,50 @@
-import { createRouter, createWebHashHistory } from "vue-router";
-import { hasAnyRole } from "@/composables/useHasAnyRole";
-import { useUserInfoStore } from "@/stores/userinfo.ts";
-import { useSnackbarStore } from "@/stores/snackbar.ts";
-import { STATUS_INDICATORS } from "@/constants.ts";
 import { mdiShieldLock } from "@mdi/js";
-import HomeView from "@/views/HomeView.vue";
+import {
+  createRouter,
+  createWebHistory,
+} from "vue-router";
+
+import { hasAnyRole } from "@/composables/useHasAnyRole";
+import { STATUS_INDICATORS } from "@/constants.ts";
+import { useSnackbarStore } from "@/stores/snackbar.ts";
+import { useUserInfoStore } from "@/stores/userinfo.ts";
 import GetStartedView from "@/views/GetStartedView.vue";
-import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
+import HomeView from "@/views/HomeView.vue";
 import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
-
-
-
+import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
+import { handleHotUpdate , routes as fileBasedRoutes,} from "vue-router/auto-routes";
 
 const routes = [
+  ...fileBasedRoutes,
   {
     path: "/",
     name: "home",
     component: HomeView,
     meta: {},
-  }
-  , {
+  },
+  {
     path: "/getStarted",
     name: "getStarted",
     component: GetStartedView,
     meta: {},
-  }, {
-  path: "/projekte",
+  },
+  {
+    path: "/projekte",
     name: "projekte",
     component: ProjekteOverviewView,
     meta: {},
   },
-  {  path: "/projekte/anlegen",
+  {
+    path: "/projekte/anlegen",
     name: "projektAnlegen",
     component: ProjektAnlegenView,
     meta: {},
-  }
-]
+  },
+  { path: "/:catchAll(.*)*", redirect: "/" }, // CatchAll route
+];
 
 const router = createRouter({
-  history: createWebHashHistory(),
+  history: createWebHistory(),
   routes,
   scrollBehavior() {
     return {
@@ -75,5 +81,9 @@ router.beforeEach(async (to, from) => {
 
   return { path: "/" };
 });
+
+if (import.meta.hot) {
+  handleHotUpdate(router);
+}
 
 export default router;
