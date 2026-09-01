@@ -38,7 +38,8 @@ public class SoapGeschaeftspartnerClient implements GeschaeftspartnerClient {
         try {
             response = geschaeftspartnerPort.zFMCAGPMIFBUPAREADRFC(request);
         } catch (final WebServiceException exception) {
-            log.warn("Could not read Geschaeftspartner {} from the third party system", geschaeftspartnerId, exception);
+            log.warn("Could not read Geschaeftspartner {} from the third party system",
+                    geschaeftspartnerId.replace('\n', '_').replace('\r', '_'), exception);
             throw new ResponseStatusException(HttpStatus.BAD_GATEWAY,
                     "Die Geschäftspartnerdaten konnten nicht abgerufen werden.", exception);
         }
@@ -62,7 +63,8 @@ public class SoapGeschaeftspartnerClient implements GeschaeftspartnerClient {
                 continue;
             }
             log.warn("Reading Geschaeftspartner {} reported {} {}{}: {}",
-                    geschaeftspartnerId, message.getTYPE(), message.getID(), message.getNUMBER(), message.getMESSAGE());
+                    geschaeftspartnerId.replace('\n', '_').replace('\r', '_'),
+                    message.getTYPE(), message.getID(), message.getNUMBER(), message.getMESSAGE());
         }
     }
 
