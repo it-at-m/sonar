@@ -12,7 +12,7 @@
       </v-list-item>
       <v-list-item
         v-if="showGetStarted"
-        to="/get-started"
+        to="/getStarted"
       >
         <v-list-item-title> Get Started </v-list-item-title>
       </v-list-item>
