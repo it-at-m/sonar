@@ -2,6 +2,7 @@ package de.muenchen.oss.sonar.backend.projekt;
 
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import java.time.LocalDate;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -36,6 +37,10 @@ public class ProjektService {
         return projektRepository
                 .findAll(ProjektSpecifications.matching(filter), pageRequest)
                 .map(projektEntityMapper::toProjekt);
+    }
+
+    public boolean existsProjekt(final UUID projektId) {
+        return projektRepository.existsById(projektId);
     }
 
     @Transactional
