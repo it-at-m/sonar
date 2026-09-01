@@ -14,13 +14,6 @@ export default defineConfig(({ mode }) => {
   const isDevelopment = mode === "development";
   return {
     plugins: [
-      VueRouter({
-        routesFolder: {
-          src: "src/routes",
-        },
-        dts: "./route-map.d.ts",
-        ...(isDevelopment && { extendRoute }),
-      }),
       vue({
         template: { transformAssetUrls },
         features: {

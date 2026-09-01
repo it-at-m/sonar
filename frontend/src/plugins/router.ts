@@ -1,22 +1,44 @@
-import { mdiShieldLock } from "@mdi/js";
-import { createRouter, createWebHistory } from "vue-router";
-import {
-  routes as fileBasedRoutes,
-  handleHotUpdate,
-} from "vue-router/auto-routes";
-
+import { createRouter, createWebHashHistory } from "vue-router";
 import { hasAnyRole } from "@/composables/useHasAnyRole";
-import { STATUS_INDICATORS } from "@/constants.ts";
+import { useUserInfoStore } from "@/stores/userinfo.ts";
 import { useSnackbarStore } from "@/stores/snackbar.ts";
-import { useUserInfoStore } from "@/stores/userinfo";
+import { STATUS_INDICATORS } from "@/constants.ts";
+import { mdiShieldLock } from "@mdi/js";
+import HomeView from "@/views/HomeView.vue";
+import GetStartedView from "@/views/GetStartedView.vue";
+import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
+import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
+
+
+
 
 const routes = [
-  ...fileBasedRoutes,
-  { path: "/:catchAll(.*)*", redirect: "/" }, // CatchAll route
-];
+  {
+    path: "/",
+    name: "home",
+    component: HomeView,
+    meta: {},
+  }
+  , {
+    path: "/getStarted",
+    name: "getStarted",
+    component: GetStartedView,
+    meta: {},
+  }, {
+  path: "/projekte",
+    name: "projekte",
+    component: ProjekteOverviewView,
+    meta: {},
+  },
+  {  path: "/projekte/anlegen",
+    name: "projektAnlegen",
+    component: ProjektAnlegenView,
+    meta: {},
+  }
+]
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHashHistory(),
   routes,
   scrollBehavior() {
     return {
@@ -53,9 +75,5 @@ router.beforeEach(async (to, from) => {
 
   return { path: "/" };
 });
-
-if (import.meta.hot) {
-  handleHotUpdate(router);
-}
 
 export default router;
