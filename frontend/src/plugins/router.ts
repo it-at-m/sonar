@@ -1,8 +1,9 @@
 import { mdiShieldLock } from "@mdi/js";
+import { createRouter, createWebHistory } from "vue-router";
 import {
-  createRouter,
-  createWebHistory,
-} from "vue-router";
+  routes as fileBasedRoutes,
+  handleHotUpdate,
+} from "vue-router/auto-routes";
 
 import { hasAnyRole } from "@/composables/useHasAnyRole";
 import { STATUS_INDICATORS } from "@/constants.ts";
@@ -12,7 +13,6 @@ import GetStartedView from "@/views/GetStartedView.vue";
 import HomeView from "@/views/HomeView.vue";
 import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
 import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
-import { handleHotUpdate , routes as fileBasedRoutes,} from "vue-router/auto-routes";
 
 const routes = [
   ...fileBasedRoutes,
