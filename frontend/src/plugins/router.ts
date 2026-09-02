@@ -1,7 +1,6 @@
 import { mdiShieldLock } from "@mdi/js";
 import { createRouter, createWebHistory } from "vue-router";
 import {
-  routes as fileBasedRoutes,
   handleHotUpdate,
 } from "vue-router/auto-routes";
 
@@ -15,7 +14,6 @@ import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
 import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
 
 const routes = [
-  ...fileBasedRoutes,
   {
     path: "/",
     name: "home",
@@ -23,8 +21,8 @@ const routes = [
     meta: {},
   },
   {
-    path: "/getStarted",
-    name: "getStarted",
+    path: "/get-started",
+    name: "get-started",
     component: GetStartedView,
     meta: {},
   },
@@ -36,7 +34,7 @@ const routes = [
   },
   {
     path: "/projekte/anlegen",
-    name: "projektAnlegen",
+    name: "projekt-anlegen",
     component: ProjektAnlegenView,
     meta: {},
   },
