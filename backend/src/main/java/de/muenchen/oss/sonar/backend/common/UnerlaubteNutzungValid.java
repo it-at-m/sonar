@@ -1,6 +1,5 @@
-package de.muenchen.oss.sonar.backend.projekt.dto;
+package de.muenchen.oss.sonar.backend.common;
 
-import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
@@ -23,7 +22,7 @@ public @interface UnerlaubteNutzungValid {
 
     Class<? extends Payload>[] payload() default {};
 
-    class Validator implements ConstraintValidator<UnerlaubteNutzungValid, ProjektAdresseRequestDTO> {
+    class Validator implements ConstraintValidator<UnerlaubteNutzungValid, UnerlaubteNutzung> {
 
         private static final String ZEITRAUM_INCOMPLETE = "Der Zeitraum der unerlaubten Nutzung ist mit Beginn und Ende anzugeben.";
         private static final String ZEITRAUM_INVERTED = "Das Ende der unerlaubten Nutzung darf nicht vor deren Beginn liegen.";
@@ -34,20 +33,21 @@ public @interface UnerlaubteNutzungValid {
         private static final String TAGE = "tageUnerlaubteNutzung";
 
         @Override
-        public boolean isValid(final ProjektAdresseRequestDTO adresse, final ConstraintValidatorContext context) {
+        public boolean isValid(final UnerlaubteNutzung unerlaubteNutzung, final ConstraintValidatorContext context) {
             context.disableDefaultConstraintViolation();
 
             boolean valid = true;
 
-            if ((adresse.unerlaubteNutzungVon() == null) != (adresse.unerlaubteNutzungBis() == null)) {
-                addViolation(context, ZEITRAUM_INCOMPLETE, adresse.unerlaubteNutzungBis() == null ? BIS : VON);
+            if ((unerlaubteNutzung.unerlaubteNutzungVon() == null) != (unerlaubteNutzung.unerlaubteNutzungBis() == null)) {
+                addViolation(context, ZEITRAUM_INCOMPLETE, unerlaubteNutzung.unerlaubteNutzungBis() == null ? BIS : VON);
                 valid = false;
             }
-            if (!Zeitraum.isOrdered(adresse.unerlaubteNutzungVon(), adresse.unerlaubteNutzungBis())) {
+            if (!Zeitraum.isOrdered(unerlaubteNutzung.unerlaubteNutzungVon(), unerlaubteNutzung.unerlaubteNutzungBis())) {
                 addViolation(context, ZEITRAUM_INVERTED, BIS);
                 valid = false;
             }
-            if ((adresse.unerlaubteNutzungVon() != null || adresse.unerlaubteNutzungBis() != null) && adresse.tageUnerlaubteNutzung() != null) {
+            if ((unerlaubteNutzung.unerlaubteNutzungVon() != null || unerlaubteNutzung.unerlaubteNutzungBis() != null)
+                    && unerlaubteNutzung.tageUnerlaubteNutzung() != null) {
                 addViolation(context, ZEITRAUM_AND_TAGE, TAGE);
                 valid = false;
             }

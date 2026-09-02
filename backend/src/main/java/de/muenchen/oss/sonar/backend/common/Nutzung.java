@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.abrechnung;
+package de.muenchen.oss.sonar.backend.common;
 
 /**
  * The constants are placeholders.

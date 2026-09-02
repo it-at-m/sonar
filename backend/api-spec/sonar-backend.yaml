@@ -244,6 +244,7 @@ paths:
         Create a new Projekt.
          Creates a new Projekt together with its Adressen in one call.
          Abrechnungsende must not be before Abrechnungsbeginn.
+         An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
          Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
          Either that period or tageUnerlaubteNutzung is given, never both.
       operationId: saveProjekt
@@ -499,17 +500,40 @@ components:
     ProjektAdresseRequestDTO:
       required:
       - anzahlMahnungen
-      - bezeichnung
+      - art
       type: object
       properties:
-        bezeichnung:
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
           maxLength: 255
           minLength: 1
           type: string
-        baunutzung:
-          maxLength: 255
-          minLength: 0
+        hausnummerVon:
+          maxLength: 20
+          minLength: 1
           type: string
+        hausnummerBis:
+          maxLength: 20
+          minLength: 1
+          type: string
+        flurstueck:
+          maxLength: 255
+          minLength: 1
+          type: string
+        gemarkung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -555,10 +579,27 @@ components:
         id:
           type: string
           format: uuid
-        bezeichnung:
+        art:
           type: string
-        baunutzung:
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
           type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date

@@ -106,11 +106,11 @@ import type { ProjektAdresseForm } from "@/types/ProjektAdresseForm";
 import { mdiDelete } from "@mdi/js";
 import { computed } from "vue";
 
-import { hasZeitraum, tageUnerlaubteNutzung } from "@/util/projektAdresseForm";
+import { hasZeitraum, tageUnerlaubteNutzung } from "@/util/unerlaubteNutzung";
 import {
   unerlaubteNutzungBisRule,
   unerlaubteNutzungVonRule,
-} from "@/util/projektAdresseRules";
+} from "@/util/unerlaubteNutzungRules";
 import { requiredRule } from "@/util/validationRules";
 
 const adresse = defineModel<ProjektAdresseForm>({ required: true });

@@ -1,14 +1,14 @@
 package de.muenchen.oss.sonar.backend.abrechnung.dto;
 
-import de.muenchen.oss.sonar.backend.abrechnung.Nutzung;
-import de.muenchen.oss.sonar.backend.abrechnung.NutzungsobjektArt;
+import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.common.Nutzung;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
 public record AbrechnungNutzungsobjektResponseDTO(
         UUID id,
-        NutzungsobjektArt art,
+        Adressart art,
         String adresse,
         String hausnummerVon,
         String hausnummerBis,

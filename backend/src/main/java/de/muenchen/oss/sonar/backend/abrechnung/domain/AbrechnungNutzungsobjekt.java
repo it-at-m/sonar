@@ -1,7 +1,7 @@
 package de.muenchen.oss.sonar.backend.abrechnung.domain;
 
-import de.muenchen.oss.sonar.backend.abrechnung.Nutzung;
-import de.muenchen.oss.sonar.backend.abrechnung.NutzungsobjektArt;
+import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import java.time.LocalDate;
 import java.util.List;
@@ -9,7 +9,7 @@ import java.util.UUID;
 
 public record AbrechnungNutzungsobjekt(
         UUID id,
-        NutzungsobjektArt art,
+        Adressart art,
         String adresse,
         String hausnummerVon,
         String hausnummerBis,

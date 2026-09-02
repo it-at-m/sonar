@@ -1,7 +1,9 @@
 package de.muenchen.oss.sonar.backend.abrechnung.dto;
 
-import de.muenchen.oss.sonar.backend.abrechnung.Nutzung;
-import de.muenchen.oss.sonar.backend.abrechnung.NutzungsobjektArt;
+import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.common.AdressartValid;
+import de.muenchen.oss.sonar.backend.common.Adresse;
+import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.common.UnerlaubteNutzung;
 import de.muenchen.oss.sonar.backend.common.UnerlaubteNutzungValid;
 import jakarta.validation.Valid;
@@ -12,10 +14,10 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
 import java.util.List;
 
-@NutzungsobjektArtValid
+@AdressartValid
 @UnerlaubteNutzungValid
 public record AbrechnungNutzungsobjektRequestDTO(
-        @NotNull NutzungsobjektArt art,
+        @NotNull Adressart art,
         @Size(min = 1, max = 255) String adresse,
         @Size(min = 1, max = 20) String hausnummerVon,
         @Size(min = 1, max = 20) String hausnummerBis,
@@ -26,7 +28,7 @@ public record AbrechnungNutzungsobjektRequestDTO(
         LocalDate unerlaubteNutzungBis,
         @Min(1) Integer tageUnerlaubteNutzung,
         @Size(max = 10_000) String bemerkung,
-        @NotEmpty List<@Valid AbrechnungPositionRequestDTO> positionen) implements UnerlaubteNutzung {
+        @NotEmpty List<@Valid AbrechnungPositionRequestDTO> positionen) implements Adresse, UnerlaubteNutzung {
 
     /**
      * Copies the positions in, so that the request stays immutable however the caller treats the list
