@@ -5,14 +5,16 @@ import UnpluginFonts from "unplugin-fonts/vite";
 import { defineConfig } from "vite";
 import vueDevTools from "vite-plugin-vue-devtools";
 import vuetify, { transformAssetUrls } from "vite-plugin-vuetify";
+import VueRouter from "vue-router/vite";
 
-import { EncodeBracketsPlugin } from "./encode-brackets-plugin";
+import { EncodeBracketsPlugin, extendRoute } from "./encode-brackets-plugin";
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
   const isDevelopment = mode === "development";
   return {
     plugins: [
+      VueRouter({ extendRoute }),
       vue({
         template: { transformAssetUrls },
         features: {
