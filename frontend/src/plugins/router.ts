@@ -6,6 +6,8 @@ import { hasAnyRole } from "@/composables/useHasAnyRole";
 import { STATUS_INDICATORS } from "@/constants.ts";
 import { useSnackbarStore } from "@/stores/snackbar.ts";
 import { useUserInfoStore } from "@/stores/userinfo.ts";
+import AbrechnungAnlegenView from "@/views/AbrechnungAnlegenView.vue";
+import AbrechnungenOverviewView from "@/views/AbrechnungenOverviewView.vue";
 import GetStartedView from "@/views/GetStartedView.vue";
 import HomeView from "@/views/HomeView.vue";
 import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
@@ -34,6 +36,20 @@ const routes = [
     path: "/projekte/anlegen",
     name: "projekt-anlegen",
     component: ProjektAnlegenView,
+    meta: {},
+  },
+  {
+    path: "/projekte/:projektId/abrechnungen",
+    name: "abrechnungen",
+    component: AbrechnungenOverviewView,
+    props: true,
+    meta: {},
+  },
+  {
+    path: "/projekte/:projektId/abrechnungen/anlegen",
+    name: "abrechnung-anlegen",
+    component: AbrechnungAnlegenView,
+    props: true,
     meta: {},
   },
   { path: "/:catchAll(.*)*", redirect: "/" }, // CatchAll route
