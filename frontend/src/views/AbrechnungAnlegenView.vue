@@ -31,15 +31,13 @@
 <script setup lang="ts">
 import { mdiArrowLeft } from "@mdi/js";
 import { ref } from "vue";
-import { useRoute } from "vue-router";
 
 const TABS = {
   BASIS: "basis",
   BERECHNUNG: "berechnung",
 } as const;
 
-const route = useRoute("/projekte/[projektId]/abrechnungen/anlegen");
-const projektId = route.params.projektId;
+const { projektId } = defineProps<{ projektId: string }>();
 
 const tab = ref<string>(TABS.BASIS);
 </script>

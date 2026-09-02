@@ -25,8 +25,6 @@
 
 <script setup lang="ts">
 import { mdiArrowLeft, mdiPlus } from "@mdi/js";
-import { useRoute } from "vue-router";
 
-const route = useRoute("/projekte/[projektId]/abrechnungen/");
-const projektId = route.params.projektId;
+const { projektId } = defineProps<{ projektId: string }>();
 </script>
