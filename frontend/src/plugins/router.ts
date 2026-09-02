@@ -1,17 +1,41 @@
 import { mdiShieldLock } from "@mdi/js";
 import { createRouter, createWebHistory } from "vue-router";
-import {
-  routes as fileBasedRoutes,
-  handleHotUpdate,
-} from "vue-router/auto-routes";
+import { handleHotUpdate } from "vue-router/auto-routes";
 
 import { hasAnyRole } from "@/composables/useHasAnyRole";
 import { STATUS_INDICATORS } from "@/constants.ts";
 import { useSnackbarStore } from "@/stores/snackbar.ts";
-import { useUserInfoStore } from "@/stores/userinfo";
+import { useUserInfoStore } from "@/stores/userinfo.ts";
+import GetStartedView from "@/views/GetStartedView.vue";
+import HomeView from "@/views/HomeView.vue";
+import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
+import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
 
 const routes = [
-  ...fileBasedRoutes,
+  {
+    path: "/",
+    name: "home",
+    component: HomeView,
+    meta: {},
+  },
+  {
+    path: "/get-started",
+    name: "get-started",
+    component: GetStartedView,
+    meta: {},
+  },
+  {
+    path: "/projekte",
+    name: "projekte",
+    component: ProjekteOverviewView,
+    meta: {},
+  },
+  {
+    path: "/projekte/anlegen",
+    name: "projekt-anlegen",
+    component: ProjektAnlegenView,
+    meta: {},
+  },
   { path: "/:catchAll(.*)*", redirect: "/" }, // CatchAll route
 ];
 
