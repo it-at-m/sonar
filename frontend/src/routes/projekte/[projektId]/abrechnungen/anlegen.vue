@@ -38,7 +38,12 @@
           eager
           :value="TABS.BERECHNUNG"
         >
-          <abrechnung-berechnung v-model="abrechnung" />
+          <abrechnung-berechnung
+            ref="berechnung"
+            v-model="abrechnung"
+            :invalid-nutzungsobjekte="invalidNutzungsobjekte"
+            :suggestions="suggestions"
+          />
         </v-tabs-window-item>
       </v-tabs-window>
 
@@ -72,7 +77,7 @@
 
 <script setup lang="ts">
 import { mdiArrowLeft } from "@mdi/js";
-import { ref, useTemplateRef } from "vue";
+import { computed, nextTick, onMounted, ref, useTemplateRef } from "vue";
 import { useRoute, useRouter } from "vue-router";
 
 import { ApiFactory } from "@/api/ApiFactory";
@@ -84,11 +89,12 @@ import AbrechnungBasisinformationen from "@/components/AbrechnungBasisinformatio
 import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
+import { useProjektAdresseSuggestions } from "@/composables/projektAdresseSuggestions";
 import { useSaveLeave } from "@/composables/saveLeave";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 import { toAbrechnungRequestDTO } from "@/util/abrechnungMapper";
-import { tabOfFirstError, TABS } from "@/util/abrechnungTabs";
+import { nutzungsobjektOfError, tabOfError, TABS } from "@/util/abrechnungTabs";
 
 const route = useRoute("/projekte/[projektId]/abrechnungen/anlegen");
 const projektId = route.params.projektId;
@@ -96,10 +102,12 @@ const router = useRouter();
 const snackbarStore = useSnackbarStore();
 
 const form = useTemplateRef("form");
+const berechnung = useTemplateRef("berechnung");
 const tab = ref<string>(TABS.BASIS);
 const saving = ref(false);
 
 const { abrechnung, isDirty } = useAbrechnungForm();
+const { load: loadSuggestions, suggestions } = useProjektAdresseSuggestions();
 
 const {
   cancel,
@@ -109,6 +117,12 @@ const {
   saveLeaveDialogText,
   saveLeaveDialogTitle,
 } = useSaveLeave(isDirty);
+
+const invalidNutzungsobjekte = computed(() =>
+  (form.value?.errors ?? [])
+    .map((error) => nutzungsobjektOfError(String(error.id)))
+    .filter((index): index is number => index !== undefined)
+);
 
 function errorText(error: unknown): string {
   if (error instanceof ResponseError) {
@@ -122,13 +136,27 @@ function errorText(error: unknown): string {
   return "Die Abrechnung konnte nicht gespeichert werden.";
 }
 
+async function showFirstError(
+  errors: { id: string | number }[]
+): Promise<void> {
+  const first = errors[0];
+  if (first === undefined) {
+    return;
+  }
+  const id = String(first.id);
+  const offendingTab = tabOfError(id);
+  if (offendingTab !== undefined) {
+    tab.value = offendingTab;
+  }
+  berechnung.value?.showError(id);
+  await nextTick();
+  document.getElementById(id)?.focus();
+}
+
 async function save(): Promise<void> {
   const validation = await form.value?.validate();
   if (!validation?.valid) {
-    const offendingTab = tabOfFirstError(validation?.errors ?? []);
-    if (offendingTab) {
-      tab.value = offendingTab;
-    }
+    await showFirstError(validation?.errors ?? []);
     return;
   }
 
@@ -156,4 +184,17 @@ async function save(): Promise<void> {
 function abbrechen(): void {
   void router.push(`/projekte/${projektId}/abrechnungen`);
 }
+
+async function loadProjektAdressen(): Promise<void> {
+  try {
+    await loadSuggestions(projektId);
+  } catch {
+    snackbarStore.push({
+      text: "Die Adressen des Projekts konnten nicht geladen werden. Sie lassen sich daher nicht übernehmen.",
+      color: STATUS_INDICATORS.WARNING,
+    });
+  }
+}
+
+onMounted(() => void loadProjektAdressen());
 </script>

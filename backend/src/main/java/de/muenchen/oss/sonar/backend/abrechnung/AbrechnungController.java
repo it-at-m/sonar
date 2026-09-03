@@ -33,7 +33,7 @@ public class AbrechnungController {
     /**
      * Create a new Abrechnung for a Projekt.
      * Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
-     * An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both. 
+     * An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungRequestDTO the details of the Abrechnung to create

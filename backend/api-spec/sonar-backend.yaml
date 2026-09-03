@@ -304,6 +304,34 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
+  /projekt/{projektId}:
+    get:
+      tags:
+      - projekt-controller
+      summary: Retrieve a single Projekt.
+      description: |-
+        Retrieve a single Projekt.
+         Fetches the Projekt together with its Adressen, in the order they were entered.
+      operationId: getProjekt
+      parameters:
+      - name: projektId
+        in: path
+        description: the id of the requested Projekt
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: the Projekt represented as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
   /geschaeftspartner/{geschaeftspartnerId}:
     get:
       tags:

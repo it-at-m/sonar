@@ -12,6 +12,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -20,6 +21,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -67,9 +69,24 @@ public class ProjektController {
     }
 
     /**
+     * Retrieve a single Projekt.
+     * Fetches the Projekt together with its Adressen, in the order they were entered.
+     *
+     * @param projektId the id of the requested Projekt
+     * @return the Projekt represented as a DTO
+     */
+    @GetMapping("{projektId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = "404", description = "the Projekt does not exist", content = @Content)
+    public ProjektResponseDTO getProjekt(@PathVariable("projektId") final UUID projektId) {
+        return projektDTOMapper.toDTO(projektService.getProjekt(projektId));
+    }
+
+    /**
      * Create a new Projekt.
      * Creates a new Projekt together with its Adressen in one call.
      * Abrechnungsende must not be before Abrechnungsbeginn.
+     * An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
      * Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
      * Either that period or tageUnerlaubteNutzung is given, never both.
      *
