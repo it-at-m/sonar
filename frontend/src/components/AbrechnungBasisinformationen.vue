@@ -10,7 +10,7 @@
         label="Geschäftspartner:in ID"
         :maxlength="GESCHAEFTSPARTNER_ID_MAX_LENGTH"
         :rules="[requiredRule]"
-        :error-messages="geschaeftspartner.fehlermeldung.value"
+        :error-messages="geschaeftspartner.errorMessage.value"
       />
     </v-col>
   </v-row>
@@ -20,7 +20,7 @@
       md="8"
     >
       <geschaeftspartner-stammdaten
-        :daten="geschaeftspartner.daten.value"
+        :daten="geschaeftspartner.data.value"
         :loading="geschaeftspartner.loading.value"
       />
     </v-col>
@@ -46,7 +46,7 @@
           label="Zustellungsbevollmächtigte:r ID"
           :maxlength="GESCHAEFTSPARTNER_ID_MAX_LENGTH"
           :rules="[requiredRule]"
-          :error-messages="zustellungsbevollmaechtigter.fehlermeldung.value"
+          :error-messages="zustellungsbevollmaechtigter.errorMessage.value"
         />
       </v-col>
       <v-col
@@ -67,7 +67,7 @@
         md="8"
       >
         <geschaeftspartner-stammdaten
-          :daten="zustellungsbevollmaechtigter.daten.value"
+          :daten="zustellungsbevollmaechtigter.data.value"
           :loading="zustellungsbevollmaechtigter.loading.value"
         />
       </v-col>

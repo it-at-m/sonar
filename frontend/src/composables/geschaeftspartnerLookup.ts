@@ -9,34 +9,44 @@ import {
 } from "@/api/generated/sonar-backend";
 
 export function useGeschaeftspartnerLookup() {
-  const daten = ref<GeschaeftspartnerResponseDTO | null>(null);
+  const data = ref<GeschaeftspartnerResponseDTO | null>(null);
   const loading = ref(false);
-  const fehlermeldung = ref("");
+  const errorMessage = ref("");
+  let latestSequence = 0;
 
   async function lookup(geschaeftspartnerId: string): Promise<void> {
-    daten.value = null;
-    fehlermeldung.value = "";
+    const sequence = ++latestSequence;
+    data.value = null;
+    errorMessage.value = "";
     if (!geschaeftspartnerId.trim()) {
+      loading.value = false;
       return;
     }
     loading.value = true;
     try {
-      daten.value = await ApiFactory.getInstance(
+      const response = await ApiFactory.getInstance(
         GeschaeftspartnerControllerApi
       ).getGeschaeftspartner(geschaeftspartnerId.trim());
+      if (sequence === latestSequence) {
+        data.value = response;
+      }
     } catch (error) {
-      fehlermeldung.value =
-        error instanceof ResponseError && error.response.status === 404
-          ? "Zu dieser ID wurden keine Geschäftspartnerdaten gefunden."
-          : "Die Geschäftspartnerdaten konnten nicht abgerufen werden.";
+      if (sequence === latestSequence) {
+        errorMessage.value =
+          error instanceof ResponseError && error.response.status === 404
+            ? "Zu dieser ID wurden keine Geschäftspartnerdaten gefunden."
+            : "Die Geschäftspartnerdaten konnten nicht abgerufen werden.";
+      }
     } finally {
-      loading.value = false;
+      if (sequence === latestSequence) {
+        loading.value = false;
+      }
     }
   }
 
   return {
-    daten,
-    fehlermeldung,
+    data,
+    errorMessage,
     loading,
     lookup,
   };
