@@ -25,7 +25,7 @@ public class AbrechnungService {
             throw new NotFoundException(String.format(MSG_NOT_FOUND, abrechnung.projektId()));
         }
         final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
-        log.debug("Create Abrechnung {}", String.valueOf(abrechnungEntity).replace('\n', '_').replace('\r', '_'));
+        log.debug("Create Abrechnung {}", abrechnungEntity);
         return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(abrechnungEntity));
     }
 }

@@ -35,8 +35,7 @@ public class ProjektService {
             final Sort.Direction direction) {
         final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde);
         final Sort sort = resolveSortWithInputOrDefaults(sortBy, direction);
-        log.info("Get Projekte at Page {} with a PageSize of {} matching {} ordered by {}", pageNumber, pageSize,
-                String.valueOf(filter).replace('\n', '_').replace('\r', '_'), sort);
+        log.info("Get Projekte at Page {} with a PageSize of {} matching {} ordered by {}", pageNumber, pageSize, filter, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
         return projektRepository
                 .findAll(ProjektSpecifications.matching(filter), pageRequest)
@@ -59,7 +58,7 @@ public class ProjektService {
     @Transactional
     public Projekt createProjekt(final Projekt projekt) {
         final ProjektEntity projektEntity = projektEntityMapper.toEntity(projekt);
-        log.debug("Create Projekt {}", String.valueOf(projektEntity).replace('\n', '_').replace('\r', '_'));
+        log.debug("Create Projekt {}", projektEntity);
         return projektEntityMapper.toProjekt(projektRepository.save(projektEntity));
     }
 
