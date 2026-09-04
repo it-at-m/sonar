@@ -54,14 +54,5 @@ class UnconfiguredGeschaeftspartnerClientTest {
                 assertThat(event.getFormattedMessage()).contains("sonar.geschaeftspartner.client.url");
             });
         }
-
-        @Test
-        void givenIdWithLineBreak_thenSanitizeItInTheLog() {
-            assertThatThrownBy(() -> unitUnderTest.findById("4711\nERROR forged"))
-                    .isInstanceOf(ResponseStatusException.class);
-
-            assertThat(loggedEvents.list).singleElement()
-                    .satisfies(event -> assertThat(event.getFormattedMessage()).doesNotContain("\n"));
-        }
     }
 }

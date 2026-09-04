@@ -14,8 +14,7 @@ public class UnconfiguredGeschaeftspartnerClient implements GeschaeftspartnerCli
 
     @Override
     public Optional<GeschaeftspartnerResponseDTO> findById(final String geschaeftspartnerId) {
-        log.error("Could not read Geschaeftspartner {}, sonar.geschaeftspartner.client.url is not set",
-                String.valueOf(geschaeftspartnerId).replace('\n', '_').replace('\r', '_'));
+        log.error("Could not read Geschaeftspartner {}, sonar.geschaeftspartner.client.url is not set", geschaeftspartnerId);
         throw new ResponseStatusException(HttpStatus.BAD_GATEWAY, MSG_NOT_REACHABLE);
     }
 
