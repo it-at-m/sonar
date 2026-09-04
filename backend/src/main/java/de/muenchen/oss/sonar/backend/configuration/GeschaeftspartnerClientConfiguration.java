@@ -1,5 +1,10 @@
-package de.muenchen.oss.sonar.backend.geschaeftspartner;
+package de.muenchen.oss.sonar.backend.configuration;
 
+import de.muenchen.oss.sonar.backend.geschaeftspartner.GeschaeftspartnerClient;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.GeschaeftspartnerProperties;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.MockGeschaeftspartnerClient;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.SoapGeschaeftspartnerClient;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.UnconfiguredGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerDTOMapper;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.ws.ZFMCAGPMIFBUPAREADRFCPortType;
 import lombok.extern.slf4j.Slf4j;

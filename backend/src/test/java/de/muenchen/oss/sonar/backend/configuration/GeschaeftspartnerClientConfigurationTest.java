@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.geschaeftspartner;
+package de.muenchen.oss.sonar.backend.configuration;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -6,6 +6,9 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.read.ListAppender;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.GeschaeftspartnerProperties;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.SoapGeschaeftspartnerClient;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.UnconfiguredGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerDTOMapper;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
