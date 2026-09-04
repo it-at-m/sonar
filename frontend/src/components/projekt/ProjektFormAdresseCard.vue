@@ -4,10 +4,10 @@
     variant="outlined"
   >
     <v-card-title class="d-flex align-center">
-      <span class="text-title-medium">Adresse {{ position }}</span>
+      <span class="text-title-medium">{{ title }}</span>
       <v-spacer />
       <v-btn
-        :aria-label="`Adresse ${position} entfernen`"
+        :aria-label="`${title} entfernen`"
         :disabled="!removable"
         :icon="mdiDelete"
         variant="text"
@@ -15,69 +15,23 @@
       />
     </v-card-title>
     <v-card-text>
+      <adresse-fields
+        :id-prefix="idPrefix"
+        :model-value="adresse"
+      />
+
+      <unerlaubte-nutzung-fields
+        :id-prefix="idPrefix"
+        :model-value="adresse"
+      />
+
       <v-row>
         <v-col
           cols="12"
-          md="6"
-        >
-          <v-text-field
-            v-model="adresse.bezeichnung"
-            label="Adresse, Hausnummer oder Flurstück"
-            maxlength="255"
-            :rules="[requiredRule]"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-text-field
-            v-model="adresse.baunutzung"
-            label="Baunutzung"
-            maxlength="255"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="3"
-        >
-          <v-text-field
-            v-model="adresse.unerlaubteNutzungVon"
-            label="Unerlaubte Nutzung von"
-            type="date"
-            :rules="[unerlaubteNutzungVonRule(adresse)]"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="3"
-        >
-          <v-text-field
-            v-model="adresse.unerlaubteNutzungBis"
-            label="Unerlaubte Nutzung bis"
-            type="date"
-            :rules="[unerlaubteNutzungBisRule(adresse)]"
-          />
-        </v-col>
-        <v-col
-          cols="12"
-          md="6"
-        >
-          <v-number-input
-            v-model="tage"
-            label="Tage unerlaubte Nutzung"
-            :min="1"
-            :precision="0"
-            :disabled="tageAusZeitraum"
-            :hint="tageHint"
-            persistent-hint
-          />
-        </v-col>
-        <v-col
-          cols="12"
           md="3"
         >
           <v-number-input
+            :id="`${idPrefix}-anzahl-mahnungen`"
             v-model="adresse.anzahlMahnungen"
             label="Anzahl Mahnungen"
             :min="0"
@@ -90,6 +44,7 @@
           md="9"
         >
           <v-checkbox
+            :id="`${idPrefix}-sondernutzung-erlaubt`"
             v-model="adresse.sondernutzungErlaubt"
             label="Sondernutzung erlaubt"
             hide-details
@@ -106,37 +61,20 @@ import type { ProjektAdresseForm } from "@/types/ProjektAdresseForm";
 import { mdiDelete } from "@mdi/js";
 import { computed } from "vue";
 
-import { hasZeitraum, tageUnerlaubteNutzung } from "@/util/projektAdresseForm";
-import {
-  unerlaubteNutzungBisRule,
-  unerlaubteNutzungVonRule,
-} from "@/util/projektAdresseRules";
+import AdresseFields from "@/components/common/AdresseFields.vue";
+import UnerlaubteNutzungFields from "@/components/common/UnerlaubteNutzungFields.vue";
+import { adresseLabel } from "@/util/adresseLabel";
 import { requiredRule } from "@/util/validationRules";
 
 const adresse = defineModel<ProjektAdresseForm>({ required: true });
 
-defineProps<{
+const props = defineProps<{
+  idPrefix: string;
   position: number;
   removable: boolean;
 }>();
 
 const emit = defineEmits<{ remove: [] }>();
 
-const tageAusZeitraum = computed(() => hasZeitraum(adresse.value));
-
-const tage = computed({
-  get: () => tageUnerlaubteNutzung(adresse.value) ?? null,
-  set: (value: number | null) => {
-    // A period wins, so a directly entered count is kept but not overwritten while one is given.
-    if (!tageAusZeitraum.value) {
-      adresse.value.tageUnerlaubteNutzung = value;
-    }
-  },
-});
-
-const tageHint = computed(() =>
-  tageAusZeitraum.value
-    ? "Aus dem Zeitraum berechnet"
-    : "Alternativ zum Zeitraum eintragbar"
-);
+const title = computed(() => adresseLabel(adresse.value, props.position));
 </script>

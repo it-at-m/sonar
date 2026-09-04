@@ -244,6 +244,7 @@ paths:
         Create a new Projekt.
          Creates a new Projekt together with its Adressen in one call.
          Abrechnungsende must not be before Abrechnungsbeginn.
+         An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
          Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
          Either that period or tageUnerlaubteNutzung is given, never both.
       operationId: saveProjekt
@@ -263,6 +264,105 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/abrechnung:
+    post:
+      tags:
+      - abrechnung-controller
+      summary: Create a new Abrechnung for a Projekt.
+      description: |-
+        Create a new Abrechnung for a Projekt.
+         Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
+         An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
+      operationId: saveAbrechnung
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: the details of the Abrechnung to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AbrechnungRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the details of the Abrechnung are invalid
+        "404":
+          description: the Projekt does not exist
+        "201":
+          description: the created Abrechnung as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}:
+    get:
+      tags:
+      - projekt-controller
+      summary: Retrieve a single Projekt.
+      description: |-
+        Retrieve a single Projekt.
+         Fetches the Projekt together with its Adressen.
+      operationId: getProjekt
+      parameters:
+      - name: projektId
+        in: path
+        description: the id of the requested Projekt
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: the Projekt represented as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
+  /geschaeftspartner/{geschaeftspartnerId}:
+    get:
+      tags:
+      - geschaeftspartner-controller
+      summary: Retrieve the master data of a Geschäftspartner.
+      description: |-
+        Retrieve the master data of a Geschäftspartner.
+         Retrieved data come from a third party system owning them.
+      operationId: getGeschaeftspartner
+      parameters:
+      - name: geschaeftspartnerId
+        in: path
+        description: the id of the requested Geschäftspartner
+        required: true
+        schema:
+          maxLength: 10
+          minLength: 0
+          type: string
+      responses:
+        "400":
+          description: the id is longer than the owning system allows
+        "404":
+          description: the owning system does not know the id
+        "502":
+          description: the owning system could not be reached
+        "200":
+          description: the master data of the Geschäftspartner as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeschaeftspartnerResponseDTO"
       security:
       - bearerAuth: []
   /actuator:
@@ -428,17 +528,40 @@ components:
     ProjektAdresseRequestDTO:
       required:
       - anzahlMahnungen
-      - bezeichnung
+      - art
       type: object
       properties:
-        bezeichnung:
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
           maxLength: 255
           minLength: 1
           type: string
-        baunutzung:
-          maxLength: 255
-          minLength: 0
+        hausnummerVon:
+          maxLength: 20
+          minLength: 1
           type: string
+        hausnummerBis:
+          maxLength: 20
+          minLength: 1
+          type: string
+        flurstueck:
+          maxLength: 255
+          minLength: 1
+          type: string
+        gemarkung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -484,10 +607,27 @@ components:
         id:
           type: string
           format: uuid
-        bezeichnung:
+        art:
           type: string
-        baunutzung:
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
           type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -520,6 +660,282 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektAdresseResponseDTO"
+    AbrechnungNutzungsobjektRequestDTO:
+      required:
+      - art
+      - positionen
+      type: object
+      properties:
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          maxLength: 255
+          minLength: 1
+          type: string
+        hausnummerVon:
+          maxLength: 20
+          minLength: 1
+          type: string
+        hausnummerBis:
+          maxLength: 20
+          minLength: 1
+          type: string
+        flurstueck:
+          maxLength: 255
+          minLength: 1
+          type: string
+        gemarkung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          minimum: 1
+          type: integer
+          format: int32
+        bemerkung:
+          maxLength: 10000
+          minLength: 0
+          type: string
+        positionen:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungPositionRequestDTO"
+    AbrechnungPositionRequestDTO:
+      required:
+      - anteilAnFlaeche
+      - beginn
+      - breite
+      - ende
+      - flaeche
+      - laenge
+      type: object
+      properties:
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+        laenge:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        breite:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        flaeche:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        haelfte:
+          type: boolean
+        anteilAnFlaeche:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+    AbrechnungRequestDTO:
+      required:
+      - abrechnungsArt
+      - geschaeftspartnerId
+      - nutzungsobjekte
+      - zeitraumBis
+      - zeitraumVon
+      type: object
+      properties:
+        geschaeftspartnerId:
+          maxLength: 10
+          minLength: 1
+          type: string
+        zustellungsbevollmaechtigterGenutzt:
+          type: boolean
+        zustellungsbevollmaechtigterId:
+          maxLength: 10
+          minLength: 1
+          type: string
+        zustellungsbevollmaechtigterTyp:
+          type: string
+          enum:
+          - GESETZLICHER_VERTRETER
+          - VORMUND
+          - BETREUER
+          - NACHLASSVERWALTER
+          - NACHLASSPFLEGER
+          - TESTAMENTSVOLLSTRECKER
+          - ZWANGSVERWALTER
+          - PFLEGER
+          - VORSTAND
+          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
+          - LIQUIDATOR
+          - KONKURSVERWALTER
+          - STEUERLICHER_VERTRETER
+          - EMPFANGSBEVOLLMAECHTIGTER
+          - VERGLEICHSVERWALTER
+          - GESAMTRECHTSNACHFOLGER
+          - VERWALTER_NACH_DEM_WEG
+          - GESCHAEFTSFUEHRER
+          - GESELLSCHAFTER
+          - INSOLVENZVERWALTER
+          - NACHTRAGSLIQUIDATOR
+          - TREUHAENDER
+          - VORLAEUFIGER_INSOLVENZVERWALTER
+        zeitraumVon:
+          type: string
+          format: date
+        zeitraumBis:
+          type: string
+          format: date
+        abrechnungsArt:
+          type: string
+          enum:
+          - ENDABRECHNUNG
+          - ZWISCHENABRECHNUNG
+        nutzungsobjekte:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungNutzungsobjektRequestDTO"
+      description: |-
+        The Abrechnung to create.
+         <p>
+         An Abrechnung is created below its Projekt, so the path decides which one it belongs to.
+         </p>
+    AbrechnungNutzungsobjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          type: integer
+          format: int32
+        bemerkung:
+          type: string
+        positionen:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungPositionResponseDTO"
+    AbrechnungPositionResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+        laenge:
+          type: number
+        breite:
+          type: number
+        flaeche:
+          type: number
+        haelfte:
+          type: boolean
+        anteilAnFlaeche:
+          type: number
+    AbrechnungResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektId:
+          type: string
+          format: uuid
+        geschaeftspartnerId:
+          type: string
+        zustellungsbevollmaechtigterGenutzt:
+          type: boolean
+        zustellungsbevollmaechtigterId:
+          type: string
+        zustellungsbevollmaechtigterTyp:
+          type: string
+          enum:
+          - GESETZLICHER_VERTRETER
+          - VORMUND
+          - BETREUER
+          - NACHLASSVERWALTER
+          - NACHLASSPFLEGER
+          - TESTAMENTSVOLLSTRECKER
+          - ZWANGSVERWALTER
+          - PFLEGER
+          - VORSTAND
+          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
+          - LIQUIDATOR
+          - KONKURSVERWALTER
+          - STEUERLICHER_VERTRETER
+          - EMPFANGSBEVOLLMAECHTIGTER
+          - VERGLEICHSVERWALTER
+          - GESAMTRECHTSNACHFOLGER
+          - VERWALTER_NACH_DEM_WEG
+          - GESCHAEFTSFUEHRER
+          - GESELLSCHAFTER
+          - INSOLVENZVERWALTER
+          - NACHTRAGSLIQUIDATOR
+          - TREUHAENDER
+          - VORLAEUFIGER_INSOLVENZVERWALTER
+        zeitraumVon:
+          type: string
+          format: date
+        zeitraumBis:
+          type: string
+          format: date
+        abrechnungsArt:
+          type: string
+          enum:
+          - ENDABRECHNUNG
+          - ZWISCHENABRECHNUNG
+        nutzungsobjekte:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungNutzungsobjektResponseDTO"
     PageMetadata:
       type: object
       properties:
@@ -553,6 +969,68 @@ components:
             $ref: "#/components/schemas/ProjektResponseDTO"
         page:
           $ref: "#/components/schemas/PageMetadata"
+    GeschaeftspartnerResponseDTO:
+      type: object
+      properties:
+        anrede:
+          type: string
+          description: Title text
+        name1:
+          type: string
+          description: Name 1 of organization
+        name2:
+          type: string
+          description: Name 2 of organization
+        name3:
+          type: string
+          description: Name 3 of organization
+        name4:
+          type: string
+          description: Name 4 of organization
+        vorname:
+          type: string
+          description: First name of business partner (person)
+        nachname:
+          type: string
+          description: Last name of business partner (person)
+        coName:
+          type: string
+          description: c/o name
+        strasse:
+          type: string
+          description: Street
+        hausnummer:
+          type: string
+          description: House Number
+        adresszusatz:
+          type: string
+          description: Street 2
+        postleitzahl:
+          type: string
+          description: City postal code
+        ort:
+          type: string
+          description: City
+        land:
+          type: string
+          description: Country Key
+        telefon:
+          type: string
+          description: "Complete number: dialling code+number+extension"
+        mobil:
+          type: string
+          description: "Complete number: dialling code+number+extension"
+        fax:
+          type: string
+          description: "Complete number: dialling code+number+extension"
+        email:
+          type: string
+          description: E-Mail Address
+        adressnotiz:
+          type: string
+          description: Address notes
+      description: "The master data of a Geschäftspartner, read from a third party\
+        \ system owning it."
     Link:
       type: object
       properties:

@@ -3,6 +3,9 @@ package de.muenchen.oss.sonar.backend.projekt;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
+import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
+import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
 import java.time.LocalDate;
@@ -27,13 +30,17 @@ class ProjektEntityMapperTest {
         void givenEntity_thenReturnsCorrectProjekt() {
             final ProjektAdresseEntity adresseEntity = new ProjektAdresseEntity();
             adresseEntity.setId(UUID.randomUUID());
-            adresseEntity.setBezeichnung("Marienplatz 8");
-            adresseEntity.setBaunutzung("Gastronomie");
-            adresseEntity.setUnerlaubteNutzungVon(BEGINN);
-            adresseEntity.setUnerlaubteNutzungBis(ENDE);
-            adresseEntity.setTageUnerlaubteNutzung(90);
             adresseEntity.setAnzahlMahnungen(2);
             adresseEntity.setSondernutzungErlaubt(true);
+
+            final AdressdatenEmbeddable adressdaten = adresseEntity.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten.setUnerlaubteNutzungBis(ENDE);
+            adressdaten.setTageUnerlaubteNutzung(90);
 
             final ProjektEntity projektEntity = new ProjektEntity();
             projektEntity.setId(UUID.randomUUID());
@@ -53,11 +60,16 @@ class ProjektEntityMapperTest {
 
             final ProjektAdresse adresse = result.adressen().getFirst();
             assertThat(adresse.id()).isEqualTo(adresseEntity.getId());
-            assertThat(adresse.bezeichnung()).isEqualTo(adresseEntity.getBezeichnung());
-            assertThat(adresse.baunutzung()).isEqualTo(adresseEntity.getBaunutzung());
-            assertThat(adresse.unerlaubteNutzungVon()).isEqualTo(adresseEntity.getUnerlaubteNutzungVon());
-            assertThat(adresse.unerlaubteNutzungBis()).isEqualTo(adresseEntity.getUnerlaubteNutzungBis());
-            assertThat(adresse.tageUnerlaubteNutzung()).isEqualTo(adresseEntity.getTageUnerlaubteNutzung());
+            assertThat(adresse.art()).isEqualTo(adressdaten.getArt());
+            assertThat(adresse.adresse()).isEqualTo(adressdaten.getAdresse());
+            assertThat(adresse.hausnummerVon()).isEqualTo(adressdaten.getHausnummerVon());
+            assertThat(adresse.hausnummerBis()).isEqualTo(adressdaten.getHausnummerBis());
+            assertThat(adresse.flurstueck()).isEqualTo(adressdaten.getFlurstueck());
+            assertThat(adresse.gemarkung()).isEqualTo(adressdaten.getGemarkung());
+            assertThat(adresse.nutzung()).isEqualTo(adressdaten.getNutzung());
+            assertThat(adresse.unerlaubteNutzungVon()).isEqualTo(adressdaten.getUnerlaubteNutzungVon());
+            assertThat(adresse.unerlaubteNutzungBis()).isEqualTo(adressdaten.getUnerlaubteNutzungBis());
+            assertThat(adresse.tageUnerlaubteNutzung()).isEqualTo(adressdaten.getTageUnerlaubteNutzung());
             assertThat(adresse.anzahlMahnungen()).isEqualTo(adresseEntity.getAnzahlMahnungen());
             assertThat(adresse.sondernutzungErlaubt()).isEqualTo(adresseEntity.isSondernutzungErlaubt());
         }
@@ -68,7 +80,8 @@ class ProjektEntityMapperTest {
         @Test
         void givenProjekt_thenReturnsCorrectEntity() {
             final ProjektAdresse adresse = new ProjektAdresse(
-                    null, "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 1, false);
+                    null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    BEGINN, ENDE, null, 1, false);
             final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
@@ -80,11 +93,17 @@ class ProjektEntityMapperTest {
             assertThat(result.getAdressen()).hasSize(1);
 
             final ProjektAdresseEntity adresseEntity = result.getAdressen().getFirst();
-            assertThat(adresseEntity.getBezeichnung()).isEqualTo(adresse.bezeichnung());
-            assertThat(adresseEntity.getBaunutzung()).isEqualTo(adresse.baunutzung());
-            assertThat(adresseEntity.getUnerlaubteNutzungVon()).isEqualTo(adresse.unerlaubteNutzungVon());
-            assertThat(adresseEntity.getUnerlaubteNutzungBis()).isEqualTo(adresse.unerlaubteNutzungBis());
-            assertThat(adresseEntity.getTageUnerlaubteNutzung()).isEqualTo(adresse.tageUnerlaubteNutzung());
+            final AdressdatenEmbeddable adressdaten = adresseEntity.getAdressdaten();
+            assertThat(adressdaten.getArt()).isEqualTo(adresse.art());
+            assertThat(adressdaten.getAdresse()).isEqualTo(adresse.adresse());
+            assertThat(adressdaten.getHausnummerVon()).isEqualTo(adresse.hausnummerVon());
+            assertThat(adressdaten.getHausnummerBis()).isEqualTo(adresse.hausnummerBis());
+            assertThat(adressdaten.getFlurstueck()).isEqualTo(adresse.flurstueck());
+            assertThat(adressdaten.getGemarkung()).isEqualTo(adresse.gemarkung());
+            assertThat(adressdaten.getNutzung()).isEqualTo(adresse.nutzung());
+            assertThat(adressdaten.getUnerlaubteNutzungVon()).isEqualTo(adresse.unerlaubteNutzungVon());
+            assertThat(adressdaten.getUnerlaubteNutzungBis()).isEqualTo(adresse.unerlaubteNutzungBis());
+            assertThat(adressdaten.getTageUnerlaubteNutzung()).isEqualTo(adresse.tageUnerlaubteNutzung());
             assertThat(adresseEntity.getAnzahlMahnungen()).isEqualTo(adresse.anzahlMahnungen());
             assertThat(adresseEntity.isSondernutzungErlaubt()).isEqualTo(adresse.sondernutzungErlaubt());
         }
@@ -92,7 +111,8 @@ class ProjektEntityMapperTest {
         @Test
         void givenProjektWithId_thenIdIsNotCarriedOver() {
             final ProjektAdresse adresse = new ProjektAdresse(
-                    UUID.randomUUID(), "Marienplatz 8", null, null, null, 12, 0, false);
+                    UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, null, 12, 0, false);
             final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", BEGINN, ENDE, List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);

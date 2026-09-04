@@ -82,7 +82,7 @@ describe("projekteListe.ts", () => {
             projektnummer: "2026-0001",
             abrechnungBeginn: new Date("2026-01-01"),
             abrechnungEnde: new Date("2026-03-31"),
-            adressen: [{ bezeichnung: "A" }, { bezeichnung: "B" }],
+            adressen: [{ adresse: "A" }, { adresse: "B" }],
           },
         ],
       };

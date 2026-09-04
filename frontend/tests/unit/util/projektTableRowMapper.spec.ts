@@ -37,7 +37,7 @@ describe("projektTableRowMapper.ts", () => {
 
     it("givenAdressen_thenCountThem", () => {
       const row = toProjektTableRow({
-        adressen: [{ bezeichnung: "A" }, { bezeichnung: "B" }],
+        adressen: [{ adresse: "A" }, { adresse: "B" }],
       });
 
       expect(row.anzahlAdressen).toBe(2);
