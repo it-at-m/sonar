@@ -10,7 +10,7 @@
         label="Geschäftspartner:in ID"
         :maxlength="GESCHAEFTSPARTNER_ID_MAX_LENGTH"
         :rules="[requiredRule]"
-        :error-messages="geschaeftspartner.errorMessage.value"
+        :error-messages="geschaeftspartner.errorMessage"
       />
     </v-col>
   </v-row>
@@ -20,8 +20,8 @@
       md="8"
     >
       <geschaeftspartner-stammdaten
-        :daten="geschaeftspartner.data.value"
-        :loading="geschaeftspartner.loading.value"
+        :daten="geschaeftspartner.data"
+        :loading="geschaeftspartner.loading"
       />
     </v-col>
   </v-row>
@@ -46,7 +46,7 @@
           label="Zustellungsbevollmächtigte:r ID"
           :maxlength="GESCHAEFTSPARTNER_ID_MAX_LENGTH"
           :rules="[requiredRule]"
-          :error-messages="zustellungsbevollmaechtigter.errorMessage.value"
+          :error-messages="zustellungsbevollmaechtigter.errorMessage"
         />
       </v-col>
       <v-col
@@ -67,8 +67,8 @@
         md="8"
       >
         <geschaeftspartner-stammdaten
-          :daten="zustellungsbevollmaechtigter.data.value"
-          :loading="zustellungsbevollmaechtigter.loading.value"
+          :daten="zustellungsbevollmaechtigter.data"
+          :loading="zustellungsbevollmaechtigter.loading"
         />
       </v-col>
     </v-row>
@@ -77,12 +77,19 @@
 
 <script setup lang="ts">
 import type { AbrechnungForm } from "@/composables/abrechnungForm";
+import type { GeschaeftspartnerLookupResult } from "@/util/geschaeftspartnerLookup";
+import type { Ref } from "vue";
 
 import { watchDebounced } from "@vueuse/core";
+import { ref } from "vue";
 
 import GeschaeftspartnerStammdaten from "@/components/GeschaeftspartnerStammdaten.vue";
-import { useGeschaeftspartnerLookup } from "@/composables/geschaeftspartnerLookup";
+import { lookupGeschaeftspartner } from "@/util/geschaeftspartnerLookup";
 import { requiredRule } from "@/util/validationRules";
+
+interface GeschaeftspartnerLookupState extends GeschaeftspartnerLookupResult {
+  loading: boolean;
+}
 
 const GESCHAEFTSPARTNER_ID_MAX_LENGTH = 10;
 const LOOKUP_DEBOUNCE_MS = 300;
@@ -121,17 +128,43 @@ const ZUSTELLUNGSBEVOLLMAECHTIGTER_TYP_OPTIONS = [
 
 const abrechnung = defineModel<AbrechnungForm>({ required: true });
 
-const geschaeftspartner = useGeschaeftspartnerLookup();
-const zustellungsbevollmaechtigter = useGeschaeftspartnerLookup();
+function emptyLookupState(): GeschaeftspartnerLookupState {
+  return { data: null, loading: false, errorMessage: "" };
+}
 
-watchDebounced(
-  () => abrechnung.value.geschaeftspartnerId,
-  (id) => void geschaeftspartner.lookup(id),
-  { debounce: LOOKUP_DEBOUNCE_MS }
-);
-watchDebounced(
+const geschaeftspartner = ref<GeschaeftspartnerLookupState>(emptyLookupState());
+const zustellungsbevollmaechtigter =
+  ref<GeschaeftspartnerLookupState>(emptyLookupState());
+
+function watchLookup(
+  geschaeftspartnerId: () => string,
+  lookupState: Ref<GeschaeftspartnerLookupState>
+): void {
+  watchDebounced(
+    geschaeftspartnerId,
+    async (id, _previousId, onCleanup) => {
+      // A newer id supersedes this lookup, so its answer must not overwrite the newer state.
+      let outdated = false;
+      onCleanup(() => (outdated = true));
+
+      const gesuchteId = id.trim();
+      if (!gesuchteId) {
+        lookupState.value = emptyLookupState();
+        return;
+      }
+      lookupState.value = { data: null, loading: true, errorMessage: "" };
+      const result = await lookupGeschaeftspartner(gesuchteId);
+      if (!outdated) {
+        lookupState.value = { ...result, loading: false };
+      }
+    },
+    { debounce: LOOKUP_DEBOUNCE_MS }
+  );
+}
+
+watchLookup(() => abrechnung.value.geschaeftspartnerId, geschaeftspartner);
+watchLookup(
   () => abrechnung.value.zustellungsbevollmaechtigterId,
-  (id) => void zustellungsbevollmaechtigter.lookup(id),
-  { debounce: LOOKUP_DEBOUNCE_MS }
+  zustellungsbevollmaechtigter
 );
 </script>
