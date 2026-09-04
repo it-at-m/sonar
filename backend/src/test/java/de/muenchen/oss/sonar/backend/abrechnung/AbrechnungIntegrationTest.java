@@ -27,6 +27,7 @@ import org.springframework.boot.resttestclient.autoconfigure.AutoConfigureRestTe
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
 import org.springframework.context.annotation.Import;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
@@ -90,6 +91,382 @@ class AbrechnungIntegrationTest {
         projekt.addAdresse(adresse);
 
         projektId = projektRepository.save(projekt).getId();
+    }
+
+    @Nested
+    class GetAbrechnungenPage {
+
+        @Test
+        void givenAbrechnungenOfSeveralProjekte_thenReturnOnlyThoseOfTheRequestedProjekt() {
+            final AbrechnungPositionEntity eigenePosition = new AbrechnungPositionEntity();
+            eigenePosition.setBeginn(VON);
+            eigenePosition.setEnde(BIS);
+            eigenePosition.setLaenge(new BigDecimal("12.00"));
+            eigenePosition.setBreite(new BigDecimal("3.00"));
+            eigenePosition.setFlaeche(new BigDecimal("36.00"));
+            eigenePosition.setHaelfte(true);
+            eigenePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity eigenesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            eigenesNutzungsobjekt.addPosition(eigenePosition);
+
+            final AdressdatenEmbeddable eigeneAdressdaten = eigenesNutzungsobjekt.getAdressdaten();
+            eigeneAdressdaten.setArt(Adressart.ADRESSE);
+            eigeneAdressdaten.setAdresse("Marienplatz");
+            eigeneAdressdaten.setHausnummerVon("8");
+            eigeneAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity eigeneAbrechnung = new AbrechnungEntity();
+            eigeneAbrechnung.setProjektId(projektId);
+            eigeneAbrechnung.setGeschaeftspartnerId("1000000001");
+            eigeneAbrechnung.setZeitraumVon(VON);
+            eigeneAbrechnung.setZeitraumBis(BIS);
+            eigeneAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            eigeneAbrechnung.addNutzungsobjekt(eigenesNutzungsobjekt);
+            abrechnungRepository.save(eigeneAbrechnung);
+
+            final ProjektEntity anderesProjekt = new ProjektEntity();
+            anderesProjekt.setProjektnummer("2026-0002");
+            anderesProjekt.setAbrechnungBeginn(VON);
+            anderesProjekt.setAbrechnungEnde(BIS);
+
+            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
+            adresse.setAnzahlMahnungen(0);
+            adresse.setSondernutzungErlaubt(false);
+            adresse.getAdressdaten().setArt(Adressart.ADRESSE);
+            adresse.getAdressdaten().setAdresse("Sendlinger Straße");
+            adresse.getAdressdaten().setHausnummerVon("1");
+            anderesProjekt.addAdresse(adresse);
+
+            final UUID anderesProjektId = projektRepository.save(anderesProjekt).getId();
+
+            final AbrechnungEntity fremdeAbrechnung = new AbrechnungEntity();
+            fremdeAbrechnung.setProjektId(anderesProjektId);
+            fremdeAbrechnung.setGeschaeftspartnerId("1000000002");
+            fremdeAbrechnung.setZeitraumVon(VON);
+            fremdeAbrechnung.setZeitraumBis(BIS);
+            fremdeAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+
+            final AbrechnungPositionEntity fremdePosition = new AbrechnungPositionEntity();
+            fremdePosition.setBeginn(VON);
+            fremdePosition.setEnde(BIS);
+            fremdePosition.setLaenge(new BigDecimal("12.00"));
+            fremdePosition.setBreite(new BigDecimal("3.00"));
+            fremdePosition.setFlaeche(new BigDecimal("36.00"));
+            fremdePosition.setHaelfte(true);
+            fremdePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity fremdesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            fremdesNutzungsobjekt.addPosition(fremdePosition);
+
+            final AdressdatenEmbeddable fremdeAdressdaten = fremdesNutzungsobjekt.getAdressdaten();
+            fremdeAdressdaten.setArt(Adressart.ADRESSE);
+            fremdeAdressdaten.setAdresse("Sendlinger Straße");
+            fremdeAdressdaten.setHausnummerVon("1");
+            fremdeAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            fremdeAbrechnung.addNutzungsobjekt(fremdesNutzungsobjekt);
+            abrechnungRepository.save(fremdeAbrechnung);
+
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                    .expectBody()
+                    .jsonPath("$.content..geschaeftspartnerId")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, geschaeftspartnerIds -> assertThat(geschaeftspartnerIds).containsExactly("1000000001"));
+        }
+
+        @Test
+        void givenNoSortParameters_thenPageByDescendingZeitraumVonWithoutRepeatingOrSkipping() {
+            final AbrechnungPositionEntity position0001 = new AbrechnungPositionEntity();
+            position0001.setBeginn(VON);
+            position0001.setEnde(BIS);
+            position0001.setLaenge(new BigDecimal("12.00"));
+            position0001.setBreite(new BigDecimal("3.00"));
+            position0001.setFlaeche(new BigDecimal("36.00"));
+            position0001.setHaelfte(true);
+            position0001.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0001 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0001.addPosition(position0001);
+
+            final AdressdatenEmbeddable adressdaten0001 = nutzungsobjekt0001.getAdressdaten();
+            adressdaten0001.setArt(Adressart.ADRESSE);
+            adressdaten0001.setAdresse("Marienplatz");
+            adressdaten0001.setHausnummerVon("8");
+            adressdaten0001.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0001 = new AbrechnungEntity();
+            abrechnung0001.setProjektId(projektId);
+            abrechnung0001.setGeschaeftspartnerId("1000000001");
+            abrechnung0001.setZeitraumVon(LocalDate.of(2026, 1, 1));
+            abrechnung0001.setZeitraumBis(BIS);
+            abrechnung0001.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung0001.addNutzungsobjekt(nutzungsobjekt0001);
+            abrechnungRepository.save(abrechnung0001);
+
+            final AbrechnungPositionEntity position0002 = new AbrechnungPositionEntity();
+            position0002.setBeginn(VON);
+            position0002.setEnde(BIS);
+            position0002.setLaenge(new BigDecimal("12.00"));
+            position0002.setBreite(new BigDecimal("3.00"));
+            position0002.setFlaeche(new BigDecimal("36.00"));
+            position0002.setHaelfte(true);
+            position0002.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0002 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0002.addPosition(position0002);
+
+            final AdressdatenEmbeddable adressdaten0002 = nutzungsobjekt0002.getAdressdaten();
+            adressdaten0002.setArt(Adressart.ADRESSE);
+            adressdaten0002.setAdresse("Marienplatz");
+            adressdaten0002.setHausnummerVon("8");
+            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0002 = new AbrechnungEntity();
+            abrechnung0002.setProjektId(projektId);
+            abrechnung0002.setGeschaeftspartnerId("1000000002");
+            abrechnung0002.setZeitraumVon(LocalDate.of(2026, 3, 1));
+            abrechnung0002.setZeitraumBis(BIS);
+            abrechnung0002.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung0002.addNutzungsobjekt(nutzungsobjekt0002);
+            abrechnungRepository.save(abrechnung0002);
+
+            final AbrechnungPositionEntity position0003 = new AbrechnungPositionEntity();
+            position0003.setBeginn(VON);
+            position0003.setEnde(BIS);
+            position0003.setLaenge(new BigDecimal("12.00"));
+            position0003.setBreite(new BigDecimal("3.00"));
+            position0003.setFlaeche(new BigDecimal("36.00"));
+            position0003.setHaelfte(true);
+            position0003.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0003 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0003.addPosition(position0003);
+
+            final AdressdatenEmbeddable adressdaten0003 = nutzungsobjekt0003.getAdressdaten();
+            adressdaten0003.setArt(Adressart.ADRESSE);
+            adressdaten0003.setAdresse("Marienplatz");
+            adressdaten0003.setHausnummerVon("8");
+            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0003 = new AbrechnungEntity();
+            abrechnung0003.setProjektId(projektId);
+            abrechnung0003.setGeschaeftspartnerId("1000000003");
+            abrechnung0003.setZeitraumVon(LocalDate.of(2026, 2, 1));
+            abrechnung0003.setZeitraumBis(BIS);
+            abrechnung0003.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung0003.addNutzungsobjekt(nutzungsobjekt0003);
+            abrechnungRepository.save(abrechnung0003);
+
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("pageNumber", "0")
+                            .queryParam("pageSize", "2")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.content..geschaeftspartnerId")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, geschaeftspartnerIds -> assertThat(geschaeftspartnerIds).containsExactly("1000000002", "1000000003"));
+
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("pageNumber", "1")
+                            .queryParam("pageSize", "2")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.content..geschaeftspartnerId")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, geschaeftspartnerIds -> assertThat(geschaeftspartnerIds).containsExactly("1000000001"));
+        }
+
+        @Test
+        void givenZeitraumBisAscending_thenOrderByThatColumn() {
+            final AbrechnungPositionEntity position0001 = new AbrechnungPositionEntity();
+            position0001.setBeginn(VON);
+            position0001.setEnde(BIS);
+            position0001.setLaenge(new BigDecimal("12.00"));
+            position0001.setBreite(new BigDecimal("3.00"));
+            position0001.setFlaeche(new BigDecimal("36.00"));
+            position0001.setHaelfte(true);
+            position0001.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0001 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0001.addPosition(position0001);
+
+            final AdressdatenEmbeddable adressdaten0001 = nutzungsobjekt0001.getAdressdaten();
+            adressdaten0001.setArt(Adressart.ADRESSE);
+            adressdaten0001.setAdresse("Marienplatz");
+            adressdaten0001.setHausnummerVon("8");
+            adressdaten0001.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0001 = new AbrechnungEntity();
+            abrechnung0001.setProjektId(projektId);
+            abrechnung0001.setGeschaeftspartnerId("1000000001");
+            abrechnung0001.setZeitraumVon(VON);
+            abrechnung0001.setZeitraumBis(LocalDate.of(2026, 6, 30));
+            abrechnung0001.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung0001.addNutzungsobjekt(nutzungsobjekt0001);
+            abrechnungRepository.save(abrechnung0001);
+
+            final AbrechnungPositionEntity position0002 = new AbrechnungPositionEntity();
+            position0002.setBeginn(VON);
+            position0002.setEnde(BIS);
+            position0002.setLaenge(new BigDecimal("12.00"));
+            position0002.setBreite(new BigDecimal("3.00"));
+            position0002.setFlaeche(new BigDecimal("36.00"));
+            position0002.setHaelfte(true);
+            position0002.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0002 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0002.addPosition(position0002);
+
+            final AdressdatenEmbeddable adressdaten0002 = nutzungsobjekt0002.getAdressdaten();
+            adressdaten0002.setArt(Adressart.ADRESSE);
+            adressdaten0002.setAdresse("Marienplatz");
+            adressdaten0002.setHausnummerVon("8");
+            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0002 = new AbrechnungEntity();
+            abrechnung0002.setProjektId(projektId);
+            abrechnung0002.setGeschaeftspartnerId("1000000002");
+            abrechnung0002.setZeitraumVon(VON);
+            abrechnung0002.setZeitraumBis(LocalDate.of(2026, 3, 31));
+            abrechnung0002.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung0002.addNutzungsobjekt(nutzungsobjekt0002);
+            abrechnungRepository.save(abrechnung0002);
+
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("sortBy", "ZEITRAUM_BIS")
+                            .queryParam("sortDirection", "ASC")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.content..geschaeftspartnerId")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, geschaeftspartnerIds -> assertThat(geschaeftspartnerIds).containsExactly("1000000002", "1000000001"));
+        }
+
+        @Test
+        void givenAbrechnungenPage_thenIncludeTheirNutzungsobjekte() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+            position.setHaelfte(true);
+            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt.addPosition(position);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(projektId);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnungRepository.save(abrechnung);
+
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.page.totalElements").isEqualTo(1)
+                    .jsonPath("$.content[0].abrechnungsArt").isEqualTo("ZWISCHENABRECHNUNG")
+                    .jsonPath("$.content[0].nutzungsobjekte.length()").isEqualTo(1)
+                    .jsonPath("$.content[0].nutzungsobjekte[0].adresse").isEqualTo("Marienplatz");
+        }
+
+        @Test
+        void givenProjektWithoutAbrechnungen_thenReturnEmptyPage() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.page.totalElements").isEqualTo(0);
+        }
+
+        @Test
+        void givenUnknownProjekt_thenReturnNotFound() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .build(UUID.randomUUID()))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenUnknownSortBy_thenRejectTheRequest() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("sortBy", "GEHEIMES_FELD")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void givenPageSizeAboveMaximum_thenReturnBadRequest() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("pageSize", "101")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void givenNegativePageNumber_thenReturnBadRequest() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("pageNumber", "-1")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
     }
 
     @Nested
