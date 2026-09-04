@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.geschaeftspartner;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
 
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.client.GeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

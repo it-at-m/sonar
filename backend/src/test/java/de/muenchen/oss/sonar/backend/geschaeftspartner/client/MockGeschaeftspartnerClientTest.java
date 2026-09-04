@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.geschaeftspartner;
+package de.muenchen.oss.sonar.backend.geschaeftspartner.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 

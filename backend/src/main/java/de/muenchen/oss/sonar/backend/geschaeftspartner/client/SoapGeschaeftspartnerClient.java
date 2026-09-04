@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.geschaeftspartner;
+package de.muenchen.oss.sonar.backend.geschaeftspartner.client;
 
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerDTOMapper;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerResponseDTO;
