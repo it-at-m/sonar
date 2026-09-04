@@ -6,11 +6,16 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.muenchen.oss.sonar.backend.TestConstants;
 import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
+import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
+import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektAdresseRequestDTO;
+import de.muenchen.oss.sonar.backend.projekt.dto.ProjektAdresseResponseDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektRequestDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektResponseDTO;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,17 +60,23 @@ class ProjektIntegrationTest {
     @Autowired
     private TransactionTemplate transactionTemplate;
 
+    private UUID projektId;
+
     @BeforeEach
     public void setUp() {
         projektRepository.deleteAll();
 
         final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-        adresse.setBezeichnung("Marienplatz 8");
-        adresse.setBaunutzung("Gastronomie");
-        adresse.setUnerlaubteNutzungVon(BEGINN);
-        adresse.setUnerlaubteNutzungBis(ENDE);
         adresse.setAnzahlMahnungen(0);
         adresse.setSondernutzungErlaubt(false);
+
+        final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+        adressdaten.setArt(Adressart.ADRESSE);
+        adressdaten.setAdresse("Marienplatz");
+        adressdaten.setHausnummerVon("8");
+        adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+        adressdaten.setUnerlaubteNutzungVon(BEGINN);
+        adressdaten.setUnerlaubteNutzungBis(ENDE);
 
         final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer("2026-0001");
@@ -73,7 +84,7 @@ class ProjektIntegrationTest {
         projekt.setAbrechnungEnde(ENDE);
         projekt.addAdresse(adresse);
 
-        projektRepository.save(projekt);
+        projektId = projektRepository.save(projekt).getId();
     }
 
     @Nested
@@ -99,12 +110,16 @@ class ProjektIntegrationTest {
         @Test
         void givenNoSortParameters_thenPageByDescendingProjektnummerWithoutRepeatingOrSkipping() {
             final ProjektAdresseEntity adresse0003 = new ProjektAdresseEntity();
-            adresse0003.setBezeichnung("Marienplatz 8");
-            adresse0003.setBaunutzung("Gastronomie");
-            adresse0003.setUnerlaubteNutzungVon(BEGINN);
-            adresse0003.setUnerlaubteNutzungBis(ENDE);
             adresse0003.setAnzahlMahnungen(0);
             adresse0003.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0003 = adresse0003.getAdressdaten();
+            adressdaten0003.setArt(Adressart.ADRESSE);
+            adressdaten0003.setAdresse("Marienplatz");
+            adressdaten0003.setHausnummerVon("8");
+            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten0003.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten0003.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
@@ -114,12 +129,16 @@ class ProjektIntegrationTest {
             projektRepository.save(projekt0003);
 
             final ProjektAdresseEntity adresse0002 = new ProjektAdresseEntity();
-            adresse0002.setBezeichnung("Marienplatz 8");
-            adresse0002.setBaunutzung("Gastronomie");
-            adresse0002.setUnerlaubteNutzungVon(BEGINN);
-            adresse0002.setUnerlaubteNutzungBis(ENDE);
             adresse0002.setAnzahlMahnungen(0);
             adresse0002.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0002 = adresse0002.getAdressdaten();
+            adressdaten0002.setArt(Adressart.ADRESSE);
+            adressdaten0002.setAdresse("Marienplatz");
+            adressdaten0002.setHausnummerVon("8");
+            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten0002.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten0002.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
@@ -160,12 +179,16 @@ class ProjektIntegrationTest {
         @Test
         void givenAscendingProjektnummer_thenReverseTheOrder() {
             final ProjektAdresseEntity adresse0003 = new ProjektAdresseEntity();
-            adresse0003.setBezeichnung("Marienplatz 8");
-            adresse0003.setBaunutzung("Gastronomie");
-            adresse0003.setUnerlaubteNutzungVon(BEGINN);
-            adresse0003.setUnerlaubteNutzungBis(ENDE);
             adresse0003.setAnzahlMahnungen(0);
             adresse0003.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0003 = adresse0003.getAdressdaten();
+            adressdaten0003.setArt(Adressart.ADRESSE);
+            adressdaten0003.setAdresse("Marienplatz");
+            adressdaten0003.setHausnummerVon("8");
+            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten0003.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten0003.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
@@ -175,12 +198,16 @@ class ProjektIntegrationTest {
             projektRepository.save(projekt0003);
 
             final ProjektAdresseEntity adresse0002 = new ProjektAdresseEntity();
-            adresse0002.setBezeichnung("Marienplatz 8");
-            adresse0002.setBaunutzung("Gastronomie");
-            adresse0002.setUnerlaubteNutzungVon(BEGINN);
-            adresse0002.setUnerlaubteNutzungBis(ENDE);
             adresse0002.setAnzahlMahnungen(0);
             adresse0002.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0002 = adresse0002.getAdressdaten();
+            adressdaten0002.setArt(Adressart.ADRESSE);
+            adressdaten0002.setAdresse("Marienplatz");
+            adressdaten0002.setHausnummerVon("8");
+            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten0002.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten0002.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
@@ -207,12 +234,16 @@ class ProjektIntegrationTest {
         @Test
         void givenAbrechnungBeginnAscending_thenOrderByThatColumn() {
             final ProjektAdresseEntity adresse0002 = new ProjektAdresseEntity();
-            adresse0002.setBezeichnung("Marienplatz 8");
-            adresse0002.setBaunutzung("Gastronomie");
-            adresse0002.setUnerlaubteNutzungVon(LocalDate.of(2025, 1, 1));
-            adresse0002.setUnerlaubteNutzungBis(ENDE);
             adresse0002.setAnzahlMahnungen(0);
             adresse0002.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0002 = adresse0002.getAdressdaten();
+            adressdaten0002.setArt(Adressart.ADRESSE);
+            adressdaten0002.setAdresse("Marienplatz");
+            adressdaten0002.setHausnummerVon("8");
+            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten0002.setUnerlaubteNutzungVon(LocalDate.of(2025, 1, 1));
+            adressdaten0002.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
@@ -222,12 +253,16 @@ class ProjektIntegrationTest {
             projektRepository.save(projekt0002);
 
             final ProjektAdresseEntity adresse0003 = new ProjektAdresseEntity();
-            adresse0003.setBezeichnung("Marienplatz 8");
-            adresse0003.setBaunutzung("Gastronomie");
-            adresse0003.setUnerlaubteNutzungVon(LocalDate.of(2024, 1, 1));
-            adresse0003.setUnerlaubteNutzungBis(ENDE);
             adresse0003.setAnzahlMahnungen(0);
             adresse0003.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0003 = adresse0003.getAdressdaten();
+            adressdaten0003.setArt(Adressart.ADRESSE);
+            adressdaten0003.setAdresse("Marienplatz");
+            adressdaten0003.setHausnummerVon("8");
+            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten0003.setUnerlaubteNutzungVon(LocalDate.of(2024, 1, 1));
+            adressdaten0003.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
@@ -267,12 +302,16 @@ class ProjektIntegrationTest {
         @Test
         void givenProjektnummerFragmentInDifferentCase_thenReturnMatchingProjekte() {
             final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setBezeichnung("Marienplatz 8");
-            adresse.setBaunutzung("Gastronomie");
-            adresse.setUnerlaubteNutzungVon(BEGINN);
-            adresse.setUnerlaubteNutzungBis(ENDE);
             adresse.setAnzahlMahnungen(0);
             adresse.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
@@ -298,12 +337,16 @@ class ProjektIntegrationTest {
         @Test
         void givenBlankProjektnummer_thenReturnAllProjekte() {
             final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setBezeichnung("Marienplatz 8");
-            adresse.setBaunutzung("Gastronomie");
-            adresse.setUnerlaubteNutzungVon(BEGINN);
-            adresse.setUnerlaubteNutzungBis(ENDE);
             adresse.setAnzahlMahnungen(0);
             adresse.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
@@ -329,12 +372,16 @@ class ProjektIntegrationTest {
         @Test
         void givenAbrechnungBeginn_thenReturnOnlyProjekteStartingOnThatDay() {
             final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setBezeichnung("Marienplatz 8");
-            adresse.setBaunutzung("Gastronomie");
-            adresse.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
-            adresse.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
             adresse.setAnzahlMahnungen(0);
             adresse.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
+            adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
@@ -360,12 +407,16 @@ class ProjektIntegrationTest {
         @Test
         void givenAbrechnungEnde_thenReturnOnlyProjekteEndingOnThatDay() {
             final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setBezeichnung("Marienplatz 8");
-            adresse.setBaunutzung("Gastronomie");
-            adresse.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
-            adresse.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
             adresse.setAnzahlMahnungen(0);
             adresse.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
+            adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
@@ -407,12 +458,16 @@ class ProjektIntegrationTest {
         @Test
         void givenSeveralCriteria_thenCombineThemWithAnd() {
             final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setBezeichnung("Marienplatz 8");
-            adresse.setBaunutzung("Gastronomie");
-            adresse.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
-            adresse.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
             adresse.setAnzahlMahnungen(0);
             adresse.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
+            adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
@@ -439,12 +494,16 @@ class ProjektIntegrationTest {
         @Test
         void givenFilter_thenTotalElementsCountsOnlyMatches() {
             final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setBezeichnung("Marienplatz 8");
-            adresse.setBaunutzung("Gastronomie");
-            adresse.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
-            adresse.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
             adresse.setAnzahlMahnungen(0);
             adresse.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
+            adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
@@ -503,11 +562,56 @@ class ProjektIntegrationTest {
     }
 
     @Nested
+    class GetProjekt {
+        @Test
+        void givenKnownId_thenReturnProjektWithItsAdressen() {
+            restTestClient.get()
+                    .uri("/projekt/{projektId}", projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                    .expectBody(ProjektResponseDTO.class)
+                    .value(projektResponseDTO -> {
+                        assertNotNull(projektResponseDTO);
+                        assertThat(projektResponseDTO.id()).isEqualTo(projektId);
+                        assertThat(projektResponseDTO.projektnummer()).isEqualTo("2026-0001");
+                        assertThat(projektResponseDTO.adressen()).hasSize(1);
+
+                        final ProjektAdresseResponseDTO adresse = projektResponseDTO.adressen().getFirst();
+                        assertThat(adresse.art()).isEqualTo(Adressart.ADRESSE);
+                        assertThat(adresse.adresse()).isEqualTo("Marienplatz");
+                        assertThat(adresse.hausnummerVon()).isEqualTo("8");
+                        assertThat(adresse.nutzung()).isEqualTo(Nutzung.NUTZUNG_A);
+                    });
+        }
+
+        @Test
+        void givenUnknownId_thenReturnNotFound() {
+            restTestClient.get()
+                    .uri("/projekt/{projektId}", UUID.randomUUID())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenIdThatIsNoUuid_thenReturnBadRequest() {
+            restTestClient.get()
+                    .uri("/projekt/{projektId}", "2026-0001")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+    }
+
+    @Nested
     class SaveProjekt {
         @Test
         void givenProjekt_thenProjektIsSaved() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, null, 3, true);
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    BEGINN, ENDE, null, 3, true);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
@@ -534,10 +638,13 @@ class ProjektIntegrationTest {
                 assertThat(projekt.getAdressen()).hasSize(1);
 
                 final ProjektAdresseEntity adresse = projekt.getAdressen().getFirst();
-                assertThat(adresse.getBezeichnung()).isEqualTo("Flurstück 1234/5");
-                assertThat(adresse.getBaunutzung()).isEqualTo("Wohnen");
-                assertThat(adresse.getUnerlaubteNutzungVon()).isEqualTo(BEGINN);
-                assertThat(adresse.getUnerlaubteNutzungBis()).isEqualTo(ENDE);
+                final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
+                assertThat(adressdaten.getArt()).isEqualTo(Adressart.FLURSTUECK);
+                assertThat(adressdaten.getFlurstueck()).isEqualTo("1234/5");
+                assertThat(adressdaten.getGemarkung()).isEqualTo("Sendling");
+                assertThat(adressdaten.getNutzung()).isEqualTo(Nutzung.NUTZUNG_B);
+                assertThat(adressdaten.getUnerlaubteNutzungVon()).isEqualTo(BEGINN);
+                assertThat(adressdaten.getUnerlaubteNutzungBis()).isEqualTo(ENDE);
                 assertThat(adresse.getAnzahlMahnungen()).isEqualTo(3);
                 assertThat(adresse.isSondernutzungErlaubt()).isTrue();
             });
@@ -546,7 +653,8 @@ class ProjektIntegrationTest {
         @Test
         void givenInvertedAbrechnungszeitraum_thenReturnBadRequest() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    "Flurstück 1234/5", "Wohnen", null, null, null, 0, false);
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", ENDE, BEGINN, List.of(adresseDTO));
 
             restTestClient.post()
@@ -563,7 +671,8 @@ class ProjektIntegrationTest {
         @Test
         void givenTageInsteadOfZeitraum_thenProjektIsSavedWithThoseTage() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    "Flurstück 1234/5", "Wohnen", null, null, 12, 0, false);
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    null, null, 12, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
@@ -582,7 +691,7 @@ class ProjektIntegrationTest {
 
             transactionTemplate.executeWithoutResult(status -> {
                 final ProjektEntity projekt = projektRepository.findById(responseDTO.id()).orElseThrow();
-                final ProjektAdresseEntity persisted = projekt.getAdressen().getFirst();
+                final AdressdatenEmbeddable persisted = projekt.getAdressen().getFirst().getAdressdaten();
                 assertThat(persisted.getTageUnerlaubteNutzung()).isEqualTo(12);
                 assertThat(persisted.getUnerlaubteNutzungVon()).isNull();
             });
@@ -591,7 +700,8 @@ class ProjektIntegrationTest {
         @Test
         void givenZeitraum_thenTageAreDerivedFromIt() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    "Flurstück 1234/5", "Wohnen", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), null, 0, false);
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
@@ -610,14 +720,15 @@ class ProjektIntegrationTest {
             assertThat(responseDTO).isNotNull();
             transactionTemplate.executeWithoutResult(status -> assertThat(
                     projektRepository.findById(responseDTO.id()).orElseThrow()
-                            .getAdressen().getFirst().getTageUnerlaubteNutzung())
+                            .getAdressen().getFirst().getAdressdaten().getTageUnerlaubteNutzung())
                     .isEqualTo(31));
         }
 
         @Test
         void givenZeitraumAndTage_thenReturnBadRequest() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    "Flurstück 1234/5", "Wohnen", BEGINN, ENDE, 12, 0, false);
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    BEGINN, ENDE, 12, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", BEGINN, ENDE, List.of(adresseDTO));
 
             restTestClient.post()

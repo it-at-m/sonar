@@ -1,10 +1,8 @@
-export interface ProjektAdresseForm {
+import type { Adresse } from "@/types/Adresse";
+import type { UnerlaubteNutzung } from "@/types/UnerlaubteNutzung";
+
+export interface ProjektAdresseForm extends Adresse, UnerlaubteNutzung {
   id: string;
-  bezeichnung: string;
-  baunutzung: string;
-  unerlaubteNutzungVon: string;
-  unerlaubteNutzungBis: string;
-  tageUnerlaubteNutzung: number | null;
   anzahlMahnungen: number;
   sondernutzungErlaubt: boolean;
 }

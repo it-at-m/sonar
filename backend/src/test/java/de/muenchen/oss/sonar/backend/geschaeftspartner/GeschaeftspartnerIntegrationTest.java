@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
+import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
 import org.junit.jupiter.api.Nested;
@@ -36,6 +37,9 @@ class GeschaeftspartnerIntegrationTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private AbrechnungRepository abrechnungRepository;
 
     @MockitoBean
     private ProjektRepository projektRepository;

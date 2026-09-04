@@ -1,26 +1,27 @@
-import type { ProjektAdresseForm } from "@/types/ProjektAdresseForm";
+import type { UnerlaubteNutzung } from "@/types/UnerlaubteNutzung";
 import type { ValidationRule } from "@/util/validationRules";
 
 import { endeNotBeforeBeginn } from "@/util/validationRules";
 
 export function unerlaubteNutzungVonRule(
-  adresse: ProjektAdresseForm
+  unerlaubteNutzung: UnerlaubteNutzung
 ): ValidationRule {
   return (value: string) =>
     !!value ||
-    !adresse.unerlaubteNutzungBis ||
+    !unerlaubteNutzung.unerlaubteNutzungBis ||
     "Bitte den Beginn des Zeitraums angeben.";
 }
 
 export function unerlaubteNutzungBisRule(
-  adresse: ProjektAdresseForm
+  unerlaubteNutzung: UnerlaubteNutzung
 ): ValidationRule {
   return (value: string) => {
     if (!value) {
       return (
-        !adresse.unerlaubteNutzungVon || "Bitte das Ende des Zeitraums angeben."
+        !unerlaubteNutzung.unerlaubteNutzungVon ||
+        "Bitte das Ende des Zeitraums angeben."
       );
     }
-    return endeNotBeforeBeginn(adresse.unerlaubteNutzungVon, value);
+    return endeNotBeforeBeginn(unerlaubteNutzung.unerlaubteNutzungVon, value);
   };
 }

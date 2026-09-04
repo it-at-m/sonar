@@ -6,6 +6,7 @@
       md="4"
     >
       <v-text-field
+        id="basis-geschaeftspartner-id"
         v-model="abrechnung.geschaeftspartnerId"
         label="Geschäftspartner:in ID"
         :maxlength="GESCHAEFTSPARTNER_ID_MAX_LENGTH"
@@ -42,6 +43,7 @@
         md="4"
       >
         <v-text-field
+          id="basis-zustellungsbevollmaechtigter-id"
           v-model="abrechnung.zustellungsbevollmaechtigterId"
           label="Zustellungsbevollmächtigte:r ID"
           :maxlength="GESCHAEFTSPARTNER_ID_MAX_LENGTH"
@@ -54,6 +56,7 @@
         md="4"
       >
         <v-select
+          id="basis-zustellungsbevollmaechtigter-typ"
           v-model="abrechnung.zustellungsbevollmaechtigterTyp"
           label="Typ"
           :items="ZUSTELLUNGSBEVOLLMAECHTIGTER_TYP_OPTIONS"
@@ -76,6 +79,7 @@
 </template>
 
 <script setup lang="ts">
+import type { AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum } from "@/api/generated/sonar-backend";
 import type { AbrechnungForm } from "@/composables/abrechnungForm";
 
 import { watchDebounced } from "@vueuse/core";
@@ -87,7 +91,10 @@ import { requiredRule } from "@/util/validationRules";
 const GESCHAEFTSPARTNER_ID_MAX_LENGTH = 10;
 const LOOKUP_DEBOUNCE_MS = 300;
 
-const ZUSTELLUNGSBEVOLLMAECHTIGTER_TYP_OPTIONS = [
+const ZUSTELLUNGSBEVOLLMAECHTIGTER_TYP_OPTIONS: {
+  title: string;
+  value: AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum;
+}[] = [
   { title: "01-Gesetzliche:r Vertreter:in", value: "GESETZLICHER_VERTRETER" },
   { title: "02-Vormund", value: "VORMUND" },
   { title: "03-Betreuer:in", value: "BETREUER" },

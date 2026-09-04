@@ -1,7 +1,11 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
+import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
+
+import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import java.time.LocalDate;
+import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -31,17 +35,31 @@ public class ProjektService {
             final Sort.Direction direction) {
         final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde);
         final Sort sort = resolveSortWithInputOrDefaults(sortBy, direction);
-        log.info("Get Projekte at Page {} with a PageSize of {} matching {} ordered by {}", pageNumber, pageSize, filter, sort);
+        log.info("Get Projekte at Page {} with a PageSize of {} matching {} ordered by {}", pageNumber, pageSize,
+                String.valueOf(filter).replace('\n', '_').replace('\r', '_'), sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
         return projektRepository
                 .findAll(ProjektSpecifications.matching(filter), pageRequest)
                 .map(projektEntityMapper::toProjekt);
     }
 
+    @Transactional(readOnly = true)
+    public Projekt getProjekt(final UUID projektId) {
+        log.info("Get Projekt {}", projektId);
+        return projektRepository
+                .findById(projektId)
+                .map(projektEntityMapper::toProjekt)
+                .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, projektId)));
+    }
+
+    public boolean existsProjekt(final UUID projektId) {
+        return projektRepository.existsById(projektId);
+    }
+
     @Transactional
     public Projekt createProjekt(final Projekt projekt) {
         final ProjektEntity projektEntity = projektEntityMapper.toEntity(projekt);
-        log.debug("Create Projekt {}", projektEntity);
+        log.debug("Create Projekt {}", String.valueOf(projektEntity).replace('\n', '_').replace('\r', '_'));
         return projektEntityMapper.toProjekt(projektRepository.save(projektEntity));
     }
 
