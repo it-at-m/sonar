@@ -69,6 +69,7 @@
         <springdoc-openapi-starter-webmvc-ui.version>3.1.0</springdoc-openapi-starter-webmvc-ui.version>
         <springdoc-openapi-maven-plugin.version>1.5</springdoc-openapi-maven-plugin.version>
         <therapi-runtime-javadoc.version>0.15.0</therapi-runtime-javadoc.version>
+        <cxf.version>4.2.0</cxf.version> <!-- must match the version of the cxf-codegen-plugin below -->
 
         <!-- Flyway maven plugin configuration for local stack database -->
         <flyway.url>jdbc:postgresql://localhost:5432/postgres</flyway.url>
@@ -233,6 +234,16 @@
             <artifactId>spring-boot-configuration-processor</artifactId>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-frontend-jaxws</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.cxf</groupId>
+            <artifactId>cxf-rt-transports-http</artifactId>
+            <version>${cxf.version}</version>
+        </dependency>
 
     </dependencies>
 
@@ -286,6 +297,33 @@
                                     -Amapstruct.defaultComponentModel=spring
                                 </compilerArg>
                             </compilerArgs>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.cxf</groupId>
+                <artifactId>cxf-codegen-plugin</artifactId>
+                <version>${cxf.version}</version>
+                <executions>
+                    <execution>
+                        <id>generate-sources</id>
+                        <phase>generate-sources</phase>
+                        <goals>
+                            <goal>wsdl2java</goal>
+                        </goals>
+                        <configuration>
+                            <wsdlOptions>
+                                <wsdlOption>
+                                    <wsdl>${project.basedir}/src/main/resources/wsdl/Z_FMCA_GPM_IF_BUPA_READ_RFC.wsdl.xml</wsdl>
+                                    <wsdlLocation>classpath:wsdl/Z_FMCA_GPM_IF_BUPA_READ_RFC.wsdl.xml</wsdlLocation>
+                                    <extraargs>
+                                        <extraarg>-p</extraarg>
+                                        <extraarg>urn:sap-com:document:sap:rfc:functions=de.muenchen.oss.sonar.backend.geschaeftspartner.ws</extraarg>
+                                        <extraarg>-quiet</extraarg>
+                                    </extraargs>
+                                </wsdlOption>
+                            </wsdlOptions>
                         </configuration>
                     </execution>
                 </executions>

@@ -265,6 +265,39 @@ paths:
                 $ref: "#/components/schemas/ProjektResponseDTO"
       security:
       - bearerAuth: []
+  /geschaeftspartner/{geschaeftspartnerId}:
+    get:
+      tags:
+      - geschaeftspartner-controller
+      summary: Retrieve the master data of a Geschäftspartner.
+      description: |-
+        Retrieve the master data of a Geschäftspartner.
+         Retrieved data come from a third party system owning them.
+      operationId: getGeschaeftspartner
+      parameters:
+      - name: geschaeftspartnerId
+        in: path
+        description: the id of the requested Geschäftspartner
+        required: true
+        schema:
+          maxLength: 10
+          minLength: 0
+          type: string
+      responses:
+        "400":
+          description: the id is longer than the owning system allows
+        "404":
+          description: the owning system does not know the id
+        "502":
+          description: the owning system could not be reached
+        "200":
+          description: the master data of the Geschäftspartner as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GeschaeftspartnerResponseDTO"
+      security:
+      - bearerAuth: []
   /actuator:
     get:
       tags:
@@ -553,6 +586,68 @@ components:
             $ref: "#/components/schemas/ProjektResponseDTO"
         page:
           $ref: "#/components/schemas/PageMetadata"
+    GeschaeftspartnerResponseDTO:
+      type: object
+      properties:
+        anrede:
+          type: string
+          description: Title text
+        name1:
+          type: string
+          description: Name 1 of organization
+        name2:
+          type: string
+          description: Name 2 of organization
+        name3:
+          type: string
+          description: Name 3 of organization
+        name4:
+          type: string
+          description: Name 4 of organization
+        vorname:
+          type: string
+          description: First name of business partner (person)
+        nachname:
+          type: string
+          description: Last name of business partner (person)
+        coName:
+          type: string
+          description: c/o name
+        strasse:
+          type: string
+          description: Street
+        hausnummer:
+          type: string
+          description: House Number
+        adresszusatz:
+          type: string
+          description: Street 2
+        postleitzahl:
+          type: string
+          description: City postal code
+        ort:
+          type: string
+          description: City
+        land:
+          type: string
+          description: Country Key
+        telefon:
+          type: string
+          description: "Complete number: dialling code+number+extension"
+        mobil:
+          type: string
+          description: "Complete number: dialling code+number+extension"
+        fax:
+          type: string
+          description: "Complete number: dialling code+number+extension"
+        email:
+          type: string
+          description: E-Mail Address
+        adressnotiz:
+          type: string
+          description: Address notes
+      description: "The master data of a Geschäftspartner, read from a third party\
+        \ system owning it."
     Link:
       type: object
       properties:
