@@ -366,6 +366,117 @@ class AbrechnungIntegrationTest {
         }
 
         @Test
+        void givenSeveralSortColumns_thenOrderByTheSecondColumnWithinTheFirst() {
+            final AbrechnungPositionEntity position0001 = new AbrechnungPositionEntity();
+            position0001.setBeginn(VON);
+            position0001.setEnde(BIS);
+            position0001.setLaenge(new BigDecimal("12.00"));
+            position0001.setBreite(new BigDecimal("3.00"));
+            position0001.setFlaeche(new BigDecimal("36.00"));
+            position0001.setHaelfte(true);
+            position0001.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0001 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0001.addPosition(position0001);
+
+            final AdressdatenEmbeddable adressdaten0001 = nutzungsobjekt0001.getAdressdaten();
+            adressdaten0001.setArt(Adressart.ADRESSE);
+            adressdaten0001.setAdresse("Marienplatz");
+            adressdaten0001.setHausnummerVon("8");
+            adressdaten0001.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0001 = new AbrechnungEntity();
+            abrechnung0001.setProjektId(projektId);
+            abrechnung0001.setGeschaeftspartnerId("1000000001");
+            abrechnung0001.setZeitraumVon(LocalDate.of(2026, 1, 1));
+            abrechnung0001.setZeitraumBis(BIS);
+            abrechnung0001.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung0001.addNutzungsobjekt(nutzungsobjekt0001);
+            abrechnungRepository.save(abrechnung0001);
+
+            final AbrechnungPositionEntity position0002 = new AbrechnungPositionEntity();
+            position0002.setBeginn(VON);
+            position0002.setEnde(BIS);
+            position0002.setLaenge(new BigDecimal("12.00"));
+            position0002.setBreite(new BigDecimal("3.00"));
+            position0002.setFlaeche(new BigDecimal("36.00"));
+            position0002.setHaelfte(true);
+            position0002.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0002 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0002.addPosition(position0002);
+
+            final AdressdatenEmbeddable adressdaten0002 = nutzungsobjekt0002.getAdressdaten();
+            adressdaten0002.setArt(Adressart.ADRESSE);
+            adressdaten0002.setAdresse("Marienplatz");
+            adressdaten0002.setHausnummerVon("8");
+            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0002 = new AbrechnungEntity();
+            abrechnung0002.setProjektId(projektId);
+            abrechnung0002.setGeschaeftspartnerId("1000000002");
+            abrechnung0002.setZeitraumVon(LocalDate.of(2026, 3, 1));
+            abrechnung0002.setZeitraumBis(BIS);
+            abrechnung0002.setAbrechnungsArt(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            abrechnung0002.addNutzungsobjekt(nutzungsobjekt0002);
+            abrechnungRepository.save(abrechnung0002);
+
+            final AbrechnungPositionEntity position0003 = new AbrechnungPositionEntity();
+            position0003.setBeginn(VON);
+            position0003.setEnde(BIS);
+            position0003.setLaenge(new BigDecimal("12.00"));
+            position0003.setBreite(new BigDecimal("3.00"));
+            position0003.setFlaeche(new BigDecimal("36.00"));
+            position0003.setHaelfte(true);
+            position0003.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt0003 = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt0003.addPosition(position0003);
+
+            final AdressdatenEmbeddable adressdaten0003 = nutzungsobjekt0003.getAdressdaten();
+            adressdaten0003.setArt(Adressart.ADRESSE);
+            adressdaten0003.setAdresse("Marienplatz");
+            adressdaten0003.setHausnummerVon("8");
+            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung0003 = new AbrechnungEntity();
+            abrechnung0003.setProjektId(projektId);
+            abrechnung0003.setGeschaeftspartnerId("1000000003");
+            abrechnung0003.setZeitraumVon(LocalDate.of(2026, 2, 1));
+            abrechnung0003.setZeitraumBis(BIS);
+            abrechnung0003.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung0003.addNutzungsobjekt(nutzungsobjekt0003);
+            abrechnungRepository.save(abrechnung0003);
+
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("sortBy", "ABRECHNUNGS_ART,ZEITRAUM_VON")
+                            .queryParam("sortDirection", "ASC,DESC")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.content..geschaeftspartnerId")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, geschaeftspartnerIds -> assertThat(geschaeftspartnerIds)
+                            .containsExactly("1000000003", "1000000001", "1000000002"));
+        }
+
+        @Test
+        void givenMoreSortColumnsThanExist_thenAcceptTheRequest() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .queryParam("sortBy", "ZEITRAUM_VON,ZEITRAUM_BIS,ABRECHNUNGS_ART,GESCHAEFTSPARTNER_ID,ZEITRAUM_VON")
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk();
+        }
+
+        @Test
         void givenAbrechnungenPage_thenIncludeTheirNutzungsobjekte() {
             final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
             position.setBeginn(VON);

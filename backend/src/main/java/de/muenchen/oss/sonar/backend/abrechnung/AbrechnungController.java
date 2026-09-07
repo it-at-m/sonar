@@ -4,12 +4,17 @@ import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungDTOMapper;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
 import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfiguration;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.enums.Explode;
+import io.swagger.v3.oas.annotations.media.ArraySchema;
 import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,12 +44,17 @@ public class AbrechnungController {
     /**
      * Retrieve the Abrechnungen of a Projekt with pagination.
      * Fetches a paginated list of all Abrechnungen belonging to the Projekt.
+     * The order is applied by the database, so it holds for the whole result and not just for the
+     * requested page.
+     * Both sort parameters take a comma separated list. The order of the columns is the order they
+     * are applied in, and the direction at the same position belongs to the column.
+     * A column named more than once takes part in the order only at its first position.
      *
      * @param projektId the UUID of the Projekt the Abrechnungen belong to
      * @param pageNumber the number of the requested page (default: 0)
      * @param pageSize the size of the page to retrieve (default: 10, at most 100)
-     * @param sortBy the column to order by (default: ZEITRAUM_VON)
-     * @param sortDirection the direction to order in (default: DESC)
+     * @param sortBy the columns to order by, the most significant one first (default: ZEITRAUM_VON)
+     * @param sortDirection the direction of the column at the same position (default: DESC)
      * @return a page of Abrechnungen represented as DTOs
      */
     @GetMapping
@@ -54,8 +64,26 @@ public class AbrechnungController {
     public Page<AbrechnungResponseDTO> getAbrechnungenByPageAndSize(@PathVariable("projektId") final UUID projektId,
             @RequestParam(defaultValue = "0") @Min(0) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) final int pageSize,
-            @RequestParam(defaultValue = "ZEITRAUM_VON") final AbrechnungSortBy sortBy,
-            @RequestParam(defaultValue = "DESC") final Sort.Direction sortDirection) {
+            // Explode.FALSE documents the list as one comma separated value. The client is generated from
+            // this document, and the API gateway in front of the application rejects a request that repeats
+            // a query parameter as parameter pollution. The array annotation is what carries the item type
+            // into the document, and springdoc ignores explode without it.
+            // Once the array annotation supplies the schema, springdoc no longer copies the default of the
+            // request parameter into it, so the default is repeated on the array schema.
+            @RequestParam(defaultValue = "ZEITRAUM_VON") @Parameter(
+                    explode = Explode.FALSE,
+                    array = @ArraySchema(
+                            arraySchema = @Schema(defaultValue = "[\"ZEITRAUM_VON\"]"),
+                            schema = @Schema(implementation = AbrechnungSortBy.class)
+                    )
+            ) final List<AbrechnungSortBy> sortBy,
+            @RequestParam(defaultValue = "DESC") @Parameter(
+                    explode = Explode.FALSE,
+                    array = @ArraySchema(
+                            arraySchema = @Schema(defaultValue = "[\"DESC\"]"),
+                            schema = @Schema(implementation = Sort.Direction.class)
+                    )
+            ) final List<Sort.Direction> sortDirection) {
         return abrechnungService.getAbrechnungenOfProjekt(projektId, pageNumber, pageSize, sortBy, sortDirection)
                 .map(abrechnungDTOMapper::toDTO);
     }

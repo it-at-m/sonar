@@ -18,6 +18,7 @@ import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
@@ -59,13 +60,13 @@ class AbrechnungServiceTest {
     @Nested
     class GetAbrechnungenPage {
 
-        private Sort captureRequestedSort(final AbrechnungSortBy sortBy, final Sort.Direction direction) {
+        private Sort captureRequestedSort(final List<AbrechnungSortBy> sortBy, final List<Sort.Direction> directions) {
             final ArgumentCaptor<Pageable> pageRequestCaptor = ArgumentCaptor.forClass(Pageable.class);
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findByProjektId(eq(PROJEKT_ID), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of()));
 
-            unitUnderTest.getAbrechnungenOfProjekt(PROJEKT_ID, 0, 10, sortBy, direction);
+            unitUnderTest.getAbrechnungenOfProjekt(PROJEKT_ID, 0, 10, sortBy, directions);
 
             verify(abrechnungRepository).findByProjektId(eq(PROJEKT_ID), pageRequestCaptor.capture());
             return pageRequestCaptor.getValue().getSort();
@@ -158,21 +159,109 @@ class AbrechnungServiceTest {
         }
 
         @Test
+        void givenEmptySort_thenSortByZeitraumVonDescendingWithIdAsTiebreaker() {
+            assertThat(captureRequestedSort(List.of(), List.of())).isEqualTo(DEFAULT_SORT);
+        }
+
+        @Test
         void givenSortByAndDirection_thenSortByThatColumnWithIdAsTiebreaker() {
-            assertThat(captureRequestedSort(AbrechnungSortBy.ABRECHNUNGS_ART, Sort.Direction.ASC))
+            assertThat(captureRequestedSort(List.of(AbrechnungSortBy.ABRECHNUNGS_ART), List.of(Sort.Direction.ASC)))
                     .isEqualTo(Sort.by(Sort.Direction.ASC, "abrechnungsArt", "id"));
         }
 
         @Test
         void givenSortByWithoutDirection_thenKeepTheDefaultDirection() {
-            assertThat(captureRequestedSort(AbrechnungSortBy.ZEITRAUM_BIS, null))
+            assertThat(captureRequestedSort(List.of(AbrechnungSortBy.ZEITRAUM_BIS), null))
                     .isEqualTo(Sort.by(Sort.Direction.DESC, "zeitraumBis", "id"));
         }
 
         @Test
         void givenDirectionWithoutSortBy_thenKeepTheDefaultColumn() {
-            assertThat(captureRequestedSort(null, Sort.Direction.ASC))
+            assertThat(captureRequestedSort(null, List.of(Sort.Direction.ASC)))
                     .isEqualTo(Sort.by(Sort.Direction.ASC, "zeitraumVon", "id"));
+        }
+
+        @Test
+        void givenSeveralColumns_thenOrderByAllOfThemInTheGivenOrder() {
+            final List<AbrechnungSortBy> sortBy = List.of(AbrechnungSortBy.GESCHAEFTSPARTNER_ID, AbrechnungSortBy.ZEITRAUM_VON);
+            final List<Sort.Direction> directions = List.of(Sort.Direction.ASC, Sort.Direction.DESC);
+
+            assertThat(captureRequestedSort(sortBy, directions))
+                    .isEqualTo(Sort.by(
+                            new Sort.Order(Sort.Direction.ASC, "geschaeftspartnerId"),
+                            new Sort.Order(Sort.Direction.DESC, "zeitraumVon"),
+                            new Sort.Order(Sort.Direction.DESC, "id")));
+        }
+
+        @Test
+        void givenFewerDirectionsThanColumns_thenOrderTheRemainingColumnsByTheDefaultDirection() {
+            final List<AbrechnungSortBy> sortBy = List.of(AbrechnungSortBy.ABRECHNUNGS_ART, AbrechnungSortBy.ZEITRAUM_BIS);
+            final List<Sort.Direction> directions = List.of(Sort.Direction.ASC);
+
+            assertThat(captureRequestedSort(sortBy, directions))
+                    .isEqualTo(Sort.by(
+                            new Sort.Order(Sort.Direction.ASC, "abrechnungsArt"),
+                            new Sort.Order(Sort.Direction.DESC, "zeitraumBis"),
+                            new Sort.Order(Sort.Direction.DESC, "id")));
+        }
+
+        @Test
+        void givenBlankColumn_thenIgnoreItTogetherWithItsDirection() {
+            final List<AbrechnungSortBy> sortBy = Arrays.asList(AbrechnungSortBy.ABRECHNUNGS_ART, null);
+            final List<Sort.Direction> directions = List.of(Sort.Direction.ASC, Sort.Direction.DESC);
+
+            assertThat(captureRequestedSort(sortBy, directions))
+                    .isEqualTo(Sort.by(Sort.Direction.ASC, "abrechnungsArt", "id"));
+        }
+
+        @Test
+        void givenOnlyBlankColumns_thenKeepTheDefaultColumn() {
+            final List<AbrechnungSortBy> sortBy = Arrays.asList((AbrechnungSortBy) null);
+            final List<Sort.Direction> directions = List.of(Sort.Direction.ASC);
+
+            assertThat(captureRequestedSort(sortBy, directions))
+                    .isEqualTo(Sort.by(Sort.Direction.ASC, "zeitraumVon", "id"));
+        }
+
+        @Test
+        void givenBlankDirection_thenKeepTheDefaultDirection() {
+            final List<AbrechnungSortBy> sortBy = List.of(AbrechnungSortBy.ABRECHNUNGS_ART);
+            final List<Sort.Direction> directions = Arrays.asList((Sort.Direction) null);
+
+            assertThat(captureRequestedSort(sortBy, directions))
+                    .isEqualTo(Sort.by(Sort.Direction.DESC, "abrechnungsArt", "id"));
+        }
+
+        @Test
+        void givenRepeatedColumn_thenOrderByItOnlyAtItsFirstPosition() {
+            final List<AbrechnungSortBy> sortBy = List.of(AbrechnungSortBy.ZEITRAUM_VON, AbrechnungSortBy.ABRECHNUNGS_ART,
+                    AbrechnungSortBy.ZEITRAUM_VON);
+            final List<Sort.Direction> directions = List.of(Sort.Direction.ASC, Sort.Direction.DESC, Sort.Direction.ASC);
+
+            assertThat(captureRequestedSort(sortBy, directions))
+                    .isEqualTo(Sort.by(
+                            new Sort.Order(Sort.Direction.ASC, "zeitraumVon"),
+                            new Sort.Order(Sort.Direction.DESC, "abrechnungsArt"),
+                            new Sort.Order(Sort.Direction.DESC, "id")));
+        }
+
+        @Test
+        void givenEveryColumnRepeated_thenOrderByEachOfThemOnce() {
+            final List<AbrechnungSortBy> sortBy = List.of(AbrechnungSortBy.ZEITRAUM_VON, AbrechnungSortBy.ZEITRAUM_BIS,
+                    AbrechnungSortBy.ABRECHNUNGS_ART, AbrechnungSortBy.GESCHAEFTSPARTNER_ID, AbrechnungSortBy.ZEITRAUM_VON,
+                    AbrechnungSortBy.ZEITRAUM_BIS);
+
+            assertThat(captureRequestedSort(sortBy, null))
+                    .isEqualTo(Sort.by(Sort.Direction.DESC, "zeitraumVon", "zeitraumBis", "abrechnungsArt", "geschaeftspartnerId", "id"));
+        }
+
+        @Test
+        void givenMoreDirectionsThanColumns_thenIgnoreTheSurplus() {
+            final List<AbrechnungSortBy> sortBy = List.of(AbrechnungSortBy.ZEITRAUM_BIS);
+            final List<Sort.Direction> directions = List.of(Sort.Direction.ASC, Sort.Direction.DESC);
+
+            assertThat(captureRequestedSort(sortBy, directions))
+                    .isEqualTo(Sort.by(Sort.Direction.ASC, "zeitraumBis", "id"));
         }
     }
 

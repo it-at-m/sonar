@@ -276,6 +276,9 @@ paths:
          Fetches a paginated list of all Abrechnungen belonging to the Projekt.
          The order is applied by the database, so it holds for the whole result and not just for the
          requested page.
+         Both sort parameters take a comma separated list. The order of the columns is the order they
+         are applied in, and the direction at the same position belongs to the column.
+         A column named more than once takes part in the order only at its first position.
       operationId: getAbrechnungenByPageAndSize
       parameters:
       - name: projektId
@@ -306,25 +309,34 @@ paths:
           default: 10
       - name: sortBy
         in: query
-        description: "the column to order by (default: ZEITRAUM_VON)"
+        description: "the columns to order by, the most significant one first (default:\
+          \ ZEITRAUM_VON)"
         required: false
+        explode: false
         schema:
-          type: string
-          default: ZEITRAUM_VON
-          enum:
+          type: array
+          items:
+            type: string
+            enum:
+            - ZEITRAUM_VON
+            - ZEITRAUM_BIS
+            - ABRECHNUNGS_ART
+            - GESCHAEFTSPARTNER_ID
+          default:
           - ZEITRAUM_VON
-          - ZEITRAUM_BIS
-          - ABRECHNUNGS_ART
-          - GESCHAEFTSPARTNER_ID
       - name: sortDirection
         in: query
-        description: "the direction to order in (default: DESC)"
+        description: "the direction of the column at the same position (default: DESC)"
         required: false
+        explode: false
         schema:
-          type: string
-          default: DESC
-          enum:
-          - ASC
+          type: array
+          items:
+            type: string
+            enum:
+            - ASC
+            - DESC
+          default:
           - DESC
       responses:
         "400":
