@@ -20,7 +20,7 @@
     <template v-if="isAdresse">
       <v-col
         cols="12"
-        md="4"
+        md="5"
       >
         <v-text-field
           :id="`${idPrefix}-adresse`"
@@ -44,7 +44,7 @@
       </v-col>
       <v-col
         cols="12"
-        md="3"
+        md="2"
       >
         <v-text-field
           :id="`${idPrefix}-hausnummer-bis`"
