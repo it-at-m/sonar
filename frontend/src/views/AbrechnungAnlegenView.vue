@@ -76,6 +76,8 @@
 </template>
 
 <script setup lang="ts">
+import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
+
 import { mdiArrowLeft } from "@mdi/js";
 import { computed, nextTick, onMounted, ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
@@ -89,12 +91,12 @@ import AbrechnungBasisinformationen from "@/components/AbrechnungBasisinformatio
 import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
-import { useProjektAdresseSuggestions } from "@/composables/projektAdresseSuggestions";
 import { useSaveLeave } from "@/composables/saveLeave";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 import { toAbrechnungRequestDTO } from "@/util/abrechnungMapper";
 import { nutzungsobjektOfError, tabOfError, TABS } from "@/util/abrechnungTabs";
+import { fetchProjektAdresseSuggestions } from "@/util/projektAdresseSuggestion";
 
 const { projektId } = defineProps<{ projektId: string }>();
 
@@ -105,9 +107,9 @@ const form = useTemplateRef("form");
 const berechnung = useTemplateRef("berechnung");
 const tab = ref<string>(TABS.BASIS);
 const saving = ref(false);
+const suggestions = ref<ProjektAdresseSuggestion[]>([]);
 
 const { abrechnung, isDirty } = useAbrechnungForm();
-const { load: loadSuggestions, suggestions } = useProjektAdresseSuggestions();
 
 const {
   cancel,
@@ -187,7 +189,7 @@ function abbrechen(): void {
 
 async function loadProjektAdressen(): Promise<void> {
   try {
-    await loadSuggestions(projektId);
+    suggestions.value = await fetchProjektAdresseSuggestions(projektId);
   } catch {
     snackbarStore.push({
       text: "Die Adressen des Projekts konnten nicht geladen werden. Sie lassen sich daher nicht übernehmen.",
