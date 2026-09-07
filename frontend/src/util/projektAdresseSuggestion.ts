@@ -2,8 +2,21 @@ import type { Adresse } from "@/types/Adresse";
 import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
 import type { UnerlaubteNutzung } from "@/types/UnerlaubteNutzung";
 
-import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
+import { ApiFactory } from "@/api/ApiFactory";
+import {
+  ProjektAdresseRequestDTOArtEnum,
+  ProjektControllerApi,
+} from "@/api/generated/sonar-backend";
 import { NUTZUNG_OPTIONS } from "@/util/nutzungOptions";
+import { toProjektAdresseSuggestion } from "@/util/projektAdresseMapper";
+
+export async function fetchProjektAdresseSuggestions(
+  projektId: string
+): Promise<ProjektAdresseSuggestion[]> {
+  const projekt =
+    await ApiFactory.getInstance(ProjektControllerApi).getProjekt(projektId);
+  return (projekt.adressen ?? []).map(toProjektAdresseSuggestion);
+}
 
 export function projektAdresseSuggestionTitle(
   suggestion: ProjektAdresseSuggestion

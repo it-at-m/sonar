@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.Mockito.when;
 
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.client.GeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerResponseDTO;
 import java.util.Optional;
 import org.junit.jupiter.api.Nested;

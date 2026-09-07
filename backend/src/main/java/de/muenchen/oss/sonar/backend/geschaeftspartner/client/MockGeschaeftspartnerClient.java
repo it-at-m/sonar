@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.geschaeftspartner;
+package de.muenchen.oss.sonar.backend.geschaeftspartner.client;
 
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerResponseDTO;
 import java.util.Optional;
@@ -16,8 +16,7 @@ public class MockGeschaeftspartnerClient implements GeschaeftspartnerClient {
 
     @Override
     public Optional<GeschaeftspartnerResponseDTO> findById(final String geschaeftspartnerId) {
-        log.debug("Answering the lookup of Geschaeftspartner {} with canned data",
-                String.valueOf(geschaeftspartnerId).replace('\n', '_').replace('\r', '_'));
+        log.debug("Answering the lookup of Geschaeftspartner {} with canned data", geschaeftspartnerId);
         if (geschaeftspartnerId == null || geschaeftspartnerId.isBlank() || UNKNOWN_ID.equals(geschaeftspartnerId)) {
             return Optional.empty();
         }

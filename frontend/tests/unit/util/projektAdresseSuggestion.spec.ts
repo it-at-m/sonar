@@ -1,6 +1,6 @@
 import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
 
-import { describe, expect, it } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
@@ -9,9 +9,24 @@ import {
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnungNutzungsobjektForm";
 import {
   applyProjektAdresseSuggestion,
+  fetchProjektAdresseSuggestions,
   projektAdresseSuggestionSubtitle,
   projektAdresseSuggestionTitle,
 } from "@/util/projektAdresseSuggestion";
+
+const PROJEKT_ID = "0f9d1a3c-0f4e-4b9a-8f4a-9a5d1e2b3c4d";
+
+function stubFetch(status: number, body: unknown) {
+  const fetchSpy = vi.fn(
+    () =>
+      new Response(JSON.stringify(body), {
+        status,
+        headers: { "content-type": "application/json" },
+      })
+  );
+  vi.stubGlobal("fetch", fetchSpy);
+  return fetchSpy;
+}
 
 function suggestion(
   overrides: Partial<ProjektAdresseSuggestion> = {}
@@ -31,7 +46,73 @@ function suggestion(
   };
 }
 
+afterEach(() => vi.unstubAllGlobals());
+
 describe("projektAdresseSuggestion.ts", () => {
+  describe("fetchProjektAdresseSuggestions", () => {
+    it("givenProjekt_thenOfferItsAdressenInTheOrderTheyWereEntered", async () => {
+      stubFetch(200, {
+        id: PROJEKT_ID,
+        projektnummer: "2026-0001",
+        abrechnungBeginn: "2026-01-01",
+        abrechnungEnde: "2026-03-31",
+        adressen: [
+          {
+            art: "ADRESSE",
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            unerlaubteNutzungVon: "2026-01-05",
+            unerlaubteNutzungBis: "2026-01-10",
+            tageUnerlaubteNutzung: 6,
+            anzahlMahnungen: 2,
+            sondernutzungErlaubt: true,
+          },
+          {
+            art: "FLURSTUECK",
+            flurstueck: "1234/5",
+            gemarkung: "Sendling",
+            anzahlMahnungen: 0,
+            sondernutzungErlaubt: false,
+          },
+        ],
+      });
+
+      const suggestions = await fetchProjektAdresseSuggestions(PROJEKT_ID);
+
+      expect(suggestions).toHaveLength(2);
+      expect(suggestions[0]?.adresse).toBe("Marienplatz");
+      expect(suggestions[0]?.unerlaubteNutzungVon).toBe("2026-01-05");
+      expect(suggestions[1]?.art).toBe(
+        ProjektAdresseRequestDTOArtEnum.FLURSTUECK
+      );
+      expect(suggestions[1]?.flurstueck).toBe("1234/5");
+    });
+
+    it("givenProjektId_thenRequestThatProjekt", async () => {
+      const fetchSpy = stubFetch(200, {
+        id: PROJEKT_ID,
+        projektnummer: "2026-0001",
+        abrechnungBeginn: "2026-01-01",
+        abrechnungEnde: "2026-03-31",
+        adressen: [],
+      });
+
+      await fetchProjektAdresseSuggestions(PROJEKT_ID);
+
+      expect(String(fetchSpy.mock.calls[0]?.[0])).toContain(
+        `/projekt/${PROJEKT_ID}`
+      );
+    });
+
+    it("givenUnknownProjekt_thenFailSoTheViewCanReportIt", async () => {
+      stubFetch(404, {});
+
+      await expect(
+        fetchProjektAdresseSuggestions(PROJEKT_ID)
+      ).rejects.toThrow();
+    });
+  });
+
   describe("projektAdresseSuggestionTitle", () => {
     it("givenAdresse_thenNameItWithItsHausnummer", () => {
       expect(projektAdresseSuggestionTitle(suggestion())).toBe("Marienplatz 8");

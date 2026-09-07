@@ -1,5 +1,7 @@
 package de.muenchen.oss.sonar.backend.geschaeftspartner;
 
+import de.muenchen.oss.sonar.backend.geschaeftspartner.client.MockGeschaeftspartnerClient;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.client.UnconfiguredGeschaeftspartnerClient;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
