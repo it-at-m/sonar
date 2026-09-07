@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
+import de.muenchen.oss.sonar.backend.geschaeftspartner.client.MockGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
 import org.junit.jupiter.api.Nested;

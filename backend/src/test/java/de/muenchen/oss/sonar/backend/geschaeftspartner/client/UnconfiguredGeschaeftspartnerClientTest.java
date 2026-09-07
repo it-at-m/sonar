@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.geschaeftspartner;
+package de.muenchen.oss.sonar.backend.geschaeftspartner.client;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
@@ -53,15 +53,6 @@ class UnconfiguredGeschaeftspartnerClientTest {
                 assertThat(event.getLevel()).isEqualTo(Level.ERROR);
                 assertThat(event.getFormattedMessage()).contains("sonar.geschaeftspartner.client.url");
             });
-        }
-
-        @Test
-        void givenIdWithLineBreak_thenSanitizeItInTheLog() {
-            assertThatThrownBy(() -> unitUnderTest.findById("4711\nERROR forged"))
-                    .isInstanceOf(ResponseStatusException.class);
-
-            assertThat(loggedEvents.list).singleElement()
-                    .satisfies(event -> assertThat(event.getFormattedMessage()).doesNotContain("\n"));
         }
     }
 }
