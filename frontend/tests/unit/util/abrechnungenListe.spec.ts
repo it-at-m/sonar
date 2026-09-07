@@ -3,7 +3,7 @@ import type { PagedModelAbrechnungResponseDTO } from "@/api/generated/sonar-back
 import { afterEach, describe, expect, it, vi } from "vitest";
 
 import { PagedModelAbrechnungResponseDTOToJSON } from "@/api/generated/sonar-backend";
-import { useAbrechnungenListe } from "@/composables/abrechnungenListe";
+import { fetchAbrechnungenPage } from "@/util/abrechnungenListe";
 import { toDateString } from "@/util/formatter";
 
 const PROJEKT_ID = "123e4567-e89b-12d3-a456-426614174000";
@@ -41,12 +41,11 @@ describe("abrechnungenListe.ts", () => {
     vi.unstubAllGlobals();
   });
 
-  describe("load", () => {
+  describe("fetchAbrechnungenPage", () => {
     it("givenProjektId_thenRequestTheAbrechnungenOfThatProjekt", async () => {
       const fetchSpy = stubFetch({ content: [] });
-      const { load } = useAbrechnungenListe();
 
-      await load(PROJEKT_ID, 1, 10);
+      await fetchAbrechnungenPage(PROJEKT_ID, 1, 10);
 
       expect(requestedUrl(fetchSpy)).toContain(
         `/projekt/${PROJEKT_ID}/abrechnung`
@@ -55,24 +54,26 @@ describe("abrechnungenListe.ts", () => {
 
     it("givenTablePage_thenRequestZeroBasedBackendPage", async () => {
       const fetchSpy = stubFetch({ content: [] });
-      const { load } = useAbrechnungenListe();
 
-      await load(PROJEKT_ID, 3, 25);
+      await fetchAbrechnungenPage(PROJEKT_ID, 3, 25);
 
       expect(requestedUrl(fetchSpy)).toContain("pageNumber=2");
       expect(requestedUrl(fetchSpy)).toContain("pageSize=25");
     });
 
-    it("givenPageResponse_thenExposeTotalElementsOfAllPages", async () => {
+    it("givenPageResponse_thenReturnTotalElementsOfAllPages", async () => {
       stubFetch({
         content: [],
         page: { size: 25, number: 0, totalElements: 42, totalPages: 2 },
       });
-      const { load, totalAbrechnungen } = useAbrechnungenListe();
 
-      await load(PROJEKT_ID, 1, 25);
+      const { totalAbrechnungen } = await fetchAbrechnungenPage(
+        PROJEKT_ID,
+        1,
+        25
+      );
 
-      expect(totalAbrechnungen.value).toBe(42);
+      expect(totalAbrechnungen).toBe(42);
     });
 
     it("givenPageResponse_thenMapAbrechnungenToRows", async () => {
@@ -88,24 +89,22 @@ describe("abrechnungenListe.ts", () => {
           },
         ],
       });
-      const { load, rows } = useAbrechnungenListe();
 
-      await load(PROJEKT_ID, 1, 25);
+      const { rows } = await fetchAbrechnungenPage(PROJEKT_ID, 1, 25);
 
-      expect(rows.value).toHaveLength(1);
-      expect(itemAt(rows.value).geschaeftspartnerId).toBe("1000000001");
-      expect(itemAt(rows.value).abrechnungsArt).toBe("Endabrechnung");
-      expect(itemAt(rows.value).anzahlNutzungsobjekte).toBe(2);
-      expect(itemAt(rows.value).zeitraumVon).toBe(
+      expect(rows).toHaveLength(1);
+      expect(itemAt(rows).geschaeftspartnerId).toBe("1000000001");
+      expect(itemAt(rows).abrechnungsArt).toBe("Endabrechnung");
+      expect(itemAt(rows).anzahlNutzungsobjekte).toBe(2);
+      expect(itemAt(rows).zeitraumVon).toBe(
         toDateString(new Date("2026-01-01"))
       );
     });
 
     it("givenSort_thenSendItAsSortParameters", async () => {
       const fetchSpy = stubFetch({ content: [] });
-      const { load } = useAbrechnungenListe();
 
-      await load(PROJEKT_ID, 1, 10, {
+      await fetchAbrechnungenPage(PROJEKT_ID, 1, 10, {
         sortBy: ["ZEITRAUM_BIS"],
         sortDirection: ["ASC"],
       });
@@ -116,9 +115,8 @@ describe("abrechnungenListe.ts", () => {
 
     it("givenSeveralSortColumns_thenSendOneCommaSeparatedSortParameter", async () => {
       const fetchSpy = stubFetch({ content: [] });
-      const { load } = useAbrechnungenListe();
 
-      await load(PROJEKT_ID, 1, 10, {
+      await fetchAbrechnungenPage(PROJEKT_ID, 1, 10, {
         sortBy: ["ABRECHNUNGS_ART", "ZEITRAUM_VON"],
         sortDirection: ["ASC", "DESC"],
       });
@@ -132,22 +130,17 @@ describe("abrechnungenListe.ts", () => {
 
     it("givenNoSort_thenSendNoSortParametersSoTheBackendDefaultApplies", async () => {
       const fetchSpy = stubFetch({ content: [] });
-      const { load } = useAbrechnungenListe();
 
-      await load(PROJEKT_ID, 1, 10);
+      await fetchAbrechnungenPage(PROJEKT_ID, 1, 10);
 
       expect(requestedUrl(fetchSpy)).not.toContain("sortBy");
       expect(requestedUrl(fetchSpy)).not.toContain("sortDirection");
     });
 
-    it("givenFailingRequest_thenRethrowAndResetLoading", async () => {
+    it("givenFailingRequest_thenFailSoTheViewCanReportIt", async () => {
       vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("offline")));
-      const { load, loading } = useAbrechnungenListe();
 
-      const result = load(PROJEKT_ID, 1, 10);
-
-      await expect(result).rejects.toThrow();
-      expect(loading.value).toBe(false);
+      await expect(fetchAbrechnungenPage(PROJEKT_ID, 1, 10)).rejects.toThrow();
     });
   });
 });

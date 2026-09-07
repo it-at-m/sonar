@@ -33,15 +33,16 @@
 </template>
 
 <script setup lang="ts">
+import type { AbrechnungTableRow } from "@/types/AbrechnungTableRow";
 import type { DataTableSortItem } from "@/types/DataTableSortItem";
 
 import { mdiArrowLeft, mdiPlus } from "@mdi/js";
 import { computed, onMounted, ref, watch } from "vue";
 
 import AbrechnungTable from "@/components/AbrechnungTable.vue";
-import { useAbrechnungenListe } from "@/composables/abrechnungenListe";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
+import { fetchAbrechnungenPage } from "@/util/abrechnungenListe";
 import { toAbrechnungSort } from "@/util/abrechnungSortMapper";
 
 const DEFAULT_ITEMS_PER_PAGE = 10;
@@ -54,22 +55,33 @@ const { projektId } = defineProps<{ projektId: string }>();
 
 const snackbarStore = useSnackbarStore();
 
-const { load, loading, rows, totalAbrechnungen } = useAbrechnungenListe();
-
 const page = ref(1);
 const itemsPerPage = ref(DEFAULT_ITEMS_PER_PAGE);
 const sortBy = ref<DataTableSortItem[]>([...DEFAULT_SORT]);
+const rows = ref<AbrechnungTableRow[]>([]);
+const totalAbrechnungen = ref(0);
+const loading = ref(false);
 
 const sort = computed(() => toAbrechnungSort(sortBy.value));
 
 async function loadPage(): Promise<void> {
+  loading.value = true;
   try {
-    await load(projektId, page.value, itemsPerPage.value, sort.value);
+    const abrechnungenPage = await fetchAbrechnungenPage(
+      projektId,
+      page.value,
+      itemsPerPage.value,
+      sort.value
+    );
+    rows.value = abrechnungenPage.rows;
+    totalAbrechnungen.value = abrechnungenPage.totalAbrechnungen;
   } catch {
     snackbarStore.push({
       text: "Die Abrechnungen konnten nicht geladen werden.",
       color: STATUS_INDICATORS.ERROR,
     });
+  } finally {
+    loading.value = false;
   }
 }
 
