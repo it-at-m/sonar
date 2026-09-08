@@ -1,6 +1,10 @@
 import { describe, expect, it } from "vitest";
 
-import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
+import {
+  endeNotBeforeBeginn,
+  greaterThanZeroRule,
+  requiredRule,
+} from "@/util/validationRules";
 
 describe("validationRules.ts", () => {
   describe("requiredRule", () => {
@@ -42,6 +46,20 @@ describe("validationRules.ts", () => {
 
     it("givenNoEnde_thenReturnTrue", () => {
       expect(endeNotBeforeBeginn("2026-01-01", "")).toBe(true);
+    });
+  });
+
+  describe("greaterThanZeroRule", () => {
+    it("givenZero_thenReturnMessage", () => {
+      expect(greaterThanZeroRule(0)).toBe("Der Wert muss größer als 0 sein.");
+    });
+
+    it("givenPositiveValue_thenReturnTrue", () => {
+      expect(greaterThanZeroRule(0.01)).toBe(true);
+    });
+
+    it("givenNull_thenReturnTrue", () => {
+      expect(greaterThanZeroRule(null)).toBe(true);
     });
   });
 });

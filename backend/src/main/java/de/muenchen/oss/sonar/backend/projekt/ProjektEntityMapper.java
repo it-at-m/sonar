@@ -15,7 +15,11 @@ public interface ProjektEntityMapper {
     @Mapping(target = "id", ignore = true)
     ProjektEntity toEntity(Projekt projekt);
 
+    @Mapping(target = ".", source = "adressdaten")
+    ProjektAdresse toProjektAdresse(ProjektAdresseEntity projektAdresseEntity);
+
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "adressdaten", source = "projektAdresse")
     ProjektAdresseEntity toEntity(ProjektAdresse projektAdresse);
 
 }
