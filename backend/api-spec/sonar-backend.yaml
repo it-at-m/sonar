@@ -388,6 +388,45 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
+  /abrechnung/{abrechnungId}/widerspruch:
+    post:
+      tags:
+      - widerspruch-controller
+      summary: Create the Widerspruch of an Abrechnung.
+      description: |-
+        Create the Widerspruch of an Abrechnung.
+         An Abrechnung carries at most one Widerspruch, so a second one is refused.
+      operationId: saveWiderspruch
+      parameters:
+      - name: abrechnungId
+        in: path
+        description: the UUID of the Abrechnung the Widerspruch belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: the details of the Widerspruch to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/WiderspruchRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the details of the Widerspruch are invalid
+        "404":
+          description: the Abrechnung does not exist
+        "409":
+          description: the Abrechnung already has a Widerspruch
+        "201":
+          description: the created Widerspruch as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/WiderspruchResponseDTO"
+      security:
+      - bearerAuth: []
   /projekt/{projektId}:
     get:
       tags:
@@ -1016,10 +1055,76 @@ components:
           enum:
           - ENDABRECHNUNG
           - ZWISCHENABRECHNUNG
+        widerspruchVorhanden:
+          type: boolean
         nutzungsobjekte:
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungNutzungsobjektResponseDTO"
+    WiderspruchRequestDTO:
+      required:
+      - datumEingang
+      type: object
+      properties:
+        datumEingang:
+          type: string
+          format: date
+        datumRuecknahme:
+          type: string
+          format: date
+        datumVorlageRegierung:
+          type: string
+          format: date
+        datumAblehnungRegierung:
+          type: string
+          format: date
+        entscheidungDurchfuehrung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        sollAbgesetzt:
+          type: boolean
+        neueTeilabrechnungAnlegen:
+          type: boolean
+        bemerkung:
+          maxLength: 10000
+          minLength: 1
+          type: string
+      description: |-
+        The Widerspruch to create.
+         <p>
+         A Widerspruch is created below its Abrechnung, so the path decides which one it belongs to. Only
+         the Datum Eingang is required.
+         </p>
+    WiderspruchResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        abrechnungId:
+          type: string
+          format: uuid
+        datumEingang:
+          type: string
+          format: date
+        datumRuecknahme:
+          type: string
+          format: date
+        datumVorlageRegierung:
+          type: string
+          format: date
+        datumAblehnungRegierung:
+          type: string
+          format: date
+        entscheidungDurchfuehrung:
+          type: string
+        sollAbgesetzt:
+          type: boolean
+        neueTeilabrechnungAnlegen:
+          type: boolean
+        bemerkung:
+          type: string
     PageMetadata:
       type: object
       properties:
