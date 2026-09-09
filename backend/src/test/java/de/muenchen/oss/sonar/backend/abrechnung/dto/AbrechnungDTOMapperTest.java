@@ -35,7 +35,7 @@ class AbrechnungDTOMapperTest {
                     VON, BIS, null, "Bemerkung", List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), "1000000001", true,
                     "2000000002", ZustellungsbevollmaechtigterTyp.VORMUND, VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG,
-                    List.of(nutzungsobjekt));
+                    true, List.of(nutzungsobjekt));
 
             final AbrechnungResponseDTO result = abrechnungDTOMapper.toDTO(abrechnung);
 
@@ -48,6 +48,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.zeitraumVon()).isEqualTo(VON);
             assertThat(result.zeitraumBis()).isEqualTo(BIS);
             assertThat(result.abrechnungsArt()).isEqualTo(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            assertThat(result.widerspruchVorhanden()).isTrue();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjektResponseDTO nutzungsobjektDTO = result.nutzungsobjekte().getFirst();
@@ -89,6 +90,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.id()).isNull();
             assertThat(result.projektId()).isEqualTo(projektId);
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
+            assertThat(result.widerspruchVorhanden()).isFalse();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjekt nutzungsobjekt = result.nutzungsobjekte().getFirst();

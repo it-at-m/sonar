@@ -5,9 +5,12 @@ import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchService;
+import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -32,6 +35,7 @@ public class AbrechnungService {
 
     private final AbrechnungRepository abrechnungRepository;
     private final ProjektService projektService;
+    private final WiderspruchService widerspruchService;
     private final AbrechnungEntityMapper abrechnungEntityMapper;
 
     @Transactional(readOnly = true)
@@ -43,9 +47,11 @@ public class AbrechnungService {
         final Sort sort = resolveSortWithInputOrDefaults(sortBy, directions);
         log.info("Get Abrechnungen of Projekt {} at Page {} with a PageSize of {} ordered by {}", projektId, pageNumber, pageSize, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-        return abrechnungRepository
-                .findByProjektId(projektId, pageRequest)
-                .map(abrechnungEntityMapper::toAbrechnung);
+        final Page<AbrechnungEntity> page = abrechnungRepository.findByProjektId(projektId, pageRequest);
+        final Map<UUID, Widerspruch> widerspruecheByAbrechnungId = widerspruchService.getWiderspruecheOfAbrechnungen(
+                page.getContent().stream().map(AbrechnungEntity::getId).toList());
+        return page.map(abrechnungEntity -> abrechnungEntityMapper.toAbrechnung(abrechnungEntity,
+                widerspruecheByAbrechnungId.containsKey(abrechnungEntity.getId())));
     }
 
     @Transactional
@@ -55,7 +61,8 @@ public class AbrechnungService {
         }
         final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
         log.debug("Create Abrechnung {}", abrechnungEntity);
-        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(abrechnungEntity));
+        // A Widerspruch is filed against an existing Abrechnung, so a new one never carries one.
+        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(abrechnungEntity), false);
     }
 
     private Sort resolveSortWithInputOrDefaults(final List<AbrechnungSortBy> sortBy, final List<Sort.Direction> directions) {
