@@ -1090,12 +1090,6 @@ components:
           maxLength: 10000
           minLength: 1
           type: string
-      description: |-
-        The Widerspruch to create.
-         <p>
-         A Widerspruch is created below its Abrechnung, so the path decides which one it belongs to. Only
-         the Datum Eingang is required.
-         </p>
     WiderspruchResponseDTO:
       type: object
       properties:

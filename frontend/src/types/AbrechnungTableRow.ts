@@ -5,4 +5,5 @@ export interface AbrechnungTableRow {
   zeitraumBis: string;
   abrechnungsArt: string;
   anzahlNutzungsobjekte: number;
+  widerspruchVorhanden: boolean;
 }

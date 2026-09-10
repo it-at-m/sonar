@@ -25,6 +25,7 @@
       v-model:page="page"
       v-model:items-per-page="itemsPerPage"
       v-model:sort-by="sortBy"
+      :projekt-id="projektId"
       :rows="rows"
       :total-abrechnungen="totalAbrechnungen"
       :loading="loading"

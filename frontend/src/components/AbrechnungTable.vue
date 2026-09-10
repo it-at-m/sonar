@@ -12,12 +12,32 @@
     item-value="id"
     multi-sort
     no-data-text="Es sind noch keine Abrechnungen angelegt."
-  />
+  >
+    <template #[`item.widerspruch`]="{ item }">
+      <span v-if="item.id">
+        <v-btn
+          :aria-label="`Widerspruch zu Abrechnung ${item.geschaeftspartnerId} anlegen`"
+          density="comfortable"
+          :disabled="item.widerspruchVorhanden"
+          :icon="item.widerspruchVorhanden ? mdiChatAlert : mdiChatPlus"
+          :to="`/projekte/${projektId}/abrechnungen/${item.id}/widerspruch/anlegen`"
+          variant="text"
+        />
+        <v-tooltip
+          v-if="item.widerspruchVorhanden"
+          activator="parent"
+          text="Es besteht bereits ein Widerspruch."
+        />
+      </span>
+    </template>
+  </v-data-table-server>
 </template>
 
 <script setup lang="ts">
 import type { AbrechnungTableRow } from "@/types/AbrechnungTableRow";
 import type { DataTableSortItem } from "@/types/DataTableSortItem";
+
+import { mdiChatAlert, mdiChatPlus } from "@mdi/js";
 
 const HEADERS = [
   { title: "Geschäftspartner:in", key: "geschaeftspartnerId" },
@@ -25,6 +45,7 @@ const HEADERS = [
   { title: "Zeitraum bis", key: "zeitraumBis" },
   { title: "Art", key: "abrechnungsArt" },
   { title: "Nutzungsobjekte", key: "anzahlNutzungsobjekte", sortable: false },
+  { title: "Widerspruch", key: "widerspruch", sortable: false },
 ];
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
@@ -34,6 +55,7 @@ const itemsPerPage = defineModel<number>("itemsPerPage", { required: true });
 const sortBy = defineModel<DataTableSortItem[]>("sortBy", { required: true });
 
 defineProps<{
+  projektId: string;
   rows: AbrechnungTableRow[];
   totalAbrechnungen: number;
   loading: boolean;

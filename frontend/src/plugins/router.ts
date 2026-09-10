@@ -12,6 +12,7 @@ import GetStartedView from "@/views/GetStartedView.vue";
 import HomeView from "@/views/HomeView.vue";
 import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
 import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
+import WiderspruchAnlegenView from "@/views/WiderspruchAnlegenView.vue";
 
 const routes = [
   {
@@ -49,6 +50,13 @@ const routes = [
     path: "/projekte/:projektId/abrechnungen/anlegen",
     name: "abrechnung-anlegen",
     component: AbrechnungAnlegenView,
+    props: true,
+    meta: {},
+  },
+  {
+    path: "/projekte/:projektId/abrechnungen/:abrechnungId/widerspruch/anlegen",
+    name: "widerspruch-anlegen",
+    component: WiderspruchAnlegenView,
     props: true,
     meta: {},
   },
