@@ -17,7 +17,6 @@
       ref="form"
       @submit.prevent="save"
     >
-      <h2 class="text-headline-small mb-2">Fristen</h2>
       <v-row>
         <v-col
           cols="12"
@@ -66,7 +65,6 @@
         </v-col>
       </v-row>
 
-      <h2 class="text-headline-small mt-4 mb-2">Entscheidung</h2>
       <v-row>
         <v-col
           cols="12"
