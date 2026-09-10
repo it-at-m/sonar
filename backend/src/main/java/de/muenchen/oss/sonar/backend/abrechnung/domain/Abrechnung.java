@@ -10,6 +10,8 @@ import java.util.UUID;
 public record Abrechnung(
         UUID id,
         UUID projektId,
+        int versionsnummer,
+        UUID vorgaengerAbrechnungId,
         String geschaeftspartnerId,
         boolean zustellungsbevollmaechtigterGenutzt,
         String zustellungsbevollmaechtigterId,
@@ -18,6 +20,7 @@ public record Abrechnung(
         LocalDate zeitraumBis,
         AbrechnungsArt abrechnungsArt,
         boolean widerspruchVorhanden,
+        boolean neuereVersionVorhanden,
         List<AbrechnungNutzungsobjekt> nutzungsobjekte) {
 
     /**

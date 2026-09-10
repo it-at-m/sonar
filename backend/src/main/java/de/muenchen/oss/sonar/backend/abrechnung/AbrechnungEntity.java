@@ -10,6 +10,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
+import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -37,6 +38,12 @@ public class AbrechnungEntity extends BaseEntity {
 
     @Column(name = "projekt_id", nullable = false)
     @NotNull private UUID projektId;
+
+    @Column(nullable = false)
+    @NotNull @Min(1) private Integer versionsnummer;
+
+    @Column(name = "vorgaenger_abrechnung_id", unique = true)
+    private UUID vorgaengerAbrechnungId;
 
     @Column(nullable = false, length = 10)
     @NotNull @Size(min = 1, max = 10) private String geschaeftspartnerId;

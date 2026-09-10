@@ -33,14 +33,15 @@ class AbrechnungDTOMapperTest {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     VON, BIS, null, "Bemerkung", List.of(position));
-            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), "1000000001", true,
+            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 2, null, "1000000001", true,
                     "2000000002", ZustellungsbevollmaechtigterTyp.VORMUND, VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG,
-                    true, List.of(nutzungsobjekt));
+                    true, true, List.of(nutzungsobjekt));
 
             final AbrechnungResponseDTO result = abrechnungDTOMapper.toDTO(abrechnung);
 
             assertThat(result.id()).isEqualTo(abrechnung.id());
             assertThat(result.projektId()).isEqualTo(abrechnung.projektId());
+            assertThat(result.versionsnummer()).isEqualTo(2);
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
             assertThat(result.zustellungsbevollmaechtigterGenutzt()).isTrue();
             assertThat(result.zustellungsbevollmaechtigterId()).isEqualTo("2000000002");
@@ -49,6 +50,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.zeitraumBis()).isEqualTo(BIS);
             assertThat(result.abrechnungsArt()).isEqualTo(AbrechnungsArt.ZWISCHENABRECHNUNG);
             assertThat(result.widerspruchVorhanden()).isTrue();
+            assertThat(result.neuereVersionVorhanden()).isTrue();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjektResponseDTO nutzungsobjektDTO = result.nutzungsobjekte().getFirst();
@@ -91,6 +93,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.projektId()).isEqualTo(projektId);
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
             assertThat(result.widerspruchVorhanden()).isFalse();
+            assertThat(result.neuereVersionVorhanden()).isFalse();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjekt nutzungsobjekt = result.nutzungsobjekte().getFirst();
