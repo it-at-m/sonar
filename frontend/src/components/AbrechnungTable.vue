@@ -13,6 +13,17 @@
     multi-sort
     no-data-text="Es sind noch keine Abrechnungen angelegt."
   >
+    <template #[`item.ansehen`]="{ item }">
+      <v-btn
+        v-if="item.id"
+        :aria-label="`Abrechnung ${item.geschaeftspartnerId} in Version ${item.versionsnummer} ansehen`"
+        density="comfortable"
+        :icon="mdiEye"
+        :to="`/projekte/${projektId}/abrechnungen/${item.id}/ansehen`"
+        variant="text"
+      />
+    </template>
+
     <template #[`item.widerspruch`]="{ item }">
       <span v-if="item.id">
         <v-btn
@@ -30,6 +41,17 @@
         />
       </span>
     </template>
+
+    <template #[`item.neueVersion`]="{ item }">
+      <v-btn
+        v-if="item.id"
+        :aria-label="`Neue Version der Abrechnung ${item.geschaeftspartnerId} anlegen`"
+        density="comfortable"
+        :icon="mdiFileDocumentPlus"
+        :to="`/projekte/${projektId}/abrechnungen/${item.id}/version/anlegen`"
+        variant="text"
+      />
+    </template>
   </v-data-table-server>
 </template>
 
@@ -37,15 +59,23 @@
 import type { AbrechnungTableRow } from "@/types/AbrechnungTableRow";
 import type { DataTableSortItem } from "@/types/DataTableSortItem";
 
-import { mdiChatAlert, mdiChatPlus } from "@mdi/js";
+import {
+  mdiChatAlert,
+  mdiChatPlus,
+  mdiEye,
+  mdiFileDocumentPlus,
+} from "@mdi/js";
 
 const HEADERS = [
   { title: "Geschäftspartner:in", key: "geschaeftspartnerId" },
   { title: "Zeitraum von", key: "zeitraumVon" },
   { title: "Zeitraum bis", key: "zeitraumBis" },
   { title: "Art", key: "abrechnungsArt" },
+  { title: "Version", key: "versionsnummer" },
   { title: "Nutzungsobjekte", key: "anzahlNutzungsobjekte", sortable: false },
+  { title: "Ansehen", key: "ansehen", sortable: false },
   { title: "Widerspruch", key: "widerspruch", sortable: false },
+  { title: "Neue Version", key: "neueVersion", sortable: false },
 ];
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];

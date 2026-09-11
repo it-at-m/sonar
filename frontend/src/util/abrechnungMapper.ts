@@ -1,13 +1,20 @@
 import type {
   AbrechnungNutzungsobjektRequestDTO,
+  AbrechnungNutzungsobjektResponseDTO,
   AbrechnungPositionRequestDTO,
+  AbrechnungPositionResponseDTO,
   AbrechnungRequestDTO,
+  AbrechnungResponseDTO,
 } from "@/api/generated/sonar-backend";
 import type { AbrechnungForm } from "@/composables/abrechnungForm";
 import type { AbrechnungNutzungsobjektForm } from "@/types/AbrechnungNutzungsobjektForm";
 import type { AbrechnungPositionForm } from "@/types/AbrechnungPositionForm";
 
+import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
+import { createAbrechnungNutzungsobjekt } from "@/util/abrechnungNutzungsobjektForm";
+import { createAbrechnungPosition } from "@/util/abrechnungPositionForm";
 import { toAdresseRequestFields } from "@/util/adresseMapper";
+import { toIsoDateString } from "@/util/formatter";
 import { toUnerlaubteNutzungRequestFields } from "@/util/unerlaubteNutzungMapper";
 
 export function toAbrechnungRequestDTO(
@@ -44,6 +51,67 @@ function toNutzungsobjektRequestDTO(
     ...toUnerlaubteNutzungRequestFields(nutzungsobjekt),
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
     positionen: nutzungsobjekt.positionen.map(toPositionRequestDTO),
+  };
+}
+
+export function toAbrechnungForm(
+  abrechnung: AbrechnungResponseDTO
+): AbrechnungForm {
+  const nutzungsobjekte = (abrechnung.nutzungsobjekte ?? []).map(
+    toNutzungsobjektForm
+  );
+  return {
+    geschaeftspartnerId: abrechnung.geschaeftspartnerId ?? "",
+    zustellungsbevollmaechtigterGenutzt:
+      abrechnung.zustellungsbevollmaechtigterGenutzt ?? false,
+    zustellungsbevollmaechtigterId:
+      abrechnung.zustellungsbevollmaechtigterId ?? "",
+    zustellungsbevollmaechtigterTyp:
+      abrechnung.zustellungsbevollmaechtigterTyp ?? null,
+    zeitraumVon: toIsoDateString(abrechnung.zeitraumVon),
+    zeitraumBis: toIsoDateString(abrechnung.zeitraumBis),
+    abrechnungsArt: abrechnung.abrechnungsArt ?? null,
+    nutzungsobjekte:
+      nutzungsobjekte.length > 0
+        ? nutzungsobjekte
+        : [createAbrechnungNutzungsobjekt()],
+  };
+}
+
+function toNutzungsobjektForm(
+  nutzungsobjekt: AbrechnungNutzungsobjektResponseDTO
+): AbrechnungNutzungsobjektForm {
+  const positionen = (nutzungsobjekt.positionen ?? []).map(toPositionForm);
+  return {
+    id: crypto.randomUUID(),
+    art: nutzungsobjekt.art ?? ProjektAdresseRequestDTOArtEnum.ADRESSE,
+    adresse: nutzungsobjekt.adresse ?? "",
+    hausnummerVon: nutzungsobjekt.hausnummerVon ?? "",
+    hausnummerBis: nutzungsobjekt.hausnummerBis ?? "",
+    flurstueck: nutzungsobjekt.flurstueck ?? "",
+    gemarkung: nutzungsobjekt.gemarkung ?? "",
+    nutzung: nutzungsobjekt.nutzung ?? null,
+    unerlaubteNutzungVon: toIsoDateString(nutzungsobjekt.unerlaubteNutzungVon),
+    unerlaubteNutzungBis: toIsoDateString(nutzungsobjekt.unerlaubteNutzungBis),
+    tageUnerlaubteNutzung: nutzungsobjekt.tageUnerlaubteNutzung ?? null,
+    bemerkung: nutzungsobjekt.bemerkung ?? "",
+    positionen:
+      positionen.length > 0 ? positionen : [createAbrechnungPosition()],
+  };
+}
+
+function toPositionForm(
+  position: AbrechnungPositionResponseDTO
+): AbrechnungPositionForm {
+  return {
+    id: crypto.randomUUID(),
+    beginn: toIsoDateString(position.beginn),
+    ende: toIsoDateString(position.ende),
+    laenge: position.laenge ?? null,
+    breite: position.breite ?? null,
+    flaeche: position.flaeche ?? null,
+    haelfte: position.haelfte ?? false,
+    anteilAnFlaeche: position.anteilAnFlaeche ?? null,
   };
 }
 

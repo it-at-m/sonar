@@ -118,6 +118,7 @@ class WiderspruchIntegrationTest {
 
         final AbrechnungEntity abrechnung = new AbrechnungEntity();
         abrechnung.setProjektId(projektId);
+        abrechnung.setVersionsnummer(1);
         abrechnung.setGeschaeftspartnerId("1000000001");
         abrechnung.setZeitraumVon(VON);
         abrechnung.setZeitraumBis(BIS);

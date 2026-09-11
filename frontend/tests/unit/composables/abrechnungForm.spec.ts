@@ -105,5 +105,64 @@ describe("abrechnungForm.ts", () => {
 
       expect(isDirty()).toBe(true);
     });
+
+    it("givenUntouchedDataTakenOver_thenReturnFalse", () => {
+      const { isDirty, uebernehmen } = useAbrechnungForm();
+      uebernehmen({
+        geschaeftspartnerId: "1000000001",
+        zustellungsbevollmaechtigterGenutzt: false,
+        zustellungsbevollmaechtigterId: "",
+        zustellungsbevollmaechtigterTyp: null,
+        zeitraumVon: "2026-01-01",
+        zeitraumBis: "2026-03-31",
+        abrechnungsArt: AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG,
+        nutzungsobjekte: [createAbrechnungNutzungsobjekt()],
+      });
+
+      expect(isDirty()).toBe(false);
+    });
+
+    it("givenChangedDataTakenOver_thenReturnTrue", () => {
+      const { abrechnung, isDirty, uebernehmen } = useAbrechnungForm();
+      uebernehmen({
+        geschaeftspartnerId: "1000000001",
+        zustellungsbevollmaechtigterGenutzt: false,
+        zustellungsbevollmaechtigterId: "",
+        zustellungsbevollmaechtigterTyp: null,
+        zeitraumVon: "2026-01-01",
+        zeitraumBis: "2026-03-31",
+        abrechnungsArt: AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG,
+        nutzungsobjekte: [createAbrechnungNutzungsobjekt()],
+      });
+
+      abrechnung.value.geschaeftspartnerId = "1000000002";
+
+      expect(isDirty()).toBe(true);
+    });
+  });
+
+  describe("uebernehmen", () => {
+    it("givenDataOfAnotherAbrechnung_thenFillTheFormWithThem", () => {
+      const { abrechnung, uebernehmen } = useAbrechnungForm();
+      const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+      nutzungsobjekt.adresse = "Marienplatz";
+
+      uebernehmen({
+        geschaeftspartnerId: "1000000001",
+        zustellungsbevollmaechtigterGenutzt: false,
+        zustellungsbevollmaechtigterId: "",
+        zustellungsbevollmaechtigterTyp: null,
+        zeitraumVon: "2026-01-01",
+        zeitraumBis: "2026-03-31",
+        abrechnungsArt: AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG,
+        nutzungsobjekte: [nutzungsobjekt],
+      });
+
+      expect(abrechnung.value.geschaeftspartnerId).toBe("1000000001");
+      expect(abrechnung.value.zeitraumVon).toBe("2026-01-01");
+      expect(itemAt(abrechnung.value.nutzungsobjekte).adresse).toBe(
+        "Marienplatz"
+      );
+    });
   });
 });

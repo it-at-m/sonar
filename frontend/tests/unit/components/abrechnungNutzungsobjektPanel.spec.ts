@@ -9,6 +9,7 @@ import {
   ProjektAdresseRequestDTONutzungEnum,
 } from "@/api/generated/sonar-backend";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
+import AbrechnungPositionenTable from "@/components/AbrechnungPositionenTable.vue";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnungNutzungsobjektForm";
 
 const SUGGESTION: ProjektAdresseSuggestion = {
@@ -26,13 +27,15 @@ const SUGGESTION: ProjektAdresseSuggestion = {
 
 function mountPanel(
   nutzungsobjekt: AbrechnungNutzungsobjektForm,
-  suggestions: ProjektAdresseSuggestion[] = []
+  suggestions: ProjektAdresseSuggestion[] = [],
+  readonly = false
 ) {
   return shallowMount(AbrechnungNutzungsobjektPanel, {
     props: {
       modelValue: nutzungsobjekt,
       idPrefix: "berechnung-nutzungsobjekt-0",
       label: "Adresse 1",
+      readonly,
       removable: true,
       suggestions,
     },
@@ -99,5 +102,26 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
 
     expect(nutzungsobjekt.bemerkung).toBe("Zweite Mahnung");
     expect(nutzungsobjekt.positionen).toBe(positionen);
+  });
+
+  it("givenReadonly_thenOfferNeitherToRemoveTheEntryNorToTakeOverAnAdresse", () => {
+    const wrapper = mountPanel(
+      createAbrechnungNutzungsobjekt(),
+      [SUGGESTION],
+      true
+    );
+
+    expect(wrapper.find('[aria-label="Adresse 1 entfernen"]').exists()).toBe(
+      false
+    );
+    expect(suggestionEntries(wrapper)).toHaveLength(0);
+  });
+
+  it("givenReadonly_thenPassItOnToThePositionen", () => {
+    const wrapper = mountPanel(createAbrechnungNutzungsobjekt(), [], true);
+
+    expect(
+      wrapper.findComponent(AbrechnungPositionenTable).props("readonly")
+    ).toBe(true);
   });
 });

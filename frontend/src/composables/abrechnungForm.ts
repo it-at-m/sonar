@@ -34,6 +34,8 @@ export function useAbrechnungForm() {
     nutzungsobjekte: [createAbrechnungNutzungsobjekt()],
   });
 
+  const uebernommeneAbrechnung = ref<string | null>(null);
+
   watch(
     () => abrechnung.value.zustellungsbevollmaechtigterGenutzt,
     (genutzt) => {
@@ -44,11 +46,21 @@ export function useAbrechnungForm() {
     }
   );
 
+  function uebernehmen(form: AbrechnungForm): void {
+    abrechnung.value = form;
+    uebernommeneAbrechnung.value = JSON.stringify(form);
+  }
+
   /**
    * Covers both tabs, because both fill the same Abrechnung and the guard has to fire wherever the
    * entry happened. A single Nutzungsobjekt is there from the start, so only a second one counts.
+   * Taken over data fills the form without anyone entering it, so there a filled field says
+   * nothing. Only a difference to what was taken over counts as a change.
    */
   function isDirty(): boolean {
+    if (uebernommeneAbrechnung.value !== null) {
+      return JSON.stringify(abrechnung.value) !== uebernommeneAbrechnung.value;
+    }
     const form = abrechnung.value;
     if (
       form.geschaeftspartnerId ||
@@ -67,5 +79,5 @@ export function useAbrechnungForm() {
     return form.nutzungsobjekte.some(isAbrechnungNutzungsobjektDirty);
   }
 
-  return { abrechnung, isDirty };
+  return { abrechnung, isDirty, uebernehmen };
 }

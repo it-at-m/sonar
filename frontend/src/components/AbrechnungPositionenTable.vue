@@ -11,7 +11,7 @@
             <th>Fläche (m²)</th>
             <th>50 %</th>
             <th>Anteil Fläche (m²)</th>
-            <th />
+            <th v-if="!readonly" />
           </tr>
         </thead>
         <tbody>
@@ -94,7 +94,7 @@
                 :rules="[requiredRule, greaterThanZeroRule]"
               />
             </td>
-            <td>
+            <td v-if="!readonly">
               <v-btn
                 :aria-label="`Position ${index + 1} entfernen`"
                 :disabled="positionen.length === 1"
@@ -110,6 +110,7 @@
     </div>
 
     <v-btn
+      v-if="!readonly"
       class="mt-2"
       :prepend-icon="mdiPlus"
       variant="text"
@@ -134,8 +135,9 @@ import {
 
 const positionen = defineModel<AbrechnungPositionForm[]>({ required: true });
 
-defineProps<{
+const { readonly = false } = defineProps<{
   idPrefix: string;
+  readonly?: boolean;
 }>();
 
 function addPosition(): void {

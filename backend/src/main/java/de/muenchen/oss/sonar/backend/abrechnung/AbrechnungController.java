@@ -38,12 +38,16 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = OpenAPIDocumentationConfiguration.SECURITY_SCHEME_NAME)
 public class AbrechnungController {
 
+    private static final String PROJEKT_ID = "projektId";
+    private static final String STATUS_NOT_FOUND = "404";
+
     private final AbrechnungService abrechnungService;
     private final AbrechnungDTOMapper abrechnungDTOMapper;
 
     /**
      * Retrieve the Abrechnungen of a Projekt with pagination.
-     * Fetches a paginated list of all Abrechnungen belonging to the Projekt.
+     * Fetches a paginated list of the Abrechnungen belonging to the Projekt, each of them in its
+     * newest version. An older version is reached from the Abrechnung it was carried forward to.
      * The order is applied by the database, so it holds for the whole result and not just for the
      * requested page.
      * Both sort parameters take a comma separated list. The order of the columns is the order they
@@ -60,8 +64,8 @@ public class AbrechnungController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @ApiResponse(responseCode = "400", description = "the pagination or sort parameters are invalid", content = @Content)
-    @ApiResponse(responseCode = "404", description = "the Projekt does not exist", content = @Content)
-    public Page<AbrechnungResponseDTO> getAbrechnungenByPageAndSize(@PathVariable("projektId") final UUID projektId,
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    public Page<AbrechnungResponseDTO> getAbrechnungenByPageAndSize(@PathVariable(PROJEKT_ID) final UUID projektId,
             @RequestParam(defaultValue = "0") @Min(0) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) final int pageSize,
             // Explode.FALSE documents the list as one comma separated value. The client is generated from
@@ -89,6 +93,22 @@ public class AbrechnungController {
     }
 
     /**
+     * Retrieve a single Abrechnung of a Projekt.
+     * Fetches the Abrechnung together with its Nutzungsobjekte, whatever version it is.
+     *
+     * @param projektId the UUID of the Projekt the Abrechnung belongs to
+     * @param abrechnungId the UUID of the requested Abrechnung
+     * @return the Abrechnung represented as a DTO
+     */
+    @GetMapping("/{abrechnungId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    public AbrechnungResponseDTO getAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
+            @PathVariable("abrechnungId") final UUID abrechnungId) {
+        return abrechnungDTOMapper.toDTO(abrechnungService.getAbrechnung(projektId, abrechnungId));
+    }
+
+    /**
      * Create a new Abrechnung for a Projekt.
      * Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
      * An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
@@ -100,11 +120,35 @@ public class AbrechnungController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Abrechnung are invalid", content = @Content)
-    @ApiResponse(responseCode = "404", description = "the Projekt does not exist", content = @Content)
-    public AbrechnungResponseDTO saveAbrechnung(@PathVariable("projektId") final UUID projektId,
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    public AbrechnungResponseDTO saveAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
             @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
         return abrechnungDTOMapper.toDTO(
                 abrechnungService.createAbrechnung(abrechnungDTOMapper.toAbrechnung(projektId, abrechnungRequestDTO)));
+    }
+
+    /**
+     * Create the next version of an Abrechnung.
+     * The given Abrechnung stays as it is and the details of the request become a version of its own.
+     * They may differ from the ones of the Vorgänger in every field.
+     * Only the latest version can be carried forward, so an Abrechnung that already has a newer
+     * version is refused.
+     *
+     * @param projektId the UUID of the Projekt the Abrechnung belongs to
+     * @param abrechnungId the UUID of the Abrechnung to create the next version of
+     * @param abrechnungRequestDTO the details of the new version
+     * @return the created version as a DTO
+     */
+    @PostMapping("/{abrechnungId}/version")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponse(responseCode = "400", description = "the details of the new version are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    @ApiResponse(responseCode = "409", description = "the Abrechnung already has a newer version", content = @Content)
+    public AbrechnungResponseDTO saveAbrechnungVersion(@PathVariable(PROJEKT_ID) final UUID projektId,
+            @PathVariable("abrechnungId") final UUID abrechnungId,
+            @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
+        return abrechnungDTOMapper.toDTO(abrechnungService.createNextVersion(abrechnungId,
+                abrechnungDTOMapper.toAbrechnung(projektId, abrechnungRequestDTO)));
     }
 
 }

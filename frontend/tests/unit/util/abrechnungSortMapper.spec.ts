@@ -30,6 +30,15 @@ describe("abrechnungSortMapper.ts", () => {
       );
     });
 
+    it("givenVersionsnummer_thenMapItToTheBackendColumn", () => {
+      expect(
+        toAbrechnungSort([{ key: "versionsnummer", order: "desc" }])
+      ).toEqual({
+        sortBy: ["VERSIONSNUMMER"],
+        sortDirection: ["DESC"],
+      });
+    });
+
     it("givenColumnWithoutOrder_thenSortDescending", () => {
       expect(toAbrechnungSort([{ key: "abrechnungsArt" }])).toEqual({
         sortBy: ["ABRECHNUNGS_ART"],

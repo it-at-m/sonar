@@ -13,6 +13,7 @@ const SORT_BY_OF_COLUMN: Record<
   zeitraumVon: "ZEITRAUM_VON",
   zeitraumBis: "ZEITRAUM_BIS",
   abrechnungsArt: "ABRECHNUNGS_ART",
+  versionsnummer: "VERSIONSNUMMER",
 };
 
 export function toAbrechnungSort(

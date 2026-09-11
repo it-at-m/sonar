@@ -10,7 +10,8 @@ public enum AbrechnungSortBy {
     ZEITRAUM_VON("zeitraumVon"),
     ZEITRAUM_BIS("zeitraumBis"),
     ABRECHNUNGS_ART("abrechnungsArt"),
-    GESCHAEFTSPARTNER_ID("geschaeftspartnerId");
+    GESCHAEFTSPARTNER_ID("geschaeftspartnerId"),
+    VERSIONSNUMMER("versionsnummer");
 
     private final String entityAttribute;
 }

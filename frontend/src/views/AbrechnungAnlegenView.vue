@@ -10,42 +10,26 @@
     </v-btn>
 
     <h1 class="text-display-medium font-weight-bold mb-6">
-      Abrechnung anlegen
+      {{ title }}
     </h1>
 
+    <v-progress-circular
+      v-if="loadingVorgaenger"
+      color="primary"
+      indeterminate
+    />
+
     <v-form
+      v-else
       ref="form"
       @submit.prevent="save"
     >
-      <v-tabs
-        v-model="tab"
-        class="mb-4"
-      >
-        <v-tab :value="TABS.BASIS">Basisinformationen</v-tab>
-        <v-tab :value="TABS.BERECHNUNG">Berechnung</v-tab>
-      </v-tabs>
-
-      <v-tabs-window v-model="tab">
-        <!-- eager, because the rules of an unmounted input never run -->
-        <v-tabs-window-item
-          eager
-          :value="TABS.BASIS"
-        >
-          <abrechnung-basisinformationen v-model="abrechnung" />
-        </v-tabs-window-item>
-
-        <v-tabs-window-item
-          eager
-          :value="TABS.BERECHNUNG"
-        >
-          <abrechnung-berechnung
-            ref="berechnung"
-            v-model="abrechnung"
-            :invalid-nutzungsobjekte="invalidNutzungsobjekte"
-            :suggestions="suggestions"
-          />
-        </v-tabs-window-item>
-      </v-tabs-window>
+      <abrechnung-tabs
+        ref="tabs"
+        v-model="abrechnung"
+        :invalid-nutzungsobjekte="invalidNutzungsobjekte"
+        :suggestions="suggestions"
+      />
 
       <div class="d-flex justify-end mt-6">
         <v-btn
@@ -76,6 +60,7 @@
 </template>
 
 <script setup lang="ts">
+import type { AbrechnungResponseDTO } from "@/api/generated/sonar-backend";
 import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
 
 import { mdiArrowLeft } from "@mdi/js";
@@ -87,29 +72,34 @@ import {
   AbrechnungControllerApi,
   ResponseError,
 } from "@/api/generated/sonar-backend";
-import AbrechnungBasisinformationen from "@/components/AbrechnungBasisinformationen.vue";
-import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
+import AbrechnungTabs from "@/components/AbrechnungTabs.vue";
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import { useSaveLeave } from "@/composables/saveLeave";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
-import { toAbrechnungRequestDTO } from "@/util/abrechnungMapper";
-import { nutzungsobjektOfError, tabOfError, TABS } from "@/util/abrechnungTabs";
+import {
+  toAbrechnungForm,
+  toAbrechnungRequestDTO,
+} from "@/util/abrechnungMapper";
+import { nutzungsobjektOfError } from "@/util/abrechnungTabs";
 import { fetchProjektAdresseSuggestions } from "@/util/projektAdresseSuggestion";
 
-const { projektId } = defineProps<{ projektId: string }>();
+const { projektId, vorgaengerAbrechnungId = undefined } = defineProps<{
+  projektId: string;
+  vorgaengerAbrechnungId?: string;
+}>();
 
 const router = useRouter();
 const snackbarStore = useSnackbarStore();
 
 const form = useTemplateRef("form");
-const berechnung = useTemplateRef("berechnung");
-const tab = ref<string>(TABS.BASIS);
+const tabs = useTemplateRef("tabs");
 const saving = ref(false);
 const suggestions = ref<ProjektAdresseSuggestion[]>([]);
+const loadingVorgaenger = ref(vorgaengerAbrechnungId !== undefined);
 
-const { abrechnung, isDirty } = useAbrechnungForm();
+const { abrechnung, isDirty, uebernehmen } = useAbrechnungForm();
 
 const {
   cancel,
@@ -120,6 +110,12 @@ const {
   saveLeaveDialogTitle,
 } = useSaveLeave(isDirty);
 
+const title = computed(() =>
+  vorgaengerAbrechnungId === undefined
+    ? "Abrechnung anlegen"
+    : "Neue Version der Abrechnung anlegen"
+);
+
 const invalidNutzungsobjekte = computed(() =>
   (form.value?.errors ?? [])
     .map((error) => nutzungsobjektOfError(String(error.id)))
@@ -127,15 +123,31 @@ const invalidNutzungsobjekte = computed(() =>
 );
 
 function errorText(error: unknown): string {
+  const isNewVersion = vorgaengerAbrechnungId !== undefined;
   if (error instanceof ResponseError) {
     if (error.response.status === 400) {
-      return "Die Abrechnung konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben.";
+      return isNewVersion
+        ? "Die neue Version konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben."
+        : "Die Abrechnung konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben.";
     }
     if (error.response.status === 404) {
-      return "Das Projekt wurde nicht gefunden.";
+      return isNewVersion
+        ? "Die Abrechnung, zu der die neue Version gehört, wurde nicht gefunden."
+        : "Das Projekt wurde nicht gefunden.";
+    }
+    if (error.response.status === 409) {
+      return "Zu dieser Abrechnung besteht bereits eine neuere Version.";
     }
   }
-  return "Die Abrechnung konnte nicht gespeichert werden.";
+  return isNewVersion
+    ? "Die neue Version konnte nicht gespeichert werden."
+    : "Die Abrechnung konnte nicht gespeichert werden.";
+}
+
+function savedText(gespeicherteAbrechnung: AbrechnungResponseDTO): string {
+  return vorgaengerAbrechnungId === undefined
+    ? `Die Abrechnung ${gespeicherteAbrechnung.id} wurde angelegt.`
+    : `Die Version ${gespeicherteAbrechnung.versionsnummer} der Abrechnung wurde angelegt.`;
 }
 
 async function showFirstError(
@@ -146,11 +158,7 @@ async function showFirstError(
     return;
   }
   const id = String(first.id);
-  const offendingTab = tabOfError(id);
-  if (offendingTab !== undefined) {
-    tab.value = offendingTab;
-  }
-  berechnung.value?.showError(id);
+  tabs.value?.showError(id);
   await nextTick();
   document.getElementById(id)?.focus();
 }
@@ -164,11 +172,18 @@ async function save(): Promise<void> {
 
   saving.value = true;
   try {
-    const created = await ApiFactory.getInstance(
-      AbrechnungControllerApi
-    ).saveAbrechnung(projektId, toAbrechnungRequestDTO(abrechnung.value));
+    const abrechnungApi = ApiFactory.getInstance(AbrechnungControllerApi);
+    const requestDTO = toAbrechnungRequestDTO(abrechnung.value);
+    const saved =
+      vorgaengerAbrechnungId === undefined
+        ? await abrechnungApi.saveAbrechnung(projektId, requestDTO)
+        : await abrechnungApi.saveAbrechnungVersion(
+            projektId,
+            vorgaengerAbrechnungId,
+            requestDTO
+          );
     snackbarStore.push({
-      text: `Die Abrechnung ${created.id} wurde angelegt.`,
+      text: savedText(saved),
       color: STATUS_INDICATORS.SUCCESS,
     });
     isSave.value = true;
@@ -198,5 +213,26 @@ async function loadProjektAdressen(): Promise<void> {
   }
 }
 
-onMounted(() => void loadProjektAdressen());
+async function loadVorgaenger(abrechnungId: string): Promise<void> {
+  try {
+    const vorgaenger = await ApiFactory.getInstance(
+      AbrechnungControllerApi
+    ).getAbrechnung(projektId, abrechnungId);
+    uebernehmen(toAbrechnungForm(vorgaenger));
+    loadingVorgaenger.value = false;
+  } catch {
+    snackbarStore.push({
+      text: "Die Abrechnung konnte nicht geladen werden. Es lässt sich daher keine neue Version anlegen.",
+      color: STATUS_INDICATORS.ERROR,
+    });
+    await router.push(`/projekte/${projektId}/abrechnungen`);
+  }
+}
+
+onMounted(() => {
+  void loadProjektAdressen();
+  if (vorgaengerAbrechnungId !== undefined) {
+    void loadVorgaenger(vorgaengerAbrechnungId);
+  }
+});
 </script>

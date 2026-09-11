@@ -273,7 +273,8 @@ paths:
       summary: Retrieve the Abrechnungen of a Projekt with pagination.
       description: |-
         Retrieve the Abrechnungen of a Projekt with pagination.
-         Fetches a paginated list of all Abrechnungen belonging to the Projekt.
+         Fetches a paginated list of the Abrechnungen belonging to the Projekt, each of them in its
+         newest version. An older version is reached from the Abrechnung it was carried forward to.
          The order is applied by the database, so it holds for the whole result and not just for the
          requested page.
          Both sort parameters take a comma separated list. The order of the columns is the order they
@@ -322,6 +323,7 @@ paths:
             - ZEITRAUM_BIS
             - ABRECHNUNGS_ART
             - GESCHAEFTSPARTNER_ID
+            - VERSIONSNUMMER
           default:
           - ZEITRAUM_VON
       - name: sortDirection
@@ -382,6 +384,55 @@ paths:
           description: the Projekt does not exist
         "201":
           description: the created Abrechnung as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/abrechnung/{abrechnungId}/version:
+    post:
+      tags:
+      - abrechnung-controller
+      summary: Create the next version of an Abrechnung.
+      description: |-
+        Create the next version of an Abrechnung.
+         The given Abrechnung stays as it is and the details of the request become a version of its own.
+         They may differ from the ones of the Vorgänger in every field.
+         Only the latest version can be carried forward, so an Abrechnung that already has a newer
+         version is refused.
+      operationId: saveAbrechnungVersion
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the Abrechnung to create the next version of
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: the details of the new version
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AbrechnungRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the details of the new version are invalid
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "409":
+          description: the Abrechnung already has a newer version
+        "201":
+          description: the created version as a DTO
           content:
             application/json:
               schema:
@@ -453,6 +504,41 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/abrechnung/{abrechnungId}:
+    get:
+      tags:
+      - abrechnung-controller
+      summary: Retrieve a single Abrechnung of a Projekt.
+      description: |-
+        Retrieve a single Abrechnung of a Projekt.
+         Fetches the Abrechnung together with its Nutzungsobjekte, whatever version it is.
+      operationId: getAbrechnung
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the requested Abrechnung
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "200":
+          description: the Abrechnung represented as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
   /geschaeftspartner/{geschaeftspartnerId}:
@@ -1012,6 +1098,12 @@ components:
         projektId:
           type: string
           format: uuid
+        versionsnummer:
+          type: integer
+          format: int32
+        vorgaengerAbrechnungId:
+          type: string
+          format: uuid
         geschaeftspartnerId:
           type: string
         zustellungsbevollmaechtigterGenutzt:
@@ -1056,6 +1148,8 @@ components:
           - ENDABRECHNUNG
           - ZWISCHENABRECHNUNG
         widerspruchVorhanden:
+          type: boolean
+        neuereVersionVorhanden:
           type: boolean
         nutzungsobjekte:
           type: array

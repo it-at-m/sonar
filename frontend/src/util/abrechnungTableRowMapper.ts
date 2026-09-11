@@ -9,6 +9,7 @@ export function toAbrechnungTableRow(
 ): AbrechnungTableRow {
   return {
     id: abrechnung.id,
+    versionsnummer: abrechnung.versionsnummer ?? 1,
     geschaeftspartnerId: abrechnung.geschaeftspartnerId ?? "",
     zeitraumVon: abrechnung.zeitraumVon
       ? toDateString(abrechnung.zeitraumVon)

@@ -7,7 +7,10 @@ import {
   ProjektAdresseRequestDTONutzungEnum,
 } from "@/api/generated/sonar-backend";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
-import { toAbrechnungRequestDTO } from "@/util/abrechnungMapper";
+import {
+  toAbrechnungForm,
+  toAbrechnungRequestDTO,
+} from "@/util/abrechnungMapper";
 
 function itemAt<T>(items: readonly T[], index = 0): T {
   const item = items[index];
@@ -328,6 +331,127 @@ describe("abrechnungMapper.ts", () => {
       position.anteilAnFlaeche = 30;
 
       expect(() => toAbrechnungRequestDTO(abrechnung.value)).toThrow();
+    });
+  });
+
+  describe("toAbrechnungForm", () => {
+    it("givenAbrechnung_thenFillTheFormWithItsData", () => {
+      const form = toAbrechnungForm({
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        geschaeftspartnerId: "1000000001",
+        zustellungsbevollmaechtigterGenutzt: true,
+        zustellungsbevollmaechtigterId: "2000000002",
+        zustellungsbevollmaechtigterTyp: "VORMUND",
+        zeitraumVon: new Date("2026-01-01"),
+        zeitraumBis: new Date("2026-03-31"),
+        abrechnungsArt: "ZWISCHENABRECHNUNG",
+        nutzungsobjekte: [
+          {
+            id: "123e4567-e89b-12d3-a456-426614174002",
+            art: "ADRESSE",
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            hausnummerBis: "12",
+            nutzung: "NUTZUNG_A",
+            unerlaubteNutzungVon: new Date("2026-01-01"),
+            unerlaubteNutzungBis: new Date("2026-01-10"),
+            tageUnerlaubteNutzung: 10,
+            bemerkung: "Erste Fassung",
+            positionen: [
+              {
+                id: "123e4567-e89b-12d3-a456-426614174003",
+                beginn: new Date("2026-01-01"),
+                ende: new Date("2026-03-31"),
+                laenge: 12,
+                breite: 3,
+                flaeche: 36,
+                haelfte: true,
+                anteilAnFlaeche: 30,
+              },
+            ],
+          },
+        ],
+      });
+
+      expect(form.geschaeftspartnerId).toBe("1000000001");
+      expect(form.zustellungsbevollmaechtigterGenutzt).toBe(true);
+      expect(form.zustellungsbevollmaechtigterId).toBe("2000000002");
+      expect(form.zustellungsbevollmaechtigterTyp).toBe(
+        AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum.VORMUND
+      );
+      expect(form.zeitraumVon).toBe("2026-01-01");
+      expect(form.zeitraumBis).toBe("2026-03-31");
+      expect(form.abrechnungsArt).toBe(
+        AbrechnungRequestDTOAbrechnungsArtEnum.ZWISCHENABRECHNUNG
+      );
+
+      const nutzungsobjekt = itemAt(form.nutzungsobjekte);
+      expect(nutzungsobjekt.art).toBe(ProjektAdresseRequestDTOArtEnum.ADRESSE);
+      expect(nutzungsobjekt.adresse).toBe("Marienplatz");
+      expect(nutzungsobjekt.hausnummerBis).toBe("12");
+      expect(nutzungsobjekt.nutzung).toBe(
+        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A
+      );
+      expect(nutzungsobjekt.unerlaubteNutzungVon).toBe("2026-01-01");
+      expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(10);
+      expect(nutzungsobjekt.bemerkung).toBe("Erste Fassung");
+
+      const position = itemAt(nutzungsobjekt.positionen);
+      expect(position.beginn).toBe("2026-01-01");
+      expect(position.ende).toBe("2026-03-31");
+      expect(position.laenge).toBe(12);
+      expect(position.haelfte).toBe(true);
+      expect(position.anteilAnFlaeche).toBe(30);
+    });
+
+    it("givenFormOfAnAbrechnung_thenSendTheSameValuesBack", () => {
+      const form = toAbrechnungForm({
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: new Date("2026-01-01"),
+        zeitraumBis: new Date("2026-03-31"),
+        abrechnungsArt: "ENDABRECHNUNG",
+        nutzungsobjekte: [
+          {
+            art: "FLURSTUECK",
+            flurstueck: "1234/5",
+            gemarkung: "Sendling",
+            positionen: [
+              {
+                beginn: new Date("2026-01-01"),
+                ende: new Date("2026-03-31"),
+                laenge: 12,
+                breite: 3,
+                flaeche: 36,
+                haelfte: false,
+                anteilAnFlaeche: 36,
+              },
+            ],
+          },
+        ],
+      });
+
+      const requestDTO = toAbrechnungRequestDTO(form);
+
+      expect(requestDTO.geschaeftspartnerId).toBe("1000000001");
+      expect(requestDTO.zeitraumVon).toEqual(new Date("2026-01-01"));
+      expect(requestDTO.zeitraumBis).toEqual(new Date("2026-03-31"));
+      expect(itemAt(requestDTO.nutzungsobjekte).flurstueck).toBe("1234/5");
+      expect(itemAt(requestDTO.nutzungsobjekte).gemarkung).toBe("Sendling");
+      expect(
+        itemAt(itemAt(requestDTO.nutzungsobjekte).positionen).flaeche
+      ).toBe(36);
+    });
+
+    it("givenAbrechnungWithoutAnyDetails_thenStartWithAnEmptyNutzungsobjekt", () => {
+      const form = toAbrechnungForm({});
+
+      expect(form.geschaeftspartnerId).toBe("");
+      expect(form.zeitraumVon).toBe("");
+      expect(form.abrechnungsArt).toBeNull();
+      expect(form.nutzungsobjekte).toHaveLength(1);
+      expect(itemAt(form.nutzungsobjekte).adresse).toBe("");
+      expect(itemAt(form.nutzungsobjekte).positionen).toHaveLength(1);
     });
   });
 });
