@@ -7,11 +7,13 @@ import { STATUS_INDICATORS } from "@/constants.ts";
 import { useSnackbarStore } from "@/stores/snackbar.ts";
 import { useUserInfoStore } from "@/stores/userinfo.ts";
 import AbrechnungAnlegenView from "@/views/AbrechnungAnlegenView.vue";
+import AbrechnungAnsehenView from "@/views/AbrechnungAnsehenView.vue";
 import AbrechnungenOverviewView from "@/views/AbrechnungenOverviewView.vue";
 import GetStartedView from "@/views/GetStartedView.vue";
 import HomeView from "@/views/HomeView.vue";
 import ProjektAnlegenView from "@/views/ProjektAnlegenView.vue";
 import ProjekteOverviewView from "@/views/ProjekteOverviewView.vue";
+import WiderspruchAnlegenView from "@/views/WiderspruchAnlegenView.vue";
 
 const routes = [
   {
@@ -49,6 +51,27 @@ const routes = [
     path: "/projekte/:projektId/abrechnungen/anlegen",
     name: "abrechnung-anlegen",
     component: AbrechnungAnlegenView,
+    props: true,
+    meta: {},
+  },
+  {
+    path: "/projekte/:projektId/abrechnungen/:abrechnungId/ansehen",
+    name: "abrechnung-ansehen",
+    component: AbrechnungAnsehenView,
+    props: true,
+    meta: {},
+  },
+  {
+    path: "/projekte/:projektId/abrechnungen/:vorgaengerAbrechnungId/version/anlegen",
+    name: "abrechnung-version-anlegen",
+    component: AbrechnungAnlegenView,
+    props: true,
+    meta: {},
+  },
+  {
+    path: "/projekte/:projektId/abrechnungen/:abrechnungId/widerspruch/anlegen",
+    name: "widerspruch-anlegen",
+    component: WiderspruchAnlegenView,
     props: true,
     meta: {},
   },
