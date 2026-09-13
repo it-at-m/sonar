@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
 import java.nio.charset.StandardCharsets;
@@ -64,6 +65,9 @@ class OpenApiSpecTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @MockitoBean
+    private AbrechnungRepository abrechnungRepository;
 
     @MockitoBean
     private ProjektRepository projektRepository;

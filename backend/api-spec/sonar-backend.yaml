@@ -244,6 +244,7 @@ paths:
         Create a new Projekt.
          Creates a new Projekt together with its Adressen in one call.
          Abrechnungsende must not be before Abrechnungsbeginn.
+         An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
          Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
          Either that period or tageUnerlaubteNutzung is given, never both.
       operationId: saveProjekt
@@ -259,6 +260,156 @@ paths:
           description: the details of the Projekt are invalid
         "201":
           description: the created Projekt as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/abrechnung:
+    get:
+      tags:
+      - abrechnung-controller
+      summary: Retrieve the Abrechnungen of a Projekt with pagination.
+      description: |-
+        Retrieve the Abrechnungen of a Projekt with pagination.
+         Fetches a paginated list of all Abrechnungen belonging to the Projekt.
+         The order is applied by the database, so it holds for the whole result and not just for the
+         requested page.
+         Both sort parameters take a comma separated list. The order of the columns is the order they
+         are applied in, and the direction at the same position belongs to the column.
+         A column named more than once takes part in the order only at its first position.
+      operationId: getAbrechnungenByPageAndSize
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnungen belong to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: pageNumber
+        in: query
+        description: "the number of the requested page (default: 0)"
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+          default: 0
+      - name: pageSize
+        in: query
+        description: "the size of the page to retrieve (default: 10, at most 100)"
+        required: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: "the columns to order by, the most significant one first (default:\
+          \ ZEITRAUM_VON)"
+        required: false
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ZEITRAUM_VON
+            - ZEITRAUM_BIS
+            - ABRECHNUNGS_ART
+            - GESCHAEFTSPARTNER_ID
+          default:
+          - ZEITRAUM_VON
+      - name: sortDirection
+        in: query
+        description: "the direction of the column at the same position (default: DESC)"
+        required: false
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ASC
+            - DESC
+          default:
+          - DESC
+      responses:
+        "400":
+          description: the pagination or sort parameters are invalid
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: a page of Abrechnungen represented as DTOs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelAbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
+    post:
+      tags:
+      - abrechnung-controller
+      summary: Create a new Abrechnung for a Projekt.
+      description: |-
+        Create a new Abrechnung for a Projekt.
+         Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
+         An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
+      operationId: saveAbrechnung
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: the details of the Abrechnung to create
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AbrechnungRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the details of the Abrechnung are invalid
+        "404":
+          description: the Projekt does not exist
+        "201":
+          description: the created Abrechnung as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}:
+    get:
+      tags:
+      - projekt-controller
+      summary: Retrieve a single Projekt.
+      description: |-
+        Retrieve a single Projekt.
+         Fetches the Projekt together with its Adressen.
+      operationId: getProjekt
+      parameters:
+      - name: projektId
+        in: path
+        description: the id of the requested Projekt
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: the Projekt represented as a DTO
           content:
             application/json:
               schema:
@@ -461,17 +612,40 @@ components:
     ProjektAdresseRequestDTO:
       required:
       - anzahlMahnungen
-      - bezeichnung
+      - art
       type: object
       properties:
-        bezeichnung:
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
           maxLength: 255
           minLength: 1
           type: string
-        baunutzung:
-          maxLength: 255
-          minLength: 0
+        hausnummerVon:
+          maxLength: 20
+          minLength: 1
           type: string
+        hausnummerBis:
+          maxLength: 20
+          minLength: 1
+          type: string
+        flurstueck:
+          maxLength: 255
+          minLength: 1
+          type: string
+        gemarkung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -517,10 +691,27 @@ components:
         id:
           type: string
           format: uuid
-        bezeichnung:
+        art:
           type: string
-        baunutzung:
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
           type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -553,6 +744,282 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektAdresseResponseDTO"
+    AbrechnungNutzungsobjektRequestDTO:
+      required:
+      - art
+      - positionen
+      type: object
+      properties:
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          maxLength: 255
+          minLength: 1
+          type: string
+        hausnummerVon:
+          maxLength: 20
+          minLength: 1
+          type: string
+        hausnummerBis:
+          maxLength: 20
+          minLength: 1
+          type: string
+        flurstueck:
+          maxLength: 255
+          minLength: 1
+          type: string
+        gemarkung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          minimum: 1
+          type: integer
+          format: int32
+        bemerkung:
+          maxLength: 10000
+          minLength: 0
+          type: string
+        positionen:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungPositionRequestDTO"
+    AbrechnungPositionRequestDTO:
+      required:
+      - anteilAnFlaeche
+      - beginn
+      - breite
+      - ende
+      - flaeche
+      - laenge
+      type: object
+      properties:
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+        laenge:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        breite:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        flaeche:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        haelfte:
+          type: boolean
+        anteilAnFlaeche:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+    AbrechnungRequestDTO:
+      required:
+      - abrechnungsArt
+      - geschaeftspartnerId
+      - nutzungsobjekte
+      - zeitraumBis
+      - zeitraumVon
+      type: object
+      properties:
+        geschaeftspartnerId:
+          maxLength: 10
+          minLength: 1
+          type: string
+        zustellungsbevollmaechtigterGenutzt:
+          type: boolean
+        zustellungsbevollmaechtigterId:
+          maxLength: 10
+          minLength: 1
+          type: string
+        zustellungsbevollmaechtigterTyp:
+          type: string
+          enum:
+          - GESETZLICHER_VERTRETER
+          - VORMUND
+          - BETREUER
+          - NACHLASSVERWALTER
+          - NACHLASSPFLEGER
+          - TESTAMENTSVOLLSTRECKER
+          - ZWANGSVERWALTER
+          - PFLEGER
+          - VORSTAND
+          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
+          - LIQUIDATOR
+          - KONKURSVERWALTER
+          - STEUERLICHER_VERTRETER
+          - EMPFANGSBEVOLLMAECHTIGTER
+          - VERGLEICHSVERWALTER
+          - GESAMTRECHTSNACHFOLGER
+          - VERWALTER_NACH_DEM_WEG
+          - GESCHAEFTSFUEHRER
+          - GESELLSCHAFTER
+          - INSOLVENZVERWALTER
+          - NACHTRAGSLIQUIDATOR
+          - TREUHAENDER
+          - VORLAEUFIGER_INSOLVENZVERWALTER
+        zeitraumVon:
+          type: string
+          format: date
+        zeitraumBis:
+          type: string
+          format: date
+        abrechnungsArt:
+          type: string
+          enum:
+          - ENDABRECHNUNG
+          - ZWISCHENABRECHNUNG
+        nutzungsobjekte:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungNutzungsobjektRequestDTO"
+      description: |-
+        The Abrechnung to create.
+         <p>
+         An Abrechnung is created below its Projekt, so the path decides which one it belongs to.
+         </p>
+    AbrechnungNutzungsobjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          type: integer
+          format: int32
+        bemerkung:
+          type: string
+        positionen:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungPositionResponseDTO"
+    AbrechnungPositionResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+        laenge:
+          type: number
+        breite:
+          type: number
+        flaeche:
+          type: number
+        haelfte:
+          type: boolean
+        anteilAnFlaeche:
+          type: number
+    AbrechnungResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektId:
+          type: string
+          format: uuid
+        geschaeftspartnerId:
+          type: string
+        zustellungsbevollmaechtigterGenutzt:
+          type: boolean
+        zustellungsbevollmaechtigterId:
+          type: string
+        zustellungsbevollmaechtigterTyp:
+          type: string
+          enum:
+          - GESETZLICHER_VERTRETER
+          - VORMUND
+          - BETREUER
+          - NACHLASSVERWALTER
+          - NACHLASSPFLEGER
+          - TESTAMENTSVOLLSTRECKER
+          - ZWANGSVERWALTER
+          - PFLEGER
+          - VORSTAND
+          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
+          - LIQUIDATOR
+          - KONKURSVERWALTER
+          - STEUERLICHER_VERTRETER
+          - EMPFANGSBEVOLLMAECHTIGTER
+          - VERGLEICHSVERWALTER
+          - GESAMTRECHTSNACHFOLGER
+          - VERWALTER_NACH_DEM_WEG
+          - GESCHAEFTSFUEHRER
+          - GESELLSCHAFTER
+          - INSOLVENZVERWALTER
+          - NACHTRAGSLIQUIDATOR
+          - TREUHAENDER
+          - VORLAEUFIGER_INSOLVENZVERWALTER
+        zeitraumVon:
+          type: string
+          format: date
+        zeitraumBis:
+          type: string
+          format: date
+        abrechnungsArt:
+          type: string
+          enum:
+          - ENDABRECHNUNG
+          - ZWISCHENABRECHNUNG
+        nutzungsobjekte:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungNutzungsobjektResponseDTO"
     PageMetadata:
       type: object
       properties:
@@ -584,6 +1051,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektResponseDTO"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    PagedModelAbrechnungResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungResponseDTO"
         page:
           $ref: "#/components/schemas/PageMetadata"
     GeschaeftspartnerResponseDTO:
