@@ -37,16 +37,26 @@
       indeterminate
     />
 
-    <!-- readonly on the form reaches every input, on the tabs it hides the buttons of the Berechnung. -->
-    <v-form
-      v-else
-      readonly
-    >
-      <abrechnung-tabs
-        v-model="abrechnung"
-        readonly
-      />
-    </v-form>
+    <template v-else>
+      <!-- readonly on the form reaches every input, on the tabs it hides the buttons of the Berechnung. -->
+      <v-form readonly>
+        <abrechnung-tabs
+          v-model="abrechnung"
+          readonly
+        />
+      </v-form>
+
+      <div class="d-flex justify-end mt-6">
+        <v-btn
+          id="berechnung-durchfuehren"
+          color="primary"
+          :loading="berechnungLaeuft"
+          @click="berechnungDurchfuehren"
+        >
+          Berechnung durchführen
+        </v-btn>
+      </div>
+    </template>
   </v-container>
 </template>
 
@@ -58,12 +68,17 @@ import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
 import { ApiFactory } from "@/api/ApiFactory";
-import { AbrechnungControllerApi } from "@/api/generated/sonar-backend";
+import {
+  AbrechnungControllerApi,
+  BerechnungControllerApi,
+  ProjektControllerApi,
+} from "@/api/generated/sonar-backend";
 import AbrechnungTabs from "@/components/AbrechnungTabs.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 import { toAbrechnungForm } from "@/util/abrechnungMapper";
+import { toBerechnungRequestDTO } from "@/util/berechnungMapper";
 
 const { abrechnungId, projektId } = defineProps<{
   projektId: string;
@@ -74,6 +89,7 @@ const router = useRouter();
 const snackbarStore = useSnackbarStore();
 
 const angezeigteAbrechnung = ref<AbrechnungResponseDTO>();
+const berechnungLaeuft = ref(false);
 
 const { abrechnung, uebernehmen } = useAbrechnungForm();
 
@@ -97,6 +113,41 @@ async function loadAbrechnung(id: string): Promise<void> {
       color: STATUS_INDICATORS.ERROR,
     });
     await router.push(`/projekte/${projektId}/abrechnungen`);
+  }
+}
+
+/**
+ * The Projektnummer belongs to the Projekt, not to the Abrechnung. It is fetched on the click, so
+ * that a view which only shows the Abrechnung does not load the Projekt on every visit.
+ */
+async function berechnungDurchfuehren(): Promise<void> {
+  const geladeneAbrechnung = angezeigteAbrechnung.value;
+  if (geladeneAbrechnung === undefined) {
+    return;
+  }
+
+  berechnungLaeuft.value = true;
+  try {
+    const projekt =
+      await ApiFactory.getInstance(ProjektControllerApi).getProjekt(projektId);
+    await ApiFactory.getInstance(
+      BerechnungControllerApi
+    ).berechnungDurchfuehren(
+      projektId,
+      abrechnungId,
+      toBerechnungRequestDTO(geladeneAbrechnung, projekt)
+    );
+    snackbarStore.push({
+      text: "Die Berechnung wurde durchgeführt.",
+      color: STATUS_INDICATORS.SUCCESS,
+    });
+  } catch {
+    snackbarStore.push({
+      text: "Die Berechnung konnte nicht durchgeführt werden.",
+      color: STATUS_INDICATORS.ERROR,
+    });
+  } finally {
+    berechnungLaeuft.value = false;
   }
 }
 

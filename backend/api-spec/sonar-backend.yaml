@@ -439,6 +439,46 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
+  /projekt/{projektId}/abrechnung/{abrechnungId}/berechnung:
+    post:
+      tags:
+      - berechnung-controller
+      summary: Run the Berechnung of an Abrechnung.
+      description: |-
+        Run the Berechnung of an Abrechnung.
+         Takes the Projektnummer and the Nutzungsobjekte the Berechnung runs on. Per Nutzungsobjekt it
+         takes the Positionen with their Zeitraum and their Fläche.
+         The end of a Zeitraum must not be before its beginn.
+      operationId: berechnungDurchfuehren
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the Abrechnung to run the Berechnung of
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: the data the Berechnung runs on
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/BerechnungRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the data of the Berechnung is invalid
+        "204":
+          description: No Content
+      security:
+      - bearerAuth: []
   /abrechnung/{abrechnungId}/widerspruch:
     post:
       tags:
@@ -1155,6 +1195,61 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungNutzungsobjektResponseDTO"
+    BerechnungNutzungsobjektRequestDTO:
+      required:
+      - adressbezeichnung
+      - nutzungsobjektId
+      - positionen
+      type: object
+      properties:
+        nutzungsobjektId:
+          type: string
+          format: uuid
+        adressbezeichnung:
+          maxLength: 1000
+          minLength: 1
+          type: string
+        positionen:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/BerechnungPositionRequestDTO"
+    BerechnungPositionRequestDTO:
+      required:
+      - beginn
+      - ende
+      - flaecheQm
+      - positionId
+      type: object
+      properties:
+        positionId:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+        flaecheQm:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+    BerechnungRequestDTO:
+      required:
+      - nutzungsobjekte
+      - projektnummer
+      type: object
+      properties:
+        projektnummer:
+          maxLength: 20
+          minLength: 1
+          type: string
+        nutzungsobjekte:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/BerechnungNutzungsobjektRequestDTO"
     WiderspruchRequestDTO:
       required:
       - datumEingang

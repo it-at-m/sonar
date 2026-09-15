@@ -3,10 +3,8 @@ import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion"
 import type { UnerlaubteNutzung } from "@/types/UnerlaubteNutzung";
 
 import { ApiFactory } from "@/api/ApiFactory";
-import {
-  ProjektAdresseRequestDTOArtEnum,
-  ProjektControllerApi,
-} from "@/api/generated/sonar-backend";
+import { ProjektControllerApi } from "@/api/generated/sonar-backend";
+import { adressbezeichnung } from "@/util/adresseLabel";
 import { NUTZUNG_OPTIONS } from "@/util/nutzungOptions";
 import { toProjektAdresseSuggestion } from "@/util/projektAdresseMapper";
 
@@ -21,16 +19,7 @@ export async function fetchProjektAdresseSuggestions(
 export function projektAdresseSuggestionTitle(
   suggestion: ProjektAdresseSuggestion
 ): string {
-  if (suggestion.art === ProjektAdresseRequestDTOArtEnum.FLURSTUECK) {
-    const flurstueck = [suggestion.flurstueck, suggestion.gemarkung]
-      .filter(Boolean)
-      .join(", ");
-    return `Flurstück ${flurstueck}`;
-  }
-  const hausnummer = suggestion.hausnummerBis
-    ? `${suggestion.hausnummerVon}–${suggestion.hausnummerBis}`
-    : suggestion.hausnummerVon;
-  return [suggestion.adresse, hausnummer].filter(Boolean).join(" ");
+  return adressbezeichnung(suggestion);
 }
 
 export function projektAdresseSuggestionSubtitle(
