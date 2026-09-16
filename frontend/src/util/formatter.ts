@@ -6,6 +6,10 @@ export function toDateString(date: Date): string {
   return date ? date.toLocaleDateString() : "";
 }
 
+export function toIsoDateString(date: Date | undefined): string {
+  return date ? date.toISOString().substring(0, 10) : "";
+}
+
 export function toTimeString(date: Date): string {
   return date ? date.toLocaleTimeString() : "";
 }

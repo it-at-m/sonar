@@ -19,3 +19,13 @@ export function endeNotBeforeBeginn(
     "Das Ende darf nicht vor dem Beginn liegen."
   );
 }
+
+export function greaterThanZeroRule(value: unknown): boolean | string {
+  return (
+    isEmpty(value) || Number(value) > 0 || "Der Wert muss größer als 0 sein."
+  );
+}
+
+function isEmpty(value: unknown): boolean {
+  return value === null || value === undefined || value === "";
+}
