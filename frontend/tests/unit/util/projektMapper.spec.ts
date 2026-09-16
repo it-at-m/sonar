@@ -3,6 +3,10 @@ import type { ProjektAdresseForm } from "@/types/ProjektAdresseForm";
 
 import { describe, expect, it } from "vitest";
 
+import {
+  ProjektAdresseRequestDTOArtEnum,
+  ProjektAdresseRequestDTONutzungEnum,
+} from "@/api/generated/sonar-backend";
 import { createProjektAdresse } from "@/util/projektAdresseForm";
 import { toProjektRequestDTO } from "@/util/projektMapper";
 
@@ -17,7 +21,7 @@ function projektWith(overrides: Partial<Projekt>): Projekt {
     projektnummer: "2026-0001",
     abrechnungBeginn: "2026-01-01",
     abrechnungEnde: "2026-03-31",
-    adressen: [adresseWith({ bezeichnung: "Marienplatz 8" })],
+    adressen: [adresseWith({ adresse: "Marienplatz", hausnummerVon: "8" })],
     ...overrides,
   };
 }
@@ -41,8 +45,9 @@ describe("projektMapper.ts", () => {
         projektnummer: " 2026-0001 ",
         adressen: [
           adresseWith({
-            bezeichnung: " Marienplatz 8 ",
-            baunutzung: "Gastronomie",
+            adresse: " Marienplatz ",
+            hausnummerVon: "8",
+            nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A,
             unerlaubteNutzungVon: "2026-01-05",
             unerlaubteNutzungBis: "2026-01-10",
             anzahlMahnungen: 2,
@@ -60,8 +65,11 @@ describe("projektMapper.ts", () => {
       );
       expect(dto.abrechnungEnde.toISOString()).toBe("2026-03-31T00:00:00.000Z");
       expect(dto.adressen).toHaveLength(1);
-      expect(itemAt(dto.adressen).bezeichnung).toBe("Marienplatz 8");
-      expect(itemAt(dto.adressen).baunutzung).toBe("Gastronomie");
+      expect(itemAt(dto.adressen).adresse).toBe("Marienplatz");
+      expect(itemAt(dto.adressen).hausnummerVon).toBe("8");
+      expect(itemAt(dto.adressen).nutzung).toBe(
+        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A
+      );
       expect(itemAt(dto.adressen).unerlaubteNutzungVon?.toISOString()).toBe(
         "2026-01-05T00:00:00.000Z"
       );
@@ -69,11 +77,33 @@ describe("projektMapper.ts", () => {
       expect(itemAt(dto.adressen).sondernutzungErlaubt).toBe(true);
     });
 
+    it("givenArtFlurstueck_thenLeaveOutAdresseAndHausnummern", () => {
+      const projekt = projektWith({
+        adressen: [
+          adresseWith({
+            art: ProjektAdresseRequestDTOArtEnum.FLURSTUECK,
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            flurstueck: "1234/5",
+            gemarkung: "Sendling",
+          }),
+        ],
+      });
+
+      const dto = toProjektRequestDTO(projekt);
+
+      expect(itemAt(dto.adressen).adresse).toBeUndefined();
+      expect(itemAt(dto.adressen).hausnummerVon).toBeUndefined();
+      expect(itemAt(dto.adressen).flurstueck).toBe("1234/5");
+      expect(itemAt(dto.adressen).gemarkung).toBe("Sendling");
+    });
+
     it("givenTageWithoutZeitraum_thenSendTheTage", () => {
       const projekt = projektWith({
         adressen: [
           adresseWith({
-            bezeichnung: "Marienplatz 8",
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
             tageUnerlaubteNutzung: 12,
           }),
         ],
@@ -89,7 +119,8 @@ describe("projektMapper.ts", () => {
       const projekt = projektWith({
         adressen: [
           adresseWith({
-            bezeichnung: "Marienplatz 8",
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
             unerlaubteNutzungVon: "2026-01-05",
             unerlaubteNutzungBis: "2026-01-10",
             tageUnerlaubteNutzung: 99,
@@ -108,7 +139,8 @@ describe("projektMapper.ts", () => {
 
       const dto = toProjektRequestDTO(projekt);
 
-      expect(itemAt(dto.adressen).baunutzung).toBeUndefined();
+      expect(itemAt(dto.adressen).nutzung).toBeUndefined();
+      expect(itemAt(dto.adressen).hausnummerBis).toBeUndefined();
       expect(itemAt(dto.adressen).unerlaubteNutzungVon).toBeUndefined();
       expect(itemAt(dto.adressen).unerlaubteNutzungBis).toBeUndefined();
     });

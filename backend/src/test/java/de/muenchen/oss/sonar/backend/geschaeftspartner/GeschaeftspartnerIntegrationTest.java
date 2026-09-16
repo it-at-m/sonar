@@ -6,9 +6,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
+import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.client.MockGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
+import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchRepository;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,10 +41,16 @@ class GeschaeftspartnerIntegrationTest {
     private MockMvc mockMvc;
 
     @MockitoBean
+    private AbrechnungRepository abrechnungRepository;
+
+    @MockitoBean
     private ProjektRepository projektRepository;
 
     @MockitoBean
     private TheEntityRepository theEntityRepository;
+
+    @MockitoBean
+    private WiderspruchRepository widerspruchRepository;
 
     @Nested
     class GetGeschaeftspartner {

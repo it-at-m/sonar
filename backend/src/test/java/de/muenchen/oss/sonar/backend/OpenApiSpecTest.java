@@ -5,8 +5,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
+import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
+import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchRepository;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -66,10 +68,16 @@ class OpenApiSpecTest {
     private MockMvc mockMvc;
 
     @MockitoBean
+    private AbrechnungRepository abrechnungRepository;
+
+    @MockitoBean
     private ProjektRepository projektRepository;
 
     @MockitoBean
     private TheEntityRepository theEntityRepository;
+
+    @MockitoBean
+    private WiderspruchRepository widerspruchRepository;
 
     @Test
     @DisabledIfSystemProperty(
