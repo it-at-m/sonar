@@ -103,6 +103,20 @@ describe("AbrechnungBasisinformationen.vue", () => {
       });
     });
 
+    it("givenIdTheFormStartsWith_thenLookItUpWithoutAnEntry", async () => {
+      const fetchStub = stubFetch();
+      const wrapper = mountBasisinformationen({
+        geschaeftspartnerId: "GP-4711",
+      });
+
+      await vi.advanceTimersByTimeAsync(LOOKUP_DEBOUNCE_MS);
+      await fetchStub.respond(0, jsonResponse(200));
+
+      expect(stammdaten(wrapper).props("daten")).toMatchObject({
+        name1: "Musterfirma",
+      });
+    });
+
     it("givenPaddedId_thenTrimItBeforeRequesting", async () => {
       stubFetch();
       const wrapper = mountBasisinformationen();
