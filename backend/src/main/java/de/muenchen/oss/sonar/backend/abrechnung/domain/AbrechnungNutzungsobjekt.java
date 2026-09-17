@@ -1,5 +1,6 @@
 package de.muenchen.oss.sonar.backend.abrechnung.domain;
 
+import de.muenchen.oss.sonar.backend.berechnung.ResultVerteilung;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
@@ -45,5 +46,19 @@ public record AbrechnungNutzungsobjekt(
         }
         tageUnerlaubteNutzung = derived;
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
+    }
+
+    public ResultVerteilung getFlaecheProZeitindex(final int woche) {
+        final ResultVerteilung resultVerteilung = new ResultVerteilung();
+
+        for (final AbrechnungPosition position : positionen) {
+
+            final String zeitindex = position.getZeitindex(woche).getBezeichnung();
+            if (!zeitindex.isEmpty()) {
+                resultVerteilung.addFlaecheQm(zeitindex, position.flaeche());
+            }
+        }
+
+        return resultVerteilung;
     }
 }
