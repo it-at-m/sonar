@@ -80,15 +80,15 @@
 
 <script setup lang="ts">
 import type { AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum } from "@/api/generated/sonar-backend";
-import type { AbrechnungForm } from "@/composables/abrechnungForm";
-import type { GeschaeftspartnerLookupResult } from "@/util/geschaeftspartnerLookup";
+import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
+import type { GeschaeftspartnerLookupResult } from "@/util/geschaeftspartner/geschaeftspartnerLookup";
 import type { Ref } from "vue";
 
 import { watchDebounced } from "@vueuse/core";
 import { ref } from "vue";
 
 import GeschaeftspartnerStammdaten from "@/components/GeschaeftspartnerStammdaten.vue";
-import { lookupGeschaeftspartner } from "@/util/geschaeftspartnerLookup";
+import { lookupGeschaeftspartner } from "@/util/geschaeftspartner/geschaeftspartnerLookup";
 import { requiredRule } from "@/util/validationRules";
 
 interface GeschaeftspartnerLookupState extends GeschaeftspartnerLookupResult {

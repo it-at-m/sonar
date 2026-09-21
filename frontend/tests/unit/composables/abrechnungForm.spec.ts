@@ -3,7 +3,7 @@ import { nextTick } from "vue";
 
 import { AbrechnungRequestDTOAbrechnungsArtEnum } from "@/api/generated/sonar-backend";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
-import { createAbrechnungNutzungsobjekt } from "@/util/abrechnungNutzungsobjektForm";
+import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 
 function itemAt<T>(items: readonly T[], index = 0): T {
   const item = items[index];

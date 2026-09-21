@@ -1,4 +1,4 @@
-import type { UnerlaubteNutzung } from "@/types/UnerlaubteNutzung";
+import type { UnerlaubteNutzung } from "@/types/common/UnerlaubteNutzung";
 
 import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";

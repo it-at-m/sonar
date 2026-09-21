@@ -45,15 +45,18 @@
 </template>
 
 <script setup lang="ts">
-import type { UnerlaubteNutzung } from "@/types/UnerlaubteNutzung";
+import type { UnerlaubteNutzung } from "@/types/common/UnerlaubteNutzung";
 
 import { computed } from "vue";
 
-import { hasZeitraum, tageUnerlaubteNutzung } from "@/util/unerlaubteNutzung";
+import {
+  hasZeitraum,
+  tageUnerlaubteNutzung,
+} from "@/util/common/unerlaubteNutzungForm";
 import {
   unerlaubteNutzungBisRule,
   unerlaubteNutzungVonRule,
-} from "@/util/unerlaubteNutzungRules";
+} from "@/util/common/unerlaubteNutzungRules";
 
 const unerlaubteNutzung = defineModel<UnerlaubteNutzung>({ required: true });
 
