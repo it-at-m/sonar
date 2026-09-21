@@ -1,5 +1,7 @@
 package de.muenchen.oss.sonar.backend.berechnung;
 
+import java.math.BigDecimal;
+import java.util.Map;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -7,6 +9,60 @@ import lombok.RequiredArgsConstructor;
  * The constants are placeholders.
  */
 public final class Gebuehrenstufe {
+
+    private static final Map<Stufe, Map<Zeitindex, BigDecimal>> GEBUEHRENSATZ_TABELLE_STANDARD = Map.of(
+            Stufe.GEBUEHRENSTUFE_1, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_2, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_3, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_4, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_5, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")));
+
+    private static final Map<Stufe, Map<Zeitindex, BigDecimal>> GEBUEHRENSATZ_TABELLE_50_PROZENT = Map.of(
+            Stufe.GEBUEHRENSTUFE_1, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_2, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_3, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_4, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")),
+            Stufe.GEBUEHRENSTUFE_5, Map.of(
+                    Zeitindex.ZEITINDEX_1, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_2, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_3, new BigDecimal("3"),
+                    Zeitindex.ZEITINDEX_4, new BigDecimal("3")));
 
     private Gebuehrenstufe() {
     }
@@ -25,6 +81,13 @@ public final class Gebuehrenstufe {
             return Stufe.GEBUEHRENSTUFE_2;
         }
         return Stufe.GEBUEHRENSTUFE_1;
+    }
+
+    public static BigDecimal getGebuehrensatz(final Boolean aufschlag50prozent, final String gebuehrenstufe, final String zeitindex) {
+        final Map<Stufe, Map<Zeitindex, BigDecimal>> gebuehrensatzTabelle = Boolean.TRUE.equals(aufschlag50prozent)
+                ? GEBUEHRENSATZ_TABELLE_50_PROZENT
+                : GEBUEHRENSATZ_TABELLE_STANDARD;
+        return gebuehrensatzTabelle.get(Stufe.fromBezeichnung(gebuehrenstufe)).get(Zeitindex.fromBezeichnung(zeitindex));
     }
 
     @Getter
@@ -57,6 +120,15 @@ public final class Gebuehrenstufe {
         GEBUEHRENSTUFE_5("Gebührenstufe 5");
 
         private final String bezeichnung;
+
+        public static Stufe fromBezeichnung(final String bezeichnung) {
+            for (final Stufe stufe : values()) {
+                if (stufe.bezeichnung.equals(bezeichnung)) {
+                    return stufe;
+                }
+            }
+            throw new IllegalArgumentException(String.format("unknown Gebuehrenstufe %s", bezeichnung));
+        }
     }
 
     @Getter
@@ -85,6 +157,15 @@ public final class Gebuehrenstufe {
         ZEITINDEX_4("Zeitindex 4");
 
         private final String bezeichnung;
+
+        public static Zeitindex fromBezeichnung(final String bezeichnung) {
+            for (final Zeitindex zeitindex : values()) {
+                if (zeitindex.bezeichnung.equals(bezeichnung)) {
+                    return zeitindex;
+                }
+            }
+            throw new IllegalArgumentException(String.format("unknown Zeitindex %s", bezeichnung));
+        }
     }
 
 }

@@ -39,4 +39,7 @@ public record AbrechnungPosition(
         }
         return Gebuehrenstufe.Zeitindex.ZEITINDEX_1;
     }
+
+    public void zwischenabrechnungNotwendig(final int aktWoche) {
+    }
 }
