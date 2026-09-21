@@ -42,7 +42,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.id()).isEqualTo(abrechnung.id());
             assertThat(result.projektId()).isEqualTo(abrechnung.projektId());
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
-            assertThat(result.zustellungsbevollmaechtigterGenutzt()).isTrue();
+            assertThat(result.isZustellungsbevollmaechtigterGenutzt()).isTrue();
             assertThat(result.zustellungsbevollmaechtigterId()).isEqualTo("2000000002");
             assertThat(result.zustellungsbevollmaechtigterTyp()).isEqualTo(ZustellungsbevollmaechtigterTyp.VORMUND);
             assertThat(result.zeitraumVon()).isEqualTo(VON);
@@ -65,7 +65,7 @@ class AbrechnungDTOMapperTest {
             assertThat(positionDTO.laenge()).isEqualByComparingTo("12.00");
             assertThat(positionDTO.breite()).isEqualByComparingTo("3.00");
             assertThat(positionDTO.flaeche()).isEqualByComparingTo("36.00");
-            assertThat(positionDTO.haelfte()).isTrue();
+            assertThat(positionDTO.isHaelfte()).isTrue();
             assertThat(positionDTO.anteilAnFlaeche()).isEqualByComparingTo("30.00");
         }
     }

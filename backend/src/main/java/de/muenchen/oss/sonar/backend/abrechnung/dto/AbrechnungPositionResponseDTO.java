@@ -11,6 +11,6 @@ public record AbrechnungPositionResponseDTO(
         BigDecimal laenge,
         BigDecimal breite,
         BigDecimal flaeche,
-        boolean haelfte,
+        boolean isHaelfte,
         BigDecimal anteilAnFlaeche) {
 }

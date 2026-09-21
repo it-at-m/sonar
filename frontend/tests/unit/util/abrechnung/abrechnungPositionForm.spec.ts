@@ -20,7 +20,7 @@ describe("abrechnungPositionForm.ts", () => {
     });
 
     it("givenHaelfte_thenReturnTrue", () => {
-      const position = positionWith({ haelfte: true });
+      const position = positionWith({ isHaelfte: true });
 
       expect(isAbrechnungPositionDirty(position)).toBe(true);
     });

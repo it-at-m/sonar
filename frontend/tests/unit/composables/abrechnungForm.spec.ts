@@ -22,16 +22,16 @@ describe("abrechnungForm.ts", () => {
     });
   });
 
-  describe("zustellungsbevollmaechtigterGenutzt", () => {
+  describe("isZustellungsbevollmaechtigterGenutzt", () => {
     it("givenToggleSwitchedOff_thenClearTheDetails", async () => {
       const { abrechnung } = useAbrechnungForm();
-      abrechnung.value.zustellungsbevollmaechtigterGenutzt = true;
+      abrechnung.value.isZustellungsbevollmaechtigterGenutzt = true;
       await nextTick();
       abrechnung.value.zustellungsbevollmaechtigterId = "ZB-1";
       abrechnung.value.zustellungsbevollmaechtigterTyp =
         "GESETZLICHER_VERTRETER";
 
-      abrechnung.value.zustellungsbevollmaechtigterGenutzt = false;
+      abrechnung.value.isZustellungsbevollmaechtigterGenutzt = false;
       await nextTick();
 
       expect(abrechnung.value.zustellungsbevollmaechtigterId).toBe("");
@@ -42,7 +42,7 @@ describe("abrechnungForm.ts", () => {
       const { abrechnung } = useAbrechnungForm();
       abrechnung.value.zustellungsbevollmaechtigterId = "ZB-1";
 
-      abrechnung.value.zustellungsbevollmaechtigterGenutzt = true;
+      abrechnung.value.isZustellungsbevollmaechtigterGenutzt = true;
       await nextTick();
 
       expect(abrechnung.value.zustellungsbevollmaechtigterId).toBe("ZB-1");
@@ -65,7 +65,7 @@ describe("abrechnungForm.ts", () => {
 
     it("givenSwitchedZustellungsbevollmaechtigter_thenReturnTrue", () => {
       const { abrechnung, isDirty } = useAbrechnungForm();
-      abrechnung.value.zustellungsbevollmaechtigterGenutzt = true;
+      abrechnung.value.isZustellungsbevollmaechtigterGenutzt = true;
 
       expect(isDirty()).toBe(true);
     });

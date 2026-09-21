@@ -11,7 +11,7 @@ public record Abrechnung(
         UUID id,
         UUID projektId,
         String geschaeftspartnerId,
-        boolean zustellungsbevollmaechtigterGenutzt,
+        boolean isZustellungsbevollmaechtigterGenutzt,
         String zustellungsbevollmaechtigterId,
         ZustellungsbevollmaechtigterTyp zustellungsbevollmaechtigterTyp,
         LocalDate zeitraumVon,

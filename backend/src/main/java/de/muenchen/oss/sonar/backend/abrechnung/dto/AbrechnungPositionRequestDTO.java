@@ -14,6 +14,6 @@ public record AbrechnungPositionRequestDTO(
         @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal laenge,
         @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal breite,
         @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal flaeche,
-        boolean haelfte,
+        boolean isHaelfte,
         @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal anteilAnFlaeche) {
 }

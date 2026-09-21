@@ -28,14 +28,14 @@
   </v-row>
 
   <v-switch
-    v-model="abrechnung.zustellungsbevollmaechtigterGenutzt"
+    v-model="abrechnung.isZustellungsbevollmaechtigterGenutzt"
     class="mt-2"
     color="primary"
     label="Zustellungsbevollmächtigte:r vorhanden"
     hide-details
   />
 
-  <template v-if="abrechnung.zustellungsbevollmaechtigterGenutzt">
+  <template v-if="abrechnung.isZustellungsbevollmaechtigterGenutzt">
     <h2 class="text-headline-small mt-4 mb-2">Zustellungsbevollmächtigte:r</h2>
     <v-row>
       <v-col

@@ -5,6 +5,6 @@ export interface AbrechnungPositionForm {
   laenge: number | null;
   breite: number | null;
   flaeche: number | null;
-  haelfte: boolean;
+  isHaelfte: boolean;
   anteilAnFlaeche: number | null;
 }
