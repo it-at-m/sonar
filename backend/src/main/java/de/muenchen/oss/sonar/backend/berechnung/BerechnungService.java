@@ -6,12 +6,11 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.berechnung.domain.Berechnung;
 import de.muenchen.oss.sonar.backend.berechnung.dto.BerechnungRequestDTO;
+import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -22,116 +21,68 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class BerechnungService {
 
+    // TODO: fixed placeholder until the Verwaltungsgebuehr is calculated.
+    private static final BigDecimal VERWALTUNGSGEBUEHR = new BigDecimal("25");
+
     private final AbrechnungService abrechnungService;
 
     public Berechnung berechnungDurchfuehren(final UUID projektId, final UUID abrechnungId, final BerechnungRequestDTO berechnungRequestDTO) {
-        // Prototype: anzahlWochen is a fixed placeholder until the calculation is implemented.
-        final int anzahlWochen = 3;
+        final Abrechnung abrechnung = abrechnungService.getAbrechnung(projektId, abrechnungId);
+        final List<AbrechnungPosition> positionen = abrechnung.nutzungsobjekte().stream()
+                .map(AbrechnungNutzungsobjekt::positionen)
+                .flatMap(List::stream)
+                .toList();
 
         final Berechnung berechnung = new Berechnung();
+        berechnung.setGebuehrVerwaltung(VERWALTUNGSGEBUEHR);
+        berechnung.setGebuehrNutzung(BigDecimal.ZERO);
+        if (positionen.isEmpty()) {
+            log.debug("Berechnung of Abrechnung {} of Projekt {}: no Position to charge", abrechnungId, projektId);
+            return berechnung;
+        }
 
-        final Map<Boolean, Map<String, BigDecimal>> flaecheProZeitindex = new HashMap<>();
-        flaecheProZeitindex.put(true, new HashMap<>());
-        flaecheProZeitindex.put(false, new HashMap<>());
-
-        final Abrechnung abrechnung = abrechnungService.getAbrechnung(projektId, abrechnungId);
-
-        final LocalDate beginnMassnahme = abrechnung.nutzungsobjekte().stream()
-                .flatMap(nutzungsobjekt -> nutzungsobjekt.positionen().stream())
-                .map(AbrechnungPosition::beginn)
-                .min(Comparator.naturalOrder())
-                .orElse(null);
-        final LocalDate endeMassnahme = abrechnung.nutzungsobjekte().stream()
-                .flatMap(nutzungsobjekt -> nutzungsobjekt.positionen().stream())
-                .map(AbrechnungPosition::ende)
-                .max(Comparator.naturalOrder())
-                .orElse(null);
+        final LocalDate beginnMassnahme = positionen.stream().map(AbrechnungPosition::beginn).min(Comparator.naturalOrder()).orElseThrow();
+        final LocalDate endeMassnahme = positionen.stream().map(AbrechnungPosition::ende).max(Comparator.naturalOrder()).orElseThrow();
+        berechnung.setAbrechnungszeitraumVon(beginnMassnahme);
+        berechnung.setAbrechnungszeitraumBis(endeMassnahme);
         log.debug("Berechnung of Abrechnung {}: Massnahme from {} to {}", abrechnungId, beginnMassnahme, endeMassnahme);
 
-        BigDecimal gebuehrenGesamtFlaeche = BigDecimal.ZERO;
-
-        for (int woche = 1; woche <= anzahlWochen; woche++) {
-
-            final String gebuehrenstufe = Gebuehrenstufe.getGebuehrenstufe(woche).getBezeichnung();
-            log.debug("Berechnung of week {}: {}", woche, gebuehrenstufe);
-
-            final boolean zwischenabrechnungNotwendig = false;
-            if (zwischenabrechnungNotwendig) {
-                // TODO: create the Zwischenabrechnung for this week.
-            }
-
-            for (final AbrechnungNutzungsobjekt nutzungsobjekt : abrechnung.nutzungsobjekte()) {
-
-                final ResultVerteilung resultVerteilung = nutzungsobjekt.getFlaecheProZeitindex(woche);
-                for (final Map.Entry<String, BigDecimal> proZeitindex : resultVerteilung.getFlaecheQmProZeitindex().entrySet()) {
-
-                    final String zeitindex = proZeitindex.getKey();
-                    final BigDecimal flaecheQm = proZeitindex.getValue();
-
-                    // TODO: aufschlag ist aktuell haelfte bei nutzungsobjekt, soll aber aufschlag bei
-                    // adresse sein. Diese Eigenschaft liegt bei der Adresse (Nutzungsobjekt) und
-                    // gilt fuer alle dazugehoerigen Flaechen (Positionen).
-                    final boolean aufschlag = nutzungsobjekt.positionen().getFirst().haelfte();
-
-                    flaecheProZeitindex.get(aufschlag).merge(zeitindex, flaecheQm, BigDecimal::add);
-                }
-            }
-
-            BigDecimal gebuehrenWochensumme = BigDecimal.ZERO;
-
-            for (final Map.Entry<Boolean, Map<String, BigDecimal>> proAufschlag : flaecheProZeitindex.entrySet()) {
-
-                final boolean aufschlag50prozent = proAufschlag.getKey();
-                final Map<String, BigDecimal> mapInnen = proAufschlag.getValue();
-
-                for (final Map.Entry<String, BigDecimal> proZeitindex : mapInnen.entrySet()) {
-
-                    final String zeitindex = proZeitindex.getKey();
-                    final BigDecimal flaecheQm = proZeitindex.getValue();
-
-                    final int flaecheGerundet = flaecheQm.setScale(0, RoundingMode.CEILING).intValueExact();
-                    log.debug("Berechnung of week {}: {} qm in {} with Aufschlag {}", woche, flaecheGerundet, zeitindex,
-                            aufschlag50prozent);
-
-                    final BigDecimal gebuehrensatz = Gebuehrenstufe.getGebuehrensatz(aufschlag50prozent, gebuehrenstufe, zeitindex);
-                    final BigDecimal gebuehr = gebuehrensatz.multiply(BigDecimal.valueOf(flaecheGerundet));
-                    log.debug("Berechnung of week {}: {} at a Gebuehrensatz of {} makes a Gebuehr of {}", woche, gebuehrenstufe,
-                            gebuehrensatz, gebuehr);
-
-                    if (gebuehr.signum() != 0) {
-                        gebuehrenWochensumme = gebuehrenWochensumme.add(gebuehr);
-                    }
-                }
-            }
-
-            log.debug("Berechnung of week {}: Gebuehren of {}", woche, gebuehrenWochensumme);
-
-            gebuehrenGesamtFlaeche = gebuehrenGesamtFlaeche.add(gebuehrenWochensumme);
+        BigDecimal gebuehrNutzung = BigDecimal.ZERO;
+        for (final Berechnungswoche woche : Berechnungswoche.weeksOf(beginnMassnahme, endeMassnahme)) {
+            // TODO: check whether this week makes a Zwischenabrechnung necessary, and create it.
+            gebuehrNutzung = gebuehrNutzung.add(gebuehrDerWoche(woche, positionen));
         }
+        berechnung.setGebuehrNutzung(gebuehrNutzung);
 
-        for (final Map.Entry<Boolean, Map<String, BigDecimal>> proAufschlag : flaecheProZeitindex.entrySet()) {
-
-            final boolean aufschlag50prozent = proAufschlag.getKey();
-            final Map<String, BigDecimal> flaechenverteilung = proAufschlag.getValue();
-
-            for (final Map.Entry<String, BigDecimal> proZeitindex : flaechenverteilung.entrySet()) {
-
-                final String zeitindex = proZeitindex.getKey();
-                final BigDecimal flaecheQm = proZeitindex.getValue();
-
-                final int flaecheGerundet = flaecheQm.setScale(0, RoundingMode.CEILING).intValueExact();
-                final String gebuehrenstufe = Gebuehrenstufe.getGebuehrenstufe(flaecheGerundet).getBezeichnung();
-                final BigDecimal gebuehrensatz = Gebuehrenstufe.getGebuehrensatz(aufschlag50prozent, gebuehrenstufe, zeitindex);
-                final BigDecimal gebuehr = gebuehrensatz.multiply(BigDecimal.valueOf(flaecheGerundet));
-
-                log.debug("Berechnung of Abrechnung {}: {} qm in {} with Aufschlag {} in {} at {} makes a Gebuehr of {}", abrechnungId,
-                        flaecheGerundet, zeitindex, aufschlag50prozent, gebuehrenstufe, gebuehrensatz, gebuehr);
-            }
-        }
-
-        log.debug("Berechnung of Abrechnung {} of Projekt {}: Gebuehren of {}", abrechnungId, projektId, gebuehrenGesamtFlaeche);
-
+        log.debug("Berechnung of Abrechnung {} of Projekt {}: Gebuehren of {}", abrechnungId, projektId, gebuehrNutzung);
         return berechnung;
+    }
+
+    private BigDecimal gebuehrDerWoche(final Berechnungswoche woche, final List<AbrechnungPosition> positionen) {
+        final List<AbrechnungPosition> activePositionen = positionen.stream()
+                .filter(position -> Zeitraum.overlap(position.beginn(), position.ende(), woche.beginn(), woche.ende()))
+                .toList();
+
+        // The Gebuehrenstufe of the size follows from everything in use that week across the whole
+        // Abrechnung, while the Stufe of the duration is counted per Position.
+        int gesamtflaecheQm = 0;
+        for (final AbrechnungPosition position : activePositionen) {
+            gesamtflaecheQm += position.getFlaecheQmRoundedUp();
+        }
+
+        BigDecimal gebuehrWoche = BigDecimal.ZERO;
+        for (final AbrechnungPosition position : activePositionen) {
+            final int flaecheQm = position.getFlaecheQmRoundedUp();
+            final int laufendeWoche = position.getLaufendeWoche(woche.beginn());
+            // TODO: der Aufschlag liegt aktuell bei der Position, soll aber bei der Adresse liegen. Diese
+            // Eigenschaft liegt bei der Adresse (Nutzungsobjekt) und gilt fuer alle dazugehoerigen
+            // Flaechen (Positionen).
+            final BigDecimal gebuehrProQm = Gebuehrenstufe.getGebuehrProQm(laufendeWoche, gesamtflaecheQm, position.aufschlag50prozent());
+            log.debug("Berechnung of week {}: {} qm of {} qm in laufende Woche {} at {} per qm",
+                    woche.nummer(), flaecheQm, gesamtflaecheQm, laufendeWoche, gebuehrProQm);
+            gebuehrWoche = gebuehrWoche.add(gebuehrProQm.multiply(BigDecimal.valueOf(flaecheQm)));
+        }
+        return gebuehrWoche;
     }
 
 }

@@ -13,6 +13,13 @@ public final class Zeitraum {
     }
 
     /**
+     * Both boundaries count, so two periods that share a single day overlap.
+     */
+    public static boolean overlap(final LocalDate vonA, final LocalDate bisA, final LocalDate vonB, final LocalDate bisB) {
+        return !vonA.isAfter(bisB) && !bisA.isBefore(vonB);
+    }
+
+    /**
      * A given period wins, because then the days follow from it. Otherwise the directly entered value
      * is kept. Both boundaries count, so a period from the 1st to the 3rd is three days.
      */

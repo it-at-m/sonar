@@ -19,8 +19,8 @@ describe("abrechnungPositionForm.ts", () => {
       expect(isAbrechnungPositionDirty(createAbrechnungPosition())).toBe(false);
     });
 
-    it("givenHaelfte_thenReturnTrue", () => {
-      const position = positionWith({ haelfte: true });
+    it("givenAufschlag_thenReturnTrue", () => {
+      const position = positionWith({ aufschlag50prozent: true });
 
       expect(isAbrechnungPositionDirty(position)).toBe(true);
     });

@@ -110,7 +110,7 @@ function toPositionForm(
     laenge: position.laenge ?? null,
     breite: position.breite ?? null,
     flaeche: position.flaeche ?? null,
-    haelfte: position.haelfte ?? false,
+    aufschlag50prozent: position.aufschlag50prozent ?? false,
     anteilAnFlaeche: position.anteilAnFlaeche ?? null,
   };
 }
@@ -126,7 +126,7 @@ function toPositionRequestDTO(
     laenge: position.laenge ?? 0,
     breite: position.breite ?? 0,
     flaeche: position.flaeche ?? 0,
-    haelfte: position.haelfte,
+    aufschlag50prozent: position.aufschlag50prozent,
     anteilAnFlaeche: position.anteilAnFlaeche ?? 0,
   };
 }

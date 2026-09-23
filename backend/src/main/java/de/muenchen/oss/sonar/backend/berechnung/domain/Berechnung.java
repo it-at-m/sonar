@@ -13,6 +13,8 @@ public class Berechnung {
 
     private LocalDate abrechnungszeitraumBis;
 
+    private BigDecimal gebuehrNutzung;
+
     private BigDecimal gebuehrVerwaltung;
 
     private String zusammenfassung;

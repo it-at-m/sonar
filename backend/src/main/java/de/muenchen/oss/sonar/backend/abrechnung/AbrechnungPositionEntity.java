@@ -40,7 +40,7 @@ public class AbrechnungPositionEntity extends BaseEntity {
     @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal flaeche;
 
     @Column(nullable = false)
-    private boolean haelfte;
+    private boolean aufschlag50prozent;
 
     @Column(nullable = false, precision = 12, scale = 2)
     @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal anteilAnFlaeche;

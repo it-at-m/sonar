@@ -993,7 +993,7 @@ components:
           minimum: 0
           exclusiveMinimum: true
           type: number
-        haelfte:
+        aufschlag50prozent:
           type: boolean
         anteilAnFlaeche:
           minimum: 0
@@ -1125,7 +1125,7 @@ components:
           type: number
         flaeche:
           type: number
-        haelfte:
+        aufschlag50prozent:
           type: boolean
         anteilAnFlaeche:
           type: number

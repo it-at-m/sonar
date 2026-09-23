@@ -366,7 +366,7 @@ describe("abrechnungMapper.ts", () => {
                 laenge: 12,
                 breite: 3,
                 flaeche: 36,
-                haelfte: true,
+                aufschlag50prozent: true,
                 anteilAnFlaeche: 30,
               },
             ],
@@ -401,7 +401,7 @@ describe("abrechnungMapper.ts", () => {
       expect(position.beginn).toBe("2026-01-01");
       expect(position.ende).toBe("2026-03-31");
       expect(position.laenge).toBe(12);
-      expect(position.haelfte).toBe(true);
+      expect(position.aufschlag50prozent).toBe(true);
       expect(position.anteilAnFlaeche).toBe(30);
     });
 
@@ -423,7 +423,7 @@ describe("abrechnungMapper.ts", () => {
                 laenge: 12,
                 breite: 3,
                 flaeche: 36,
-                haelfte: false,
+                aufschlag50prozent: false,
                 anteilAnFlaeche: 36,
               },
             ],
