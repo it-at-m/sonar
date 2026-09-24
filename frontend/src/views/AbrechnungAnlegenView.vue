@@ -76,7 +76,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
+import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiArrowLeft } from "@mdi/js";
 import { computed, nextTick, onMounted, ref, useTemplateRef } from "vue";
@@ -94,9 +94,13 @@ import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import { useSaveLeave } from "@/composables/saveLeave";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
-import { toAbrechnungRequestDTO } from "@/util/abrechnungMapper";
-import { nutzungsobjektOfError, tabOfError, TABS } from "@/util/abrechnungTabs";
-import { fetchProjektAdresseSuggestions } from "@/util/projektAdresseSuggestion";
+import { toAbrechnungRequestDTO } from "@/util/abrechnung/abrechnungMapper";
+import {
+  nutzungsobjektOfError,
+  tabOfError,
+  TABS,
+} from "@/util/abrechnung/abrechnungTabs";
+import { fetchProjektAdresseSuggestions } from "@/util/projekt/projektAdresseSuggestion";
 
 const { projektId } = defineProps<{ projektId: string }>();
 

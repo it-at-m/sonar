@@ -96,20 +96,20 @@
 </template>
 
 <script setup lang="ts">
-import type { AbrechnungForm } from "@/composables/abrechnungForm";
-import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
+import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
+import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiAlertCircle, mdiPlus } from "@mdi/js";
 import { computed, ref } from "vue";
 
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
-import { createAbrechnungNutzungsobjekt } from "@/util/abrechnungNutzungsobjektForm";
-import { ABRECHNUNGS_ART_OPTIONS } from "@/util/abrechnungsArt";
+import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
+import { ABRECHNUNGS_ART_OPTIONS } from "@/util/abrechnung/abrechnungsArt";
 import {
   nutzungsobjektIdPrefix,
   nutzungsobjektOfError,
-} from "@/util/abrechnungTabs";
-import { adresseLabel } from "@/util/adresseLabel";
+} from "@/util/abrechnung/abrechnungTabs";
+import { adresseLabel } from "@/util/common/adresseLabel";
 import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
 
 const abrechnung = defineModel<AbrechnungForm>({ required: true });

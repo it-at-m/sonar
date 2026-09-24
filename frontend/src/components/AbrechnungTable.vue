@@ -16,7 +16,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AbrechnungTableRow } from "@/types/AbrechnungTableRow";
+import type { AbrechnungTableRow } from "@/types/abrechnung/AbrechnungTableRow";
 import type { DataTableSortItem } from "@/types/DataTableSortItem";
 
 const HEADERS = [

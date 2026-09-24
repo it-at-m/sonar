@@ -1,4 +1,4 @@
-import type { AbrechnungForm } from "@/composables/abrechnungForm";
+import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
 import type { VueWrapper } from "@vue/test-utils";
 
 import { flushPromises, mount } from "@vue/test-utils";
