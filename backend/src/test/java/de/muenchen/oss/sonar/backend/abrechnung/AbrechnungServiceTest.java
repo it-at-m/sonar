@@ -79,7 +79,7 @@ class AbrechnungServiceTest {
             assertThat(savedNutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(90);
             assertThat(savedNutzungsobjekt.positionen()).hasSize(1);
             assertThat(savedNutzungsobjekt.positionen().getFirst().flaeche()).isEqualByComparingTo("36.00");
-            assertThat(savedNutzungsobjekt.positionen().getFirst().isHaelfte()).isTrue();
+            assertThat(savedNutzungsobjekt.positionen().getFirst().haelfte()).isTrue();
         }
 
         @Test

@@ -46,7 +46,7 @@ function mountBasisinformationen(abrechnung: Partial<AbrechnungForm> = {}) {
     props: {
       modelValue: {
         geschaeftspartnerId: "",
-        isZustellungsbevollmaechtigterGenutzt: false,
+        zustellungsbevollmaechtigterGenutzt: false,
         zustellungsbevollmaechtigterId: "",
         zustellungsbevollmaechtigterTyp: null,
         ...abrechnung,
@@ -237,7 +237,7 @@ describe("AbrechnungBasisinformationen.vue", () => {
     it("givenKnownId_thenShowTheStammdatenOfThatField", async () => {
       const fetchStub = stubFetch();
       const wrapper = mountBasisinformationen({
-        isZustellungsbevollmaechtigterGenutzt: true,
+        zustellungsbevollmaechtigterGenutzt: true,
       });
 
       await type(wrapper, { zustellungsbevollmaechtigterId: "GP-0815" });
@@ -252,7 +252,7 @@ describe("AbrechnungBasisinformationen.vue", () => {
     it("givenUnknownId_thenReportItOnTheOwnIdField", async () => {
       const fetchStub = stubFetch();
       const wrapper = mountBasisinformationen({
-        isZustellungsbevollmaechtigterGenutzt: true,
+        zustellungsbevollmaechtigterGenutzt: true,
       });
 
       await type(wrapper, { zustellungsbevollmaechtigterId: "GP-0000" });

@@ -10,7 +10,7 @@ public record AbrechnungResponseDTO(
         UUID id,
         UUID projektId,
         String geschaeftspartnerId,
-        boolean isZustellungsbevollmaechtigterGenutzt,
+        boolean zustellungsbevollmaechtigterGenutzt,
         String zustellungsbevollmaechtigterId,
         ZustellungsbevollmaechtigterTyp zustellungsbevollmaechtigterTyp,
         LocalDate zeitraumVon,

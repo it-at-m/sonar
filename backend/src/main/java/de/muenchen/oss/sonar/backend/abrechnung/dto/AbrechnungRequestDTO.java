@@ -20,7 +20,7 @@ import java.util.List;
 @ZustellungsbevollmaechtigterValid
 public record AbrechnungRequestDTO(
         @NotNull @Size(min = 1, max = 10) String geschaeftspartnerId,
-        boolean isZustellungsbevollmaechtigterGenutzt,
+        boolean zustellungsbevollmaechtigterGenutzt,
         @Size(min = 1, max = 10) String zustellungsbevollmaechtigterId,
         ZustellungsbevollmaechtigterTyp zustellungsbevollmaechtigterTyp,
         @NotNull LocalDate zeitraumVon,

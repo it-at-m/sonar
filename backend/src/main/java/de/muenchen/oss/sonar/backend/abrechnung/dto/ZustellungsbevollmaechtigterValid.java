@@ -36,7 +36,7 @@ public @interface ZustellungsbevollmaechtigterValid {
 
             boolean valid = true;
 
-            if (abrechnung.isZustellungsbevollmaechtigterGenutzt()) {
+            if (abrechnung.zustellungsbevollmaechtigterGenutzt()) {
                 if (abrechnung.zustellungsbevollmaechtigterId() == null) {
                     addViolation(context, INCOMPLETE, ID);
                     valid = false;

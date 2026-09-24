@@ -744,7 +744,7 @@ components:
           minimum: 0
           exclusiveMinimum: true
           type: number
-        isHaelfte:
+        haelfte:
           type: boolean
         anteilAnFlaeche:
           minimum: 0
@@ -763,7 +763,7 @@ components:
           maxLength: 10
           minLength: 1
           type: string
-        isZustellungsbevollmaechtigterGenutzt:
+        zustellungsbevollmaechtigterGenutzt:
           type: boolean
         zustellungsbevollmaechtigterId:
           maxLength: 10
@@ -876,7 +876,7 @@ components:
           type: number
         flaeche:
           type: number
-        isHaelfte:
+        haelfte:
           type: boolean
         anteilAnFlaeche:
           type: number
@@ -891,7 +891,7 @@ components:
           format: uuid
         geschaeftspartnerId:
           type: string
-        isZustellungsbevollmaechtigterGenutzt:
+        zustellungsbevollmaechtigterGenutzt:
           type: boolean
         zustellungsbevollmaechtigterId:
           type: string

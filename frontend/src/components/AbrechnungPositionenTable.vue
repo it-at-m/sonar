@@ -77,7 +77,7 @@
             </td>
             <td>
               <v-checkbox
-                v-model="position.isHaelfte"
+                v-model="position.haelfte"
                 :aria-label="`50 % für Position ${index + 1}`"
                 density="compact"
                 hide-details

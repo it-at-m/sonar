@@ -269,7 +269,7 @@ describe("abrechnungMapper.ts", () => {
 
       const requestDTO = toAbrechnungRequestDTO(abrechnung.value);
 
-      expect(requestDTO.isZustellungsbevollmaechtigterGenutzt).toBe(false);
+      expect(requestDTO.zustellungsbevollmaechtigterGenutzt).toBe(false);
       expect(requestDTO.zustellungsbevollmaechtigterId).toBeUndefined();
       expect(requestDTO.zustellungsbevollmaechtigterTyp).toBeUndefined();
     });
@@ -277,7 +277,7 @@ describe("abrechnungMapper.ts", () => {
     it("givenZustellungsbevollmaechtigter_thenSendIdAndTyp", () => {
       const { abrechnung } = useAbrechnungForm();
       abrechnung.value.geschaeftspartnerId = " 1000000001 ";
-      abrechnung.value.isZustellungsbevollmaechtigterGenutzt = true;
+      abrechnung.value.zustellungsbevollmaechtigterGenutzt = true;
       abrechnung.value.zustellungsbevollmaechtigterId = " 2000000002 ";
       abrechnung.value.zustellungsbevollmaechtigterTyp =
         AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum.VORMUND;

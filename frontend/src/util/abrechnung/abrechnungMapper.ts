@@ -18,10 +18,10 @@ export function toAbrechnungRequestDTO(
     throw new Error("Die Art der Abrechnung fehlt.");
   }
 
-  const genutzt = abrechnung.isZustellungsbevollmaechtigterGenutzt;
+  const genutzt = abrechnung.zustellungsbevollmaechtigterGenutzt;
   return {
     geschaeftspartnerId: abrechnung.geschaeftspartnerId.trim(),
-    isZustellungsbevollmaechtigterGenutzt: genutzt,
+    zustellungsbevollmaechtigterGenutzt: genutzt,
     // Leftovers of a toggle switched back off are rejected, so they are dropped here.
     zustellungsbevollmaechtigterId: genutzt
       ? abrechnung.zustellungsbevollmaechtigterId.trim()
@@ -58,7 +58,7 @@ function toPositionRequestDTO(
     laenge: position.laenge ?? 0,
     breite: position.breite ?? 0,
     flaeche: position.flaeche ?? 0,
-    isHaelfte: position.isHaelfte,
+    haelfte: position.haelfte,
     anteilAnFlaeche: position.anteilAnFlaeche ?? 0,
   };
 }

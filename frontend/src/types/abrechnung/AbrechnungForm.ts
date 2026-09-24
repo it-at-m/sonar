@@ -6,7 +6,7 @@ import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/Abrechnung
 
 export interface AbrechnungForm {
   geschaeftspartnerId: string;
-  isZustellungsbevollmaechtigterGenutzt: boolean;
+  zustellungsbevollmaechtigterGenutzt: boolean;
   zustellungsbevollmaechtigterId: string;
   zustellungsbevollmaechtigterTyp: AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum | null;
   zeitraumVon: string;

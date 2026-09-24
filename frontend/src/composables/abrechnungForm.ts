@@ -10,7 +10,7 @@ import {
 export function useAbrechnungForm() {
   const abrechnung = ref<AbrechnungForm>({
     geschaeftspartnerId: "",
-    isZustellungsbevollmaechtigterGenutzt: false,
+    zustellungsbevollmaechtigterGenutzt: false,
     zustellungsbevollmaechtigterId: "",
     zustellungsbevollmaechtigterTyp: null,
     zeitraumVon: "",
@@ -20,7 +20,7 @@ export function useAbrechnungForm() {
   });
 
   watch(
-    () => abrechnung.value.isZustellungsbevollmaechtigterGenutzt,
+    () => abrechnung.value.zustellungsbevollmaechtigterGenutzt,
     (genutzt) => {
       if (!genutzt) {
         abrechnung.value.zustellungsbevollmaechtigterId = "";
@@ -37,7 +37,7 @@ export function useAbrechnungForm() {
     const form = abrechnung.value;
     if (
       form.geschaeftspartnerId ||
-      form.isZustellungsbevollmaechtigterGenutzt ||
+      form.zustellungsbevollmaechtigterGenutzt ||
       form.zustellungsbevollmaechtigterId ||
       form.zustellungsbevollmaechtigterTyp !== null ||
       form.zeitraumVon ||
