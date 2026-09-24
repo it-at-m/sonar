@@ -439,6 +439,39 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
+  /projekt/{projektId}/abrechnung/{abrechnungId}/berechnung:
+    post:
+      tags:
+      - berechnung-controller
+      summary: Run the Berechnung of an Abrechnung.
+      description: |-
+        Run the Berechnung of an Abrechnung.
+         The Berechnung runs on the stored Nutzungsobjekte and Positionen of the Abrechnung, so the call
+         needs nothing beyond the two ids.
+         The result is not persisted yet and only reaches the application log.
+      operationId: berechnungDurchfuehren
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the Abrechnung to run the Berechnung of
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "204":
+          description: No Content
+      security:
+      - bearerAuth: []
   /abrechnung/{abrechnungId}/widerspruch:
     post:
       tags:

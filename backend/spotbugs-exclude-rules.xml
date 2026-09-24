@@ -16,4 +16,10 @@
         <Class name="~.*MapperImpl"/>
         <Bug pattern="RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE"/>
     </Match>
+    <Match>
+        <!-- Ported from the prototype. Its objects hand their lists out directly, and making them
+             immutable belongs to the refactoring. -->
+        <Package name="~de\.muenchen\.oss\.sonar\.backend\.berechnung.*"/>
+        <Bug pattern="EI_EXPOSE_REP"/>
+    </Match>
 </FindBugsFilter>
