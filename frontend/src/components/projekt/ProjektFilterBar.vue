@@ -54,7 +54,7 @@
 </template>
 
 <script setup lang="ts">
-import type { ProjektFilter } from "@/types/ProjektFilter";
+import type { ProjektFilter } from "@/types/projekt/ProjektFilter";
 
 import { mdiFilterRemove, mdiMagnify } from "@mdi/js";
 import { computed } from "vue";

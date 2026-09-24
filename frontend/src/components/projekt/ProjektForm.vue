@@ -40,11 +40,12 @@
       </v-col>
     </v-row>
 
-    <h2 class="text-headline-small mt-4 mb-2">Adressen/Flurnummern</h2>
+    <h2 class="text-headline-small mt-4 mb-2">Adressen/Flurstücke</h2>
 
     <projekt-form-adresse-card
       v-for="(adresse, index) in projekt.adressen"
       :key="adresse.id"
+      :id-prefix="`adresse-${index}`"
       :model-value="adresse"
       :position="index + 1"
       :removable="projekt.adressen.length > 1"
@@ -56,7 +57,7 @@
       variant="text"
       @click="addAdresse"
     >
-      Adresse hinzufügen
+      Adresse/Flurstück hinzufügen
     </v-btn>
 
     <div class="d-flex justify-end mt-6">
@@ -86,8 +87,8 @@ import { useTemplateRef } from "vue";
 
 import ProjektFormAdresseCard from "@/components/projekt/ProjektFormAdresseCard.vue";
 import { useProjektForm } from "@/composables/projektForm";
-import { toProjektRequestDTO } from "@/util/projektMapper";
-import { abrechnungEndeRule } from "@/util/projektRules";
+import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
+import { abrechnungEndeRule } from "@/util/projekt/projektRules";
 import { requiredRule } from "@/util/validationRules";
 
 defineProps<{ saving: boolean }>();
