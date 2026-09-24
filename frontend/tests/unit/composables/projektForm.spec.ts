@@ -38,7 +38,7 @@ describe("projektForm.ts", () => {
 
     it("givenFilledAdresse_thenReturnTrue", () => {
       const { isDirty, projekt } = useProjektForm();
-      itemAt(projekt.adressen).bezeichnung = "Marienplatz 8";
+      itemAt(projekt.adressen).adresse = "Marienplatz";
 
       expect(isDirty()).toBe(true);
     });
@@ -47,14 +47,14 @@ describe("projektForm.ts", () => {
   describe("removeAdresse", () => {
     it("givenIndex_thenRemoveOnlyThatAdresse", () => {
       const { addAdresse, projekt, removeAdresse } = useProjektForm();
-      itemAt(projekt.adressen).bezeichnung = "erste";
+      itemAt(projekt.adressen).adresse = "erste";
       addAdresse();
-      itemAt(projekt.adressen, 1).bezeichnung = "zweite";
+      itemAt(projekt.adressen, 1).adresse = "zweite";
 
       removeAdresse(0);
 
       expect(projekt.adressen).toHaveLength(1);
-      expect(itemAt(projekt.adressen).bezeichnung).toBe("zweite");
+      expect(itemAt(projekt.adressen).adresse).toBe("zweite");
     });
   });
 });
