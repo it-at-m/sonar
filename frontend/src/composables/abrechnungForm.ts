@@ -1,11 +1,11 @@
+import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
+
 import { ref, watch } from "vue";
 
-export interface AbrechnungForm {
-  geschaeftspartnerId: string;
-  zustellungsbevollmaechtigterGenutzt: boolean;
-  zustellungsbevollmaechtigterId: string;
-  zustellungsbevollmaechtigterTyp: string | null;
-}
+import {
+  createAbrechnungNutzungsobjekt,
+  isAbrechnungNutzungsobjektDirty,
+} from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 
 export function useAbrechnungForm() {
   const abrechnung = ref<AbrechnungForm>({
@@ -13,6 +13,10 @@ export function useAbrechnungForm() {
     zustellungsbevollmaechtigterGenutzt: false,
     zustellungsbevollmaechtigterId: "",
     zustellungsbevollmaechtigterTyp: null,
+    zeitraumVon: "",
+    zeitraumBis: "",
+    abrechnungsArt: null,
+    nutzungsobjekte: [createAbrechnungNutzungsobjekt()],
   });
 
   watch(
@@ -25,5 +29,28 @@ export function useAbrechnungForm() {
     }
   );
 
-  return { abrechnung };
+  /**
+   * Covers both tabs, because both fill the same Abrechnung and the guard has to fire wherever the
+   * entry happened. A single Nutzungsobjekt is there from the start, so only a second one counts.
+   */
+  function isDirty(): boolean {
+    const form = abrechnung.value;
+    if (
+      form.geschaeftspartnerId ||
+      form.zustellungsbevollmaechtigterGenutzt ||
+      form.zustellungsbevollmaechtigterId ||
+      form.zustellungsbevollmaechtigterTyp !== null ||
+      form.zeitraumVon ||
+      form.zeitraumBis ||
+      form.abrechnungsArt !== null
+    ) {
+      return true;
+    }
+    if (form.nutzungsobjekte.length > 1) {
+      return true;
+    }
+    return form.nutzungsobjekte.some(isAbrechnungNutzungsobjektDirty);
+  }
+
+  return { abrechnung, isDirty };
 }

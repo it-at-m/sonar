@@ -26,7 +26,7 @@
 
 <script setup lang="ts">
 import type { DataTableSortItem } from "@/types/DataTableSortItem";
-import type { ProjektTableRow } from "@/types/ProjektTableRow";
+import type { ProjektTableRow } from "@/types/projekt/ProjektTableRow";
 
 import { mdiReceiptTextOutline } from "@mdi/js";
 import { computed } from "vue";
