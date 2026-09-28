@@ -7,7 +7,6 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
-import java.util.UUID;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -22,9 +21,6 @@ import lombok.ToString;
 public class WiderspruchEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
-
-    @Column(name = "abrechnung_id", nullable = false, unique = true)
-    @NotNull private UUID abrechnungId;
 
     @Column(nullable = false)
     @NotNull private LocalDate datumEingang;

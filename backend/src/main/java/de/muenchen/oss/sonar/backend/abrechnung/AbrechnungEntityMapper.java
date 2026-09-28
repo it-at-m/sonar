@@ -11,10 +11,10 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface AbrechnungEntityMapper {
 
-    @Mapping(target = "widerspruchVorhanden", source = "widerspruchVorhanden")
-    Abrechnung toAbrechnung(AbrechnungEntity abrechnungEntity, boolean widerspruchVorhanden);
+    Abrechnung toAbrechnung(AbrechnungEntity abrechnungEntity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "widerspruch", ignore = true)
     AbrechnungEntity toEntity(Abrechnung abrechnung);
 
     @Mapping(target = ".", source = "adressdaten")

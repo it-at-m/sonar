@@ -7,6 +7,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
+import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchEntity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -32,11 +33,12 @@ class AbrechnungEntityMapperTest {
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
                     VON, BIS, null, "Bemerkung", List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), "1000000001", false, null, null,
-                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, false, List.of(nutzungsobjekt));
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, List.of(nutzungsobjekt));
 
             final AbrechnungEntity result = abrechnungEntityMapper.toEntity(abrechnung);
 
             assertThat(result.getId()).isNull();
+            assertThat(result.getWiderspruch()).isNull();
             assertThat(result.getProjektId()).isNotNull();
             assertThat(result.getNutzungsobjekte()).hasSize(1);
 
@@ -63,7 +65,7 @@ class AbrechnungEntityMapperTest {
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
                     VON, BIS, null, "Bemerkung", List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), "1000000001", false, null, null,
-                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, false, List.of(nutzungsobjekt));
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, List.of(nutzungsobjekt));
 
             final AbrechnungEntity entity = abrechnungEntityMapper.toEntity(abrechnung);
             final UUID abrechnungId = UUID.randomUUID();
@@ -73,7 +75,7 @@ class AbrechnungEntityMapperTest {
             entity.getNutzungsobjekte().getFirst().setId(nutzungsobjektId);
             entity.getNutzungsobjekte().getFirst().getPositionen().getFirst().setId(positionId);
 
-            final Abrechnung result = abrechnungEntityMapper.toAbrechnung(entity, false);
+            final Abrechnung result = abrechnungEntityMapper.toAbrechnung(entity);
 
             assertThat(result.id()).isEqualTo(abrechnungId);
             assertThat(result.nutzungsobjekte().getFirst().id()).isEqualTo(nutzungsobjektId);
@@ -83,18 +85,32 @@ class AbrechnungEntityMapperTest {
         }
 
         @Test
-        void givenWiderspruchVorhanden_thenCarryTheFlagIntoTheAbrechnung() {
+        void givenWiderspruch_thenCarryItIntoTheAbrechnung() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
                     VON, BIS, null, "Bemerkung", List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), "1000000001", false, null, null,
-                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, false, List.of(nutzungsobjekt));
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, List.of(nutzungsobjekt));
             final AbrechnungEntity entity = abrechnungEntityMapper.toEntity(abrechnung);
 
-            assertThat(abrechnungEntityMapper.toAbrechnung(entity, true).widerspruchVorhanden()).isTrue();
-            assertThat(abrechnungEntityMapper.toAbrechnung(entity, false).widerspruchVorhanden()).isFalse();
+            assertThat(abrechnungEntityMapper.toAbrechnung(entity).widerspruch()).isNull();
+            assertThat(abrechnungEntityMapper.toAbrechnung(entity).isWiderspruchVorhanden()).isFalse();
+
+            final UUID widerspruchId = UUID.randomUUID();
+            final WiderspruchEntity widerspruch = new WiderspruchEntity();
+            widerspruch.setId(widerspruchId);
+            widerspruch.setDatumEingang(LocalDate.of(2026, 4, 1));
+            widerspruch.setBemerkung("Widerspruch der Eigentümerin");
+            entity.setWiderspruch(widerspruch);
+
+            final Abrechnung result = abrechnungEntityMapper.toAbrechnung(entity);
+
+            assertThat(result.isWiderspruchVorhanden()).isTrue();
+            assertThat(result.widerspruch().id()).isEqualTo(widerspruchId);
+            assertThat(result.widerspruch().datumEingang()).isEqualTo(LocalDate.of(2026, 4, 1));
+            assertThat(result.widerspruch().bemerkung()).isEqualTo("Widerspruch der Eigentümerin");
         }
     }
 }

@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.abrechnung.domain;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungsArt;
 import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
+import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -17,7 +18,7 @@ public record Abrechnung(
         LocalDate zeitraumVon,
         LocalDate zeitraumBis,
         AbrechnungsArt abrechnungsArt,
-        boolean widerspruchVorhanden,
+        Widerspruch widerspruch,
         List<AbrechnungNutzungsobjekt> nutzungsobjekte) {
 
     /**
@@ -30,5 +31,9 @@ public record Abrechnung(
             throw new IllegalArgumentException("zeitraumBis is before zeitraumVon");
         }
         nutzungsobjekte = nutzungsobjekte == null ? List.of() : List.copyOf(nutzungsobjekte);
+    }
+
+    public boolean isWiderspruchVorhanden() {
+        return widerspruch != null;
     }
 }

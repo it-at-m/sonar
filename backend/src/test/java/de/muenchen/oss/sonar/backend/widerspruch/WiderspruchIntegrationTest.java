@@ -77,8 +77,8 @@ class WiderspruchIntegrationTest {
 
     @BeforeEach
     public void setUp() {
-        widerspruchRepository.deleteAll();
         abrechnungRepository.deleteAll();
+        widerspruchRepository.deleteAll();
         projektRepository.deleteAll();
 
         final ProjektAdresseEntity projektAdresse = new ProjektAdresseEntity();
@@ -144,14 +144,12 @@ class WiderspruchIntegrationTest {
                     .expectStatus().isCreated()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
                     .expectBody(WiderspruchResponseDTO.class)
-                    .value(dto -> assertThat(dto.abrechnungId()).isEqualTo(abrechnungId))
                     .returnResult()
                     .getResponseBody();
 
             assertThat(responseDTO).isNotNull();
 
             final WiderspruchEntity persisted = widerspruchRepository.findById(responseDTO.id()).orElseThrow();
-            assertThat(persisted.getAbrechnungId()).isEqualTo(abrechnungId);
             assertThat(persisted.getDatumEingang()).isEqualTo(EINGANG);
             assertThat(persisted.getDatumRuecknahme()).isEqualTo(LocalDate.of(2026, 4, 15));
             assertThat(persisted.getDatumVorlageRegierung()).isEqualTo(LocalDate.of(2026, 5, 1));
@@ -221,10 +219,16 @@ class WiderspruchIntegrationTest {
 
         @Test
         void givenAbrechnungThatAlreadyHasOne_thenReturnConflict() {
-            final WiderspruchEntity bestehenderWiderspruch = new WiderspruchEntity();
-            bestehenderWiderspruch.setAbrechnungId(abrechnungId);
-            bestehenderWiderspruch.setDatumEingang(EINGANG);
-            widerspruchRepository.save(bestehenderWiderspruch);
+            final WiderspruchRequestDTO bestehenderWiderspruch = new WiderspruchRequestDTO(EINGANG, null, null, null,
+                    null, false, false, null);
+
+            restTestClient.post()
+                    .uri(WIDERSPRUCH_PATH, abrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(bestehenderWiderspruch)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated();
 
             final WiderspruchRequestDTO zweiterWiderspruch = new WiderspruchRequestDTO(LocalDate.of(2026, 4, 20), null,
                     null, null, null, false, false, null);
@@ -258,10 +262,16 @@ class WiderspruchIntegrationTest {
 
         @Test
         void givenAbrechnungWithWiderspruch_thenTheOverviewReportsIt() {
-            final WiderspruchEntity widerspruch = new WiderspruchEntity();
-            widerspruch.setAbrechnungId(abrechnungId);
-            widerspruch.setDatumEingang(EINGANG);
-            widerspruchRepository.save(widerspruch);
+            final WiderspruchRequestDTO widerspruch = new WiderspruchRequestDTO(EINGANG, null, null, null, null, false,
+                    false, null);
+
+            restTestClient.post()
+                    .uri(WIDERSPRUCH_PATH, abrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(widerspruch)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated();
 
             restTestClient.get()
                     .uri(uriBuilder -> uriBuilder

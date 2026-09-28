@@ -5,7 +5,6 @@ import java.util.UUID;
 
 public record Widerspruch(
         UUID id,
-        UUID abrechnungId,
         LocalDate datumEingang,
         LocalDate datumRuecknahme,
         LocalDate datumVorlageRegierung,

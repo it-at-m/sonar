@@ -1,13 +1,16 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
 import de.muenchen.oss.sonar.backend.common.BaseEntity;
+import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchEntity;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.NotEmpty;
@@ -60,6 +63,11 @@ public class AbrechnungEntity extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 50)
     @NotNull private AbrechnungsArt abrechnungsArt;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "widerspruch_id")
+    @ToString.Exclude
+    private WiderspruchEntity widerspruch;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "abrechnung_id", nullable = false)
