@@ -34,7 +34,7 @@
 </template>
 
 <script setup lang="ts">
-import type { AbrechnungTableRow } from "@/types/AbrechnungTableRow";
+import type { AbrechnungTableRow } from "@/types/abrechnung/AbrechnungTableRow";
 import type { DataTableSortItem } from "@/types/DataTableSortItem";
 
 import { mdiArrowLeft, mdiPlus } from "@mdi/js";
@@ -43,8 +43,8 @@ import { computed, onMounted, ref, watch } from "vue";
 import AbrechnungTable from "@/components/AbrechnungTable.vue";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
-import { fetchAbrechnungenPage } from "@/util/abrechnungenListe";
-import { toAbrechnungSort } from "@/util/abrechnungSortMapper";
+import { fetchAbrechnungenPage } from "@/util/abrechnung/abrechnungenListe";
+import { toAbrechnungSort } from "@/util/abrechnung/abrechnungSortMapper";
 
 const DEFAULT_ITEMS_PER_PAGE = 10;
 

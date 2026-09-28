@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 
 import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
 import AdresseFields from "@/components/common/AdresseFields.vue";
-import { createProjektAdresse } from "@/util/projektAdresseForm";
+import { createProjektAdresse } from "@/util/projekt/projektAdresseForm";
 
 function fieldsFor(art: ProjektAdresseRequestDTOArtEnum) {
   return shallowMount(AdresseFields, {

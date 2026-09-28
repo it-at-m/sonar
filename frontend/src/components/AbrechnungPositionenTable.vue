@@ -121,11 +121,11 @@
 </template>
 
 <script setup lang="ts">
-import type { AbrechnungPositionForm } from "@/types/AbrechnungPositionForm";
+import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
 
-import { createAbrechnungPosition } from "@/util/abrechnungPositionForm";
+import { createAbrechnungPosition } from "@/util/abrechnung/abrechnungPositionForm";
 import {
   endeNotBeforeBeginn,
   greaterThanZeroRule,

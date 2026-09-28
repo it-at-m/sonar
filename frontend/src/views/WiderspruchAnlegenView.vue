@@ -176,7 +176,7 @@ import { useWiderspruchForm } from "@/composables/widerspruchForm";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 import { requiredRule } from "@/util/validationRules";
-import { toWiderspruchRequestDTO } from "@/util/widerspruchMapper";
+import { toWiderspruchRequestDTO } from "@/util/widerspruch/widerspruchMapper";
 
 const ENTSCHEIDUNG_MAX_LENGTH = 255;
 const BEMERKUNG_MAX_LENGTH = 10000;

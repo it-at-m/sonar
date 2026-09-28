@@ -99,13 +99,13 @@
 </template>
 
 <script setup lang="ts">
-import type { Adresse } from "@/types/Adresse";
+import type { Adresse } from "@/types/common/Adresse";
 
 import { computed } from "vue";
 
 import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
-import { clearFieldsOfUnselectedArt } from "@/util/adresseForm";
-import { NUTZUNG_OPTIONS } from "@/util/nutzungOptions";
+import { clearFieldsOfUnselectedArt } from "@/util/common/adresseForm";
+import { NUTZUNG_OPTIONS } from "@/util/common/nutzungOptions";
 import { requiredRule } from "@/util/validationRules";
 
 const adresse = defineModel<Adresse>({ required: true });

@@ -1,4 +1,4 @@
-import type { AbrechnungTableRow } from "@/types/AbrechnungTableRow";
+import type { AbrechnungTableRow } from "@/types/abrechnung/AbrechnungTableRow";
 
 import { mdiChatAlert, mdiChatPlus } from "@mdi/js";
 import { mount } from "@vue/test-utils";
