@@ -16,15 +16,11 @@
     <template #[`item.widerspruch`]="{ item }">
       <span v-if="item.id">
         <v-btn
-          :aria-label="`Widerspruch zu Abrechnung ${item.geschaeftspartnerId} ${item.widerspruchVorhanden ? 'vorhanden' : 'anlegen'}`"
+          :aria-label="widerspruchLabel(item)"
           density="comfortable"
           :disabled="item.widerspruchVorhanden"
           :icon="item.widerspruchVorhanden ? mdiChatAlert : mdiChatPlus"
-          :to="
-            item.widerspruchVorhanden
-              ? undefined
-              : `/projekte/${projektId}/abrechnungen/${item.id}/widerspruch/anlegen`
-          "
+          :to="widerspruchAnlegenLink(item)"
           variant="text"
         />
         <v-tooltip
@@ -58,12 +54,23 @@ const page = defineModel<number>("page", { required: true });
 const itemsPerPage = defineModel<number>("itemsPerPage", { required: true });
 const sortBy = defineModel<DataTableSortItem[]>("sortBy", { required: true });
 
-defineProps<{
+const props = defineProps<{
   projektId: string;
   rows: AbrechnungTableRow[];
   totalAbrechnungen: number;
   loading: boolean;
 }>();
+
+function widerspruchLabel(row: AbrechnungTableRow): string {
+  const zustand = row.widerspruchVorhanden ? "vorhanden" : "anlegen";
+  return `Widerspruch zu Abrechnung ${row.geschaeftspartnerId} ${zustand}`;
+}
+
+function widerspruchAnlegenLink(row: AbrechnungTableRow): string | undefined {
+  return row.widerspruchVorhanden
+    ? undefined
+    : `/projekte/${props.projektId}/abrechnungen/${row.id}/widerspruch/anlegen`;
+}
 </script>
 
 <style scoped>
