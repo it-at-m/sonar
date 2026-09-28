@@ -16,11 +16,15 @@
     <template #[`item.widerspruch`]="{ item }">
       <span v-if="item.id">
         <v-btn
-          :aria-label="`Widerspruch zu Abrechnung ${item.geschaeftspartnerId} anlegen`"
+          :aria-label="`Widerspruch zu Abrechnung ${item.geschaeftspartnerId} ${item.widerspruchVorhanden ? 'vorhanden' : 'anlegen'}`"
           density="comfortable"
           :disabled="item.widerspruchVorhanden"
           :icon="item.widerspruchVorhanden ? mdiChatAlert : mdiChatPlus"
-          :to="`/projekte/${projektId}/abrechnungen/${item.id}/widerspruch/anlegen`"
+          :to="
+            item.widerspruchVorhanden
+              ? undefined
+              : `/projekte/${projektId}/abrechnungen/${item.id}/widerspruch/anlegen`
+          "
           variant="text"
         />
         <v-tooltip
