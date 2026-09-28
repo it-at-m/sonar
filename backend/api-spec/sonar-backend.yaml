@@ -267,6 +267,90 @@ paths:
       security:
       - bearerAuth: []
   /projekt/{projektId}/abrechnung:
+    get:
+      tags:
+      - abrechnung-controller
+      summary: Retrieve the Abrechnungen of a Projekt with pagination.
+      description: |-
+        Retrieve the Abrechnungen of a Projekt with pagination.
+         Fetches a paginated list of all Abrechnungen belonging to the Projekt.
+         The order is applied by the database, so it holds for the whole result and not just for the
+         requested page.
+         Both sort parameters take a comma separated list. The order of the columns is the order they
+         are applied in, and the direction at the same position belongs to the column.
+         A column named more than once takes part in the order only at its first position.
+      operationId: getAbrechnungenByPageAndSize
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnungen belong to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: pageNumber
+        in: query
+        description: "the number of the requested page (default: 0)"
+        required: false
+        schema:
+          minimum: 0
+          type: integer
+          format: int32
+          default: 0
+      - name: pageSize
+        in: query
+        description: "the size of the page to retrieve (default: 10, at most 100)"
+        required: false
+        schema:
+          maximum: 100
+          minimum: 1
+          type: integer
+          format: int32
+          default: 10
+      - name: sortBy
+        in: query
+        description: "the columns to order by, the most significant one first (default:\
+          \ ZEITRAUM_VON)"
+        required: false
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ZEITRAUM_VON
+            - ZEITRAUM_BIS
+            - ABRECHNUNGS_ART
+            - GESCHAEFTSPARTNER_ID
+          default:
+          - ZEITRAUM_VON
+      - name: sortDirection
+        in: query
+        description: "the direction of the column at the same position (default: DESC)"
+        required: false
+        explode: false
+        schema:
+          type: array
+          items:
+            type: string
+            enum:
+            - ASC
+            - DESC
+          default:
+          - DESC
+      responses:
+        "400":
+          description: the pagination or sort parameters are invalid
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: a page of Abrechnungen represented as DTOs
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/PagedModelAbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
     post:
       tags:
       - abrechnung-controller
@@ -967,6 +1051,15 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektResponseDTO"
+        page:
+          $ref: "#/components/schemas/PageMetadata"
+    PagedModelAbrechnungResponseDTO:
+      type: object
+      properties:
+        content:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungResponseDTO"
         page:
           $ref: "#/components/schemas/PageMetadata"
     GeschaeftspartnerResponseDTO:

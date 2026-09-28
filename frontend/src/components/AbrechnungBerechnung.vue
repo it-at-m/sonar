@@ -102,26 +102,15 @@ import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSug
 import { mdiAlertCircle, mdiPlus } from "@mdi/js";
 import { computed, ref } from "vue";
 
-import { AbrechnungRequestDTOAbrechnungsArtEnum } from "@/api/generated/sonar-backend";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
+import { ABRECHNUNGS_ART_OPTIONS } from "@/util/abrechnung/abrechnungsArt";
 import {
   nutzungsobjektIdPrefix,
   nutzungsobjektOfError,
 } from "@/util/abrechnung/abrechnungTabs";
 import { adresseLabel } from "@/util/common/adresseLabel";
 import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
-
-const ABRECHNUNGS_ART_OPTIONS = [
-  {
-    title: "Endabrechnung",
-    value: AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG,
-  },
-  {
-    title: "Zwischenabrechnung",
-    value: AbrechnungRequestDTOAbrechnungsArtEnum.ZWISCHENABRECHNUNG,
-  },
-];
 
 const abrechnung = defineModel<AbrechnungForm>({ required: true });
 

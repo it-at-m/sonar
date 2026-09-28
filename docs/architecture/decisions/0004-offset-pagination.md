@@ -18,7 +18,7 @@ Wir paginieren Listen-Endpunkte offsetbasiert über Spring Data `Page`/`Pageable
 
 - Jeder paginierte Endpunkt nimmt `pageNumber` und `pageSize` und liefert ein `Page` (serialisiert als `PagedModel` mit `content` und `page`-Metadaten).
 - Die Sortierung wird **serverseitig ausgeführt**, damit sie für die gesamte Treffermenge gilt und nicht nur für die angezeigte Seite. Der Client wählt sie über die Parameter `sortBy` und `sortDirection`.
-- Fehlt einer der beiden Parameter, gilt der Standard: absteigend nach Projektnummer. Die Tabelle initialisiert ihr Sortiermodell auf denselben Wert, damit der Pfeil im Spaltenkopf zur tatsächlichen Reihenfolge passt.
+- Fehlt einer der beiden Parameter, gilt der Standard des jeweiligen Endpunkts. Die Tabelle initialisiert ihr Sortiermodell auf denselben Wert, damit der Pfeil im Spaltenkopf zur tatsächlichen Reihenfolge passt.
 
 Wir bewerten die Entscheidung neu, wenn ein Endpunkt Infinite Scroll bedient oder eine Tabelle die Größenordnung von etwa 100k Zeilen erreicht.
 
