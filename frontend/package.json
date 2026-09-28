@@ -1,18 +1,6 @@
 {
   "_comment": "TEMPORARY TRANSITIVE DEPENDENCY OVERRIDES FOR SECURITY FIXES",
-  "overrides": {
-    "jsdom": {
-      "undici": "7.29.0"
-    },
-    "@cyclonedx/cyclonedx-npm": {
-      "ajv": {
-        "fast-uri": "3.1.6"
-      },
-      "xmlbuilder2": {
-        "js-yaml": "4.3.2"
-      }
-    }
-  },
+  "overrides": {},
   "name": "sonar-frontend",
   "version": "0.0.1",
   "type": "module",
