@@ -4,9 +4,12 @@ import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungsArt;
 import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
 import de.muenchen.oss.sonar.backend.common.ZeitraumOrdered;
 import jakarta.validation.Valid;
+import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -26,6 +29,7 @@ public record AbrechnungRequestDTO(
         @NotNull LocalDate zeitraumVon,
         @NotNull LocalDate zeitraumBis,
         @NotNull AbrechnungsArt abrechnungsArt,
+        @DecimalMin("0") @Digits(integer = 10, fraction = 2) BigDecimal verwaltungsgebuehr,
         @NotEmpty List<@Valid AbrechnungNutzungsobjektRequestDTO> nutzungsobjekte) {
 
     /**

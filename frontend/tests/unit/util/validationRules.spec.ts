@@ -3,6 +3,7 @@ import { describe, expect, it } from "vitest";
 import {
   endeNotBeforeBeginn,
   greaterThanZeroRule,
+  notZeroRule,
   requiredRule,
 } from "@/util/validationRules";
 
@@ -60,6 +61,24 @@ describe("validationRules.ts", () => {
 
     it("givenNull_thenReturnTrue", () => {
       expect(greaterThanZeroRule(null)).toBe(true);
+    });
+  });
+
+  describe("notZeroRule", () => {
+    it("givenZero_thenReturnMessage", () => {
+      expect(notZeroRule(0)).toBe("Der Wert darf nicht 0 sein.");
+    });
+
+    it("givenNegativeValue_thenReturnTrue", () => {
+      expect(notZeroRule(-36)).toBe(true);
+    });
+
+    it("givenPositiveValue_thenReturnTrue", () => {
+      expect(notZeroRule(0.01)).toBe(true);
+    });
+
+    it("givenNull_thenReturnTrue", () => {
+      expect(notZeroRule(null)).toBe(true);
     });
   });
 });

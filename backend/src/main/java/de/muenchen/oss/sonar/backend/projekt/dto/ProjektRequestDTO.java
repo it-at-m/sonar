@@ -11,6 +11,7 @@ import java.util.List;
 @ZeitraumOrdered(von = "abrechnungBeginn", bis = "abrechnungEnde", message = "Das Ende der Abrechnung darf nicht vor deren Beginn liegen.")
 public record ProjektRequestDTO(
         @NotNull @Size(min = 1, max = 20) String projektnummer,
+        @Size(max = 255) String projektname,
         @NotNull LocalDate abrechnungBeginn,
         @NotNull LocalDate abrechnungEnde,
         @NotEmpty List<@Valid ProjektAdresseRequestDTO> adressen) {

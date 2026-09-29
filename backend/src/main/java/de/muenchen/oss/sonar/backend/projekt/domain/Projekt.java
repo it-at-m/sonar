@@ -9,6 +9,7 @@ import java.util.UUID;
 public record Projekt(
         UUID id,
         String projektnummer,
+        String projektname,
         LocalDate abrechnungBeginn,
         LocalDate abrechnungEnde,
         List<ProjektAdresse> adressen) {

@@ -7,6 +7,7 @@ import java.util.UUID;
 public record ProjektResponseDTO(
         UUID id,
         String projektnummer,
+        String projektname,
         LocalDate abrechnungBeginn,
         LocalDate abrechnungEnde,
         List<ProjektAdresseResponseDTO> adressen) {

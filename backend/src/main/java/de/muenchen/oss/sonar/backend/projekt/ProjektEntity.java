@@ -35,6 +35,8 @@ public class ProjektEntity extends BaseEntity {
     @Column(nullable = false, length = 20)
     @NotNull @Size(min = 1, max = 20) private String projektnummer;
 
+    @Size(max = 255) private String projektname;
+
     @Column(nullable = false)
     @NotNull private LocalDate abrechnungBeginn;
 

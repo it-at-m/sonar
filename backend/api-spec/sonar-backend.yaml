@@ -439,17 +439,15 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
-  /projekt/{projektId}/abrechnung/{abrechnungId}/berechnung:
+  /projekt/{projektId}/abrechnung/{abrechnungId}/calculate:
     post:
       tags:
-      - berechnung-controller
-      summary: Run the Berechnung of an Abrechnung.
+      - abrechnung-controller
+      summary: Calculate an Abrechnung.
       description: |-
-        Run the Berechnung of an Abrechnung.
-         The Berechnung runs on the stored Nutzungsobjekte and Positionen of the Abrechnung, so the call
-         needs nothing beyond the two ids.
-         The result is not persisted yet and only reaches the application log.
-      operationId: berechnungDurchfuehren
+        Calculate an Abrechnung.
+         The calculation runs on the stored Nutzungsobjekte and Positionen of the Abrechnung
+      operationId: calculate
       parameters:
       - name: projektId
         in: path
@@ -460,7 +458,7 @@ paths:
           format: uuid
       - name: abrechnungId
         in: path
-        description: the UUID of the Abrechnung to run the Berechnung of
+        description: the UUID of the Abrechnung to calculate
         required: true
         schema:
           type: string
@@ -832,6 +830,10 @@ components:
           maxLength: 20
           minLength: 1
           type: string
+        projektname:
+          maxLength: 255
+          minLength: 0
+          type: string
         abrechnungBeginn:
           type: string
           format: date
@@ -891,6 +893,8 @@ components:
           type: string
           format: uuid
         projektnummer:
+          type: string
+        projektname:
           type: string
         abrechnungBeginn:
           type: string
@@ -968,6 +972,10 @@ components:
       - laenge
       type: object
       properties:
+        bezeichnung:
+          maxLength: 255
+          minLength: 0
+          type: string
         beginn:
           type: string
           format: date
@@ -983,8 +991,6 @@ components:
           exclusiveMinimum: true
           type: number
         flaeche:
-          minimum: 0
-          exclusiveMinimum: true
           type: number
         haelfte:
           type: boolean
@@ -1048,6 +1054,10 @@ components:
           enum:
           - ENDABRECHNUNG
           - ZWISCHENABRECHNUNG
+        verwaltungsgebuehr:
+          minimum: 0
+          exclusiveMinimum: false
+          type: number
         nutzungsobjekte:
           minItems: 1
           type: array
@@ -1106,6 +1116,8 @@ components:
         id:
           type: string
           format: uuid
+        bezeichnung:
+          type: string
         beginn:
           type: string
           format: date
@@ -1180,6 +1192,8 @@ components:
           enum:
           - ENDABRECHNUNG
           - ZWISCHENABRECHNUNG
+        verwaltungsgebuehr:
+          type: number
         widerspruchVorhanden:
           type: boolean
         neuereVersionVorhanden:

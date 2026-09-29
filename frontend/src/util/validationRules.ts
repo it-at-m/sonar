@@ -26,6 +26,10 @@ export function greaterThanZeroRule(value: unknown): boolean | string {
   );
 }
 
+export function notZeroRule(value: unknown): boolean | string {
+  return isEmpty(value) || Number(value) !== 0 || "Der Wert darf nicht 0 sein.";
+}
+
 function isEmpty(value: unknown): boolean {
   return value === null || value === undefined || value === "";
 }

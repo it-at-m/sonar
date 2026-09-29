@@ -1,12 +1,14 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
 import de.muenchen.oss.sonar.backend.common.BaseEntity;
+import de.muenchen.oss.sonar.backend.common.NotZero;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import lombok.Getter;
@@ -24,6 +26,9 @@ public class AbrechnungPositionEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
 
+    /** The name the Fläche appears under in the Bescheiddaten, for example "F1". */
+    @Size(max = 255) private String bezeichnung;
+
     @Column(nullable = false)
     @NotNull private LocalDate beginn;
 
@@ -37,7 +42,8 @@ public class AbrechnungPositionEntity extends BaseEntity {
     @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal breite;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal flaeche;
+    @NotNull @NotZero
+    @Digits(integer = 10, fraction = 2) private BigDecimal flaeche;
 
     @Column(nullable = false)
     private boolean haelfte;

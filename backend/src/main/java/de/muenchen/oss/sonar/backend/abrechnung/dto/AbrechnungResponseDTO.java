@@ -2,6 +2,7 @@ package de.muenchen.oss.sonar.backend.abrechnung.dto;
 
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungsArt;
 import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -18,6 +19,7 @@ public record AbrechnungResponseDTO(
         LocalDate zeitraumVon,
         LocalDate zeitraumBis,
         AbrechnungsArt abrechnungsArt,
+        BigDecimal verwaltungsgebuehr,
         boolean widerspruchVorhanden,
         boolean neuereVersionVorhanden,
         List<AbrechnungNutzungsobjektResponseDTO> nutzungsobjekte) {

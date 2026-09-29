@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungDTOMapper;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
+import de.muenchen.oss.sonar.backend.berechnung.BerechnungService;
 import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfiguration;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.Explode;
@@ -42,6 +43,7 @@ public class AbrechnungController {
     private static final String STATUS_NOT_FOUND = "404";
 
     private final AbrechnungService abrechnungService;
+    private final BerechnungService berechnungService;
     private final AbrechnungDTOMapper abrechnungDTOMapper;
 
     /**
@@ -149,6 +151,21 @@ public class AbrechnungController {
             @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
         return abrechnungDTOMapper.toDTO(abrechnungService.createNextVersion(abrechnungId,
                 abrechnungDTOMapper.toAbrechnung(projektId, abrechnungRequestDTO)));
+    }
+
+    /**
+     * Calculate an Abrechnung.
+     * The calculation runs on the stored Nutzungsobjekte and Positionen of the Abrechnung
+     *
+     * @param projektId the UUID of the Projekt the Abrechnung belongs to
+     * @param abrechnungId the UUID of the Abrechnung to calculate
+     */
+    @PostMapping("/{abrechnungId}/calculate")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    public void calculate(@PathVariable(PROJEKT_ID) final UUID projektId,
+            @PathVariable("abrechnungId") final UUID abrechnungId) {
+        berechnungService.calculate(projektId, abrechnungId);
     }
 
 }

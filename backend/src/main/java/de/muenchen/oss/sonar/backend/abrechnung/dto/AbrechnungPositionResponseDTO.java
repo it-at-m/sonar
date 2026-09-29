@@ -6,6 +6,7 @@ import java.util.UUID;
 
 public record AbrechnungPositionResponseDTO(
         UUID id,
+        String bezeichnung,
         LocalDate beginn,
         LocalDate ende,
         BigDecimal laenge,
