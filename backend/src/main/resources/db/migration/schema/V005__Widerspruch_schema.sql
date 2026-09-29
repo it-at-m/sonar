@@ -1,6 +1,5 @@
 create table widerspruch (
     id uuid not null,
-    abrechnung_id uuid not null,
     datum_eingang date not null,
     datum_ruecknahme date,
     datum_vorlage_regierung date,
@@ -12,10 +11,13 @@ create table widerspruch (
     primary key (id)
 );
 
-alter table widerspruch
-    add constraint fk_widerspruch__abrechnung_id
-    foreign key (abrechnung_id) references abrechnung (id);
+alter table abrechnung
+    add column widerspruch_id uuid;
 
-alter table widerspruch
-    add constraint uq_widerspruch__abrechnung_id
-    unique (abrechnung_id);
+alter table abrechnung
+    add constraint fk_abrechnung__widerspruch_id
+    foreign key (widerspruch_id) references widerspruch (id);
+
+alter table abrechnung
+    add constraint uq_abrechnung__widerspruch_id
+    unique (widerspruch_id);

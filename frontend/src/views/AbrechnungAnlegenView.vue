@@ -61,7 +61,7 @@
 
 <script setup lang="ts">
 import type { AbrechnungResponseDTO } from "@/api/generated/sonar-backend";
-import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
+import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiArrowLeft } from "@mdi/js";
 import { computed, nextTick, onMounted, ref, useTemplateRef } from "vue";
@@ -81,9 +81,9 @@ import { useSnackbarStore } from "@/stores/snackbar";
 import {
   toAbrechnungForm,
   toAbrechnungRequestDTO,
-} from "@/util/abrechnungMapper";
-import { nutzungsobjektOfError } from "@/util/abrechnungTabs";
-import { fetchProjektAdresseSuggestions } from "@/util/projektAdresseSuggestion";
+} from "@/util/abrechnung/abrechnungMapper";
+import { nutzungsobjektOfError } from "@/util/abrechnung/abrechnungTabs";
+import { fetchProjektAdresseSuggestions } from "@/util/projekt/projektAdresseSuggestion";
 
 const { projektId, vorgaengerAbrechnungId = undefined } = defineProps<{
   projektId: string;

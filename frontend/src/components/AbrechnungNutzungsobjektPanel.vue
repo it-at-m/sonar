@@ -75,8 +75,8 @@
 </template>
 
 <script setup lang="ts">
-import type { AbrechnungNutzungsobjektForm } from "@/types/AbrechnungNutzungsobjektForm";
-import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
+import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/AbrechnungNutzungsobjektForm";
+import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiContentCopy, mdiDelete } from "@mdi/js";
 
@@ -87,7 +87,7 @@ import {
   applyProjektAdresseSuggestion,
   projektAdresseSuggestionSubtitle,
   projektAdresseSuggestionTitle,
-} from "@/util/projektAdresseSuggestion";
+} from "@/util/projekt/projektAdresseSuggestion";
 
 const nutzungsobjekt = defineModel<AbrechnungNutzungsobjektForm>({
   required: true,

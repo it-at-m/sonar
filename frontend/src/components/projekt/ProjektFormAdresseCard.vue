@@ -56,14 +56,14 @@
 </template>
 
 <script setup lang="ts">
-import type { ProjektAdresseForm } from "@/types/ProjektAdresseForm";
+import type { ProjektAdresseForm } from "@/types/projekt/ProjektAdresseForm";
 
 import { mdiDelete } from "@mdi/js";
 import { computed } from "vue";
 
 import AdresseFields from "@/components/common/AdresseFields.vue";
 import UnerlaubteNutzungFields from "@/components/common/UnerlaubteNutzungFields.vue";
-import { adresseLabel } from "@/util/adresseLabel";
+import { adresseLabel } from "@/util/common/adresseLabel";
 import { requiredRule } from "@/util/validationRules";
 
 const adresse = defineModel<ProjektAdresseForm>({ required: true });

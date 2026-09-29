@@ -1,12 +1,12 @@
-import type { ProjektFilter } from "@/types/ProjektFilter";
-import type { ProjektSort } from "@/types/ProjektSort";
-import type { ProjektTableRow } from "@/types/ProjektTableRow";
+import type { ProjektFilter } from "@/types/projekt/ProjektFilter";
+import type { ProjektSort } from "@/types/projekt/ProjektSort";
+import type { ProjektTableRow } from "@/types/projekt/ProjektTableRow";
 
 import { ref } from "vue";
 
 import { ApiFactory } from "@/api/ApiFactory";
 import { ProjektControllerApi } from "@/api/generated/sonar-backend";
-import { toProjektTableRow } from "@/util/projektTableRowMapper";
+import { toProjektTableRow } from "@/util/projekt/projektTableRowMapper";
 
 export function useProjekteListe() {
   const rows = ref<ProjektTableRow[]>([]);

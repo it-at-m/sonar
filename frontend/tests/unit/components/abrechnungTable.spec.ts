@@ -1,4 +1,4 @@
-import type { AbrechnungTableRow } from "@/types/AbrechnungTableRow";
+import type { AbrechnungTableRow } from "@/types/abrechnung/AbrechnungTableRow";
 
 import { mdiChatAlert, mdiChatPlus, mdiFileDocumentPlus } from "@mdi/js";
 import { mount } from "@vue/test-utils";
@@ -30,6 +30,12 @@ function widerspruchButton(wrapper: ReturnType<typeof mountTable>) {
 
 function widerspruchIconPath(wrapper: ReturnType<typeof mountTable>) {
   return widerspruchButton(wrapper).find(".v-icon path").attributes("d");
+}
+
+function widerspruchButtonComponent(wrapper: ReturnType<typeof mountTable>) {
+  return wrapper
+    .findAllComponents({ name: "VBtn" })
+    .find((button) => button.attributes("aria-label")?.includes("Widerspruch"));
 }
 
 function neueVersionButton(wrapper: ReturnType<typeof mountTable>) {
@@ -115,6 +121,9 @@ describe("AbrechnungTable.vue", () => {
     expect(button.attributes("aria-label")).toBe(
       "Widerspruch zu Abrechnung 1000000001 anlegen"
     );
+    expect(widerspruchButtonComponent(wrapper)?.props("to")).toBe(
+      `/projekte/${PROJEKT_ID}/abrechnungen/123e4567-e89b-12d3-a456-426614174001/widerspruch/anlegen`
+    );
   });
 
   it("givenAbrechnungWithWiderspruch_thenDisableTheButton", () => {
@@ -132,6 +141,40 @@ describe("AbrechnungTable.vue", () => {
     ]);
 
     expect(widerspruchButton(wrapper).classes()).toContain("v-btn--disabled");
+  });
+
+  it("givenAbrechnungWithWiderspruch_thenTheButtonLeadsNowhere", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: true,
+      },
+    ]);
+
+    expect(widerspruchButtonComponent(wrapper)?.props("to")).toBeUndefined();
+  });
+
+  it("givenAbrechnungWithWiderspruch_thenTheLabelSaysVorhanden", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: true,
+      },
+    ]);
+
+    expect(widerspruchButton(wrapper).attributes("aria-label")).toBe(
+      "Widerspruch zu Abrechnung 1000000001 vorhanden"
+    );
   });
 
   it("givenAbrechnungWithoutWiderspruch_thenTheButtonCarriesTheAnlegenIcon", () => {

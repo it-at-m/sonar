@@ -1,5 +1,5 @@
-import type { AbrechnungNutzungsobjektForm } from "@/types/AbrechnungNutzungsobjektForm";
-import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
+import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/AbrechnungNutzungsobjektForm";
+import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
@@ -10,7 +10,7 @@ import {
 } from "@/api/generated/sonar-backend";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import AbrechnungPositionenTable from "@/components/AbrechnungPositionenTable.vue";
-import { createAbrechnungNutzungsobjekt } from "@/util/abrechnungNutzungsobjektForm";
+import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 
 const SUGGESTION: ProjektAdresseSuggestion = {
   art: ProjektAdresseRequestDTOArtEnum.ADRESSE,

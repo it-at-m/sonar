@@ -9,6 +9,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
+import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -33,9 +34,11 @@ class AbrechnungDTOMapperTest {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     VON, BIS, null, "Bemerkung", List.of(position));
+            final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), LocalDate.of(2026, 4, 1), null, null,
+                    null, null, false, false, null);
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 2, null, "1000000001", true,
                     "2000000002", ZustellungsbevollmaechtigterTyp.VORMUND, VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG,
-                    true, true, List.of(nutzungsobjekt));
+                    widerspruch, true, List.of(nutzungsobjekt));
 
             final AbrechnungResponseDTO result = abrechnungDTOMapper.toDTO(abrechnung);
 
@@ -92,7 +95,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.id()).isNull();
             assertThat(result.projektId()).isEqualTo(projektId);
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
-            assertThat(result.widerspruchVorhanden()).isFalse();
+            assertThat(result.isWiderspruchVorhanden()).isFalse();
             assertThat(result.neuereVersionVorhanden()).isFalse();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 

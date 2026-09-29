@@ -46,7 +46,7 @@ public class WiderspruchController {
     public WiderspruchResponseDTO saveWiderspruch(@PathVariable("abrechnungId") final UUID abrechnungId,
             @Valid @RequestBody final WiderspruchRequestDTO widerspruchRequestDTO) {
         return widerspruchDTOMapper.toDTO(
-                widerspruchService.createWiderspruch(widerspruchDTOMapper.toWiderspruch(abrechnungId, widerspruchRequestDTO)));
+                widerspruchService.createWiderspruch(abrechnungId, widerspruchDTOMapper.toWiderspruch(widerspruchRequestDTO)));
     }
 
 }

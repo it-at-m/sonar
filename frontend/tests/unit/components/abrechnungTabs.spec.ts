@@ -7,7 +7,7 @@ import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
 import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
 import AbrechnungTabs from "@/components/AbrechnungTabs.vue";
 import vuetify from "@/plugins/vuetify";
-import { TABS } from "@/util/abrechnungTabs";
+import { TABS } from "@/util/abrechnung/abrechnungTabs";
 
 function mountTabs(
   abrechnung: AbrechnungForm,

@@ -63,7 +63,7 @@ import AbrechnungTabs from "@/components/AbrechnungTabs.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
-import { toAbrechnungForm } from "@/util/abrechnungMapper";
+import { toAbrechnungForm } from "@/util/abrechnung/abrechnungMapper";
 
 const { abrechnungId, projektId } = defineProps<{
   projektId: string;

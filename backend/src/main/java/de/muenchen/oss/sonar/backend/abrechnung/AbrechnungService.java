@@ -7,12 +7,9 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
-import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchService;
-import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -39,7 +36,6 @@ public class AbrechnungService {
 
     private final AbrechnungRepository abrechnungRepository;
     private final ProjektService projektService;
-    private final WiderspruchService widerspruchService;
     private final AbrechnungEntityMapper abrechnungEntityMapper;
 
     @Transactional(readOnly = true)
@@ -51,12 +47,9 @@ public class AbrechnungService {
         final Sort sort = resolveSortWithInputOrDefaults(sortBy, directions);
         log.info("Get Abrechnungen of Projekt {} at Page {} with a PageSize of {} ordered by {}", projektId, pageNumber, pageSize, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-        final Page<AbrechnungEntity> page = abrechnungRepository.findNewestVersionsByProjektId(projektId, pageRequest);
-        final Map<UUID, Widerspruch> widerspruecheByAbrechnungId = widerspruchService.getWiderspruecheOfAbrechnungen(
-                page.getContent().stream().map(AbrechnungEntity::getId).toList());
         // The page holds the newest version of each Abrechnung, so none of them has a newer one.
-        return page.map(abrechnungEntity -> abrechnungEntityMapper.toAbrechnung(abrechnungEntity,
-                widerspruecheByAbrechnungId.containsKey(abrechnungEntity.getId()), false));
+        return abrechnungRepository.findNewestVersionsByProjektId(projektId, pageRequest)
+                .map(abrechnungEntity -> abrechnungEntityMapper.toAbrechnung(abrechnungEntity, false));
     }
 
     @Transactional(readOnly = true)
@@ -64,9 +57,7 @@ public class AbrechnungService {
         log.info("Get Abrechnung {} of Projekt {}", abrechnungId, projektId);
         final AbrechnungEntity abrechnungEntity = abrechnungRepository.findByIdAndProjektId(abrechnungId, projektId)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, abrechnungId)));
-        return abrechnungEntityMapper.toAbrechnung(abrechnungEntity,
-                widerspruchService.getWiderspruchOfAbrechnung(abrechnungId).isPresent(),
-                abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId));
+        return abrechnungEntityMapper.toAbrechnung(abrechnungEntity, abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId));
     }
 
     @Transactional
@@ -77,8 +68,7 @@ public class AbrechnungService {
         final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
         abrechnungEntity.setVersionsnummer(FIRST_VERSION_NUMBER);
         log.debug("Create Abrechnung {}", abrechnungEntity);
-        // A Widerspruch is filed against an existing Abrechnung, so a new one never carries one.
-        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(abrechnungEntity), false, false);
+        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(abrechnungEntity), false);
     }
 
     /**
@@ -96,8 +86,7 @@ public class AbrechnungService {
         nextVersion.setVersionsnummer(vorgaenger.getVersionsnummer() + 1);
         nextVersion.setVorgaengerAbrechnungId(vorgaengerAbrechnungId);
         log.debug("Create next version of Abrechnung {}: {}", vorgaengerAbrechnungId, nextVersion);
-        // A Widerspruch is filed against an existing Abrechnung, and the new version is the latest one.
-        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(nextVersion), false, false);
+        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(nextVersion), false);
     }
 
     private Sort resolveSortWithInputOrDefaults(final List<AbrechnungSortBy> sortBy, final List<Sort.Direction> directions) {

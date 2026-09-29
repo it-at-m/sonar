@@ -32,14 +32,14 @@
 </template>
 
 <script setup lang="ts">
-import type { AbrechnungForm } from "@/composables/abrechnungForm";
-import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
+import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
+import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { ref, useTemplateRef } from "vue";
 
 import AbrechnungBasisinformationen from "@/components/AbrechnungBasisinformationen.vue";
 import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
-import { tabOfError, TABS } from "@/util/abrechnungTabs";
+import { tabOfError, TABS } from "@/util/abrechnung/abrechnungTabs";
 
 const abrechnung = defineModel<AbrechnungForm>({ required: true });
 

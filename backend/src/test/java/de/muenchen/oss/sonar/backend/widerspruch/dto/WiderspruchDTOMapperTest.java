@@ -20,15 +20,13 @@ class WiderspruchDTOMapperTest {
         @Test
         void givenWiderspruch_thenReturnsCorrectDTO() {
             final UUID widerspruchId = UUID.randomUUID();
-            final UUID abrechnungId = UUID.randomUUID();
-            final Widerspruch widerspruch = new Widerspruch(widerspruchId, abrechnungId, EINGANG,
+            final Widerspruch widerspruch = new Widerspruch(widerspruchId, EINGANG,
                     LocalDate.of(2026, 4, 15), LocalDate.of(2026, 5, 1), LocalDate.of(2026, 6, 1),
                     "Abrechnung wird durchgeführt", true, false, "Bemerkung");
 
             final WiderspruchResponseDTO result = widerspruchDTOMapper.toDTO(widerspruch);
 
             assertThat(result.id()).isEqualTo(widerspruchId);
-            assertThat(result.abrechnungId()).isEqualTo(abrechnungId);
             assertThat(result.datumEingang()).isEqualTo(EINGANG);
             assertThat(result.datumRuecknahme()).isEqualTo(LocalDate.of(2026, 4, 15));
             assertThat(result.datumVorlageRegierung()).isEqualTo(LocalDate.of(2026, 5, 1));
@@ -43,16 +41,14 @@ class WiderspruchDTOMapperTest {
     @Nested
     class ToWiderspruch {
         @Test
-        void givenRequestDTO_thenTakeTheAbrechnungFromThePath() {
-            final UUID abrechnungId = UUID.randomUUID();
+        void givenRequestDTO_thenLeaveTheIdUnsetAndKeepTheRest() {
             final WiderspruchRequestDTO requestDTO = new WiderspruchRequestDTO(EINGANG, LocalDate.of(2026, 4, 15),
                     LocalDate.of(2026, 5, 1), LocalDate.of(2026, 6, 1), "Abrechnung wird durchgeführt", true, true,
                     "Bemerkung");
 
-            final Widerspruch result = widerspruchDTOMapper.toWiderspruch(abrechnungId, requestDTO);
+            final Widerspruch result = widerspruchDTOMapper.toWiderspruch(requestDTO);
 
             assertThat(result.id()).isNull();
-            assertThat(result.abrechnungId()).isEqualTo(abrechnungId);
             assertThat(result.datumEingang()).isEqualTo(EINGANG);
             assertThat(result.datumRuecknahme()).isEqualTo(LocalDate.of(2026, 4, 15));
             assertThat(result.datumVorlageRegierung()).isEqualTo(LocalDate.of(2026, 5, 1));
@@ -65,11 +61,10 @@ class WiderspruchDTOMapperTest {
 
         @Test
         void givenOnlyDatumEingang_thenLeaveTheOptionalFieldsEmpty() {
-            final UUID abrechnungId = UUID.randomUUID();
             final WiderspruchRequestDTO requestDTO = new WiderspruchRequestDTO(EINGANG, null, null, null, null, false,
                     false, null);
 
-            final Widerspruch result = widerspruchDTOMapper.toWiderspruch(abrechnungId, requestDTO);
+            final Widerspruch result = widerspruchDTOMapper.toWiderspruch(requestDTO);
 
             assertThat(result.datumEingang()).isEqualTo(EINGANG);
             assertThat(result.datumRuecknahme()).isNull();

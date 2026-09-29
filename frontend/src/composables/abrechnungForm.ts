@@ -1,26 +1,11 @@
-import type {
-  AbrechnungRequestDTOAbrechnungsArtEnum,
-  AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum,
-} from "@/api/generated/sonar-backend";
-import type { AbrechnungNutzungsobjektForm } from "@/types/AbrechnungNutzungsobjektForm";
+import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
 
 import { ref, watch } from "vue";
 
 import {
   createAbrechnungNutzungsobjekt,
   isAbrechnungNutzungsobjektDirty,
-} from "@/util/abrechnungNutzungsobjektForm";
-
-export interface AbrechnungForm {
-  geschaeftspartnerId: string;
-  zustellungsbevollmaechtigterGenutzt: boolean;
-  zustellungsbevollmaechtigterId: string;
-  zustellungsbevollmaechtigterTyp: AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum | null;
-  zeitraumVon: string;
-  zeitraumBis: string;
-  abrechnungsArt: AbrechnungRequestDTOAbrechnungsArtEnum | null;
-  nutzungsobjekte: AbrechnungNutzungsobjektForm[];
-}
+} from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 
 export function useAbrechnungForm() {
   const abrechnung = ref<AbrechnungForm>({

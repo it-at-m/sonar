@@ -87,8 +87,8 @@ import { useTemplateRef } from "vue";
 
 import ProjektFormAdresseCard from "@/components/projekt/ProjektFormAdresseCard.vue";
 import { useProjektForm } from "@/composables/projektForm";
-import { toProjektRequestDTO } from "@/util/projektMapper";
-import { abrechnungEndeRule } from "@/util/projektRules";
+import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
+import { abrechnungEndeRule } from "@/util/projekt/projektRules";
 import { requiredRule } from "@/util/validationRules";
 
 defineProps<{ saving: boolean }>();

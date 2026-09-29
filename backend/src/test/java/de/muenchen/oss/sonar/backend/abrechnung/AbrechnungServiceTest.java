@@ -3,7 +3,6 @@ package de.muenchen.oss.sonar.backend.abrechnung;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -18,13 +17,11 @@ import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
-import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchService;
-import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
+import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchEntity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
@@ -56,9 +53,6 @@ class AbrechnungServiceTest {
 
     @Mock
     private ProjektService projektService;
-
-    @Mock
-    private WiderspruchService widerspruchService;
 
     @Spy
     private final AbrechnungEntityMapper abrechnungEntityMapper = Mappers.getMapper(AbrechnungEntityMapper.class);
@@ -144,7 +138,6 @@ class AbrechnungServiceTest {
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNewestVersionsByProjektId(PROJEKT_ID, pageRequest))
                     .thenReturn(new PageImpl<>(abrechnungen, pageRequest, abrechnungen.size()));
-            when(widerspruchService.getWiderspruecheOfAbrechnungen(anyCollection())).thenReturn(Map.of());
 
             final Page<Abrechnung> result = unitUnderTest.getAbrechnungenOfProjekt(PROJEKT_ID, 0, 10, null, null);
 
@@ -175,15 +168,19 @@ class AbrechnungServiceTest {
             adressdaten.setHausnummerVon("8");
             adressdaten.setNutzung(Nutzung.NUTZUNG_A);
 
-            final UUID mitWiderspruchId = UUID.randomUUID();
             final AbrechnungEntity mitWiderspruch = new AbrechnungEntity();
-            mitWiderspruch.setId(mitWiderspruchId);
+            mitWiderspruch.setId(UUID.randomUUID());
             mitWiderspruch.setProjektId(PROJEKT_ID);
             mitWiderspruch.setGeschaeftspartnerId("1000000001");
             mitWiderspruch.setZeitraumVon(VON);
             mitWiderspruch.setZeitraumBis(BIS);
             mitWiderspruch.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
             mitWiderspruch.addNutzungsobjekt(nutzungsobjekt);
+
+            final WiderspruchEntity widerspruch = new WiderspruchEntity();
+            widerspruch.setId(UUID.randomUUID());
+            widerspruch.setDatumEingang(LocalDate.of(2026, 4, 1));
+            mitWiderspruch.setWiderspruch(widerspruch);
 
             final AbrechnungPositionEntity anderePosition = new AbrechnungPositionEntity();
             anderePosition.setBeginn(VON);
@@ -218,14 +215,10 @@ class AbrechnungServiceTest {
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNewestVersionsByProjektId(PROJEKT_ID, pageRequest))
                     .thenReturn(new PageImpl<>(abrechnungen, pageRequest, abrechnungen.size()));
-            final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), mitWiderspruchId,
-                    LocalDate.of(2026, 4, 1), null, null, null, null, false, false, null);
-            when(widerspruchService.getWiderspruecheOfAbrechnungen(anyCollection()))
-                    .thenReturn(Map.of(mitWiderspruchId, widerspruch));
 
             final Page<Abrechnung> result = unitUnderTest.getAbrechnungenOfProjekt(PROJEKT_ID, 0, 10, null, null);
 
-            assertThat(result.getContent()).extracting(Abrechnung::widerspruchVorhanden).containsExactly(true, false);
+            assertThat(result.getContent()).extracting(Abrechnung::isWiderspruchVorhanden).containsExactly(true, false);
         }
 
         @Test
@@ -266,7 +259,6 @@ class AbrechnungServiceTest {
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNewestVersionsByProjektId(PROJEKT_ID, pageRequest))
                     .thenReturn(new PageImpl<>(abrechnungen, pageRequest, abrechnungen.size()));
-            when(widerspruchService.getWiderspruecheOfAbrechnungen(anyCollection())).thenReturn(Map.of());
 
             final Page<Abrechnung> result = unitUnderTest.getAbrechnungenOfProjekt(PROJEKT_ID, 0, 10, null, null);
 
@@ -407,7 +399,7 @@ class AbrechnungServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
                     VON, BIS, null, "Bemerkung", List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, false, false, List.of(nutzungsobjekt));
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final UUID savedId = UUID.randomUUID();
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
@@ -441,7 +433,7 @@ class AbrechnungServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
                     null, null, null, null, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, false, false, List.of(nutzungsobjekt));
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
@@ -463,7 +455,7 @@ class AbrechnungServiceTest {
         @Test
         void givenUnknownProjekt_thenThrowNotFound() {
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, false, false, List.of());
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(false);
 
             assertThatThrownBy(() -> unitUnderTest.createAbrechnung(abrechnung))
@@ -506,7 +498,6 @@ class AbrechnungServiceTest {
             abrechnung.addNutzungsobjekt(nutzungsobjekt);
 
             when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
-            when(widerspruchService.getWiderspruchOfAbrechnung(abrechnungId)).thenReturn(Optional.empty());
             when(abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId)).thenReturn(false);
 
             final Abrechnung result = unitUnderTest.getAbrechnung(PROJEKT_ID, abrechnungId);
@@ -550,7 +541,6 @@ class AbrechnungServiceTest {
             abrechnung.addNutzungsobjekt(nutzungsobjekt);
 
             when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
-            when(widerspruchService.getWiderspruchOfAbrechnung(abrechnungId)).thenReturn(Optional.empty());
             when(abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId)).thenReturn(true);
 
             assertThat(unitUnderTest.getAbrechnung(PROJEKT_ID, abrechnungId).neuereVersionVorhanden()).isTrue();
@@ -587,7 +577,7 @@ class AbrechnungServiceTest {
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_A,
                     null, null, null, null, List.of(position));
             final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000002", false, null, null,
-                    VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, false, false, List.of(nutzungsobjekt));
+                    VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final UUID savedId = UUID.randomUUID();
             when(abrechnungRepository.findByIdAndProjektId(vorgaengerId, PROJEKT_ID)).thenReturn(Optional.of(vorgaenger));
@@ -628,7 +618,7 @@ class AbrechnungServiceTest {
             vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
 
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, false, false, List.of());
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
 
             when(abrechnungRepository.findByIdAndProjektId(vorgaengerId, PROJEKT_ID)).thenReturn(Optional.of(vorgaenger));
             when(abrechnungRepository.existsByVorgaengerAbrechnungId(vorgaengerId)).thenReturn(true);
@@ -643,7 +633,7 @@ class AbrechnungServiceTest {
         void givenVorgaengerOfAnotherProjekt_thenThrowNotFound() {
             final UUID vorgaengerId = UUID.randomUUID();
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, false, false, List.of());
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
             when(abrechnungRepository.findByIdAndProjektId(vorgaengerId, PROJEKT_ID)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> unitUnderTest.createNextVersion(vorgaengerId, abrechnung))

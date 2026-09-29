@@ -1,14 +1,14 @@
-import type { Projekt } from "@/types/Projekt";
+import type { ProjektForm } from "@/types/projekt/ProjektForm";
 
 import { reactive } from "vue";
 
 import {
   createProjektAdresse,
   isProjektAdresseDirty,
-} from "@/util/projektAdresseForm";
+} from "@/util/projekt/projektAdresseForm";
 
 export function useProjektForm() {
-  const projekt = reactive<Projekt>({
+  const projekt = reactive<ProjektForm>({
     projektnummer: "",
     abrechnungBeginn: "",
     abrechnungEnde: "",

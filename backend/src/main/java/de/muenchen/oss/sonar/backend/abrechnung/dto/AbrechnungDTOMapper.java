@@ -16,7 +16,7 @@ public interface AbrechnungDTOMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "versionsnummer", ignore = true)
     @Mapping(target = "vorgaengerAbrechnungId", ignore = true)
-    @Mapping(target = "widerspruchVorhanden", ignore = true)
+    @Mapping(target = "widerspruch", ignore = true)
     @Mapping(target = "neuereVersionVorhanden", ignore = true)
     Abrechnung toAbrechnung(UUID projektId, AbrechnungRequestDTO abrechnungRequestDTO);
 

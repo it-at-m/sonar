@@ -11,15 +11,15 @@ import org.mapstruct.ReportingPolicy;
 @Mapper(collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED, unmappedTargetPolicy = ReportingPolicy.ERROR)
 public interface AbrechnungEntityMapper {
 
-    @Mapping(target = "widerspruchVorhanden", source = "widerspruchVorhanden")
     @Mapping(target = "neuereVersionVorhanden", source = "neuereVersionVorhanden")
-    Abrechnung toAbrechnung(AbrechnungEntity abrechnungEntity, boolean widerspruchVorhanden, boolean neuereVersionVorhanden);
+    Abrechnung toAbrechnung(AbrechnungEntity abrechnungEntity, boolean neuereVersionVorhanden);
 
     /**
      * The place in the chain of versions is left to the service. It follows from the Vorgänger and
      * never from the data that was entered.
      */
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "widerspruch", ignore = true)
     @Mapping(target = "versionsnummer", ignore = true)
     @Mapping(target = "vorgaengerAbrechnungId", ignore = true)
     AbrechnungEntity toEntity(Abrechnung abrechnung);
