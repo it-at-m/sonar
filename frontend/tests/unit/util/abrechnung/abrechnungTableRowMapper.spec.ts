@@ -64,5 +64,22 @@ describe("abrechnungTableRowMapper.ts", () => {
 
       expect(row.anzahlNutzungsobjekte).toBe(0);
     });
+
+    it("givenWiderspruchVorhanden_thenKeepTheFlag", () => {
+      expect(
+        toAbrechnungTableRow({ widerspruchVorhanden: true })
+          .widerspruchVorhanden
+      ).toBe(true);
+      expect(
+        toAbrechnungTableRow({ widerspruchVorhanden: false })
+          .widerspruchVorhanden
+      ).toBe(false);
+    });
+
+    it("givenMissingWiderspruchVorhanden_thenTreatItAsNone", () => {
+      const row = toAbrechnungTableRow({ widerspruchVorhanden: undefined });
+
+      expect(row.widerspruchVorhanden).toBe(false);
+    });
   });
 });

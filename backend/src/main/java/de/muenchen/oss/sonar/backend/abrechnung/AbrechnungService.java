@@ -43,9 +43,7 @@ public class AbrechnungService {
         final Sort sort = resolveSortWithInputOrDefaults(sortBy, directions);
         log.info("Get Abrechnungen of Projekt {} at Page {} with a PageSize of {} ordered by {}", projektId, pageNumber, pageSize, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
-        return abrechnungRepository
-                .findByProjektId(projektId, pageRequest)
-                .map(abrechnungEntityMapper::toAbrechnung);
+        return abrechnungRepository.findByProjektId(projektId, pageRequest).map(abrechnungEntityMapper::toAbrechnung);
     }
 
     @Transactional

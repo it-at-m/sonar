@@ -14,6 +14,7 @@ public interface AbrechnungEntityMapper {
     Abrechnung toAbrechnung(AbrechnungEntity abrechnungEntity);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "widerspruch", ignore = true)
     AbrechnungEntity toEntity(Abrechnung abrechnung);
 
     @Mapping(target = ".", source = "adressdaten")

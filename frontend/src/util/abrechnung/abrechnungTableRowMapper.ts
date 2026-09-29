@@ -18,5 +18,6 @@ export function toAbrechnungTableRow(
       : "",
     abrechnungsArt: abrechnungsArtLabel(abrechnung.abrechnungsArt),
     anzahlNutzungsobjekte: abrechnung.nutzungsobjekte?.length ?? 0,
+    widerspruchVorhanden: abrechnung.widerspruchVorhanden ?? false,
   };
 }

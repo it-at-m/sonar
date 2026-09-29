@@ -1,21 +1,41 @@
+import type { AbrechnungTableRow } from "@/types/abrechnung/AbrechnungTableRow";
+
+import { mdiChatAlert, mdiChatPlus } from "@mdi/js";
 import { mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import AbrechnungTable from "@/components/AbrechnungTable.vue";
 import vuetify from "@/plugins/vuetify";
 
-function mountTable() {
+const PROJEKT_ID = "123e4567-e89b-12d3-a456-426614174000";
+
+function mountTable(rows: AbrechnungTableRow[] = []) {
   return mount(AbrechnungTable, {
     props: {
       page: 1,
       itemsPerPage: 10,
       sortBy: [{ key: "zeitraumVon", order: "desc" as const }],
-      rows: [],
-      totalAbrechnungen: 0,
+      projektId: PROJEKT_ID,
+      rows,
+      totalAbrechnungen: rows.length,
       loading: false,
     },
     global: { plugins: [vuetify] },
   });
+}
+
+function widerspruchButton(wrapper: ReturnType<typeof mountTable>) {
+  return wrapper.find('[aria-label*="Widerspruch"]');
+}
+
+function widerspruchIconPath(wrapper: ReturnType<typeof mountTable>) {
+  return widerspruchButton(wrapper).find(".v-icon path").attributes("d");
+}
+
+function widerspruchButtonComponent(wrapper: ReturnType<typeof mountTable>) {
+  return wrapper
+    .findAllComponents({ name: "VBtn" })
+    .find((button) => button.attributes("aria-label")?.includes("Widerspruch"));
 }
 
 describe("AbrechnungTable.vue", () => {
@@ -59,6 +79,141 @@ describe("AbrechnungTable.vue", () => {
 
     expect(nutzungsobjekte?.classes()).not.toContain(
       "v-data-table__th--sortable"
+    );
+  });
+
+  it("givenWiderspruchColumn_thenItIsNotMarkedSortable", () => {
+    const wrapper = mountTable();
+
+    const widerspruch = wrapper
+      .findAll("th")
+      .find((header) => header.text().startsWith("Widerspruch"));
+
+    expect(widerspruch?.classes()).not.toContain("v-data-table__th--sortable");
+  });
+
+  it("givenAbrechnungWithoutWiderspruch_thenOfferToAnlegenIt", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    const button = widerspruchButton(wrapper);
+
+    expect(button.exists()).toBe(true);
+    expect(button.classes()).not.toContain("v-btn--disabled");
+    expect(button.attributes("aria-label")).toBe(
+      "Widerspruch zu Abrechnung 1000000001 anlegen"
+    );
+    expect(widerspruchButtonComponent(wrapper)?.props("to")).toBe(
+      `/projekte/${PROJEKT_ID}/abrechnungen/123e4567-e89b-12d3-a456-426614174001/widerspruch/anlegen`
+    );
+  });
+
+  it("givenAbrechnungWithWiderspruch_thenDisableTheButton", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: true,
+      },
+    ]);
+
+    expect(widerspruchButton(wrapper).classes()).toContain("v-btn--disabled");
+  });
+
+  it("givenAbrechnungWithWiderspruch_thenTheButtonLeadsNowhere", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: true,
+      },
+    ]);
+
+    expect(widerspruchButtonComponent(wrapper)?.props("to")).toBeUndefined();
+  });
+
+  it("givenAbrechnungWithWiderspruch_thenTheLabelSaysVorhanden", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: true,
+      },
+    ]);
+
+    expect(widerspruchButton(wrapper).attributes("aria-label")).toBe(
+      "Widerspruch zu Abrechnung 1000000001 vorhanden"
+    );
+  });
+
+  it("givenAbrechnungWithoutWiderspruch_thenTheButtonCarriesTheAnlegenIcon", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(widerspruchIconPath(wrapper)).toBe(mdiChatPlus);
+  });
+
+  it("givenAbrechnungWithWiderspruch_thenTheButtonCarriesTheVorhandenIcon", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: true,
+      },
+    ]);
+
+    expect(widerspruchIconPath(wrapper)).toBe(mdiChatAlert);
+  });
+
+  it("givenAbrechnungWithWiderspruch_thenExplainWhyItIsDisabled", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: true,
+      },
+    ]);
+
+    expect(wrapper.findComponent({ name: "VTooltip" }).props("text")).toBe(
+      "Es besteht bereits ein Widerspruch."
     );
   });
 });

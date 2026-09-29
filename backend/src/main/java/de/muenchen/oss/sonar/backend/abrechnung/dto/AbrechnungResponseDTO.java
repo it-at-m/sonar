@@ -16,6 +16,7 @@ public record AbrechnungResponseDTO(
         LocalDate zeitraumVon,
         LocalDate zeitraumBis,
         AbrechnungsArt abrechnungsArt,
+        boolean widerspruchVorhanden,
         List<AbrechnungNutzungsobjektResponseDTO> nutzungsobjekte) {
 
     /**

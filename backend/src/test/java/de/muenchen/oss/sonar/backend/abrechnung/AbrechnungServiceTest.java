@@ -16,6 +16,7 @@ import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchEntity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -95,6 +96,7 @@ class AbrechnungServiceTest {
             ersteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
 
             final AbrechnungEntity ersteAbrechnung = new AbrechnungEntity();
+            ersteAbrechnung.setId(UUID.randomUUID());
             ersteAbrechnung.setProjektId(PROJEKT_ID);
             ersteAbrechnung.setGeschaeftspartnerId("1000000001");
             ersteAbrechnung.setZeitraumVon(VON);
@@ -121,6 +123,7 @@ class AbrechnungServiceTest {
             zweiteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
 
             final AbrechnungEntity zweiteAbrechnung = new AbrechnungEntity();
+            zweiteAbrechnung.setId(UUID.randomUUID());
             zweiteAbrechnung.setProjektId(PROJEKT_ID);
             zweiteAbrechnung.setGeschaeftspartnerId("1000000002");
             zweiteAbrechnung.setZeitraumVon(VON);
@@ -141,6 +144,79 @@ class AbrechnungServiceTest {
             assertThat(result.getContent().getFirst().projektId()).isEqualTo(PROJEKT_ID);
             assertThat(result.getContent().getFirst().abrechnungsArt()).isEqualTo(AbrechnungsArt.ENDABRECHNUNG);
             assertThat(result.getContent().getFirst().nutzungsobjekte()).hasSize(1);
+        }
+
+        @Test
+        void givenOneAbrechnungWithWiderspruch_thenMarkOnlyThatOne() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+            position.setHaelfte(true);
+            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt.addPosition(position);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity mitWiderspruch = new AbrechnungEntity();
+            mitWiderspruch.setId(UUID.randomUUID());
+            mitWiderspruch.setProjektId(PROJEKT_ID);
+            mitWiderspruch.setGeschaeftspartnerId("1000000001");
+            mitWiderspruch.setZeitraumVon(VON);
+            mitWiderspruch.setZeitraumBis(BIS);
+            mitWiderspruch.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            mitWiderspruch.addNutzungsobjekt(nutzungsobjekt);
+
+            final WiderspruchEntity widerspruch = new WiderspruchEntity();
+            widerspruch.setId(UUID.randomUUID());
+            widerspruch.setDatumEingang(LocalDate.of(2026, 4, 1));
+            mitWiderspruch.setWiderspruch(widerspruch);
+
+            final AbrechnungPositionEntity anderePosition = new AbrechnungPositionEntity();
+            anderePosition.setBeginn(VON);
+            anderePosition.setEnde(BIS);
+            anderePosition.setLaenge(new BigDecimal("12.00"));
+            anderePosition.setBreite(new BigDecimal("3.00"));
+            anderePosition.setFlaeche(new BigDecimal("36.00"));
+            anderePosition.setHaelfte(true);
+            anderePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity anderesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            anderesNutzungsobjekt.addPosition(anderePosition);
+
+            final AdressdatenEmbeddable andereAdressdaten = anderesNutzungsobjekt.getAdressdaten();
+            andereAdressdaten.setArt(Adressart.ADRESSE);
+            andereAdressdaten.setAdresse("Sendlinger Straße");
+            andereAdressdaten.setHausnummerVon("1");
+            andereAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity ohneWiderspruch = new AbrechnungEntity();
+            ohneWiderspruch.setId(UUID.randomUUID());
+            ohneWiderspruch.setProjektId(PROJEKT_ID);
+            ohneWiderspruch.setGeschaeftspartnerId("1000000002");
+            ohneWiderspruch.setZeitraumVon(VON);
+            ohneWiderspruch.setZeitraumBis(BIS);
+            ohneWiderspruch.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            ohneWiderspruch.addNutzungsobjekt(anderesNutzungsobjekt);
+
+            final Pageable pageRequest = PageRequest.of(0, 10, DEFAULT_SORT);
+            final List<AbrechnungEntity> abrechnungen = List.of(mitWiderspruch, ohneWiderspruch);
+
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID, pageRequest))
+                    .thenReturn(new PageImpl<>(abrechnungen, pageRequest, abrechnungen.size()));
+
+            final Page<Abrechnung> result = unitUnderTest.getAbrechnungenOfProjekt(PROJEKT_ID, 0, 10, null, null);
+
+            assertThat(result.getContent()).extracting(Abrechnung::isWiderspruchVorhanden).containsExactly(true, false);
         }
 
         @Test
@@ -275,7 +351,7 @@ class AbrechnungServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
                     VON, BIS, null, "Bemerkung", List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+                    AbrechnungsArt.ENDABRECHNUNG, null, List.of(nutzungsobjekt));
 
             final UUID savedId = UUID.randomUUID();
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
@@ -304,7 +380,7 @@ class AbrechnungServiceTest {
         @Test
         void givenUnknownProjekt_thenThrowNotFound() {
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, List.of());
+                    AbrechnungsArt.ENDABRECHNUNG, null, List.of());
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(false);
 
             assertThatThrownBy(() -> unitUnderTest.createAbrechnung(abrechnung))

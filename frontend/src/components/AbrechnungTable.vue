@@ -12,12 +12,32 @@
     item-value="id"
     multi-sort
     no-data-text="Es sind noch keine Abrechnungen angelegt."
-  />
+  >
+    <template #[`item.widerspruch`]="{ item }">
+      <span v-if="item.id">
+        <v-btn
+          :aria-label="widerspruchLabel(item)"
+          density="comfortable"
+          :disabled="item.widerspruchVorhanden"
+          :icon="item.widerspruchVorhanden ? mdiChatAlert : mdiChatPlus"
+          :to="widerspruchAnlegenLink(item)"
+          variant="text"
+        />
+        <v-tooltip
+          v-if="item.widerspruchVorhanden"
+          activator="parent"
+          text="Es besteht bereits ein Widerspruch."
+        />
+      </span>
+    </template>
+  </v-data-table-server>
 </template>
 
 <script setup lang="ts">
 import type { AbrechnungTableRow } from "@/types/abrechnung/AbrechnungTableRow";
 import type { DataTableSortItem } from "@/types/DataTableSortItem";
+
+import { mdiChatAlert, mdiChatPlus } from "@mdi/js";
 
 const HEADERS = [
   { title: "Geschäftspartner:in", key: "geschaeftspartnerId" },
@@ -25,6 +45,7 @@ const HEADERS = [
   { title: "Zeitraum bis", key: "zeitraumBis" },
   { title: "Art", key: "abrechnungsArt" },
   { title: "Nutzungsobjekte", key: "anzahlNutzungsobjekte", sortable: false },
+  { title: "Widerspruch", key: "widerspruch", sortable: false },
 ];
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
@@ -33,11 +54,23 @@ const page = defineModel<number>("page", { required: true });
 const itemsPerPage = defineModel<number>("itemsPerPage", { required: true });
 const sortBy = defineModel<DataTableSortItem[]>("sortBy", { required: true });
 
-defineProps<{
+const props = defineProps<{
+  projektId: string;
   rows: AbrechnungTableRow[];
   totalAbrechnungen: number;
   loading: boolean;
 }>();
+
+function widerspruchLabel(row: AbrechnungTableRow): string {
+  const zustand = row.widerspruchVorhanden ? "vorhanden" : "anlegen";
+  return `Widerspruch zu Abrechnung ${row.geschaeftspartnerId} ${zustand}`;
+}
+
+function widerspruchAnlegenLink(row: AbrechnungTableRow): string | undefined {
+  return row.widerspruchVorhanden
+    ? undefined
+    : `/projekte/${props.projektId}/abrechnungen/${row.id}/widerspruch/anlegen`;
+}
 </script>
 
 <style scoped>

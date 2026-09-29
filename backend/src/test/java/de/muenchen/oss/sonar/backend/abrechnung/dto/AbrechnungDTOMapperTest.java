@@ -9,6 +9,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
+import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -33,9 +34,11 @@ class AbrechnungDTOMapperTest {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     VON, BIS, null, "Bemerkung", List.of(position));
+            final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), LocalDate.of(2026, 4, 1), null, null,
+                    null, null, false, false, null);
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), "1000000001", true,
                     "2000000002", ZustellungsbevollmaechtigterTyp.VORMUND, VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG,
-                    List.of(nutzungsobjekt));
+                    widerspruch, List.of(nutzungsobjekt));
 
             final AbrechnungResponseDTO result = abrechnungDTOMapper.toDTO(abrechnung);
 
@@ -48,6 +51,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.zeitraumVon()).isEqualTo(VON);
             assertThat(result.zeitraumBis()).isEqualTo(BIS);
             assertThat(result.abrechnungsArt()).isEqualTo(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            assertThat(result.widerspruchVorhanden()).isTrue();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjektResponseDTO nutzungsobjektDTO = result.nutzungsobjekte().getFirst();
@@ -89,6 +93,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.id()).isNull();
             assertThat(result.projektId()).isEqualTo(projektId);
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
+            assertThat(result.isWiderspruchVorhanden()).isFalse();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjekt nutzungsobjekt = result.nutzungsobjekte().getFirst();
