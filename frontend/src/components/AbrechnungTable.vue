@@ -14,9 +14,14 @@
     no-data-text="Es sind noch keine Abrechnungen angelegt."
   >
     <template #[`item.ansehen`]="{ item }">
+      <abrechnung-versionen-menu
+        v-if="item.id && item.versionsnummer > 1"
+        :abrechnung-id="item.id"
+        :projekt-id="projektId"
+      />
       <v-btn
-        v-if="item.id"
-        :aria-label="`Abrechnung ${item.geschaeftspartnerId} in Version ${item.versionsnummer} ansehen`"
+        v-else-if="item.id"
+        :aria-label="`Abrechnung ${item.geschaeftspartnerId} ansehen`"
         density="comfortable"
         :icon="mdiEye"
         :to="`/projekte/${projektId}/abrechnungen/${item.id}/ansehen`"
@@ -66,12 +71,13 @@ import {
   mdiFileDocumentPlus,
 } from "@mdi/js";
 
+import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
+
 const HEADERS = [
   { title: "Geschäftspartner:in", key: "geschaeftspartnerId" },
   { title: "Zeitraum von", key: "zeitraumVon" },
   { title: "Zeitraum bis", key: "zeitraumBis" },
   { title: "Art", key: "abrechnungsArt" },
-  { title: "Version", key: "versionsnummer" },
   { title: "Nutzungsobjekte", key: "anzahlNutzungsobjekte", sortable: false },
   { title: "Ansehen", key: "ansehen", sortable: false },
   { title: "Widerspruch", key: "widerspruch", sortable: false },

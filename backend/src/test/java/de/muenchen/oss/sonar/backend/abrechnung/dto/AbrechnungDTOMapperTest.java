@@ -7,6 +7,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
@@ -73,6 +74,16 @@ class AbrechnungDTOMapperTest {
             assertThat(positionDTO.flaeche()).isEqualByComparingTo("36.00");
             assertThat(positionDTO.haelfte()).isTrue();
             assertThat(positionDTO.anteilAnFlaeche()).isEqualByComparingTo("30.00");
+        }
+
+        @Test
+        void givenAbrechnungVersion_thenReturnsCorrectDTO() {
+            final AbrechnungVersion abrechnungVersion = new AbrechnungVersion(UUID.randomUUID(), 2, UUID.randomUUID());
+
+            final AbrechnungVersionResponseDTO result = abrechnungDTOMapper.toDTO(abrechnungVersion);
+
+            assertThat(result.id()).isEqualTo(abrechnungVersion.id());
+            assertThat(result.versionsnummer()).isEqualTo(2);
         }
     }
 

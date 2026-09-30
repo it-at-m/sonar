@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungDTOMapper;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
+import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungVersionResponseDTO;
 import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfiguration;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.Explode;
@@ -106,6 +107,27 @@ public class AbrechnungController {
     public AbrechnungResponseDTO getAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
             @PathVariable("abrechnungId") final UUID abrechnungId) {
         return abrechnungDTOMapper.toDTO(abrechnungService.getAbrechnung(projektId, abrechnungId));
+    }
+
+    /**
+     * Retrieve every version of an Abrechnung.
+     * Any version may be requested and the answer is always the whole chain, so a user who opened an
+     * old version still gets the full list.
+     * The entries are ordered by descending Versionsnummer, so the newest version comes first.
+     * An entry carries only what a version list needs, the UUID and the Versionsnummer.
+     *
+     * @param projektId the UUID of the Projekt the Abrechnung belongs to
+     * @param abrechnungId the UUID of any version of the Abrechnung
+     * @return the versions of the Abrechnung represented as DTOs, newest first
+     */
+    @GetMapping("/{abrechnungId}/version")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    public List<AbrechnungVersionResponseDTO> getAbrechnungVersionen(@PathVariable(PROJEKT_ID) final UUID projektId,
+            @PathVariable("abrechnungId") final UUID abrechnungId) {
+        return abrechnungService.getVersionenOfAbrechnung(projektId, abrechnungId).stream()
+                .map(abrechnungDTOMapper::toDTO)
+                .toList();
     }
 
     /**

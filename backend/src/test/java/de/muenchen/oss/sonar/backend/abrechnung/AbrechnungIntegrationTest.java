@@ -9,6 +9,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungNutzungsobjektRequ
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungPositionRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
+import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungVersionResponseDTO;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
@@ -1177,6 +1178,340 @@ class AbrechnungIntegrationTest {
 
             assertThat(abrechnungRepository.count()).isZero();
         }
+    }
+
+    @Nested
+    class GetAbrechnungVersionen {
+
+        @Test
+        void givenChainOfThreeVersions_thenReturnAllOfThemNewestFirst() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+            position.setHaelfte(true);
+            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt.addPosition(position);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity ersteVersion = new AbrechnungEntity();
+            ersteVersion.setProjektId(projektId);
+            ersteVersion.setVersionsnummer(1);
+            ersteVersion.setGeschaeftspartnerId("1000000001");
+            ersteVersion.setZeitraumVon(VON);
+            ersteVersion.setZeitraumBis(BIS);
+            ersteVersion.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            ersteVersion.addNutzungsobjekt(nutzungsobjekt);
+            final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    null, null, null, null,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                            new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
+            final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
+
+            final UUID zweiteVersionId = restTestClient.post()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(neueVersionDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(AbrechnungResponseDTO.class)
+                    .returnResult().getResponseBody().id();
+
+            final UUID dritteVersionId = restTestClient.post()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, zweiteVersionId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(neueVersionDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(AbrechnungResponseDTO.class)
+                    .returnResult().getResponseBody().id();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, zweiteVersionId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                    .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
+                    })
+                    .value(versionen -> {
+                        assertThat(versionen).extracting(AbrechnungVersionResponseDTO::id)
+                                .containsExactly(dritteVersionId, zweiteVersionId, ersteVersionId);
+                        assertThat(versionen).extracting(AbrechnungVersionResponseDTO::versionsnummer)
+                                .containsExactly(3, 2, 1);
+                    });
+        }
+
+        @Test
+        void givenOldestVersion_thenAlsoReturnTheNewerOnes() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+            position.setHaelfte(true);
+            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt.addPosition(position);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity ersteVersion = new AbrechnungEntity();
+            ersteVersion.setProjektId(projektId);
+            ersteVersion.setVersionsnummer(1);
+            ersteVersion.setGeschaeftspartnerId("1000000001");
+            ersteVersion.setZeitraumVon(VON);
+            ersteVersion.setZeitraumBis(BIS);
+            ersteVersion.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            ersteVersion.addNutzungsobjekt(nutzungsobjekt);
+            final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    null, null, null, null,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                            new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
+            final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
+
+            final UUID zweiteVersionId = restTestClient.post()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(neueVersionDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(AbrechnungResponseDTO.class)
+                    .returnResult().getResponseBody().id();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
+                    })
+                    .value(versionen -> assertThat(versionen).extracting(AbrechnungVersionResponseDTO::id)
+                            .containsExactly(zweiteVersionId, ersteVersionId));
+        }
+
+        @Test
+        void givenAbrechnungWithoutANewerVersion_thenReturnOnlyThatVersion() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+            position.setHaelfte(true);
+            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt.addPosition(position);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity einzigeVersion = new AbrechnungEntity();
+            einzigeVersion.setProjektId(projektId);
+            einzigeVersion.setVersionsnummer(1);
+            einzigeVersion.setGeschaeftspartnerId("1000000001");
+            einzigeVersion.setZeitraumVon(VON);
+            einzigeVersion.setZeitraumBis(BIS);
+            einzigeVersion.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            einzigeVersion.addNutzungsobjekt(nutzungsobjekt);
+            final UUID einzigeVersionId = abrechnungRepository.save(einzigeVersion).getId();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, einzigeVersionId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
+                    })
+                    .value(versionen -> assertThat(versionen).extracting(AbrechnungVersionResponseDTO::id)
+                            .containsExactly(einzigeVersionId));
+        }
+
+        @Test
+        void givenAnotherAbrechnungInTheSameProjekt_thenReturnOnlyItsOwnVersions() {
+            final AbrechnungPositionEntity eigenePosition = new AbrechnungPositionEntity();
+            eigenePosition.setBeginn(VON);
+            eigenePosition.setEnde(BIS);
+            eigenePosition.setLaenge(new BigDecimal("12.00"));
+            eigenePosition.setBreite(new BigDecimal("3.00"));
+            eigenePosition.setFlaeche(new BigDecimal("36.00"));
+            eigenePosition.setHaelfte(true);
+            eigenePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity eigenesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            eigenesNutzungsobjekt.addPosition(eigenePosition);
+
+            final AdressdatenEmbeddable eigeneAdressdaten = eigenesNutzungsobjekt.getAdressdaten();
+            eigeneAdressdaten.setArt(Adressart.ADRESSE);
+            eigeneAdressdaten.setAdresse("Marienplatz");
+            eigeneAdressdaten.setHausnummerVon("8");
+            eigeneAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity eigeneAbrechnung = new AbrechnungEntity();
+            eigeneAbrechnung.setProjektId(projektId);
+            eigeneAbrechnung.setVersionsnummer(1);
+            eigeneAbrechnung.setGeschaeftspartnerId("1000000001");
+            eigeneAbrechnung.setZeitraumVon(VON);
+            eigeneAbrechnung.setZeitraumBis(BIS);
+            eigeneAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            eigeneAbrechnung.addNutzungsobjekt(eigenesNutzungsobjekt);
+            final UUID eigeneAbrechnungId = abrechnungRepository.save(eigeneAbrechnung).getId();
+
+            final AbrechnungPositionEntity fremdePosition = new AbrechnungPositionEntity();
+            fremdePosition.setBeginn(VON);
+            fremdePosition.setEnde(BIS);
+            fremdePosition.setLaenge(new BigDecimal("15.00"));
+            fremdePosition.setBreite(new BigDecimal("3.00"));
+            fremdePosition.setFlaeche(new BigDecimal("45.00"));
+            fremdePosition.setHaelfte(false);
+            fremdePosition.setAnteilAnFlaeche(new BigDecimal("45.00"));
+
+            final AbrechnungNutzungsobjektEntity fremdesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            fremdesNutzungsobjekt.addPosition(fremdePosition);
+
+            final AdressdatenEmbeddable fremdeAdressdaten = fremdesNutzungsobjekt.getAdressdaten();
+            fremdeAdressdaten.setArt(Adressart.ADRESSE);
+            fremdeAdressdaten.setAdresse("Sendlinger Straße");
+            fremdeAdressdaten.setHausnummerVon("1");
+            fremdeAdressdaten.setNutzung(Nutzung.NUTZUNG_B);
+
+            final AbrechnungEntity fremdeAbrechnung = new AbrechnungEntity();
+            fremdeAbrechnung.setProjektId(projektId);
+            fremdeAbrechnung.setVersionsnummer(1);
+            fremdeAbrechnung.setGeschaeftspartnerId("1000000002");
+            fremdeAbrechnung.setZeitraumVon(VON);
+            fremdeAbrechnung.setZeitraumBis(BIS);
+            fremdeAbrechnung.setAbrechnungsArt(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            fremdeAbrechnung.addNutzungsobjekt(fremdesNutzungsobjekt);
+            final UUID fremdeAbrechnungId = abrechnungRepository.save(fremdeAbrechnung).getId();
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    null, null, null, null,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                            new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
+            final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, eigeneAbrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(neueVersionDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, fremdeAbrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
+                    })
+                    .value(versionen -> assertThat(versionen).extracting(AbrechnungVersionResponseDTO::id)
+                            .containsExactly(fremdeAbrechnungId));
+        }
+
+        @Test
+        void givenAbrechnungOfAnotherProjekt_thenReturnNotFound() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+            position.setHaelfte(true);
+            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt.addPosition(position);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity fremdeAbrechnung = new AbrechnungEntity();
+            fremdeAbrechnung.setProjektId(projektId);
+            fremdeAbrechnung.setVersionsnummer(1);
+            fremdeAbrechnung.setGeschaeftspartnerId("1000000001");
+            fremdeAbrechnung.setZeitraumVon(VON);
+            fremdeAbrechnung.setZeitraumBis(BIS);
+            fremdeAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            fremdeAbrechnung.addNutzungsobjekt(nutzungsobjekt);
+            final UUID fremdeAbrechnungId = abrechnungRepository.save(fremdeAbrechnung).getId();
+
+            final ProjektEntity anderesProjekt = new ProjektEntity();
+            anderesProjekt.setProjektnummer("2026-0002");
+            anderesProjekt.setAbrechnungBeginn(VON);
+            anderesProjekt.setAbrechnungEnde(BIS);
+
+            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
+            adresse.setAnzahlMahnungen(0);
+            adresse.setSondernutzungErlaubt(false);
+            adresse.getAdressdaten().setArt(Adressart.ADRESSE);
+            adresse.getAdressdaten().setAdresse("Sendlinger Straße");
+            adresse.getAdressdaten().setHausnummerVon("1");
+            anderesProjekt.addAdresse(adresse);
+
+            final UUID anderesProjektId = projektRepository.save(anderesProjekt).getId();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, anderesProjektId, fremdeAbrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenUnknownAbrechnung_thenReturnNotFound() {
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, UUID.randomUUID())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenUnknownProjekt_thenReturnNotFound() {
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, UUID.randomUUID(), UUID.randomUUID())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
     }
 
 }

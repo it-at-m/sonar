@@ -1,5 +1,7 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
@@ -18,6 +20,8 @@ public interface AbrechnungRepository extends CrudRepository<AbrechnungEntity, U
                 + "where nachfolger.vorgaengerAbrechnungId = abrechnung.id)"
     )
     Page<AbrechnungEntity> findNewestVersionsByProjektId(@Param("projektId") UUID projektId, Pageable pageable);
+
+    List<AbrechnungVersion> findByProjektId(UUID projektId);
 
     Optional<AbrechnungEntity> findByIdAndProjektId(UUID id, UUID projektId);
 

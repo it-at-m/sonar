@@ -5,6 +5,7 @@ import { mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import AbrechnungTable from "@/components/AbrechnungTable.vue";
+import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
 import vuetify from "@/plugins/vuetify";
 
 const PROJEKT_ID = "123e4567-e89b-12d3-a456-426614174000";
@@ -22,6 +23,10 @@ function mountTable(rows: AbrechnungTableRow[] = []) {
     },
     global: { plugins: [vuetify] },
   });
+}
+
+function versionenMenu(wrapper: ReturnType<typeof mountTable>) {
+  return wrapper.findComponent(AbrechnungVersionenMenu);
 }
 
 function widerspruchButton(wrapper: ReturnType<typeof mountTable>) {
@@ -73,7 +78,7 @@ describe("AbrechnungTable.vue", () => {
         .exists()
     );
 
-    expect(sortableHeaders).toHaveLength(5);
+    expect(sortableHeaders).toHaveLength(4);
     expect(headersWithBadge).toHaveLength(1);
     expect(headersWithBadge[0]?.text()).toContain("Zeitraum von");
   });
@@ -230,11 +235,11 @@ describe("AbrechnungTable.vue", () => {
     );
   });
 
-  it("givenAbrechnung_thenOfferToAnsehenIt", () => {
+  it("givenSingleVersion_thenLinkStraightToIt", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
-        versionsnummer: 2,
+        versionsnummer: 1,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -249,8 +254,36 @@ describe("AbrechnungTable.vue", () => {
     expect(button.exists()).toBe(true);
     expect(button.classes()).not.toContain("v-btn--disabled");
     expect(button.attributes("aria-label")).toBe(
-      "Abrechnung 1000000001 in Version 2 ansehen"
+      "Abrechnung 1000000001 ansehen"
     );
+    expect(
+      wrapper
+        .findAllComponents({ name: "VBtn" })
+        .find((candidate) =>
+          candidate.attributes("aria-label")?.includes("ansehen")
+        )
+        ?.props("to")
+    ).toBe(
+      "/projekte/123e4567-e89b-12d3-a456-426614174000/abrechnungen/123e4567-e89b-12d3-a456-426614174001/ansehen"
+    );
+  });
+
+  it("givenSeveralVersionen_thenOfferNoDirectAnsehenLink", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 2,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(wrapper.find('[aria-label*="ansehen"]').exists()).toBe(false);
+    expect(versionenMenu(wrapper).exists()).toBe(true);
   });
 
   it("givenNeueVersionColumn_thenItIsNotMarkedSortable", () => {
@@ -263,11 +296,11 @@ describe("AbrechnungTable.vue", () => {
     expect(neueVersion?.classes()).not.toContain("v-data-table__th--sortable");
   });
 
-  it("givenVersionColumn_thenShowTheVersionsnummerOfTheAbrechnung", () => {
+  it("givenAbrechnungWithSeveralVersionen_thenOfferAVersionenMenu", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
-        versionsnummer: 3,
+        versionsnummer: 2,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -277,7 +310,44 @@ describe("AbrechnungTable.vue", () => {
       },
     ]);
 
-    expect(wrapper.find("tbody tr").text()).toContain("3");
+    expect(versionenMenu(wrapper).exists()).toBe(true);
+  });
+
+  it("givenFirstVersion_thenOfferNoVersionenMenu", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(versionenMenu(wrapper).exists()).toBe(false);
+  });
+
+  it("givenVersionenMenu_thenPointItAtTheAbrechnungOfThatRow", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 2,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(versionenMenu(wrapper).props("abrechnungId")).toBe(
+      "123e4567-e89b-12d3-a456-426614174001"
+    );
+    expect(versionenMenu(wrapper).props("projektId")).toBe(PROJEKT_ID);
   });
 
   it("givenLatestVersion_thenOfferToCreateANewVersion", () => {

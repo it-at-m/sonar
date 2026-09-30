@@ -9,9 +9,23 @@
       Zurück zu den Abrechnungen
     </v-btn>
 
-    <h1 class="text-display-medium font-weight-bold mb-6">
-      {{ title }}
-    </h1>
+    <div class="d-flex align-center flex-wrap ga-4 mb-6">
+      <h1 class="text-display-medium font-weight-bold">
+        {{ title }}
+      </h1>
+      <v-spacer />
+      <v-select
+        v-if="versionen.length > 1"
+        id="abrechnung-version"
+        density="comfortable"
+        hide-details
+        :items="versionOptions"
+        label="Angezeigte Version"
+        max-width="260"
+        :model-value="abrechnungId"
+        @update:model-value="switchToVersion"
+      />
+    </div>
 
     <v-alert
       v-if="angezeigteAbrechnung?.neuereVersionVorhanden"
@@ -20,16 +34,6 @@
       type="info"
       variant="tonal"
     />
-
-    <v-btn
-      v-if="angezeigteAbrechnung?.vorgaengerAbrechnungId"
-      class="mb-4"
-      :prepend-icon="mdiHistory"
-      variant="text"
-      :to="`/projekte/${projektId}/abrechnungen/${angezeigteAbrechnung?.vorgaengerAbrechnungId}/ansehen`"
-    >
-      Vorherige Version ansehen
-    </v-btn>
 
     <v-progress-circular
       v-if="angezeigteAbrechnung === undefined"
@@ -52,8 +56,9 @@
 
 <script setup lang="ts">
 import type { AbrechnungResponseDTO } from "@/api/generated/sonar-backend";
+import type { AbrechnungVersion } from "@/types/abrechnung/AbrechnungVersion";
 
-import { mdiArrowLeft, mdiHistory } from "@mdi/js";
+import { mdiArrowLeft } from "@mdi/js";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 
@@ -64,6 +69,10 @@ import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 import { toAbrechnungForm } from "@/util/abrechnung/abrechnungMapper";
+import {
+  abrechnungVersionOptions,
+  fetchAbrechnungVersionen,
+} from "@/util/abrechnung/abrechnungVersionen";
 
 const { abrechnungId, projektId } = defineProps<{
   projektId: string;
@@ -74,6 +83,7 @@ const router = useRouter();
 const snackbarStore = useSnackbarStore();
 
 const angezeigteAbrechnung = ref<AbrechnungResponseDTO>();
+const versionen = ref<AbrechnungVersion[]>([]);
 
 const { abrechnung, uebernehmen } = useAbrechnungForm();
 
@@ -82,6 +92,14 @@ const title = computed(() =>
     ? "Abrechnung"
     : `Abrechnung, Version ${angezeigteAbrechnung.value.versionsnummer ?? 1}`
 );
+
+const versionOptions = computed(() =>
+  abrechnungVersionOptions(versionen.value)
+);
+
+function switchToVersion(id: string): void {
+  void router.push(`/projekte/${projektId}/abrechnungen/${id}/ansehen`);
+}
 
 async function loadAbrechnung(id: string): Promise<void> {
   angezeigteAbrechnung.value = undefined;
@@ -100,9 +118,28 @@ async function loadAbrechnung(id: string): Promise<void> {
   }
 }
 
+async function loadVersionen(id: string): Promise<void> {
+  // Every member of a chain answers with the same list, so a switch inside it needs no new request.
+  if (versionen.value.some((version) => version.id === id)) {
+    return;
+  }
+  versionen.value = [];
+  try {
+    versionen.value = await fetchAbrechnungVersionen(projektId, id);
+  } catch {
+    snackbarStore.push({
+      text: "Die Versionen der Abrechnung konnten nicht geladen werden. Ein Wechsel zwischen den Versionen ist daher nicht möglich.",
+      color: STATUS_INDICATORS.WARNING,
+    });
+  }
+}
+
 watch(
   () => abrechnungId,
-  (id) => void loadAbrechnung(id),
+  (id) => {
+    void loadAbrechnung(id);
+    void loadVersionen(id);
+  },
   { immediate: true }
 );
 </script>

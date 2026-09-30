@@ -11,6 +11,7 @@ import static org.mockito.Mockito.when;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
@@ -552,6 +553,124 @@ class AbrechnungServiceTest {
             when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.empty());
 
             assertThatThrownBy(() -> unitUnderTest.getAbrechnung(PROJEKT_ID, abrechnungId))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(abrechnungId.toString());
+        }
+    }
+
+    @Nested
+    class GetVersionenOfAbrechnung {
+
+        @Test
+        void givenVersionInTheMiddleOfTheChain_thenReturnEveryVersionNewestFirst() {
+            final UUID ersteVersionId = UUID.randomUUID();
+            final UUID zweiteVersionId = UUID.randomUUID();
+            final UUID dritteVersionId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
+                    new AbrechnungVersion(ersteVersionId, 1, null),
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId)));
+
+            final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, zweiteVersionId);
+
+            assertThat(versionen).extracting(AbrechnungVersion::id)
+                    .containsExactly(dritteVersionId, zweiteVersionId, ersteVersionId);
+            assertThat(versionen).extracting(AbrechnungVersion::versionsnummer).containsExactly(3, 2, 1);
+        }
+
+        @Test
+        void givenOldestVersion_thenAlsoReturnTheNewerOnes() {
+            final UUID ersteVersionId = UUID.randomUUID();
+            final UUID zweiteVersionId = UUID.randomUUID();
+            final UUID dritteVersionId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
+                    new AbrechnungVersion(ersteVersionId, 1, null),
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId)));
+
+            final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, ersteVersionId);
+
+            assertThat(versionen).extracting(AbrechnungVersion::id)
+                    .containsExactly(dritteVersionId, zweiteVersionId, ersteVersionId);
+        }
+
+        @Test
+        void givenNewestVersion_thenAlsoReturnTheOlderOnes() {
+            final UUID ersteVersionId = UUID.randomUUID();
+            final UUID zweiteVersionId = UUID.randomUUID();
+            final UUID dritteVersionId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
+                    new AbrechnungVersion(ersteVersionId, 1, null),
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId)));
+
+            final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, dritteVersionId);
+
+            assertThat(versionen).extracting(AbrechnungVersion::id)
+                    .containsExactly(dritteVersionId, zweiteVersionId, ersteVersionId);
+        }
+
+        @Test
+        void givenVersionWithoutAnyOtherVersion_thenReturnOnlyThatVersion() {
+            final UUID abrechnungId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID))
+                    .thenReturn(List.of(new AbrechnungVersion(abrechnungId, 1, null)));
+
+            final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, abrechnungId);
+
+            assertThat(versionen).extracting(AbrechnungVersion::id).containsExactly(abrechnungId);
+        }
+
+        @Test
+        void givenAnotherChainInTheSameProjekt_thenReturnOnlyTheOwnChain() {
+            final UUID eigeneErsteVersionId = UUID.randomUUID();
+            final UUID eigeneZweiteVersionId = UUID.randomUUID();
+            final UUID fremdeErsteVersionId = UUID.randomUUID();
+            final UUID fremdeZweiteVersionId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
+                    new AbrechnungVersion(eigeneErsteVersionId, 1, null),
+                    new AbrechnungVersion(eigeneZweiteVersionId, 2, eigeneErsteVersionId),
+                    new AbrechnungVersion(fremdeErsteVersionId, 1, null),
+                    new AbrechnungVersion(fremdeZweiteVersionId, 2, fremdeErsteVersionId)));
+
+            final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, eigeneErsteVersionId);
+
+            assertThat(versionen).extracting(AbrechnungVersion::id)
+                    .containsExactly(eigeneZweiteVersionId, eigeneErsteVersionId);
+        }
+
+        @Test
+        void givenVersionenInArbitraryOrder_thenStillReturnThemNewestFirst() {
+            final UUID ersteVersionId = UUID.randomUUID();
+            final UUID zweiteVersionId = UUID.randomUUID();
+            final UUID dritteVersionId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId),
+                    new AbrechnungVersion(ersteVersionId, 1, null)));
+
+            final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, ersteVersionId);
+
+            assertThat(versionen).extracting(AbrechnungVersion::versionsnummer).containsExactly(3, 2, 1);
+        }
+
+        @Test
+        void givenUnknownAbrechnung_thenThrowNotFound() {
+            final UUID abrechnungId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID))
+                    .thenReturn(List.of(new AbrechnungVersion(UUID.randomUUID(), 1, null)));
+
+            assertThatThrownBy(() -> unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, abrechnungId))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(abrechnungId.toString());
+        }
+
+        @Test
+        void givenProjektWithoutAbrechnungen_thenThrowNotFound() {
+            final UUID abrechnungId = UUID.randomUUID();
+            when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of());
+
+            assertThatThrownBy(() -> unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, abrechnungId))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(abrechnungId.toString());
         }

@@ -391,6 +391,46 @@ paths:
       security:
       - bearerAuth: []
   /projekt/{projektId}/abrechnung/{abrechnungId}/version:
+    get:
+      tags:
+      - abrechnung-controller
+      summary: Retrieve every version of an Abrechnung.
+      description: |-
+        Retrieve every version of an Abrechnung.
+         Any version may be requested and the answer is always the whole chain, so a user who opened an
+         old version still gets the full list.
+         The entries are ordered by descending Versionsnummer, so the newest version comes first.
+         An entry carries only what a version list needs, the UUID and the Versionsnummer.
+      operationId: getAbrechnungVersionen
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of any version of the Abrechnung
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "200":
+          description: "the versions of the Abrechnung represented as DTOs, newest\
+            \ first"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/AbrechnungVersionResponseDTO"
+      security:
+      - bearerAuth: []
     post:
       tags:
       - abrechnung-controller
@@ -1252,6 +1292,15 @@ components:
             $ref: "#/components/schemas/AbrechnungResponseDTO"
         page:
           $ref: "#/components/schemas/PageMetadata"
+    AbrechnungVersionResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        versionsnummer:
+          type: integer
+          format: int32
     GeschaeftspartnerResponseDTO:
       type: object
       properties:
