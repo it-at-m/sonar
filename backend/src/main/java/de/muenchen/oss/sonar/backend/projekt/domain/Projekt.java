@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.projekt.domain;
 
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +13,11 @@ public record Projekt(
         String projektname,
         LocalDate abrechnungBeginn,
         LocalDate abrechnungEnde,
+        BigDecimal verwaltungsgebuehr,
         List<ProjektAdresse> adressen) {
+
+    // TODO Store the Verwaltungsgebuehr on the Projekt. Until then every Projekt is charged the same amount.
+    public static final BigDecimal VERWALTUNGSGEBUEHR = new BigDecimal("42");
 
     /**
      * Copies the addresses in, so that the Projekt stays immutable however the caller treats the list

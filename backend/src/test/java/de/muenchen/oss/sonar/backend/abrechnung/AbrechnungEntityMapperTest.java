@@ -26,7 +26,7 @@ class AbrechnungEntityMapperTest {
     class ToEntity {
         @Test
         void givenAbrechnung_thenDropTheIdsAndKeepTheChildren() {
-            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
+            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), null, VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
@@ -54,7 +54,7 @@ class AbrechnungEntityMapperTest {
 
         @Test
         void givenAbrechnung_thenLeaveThePlaceInTheChainOfVersionsUnset() {
-            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
+            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), null, VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
@@ -73,7 +73,7 @@ class AbrechnungEntityMapperTest {
     class ToAbrechnung {
         @Test
         void givenPersistedEntity_thenReturnItWithItsIds() {
-            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
+            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), null, VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
@@ -98,14 +98,14 @@ class AbrechnungEntityMapperTest {
             assertThat(result.versionsnummer()).isEqualTo(2);
             assertThat(result.vorgaengerAbrechnungId()).isEqualTo(vorgaengerId);
             assertThat(result.nutzungsobjekte().getFirst().id()).isEqualTo(nutzungsobjektId);
-            assertThat(result.nutzungsobjekte().getFirst().positionen().getFirst().id()).isEqualTo(positionId);
-            assertThat(result.nutzungsobjekte().getFirst().positionen().getFirst().flaeche())
+            assertThat(result.nutzungsobjekte().getFirst().positionen().getFirst().getId()).isEqualTo(positionId);
+            assertThat(result.nutzungsobjekte().getFirst().positionen().getFirst().getFlaeche())
                     .isEqualByComparingTo("36.00");
         }
 
         @Test
         void givenWiderspruchVorhanden_thenCarryTheFlagIntoTheAbrechnung() {
-            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
+            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), null, VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
@@ -120,7 +120,7 @@ class AbrechnungEntityMapperTest {
 
         @Test
         void givenNeuereVersionVorhanden_thenCarryTheFlagIntoTheAbrechnung() {
-            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
+            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), null, VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,

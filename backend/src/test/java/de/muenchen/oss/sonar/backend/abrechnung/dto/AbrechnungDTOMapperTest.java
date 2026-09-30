@@ -28,7 +28,7 @@ class AbrechnungDTOMapperTest {
     class ToDTO {
         @Test
         void givenAbrechnung_thenReturnsCorrectDTO() {
-            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
+            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), null, VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
@@ -64,7 +64,7 @@ class AbrechnungDTOMapperTest {
             assertThat(nutzungsobjektDTO.positionen()).hasSize(1);
 
             final AbrechnungPositionResponseDTO positionDTO = nutzungsobjektDTO.positionen().getFirst();
-            assertThat(positionDTO.id()).isEqualTo(position.id());
+            assertThat(positionDTO.id()).isEqualTo(position.getId());
             assertThat(positionDTO.laenge()).isEqualByComparingTo("12.00");
             assertThat(positionDTO.breite()).isEqualByComparingTo("3.00");
             assertThat(positionDTO.flaeche()).isEqualByComparingTo("36.00");
@@ -78,7 +78,7 @@ class AbrechnungDTOMapperTest {
         @Test
         void givenRequestDTO_thenTakeTheProjektFromThePath() {
             final UUID projektId = UUID.randomUUID();
-            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
+            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(null,
                     VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), false,
                     new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(
@@ -107,13 +107,13 @@ class AbrechnungDTOMapperTest {
 
         @Test
         void givenPosition_thenKeepTheFlaecheAsGiven() {
-            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
+            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(null,
                     VON, BIS, new BigDecimal("1.15"), new BigDecimal("0.10"), new BigDecimal("5.00"), false,
                     BigDecimal.ZERO);
 
             final AbrechnungPosition result = abrechnungDTOMapper.toAbrechnungPosition(positionDTO);
 
-            assertThat(result.flaeche()).isEqualByComparingTo("5.00");
+            assertThat(result.getFlaeche()).isEqualByComparingTo("5.00");
         }
     }
 }

@@ -6,12 +6,13 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(unmappedTargetPolicy = ReportingPolicy.ERROR, imports = Projekt.class)
 public interface ProjektDTOMapper {
 
     ProjektResponseDTO toDTO(Projekt projekt);
 
     @Mapping(target = "id", ignore = true)
+    @Mapping(target = "verwaltungsgebuehr", expression = "java(Projekt.VERWALTUNGSGEBUEHR)")
     Projekt toProjekt(ProjektRequestDTO projektRequestDTO);
 
     @Mapping(target = "id", ignore = true)

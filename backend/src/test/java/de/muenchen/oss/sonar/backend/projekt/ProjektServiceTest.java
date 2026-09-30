@@ -235,7 +235,7 @@ class ProjektServiceTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     BEGINN, ENDE, null, 1, true);
-            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, List.of(adresse));
+            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, null, BEGINN, ENDE, null, List.of(adresse));
 
             final UUID savedId = UUID.randomUUID();
             when(projektRepository.save(any(ProjektEntity.class))).thenAnswer(invocation -> {

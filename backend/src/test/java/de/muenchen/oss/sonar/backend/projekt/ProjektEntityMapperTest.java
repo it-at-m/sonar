@@ -56,6 +56,7 @@ class ProjektEntityMapperTest {
             assertThat(result.projektnummer()).isEqualTo(projektEntity.getProjektnummer());
             assertThat(result.abrechnungBeginn()).isEqualTo(projektEntity.getAbrechnungBeginn());
             assertThat(result.abrechnungEnde()).isEqualTo(projektEntity.getAbrechnungEnde());
+            assertThat(result.verwaltungsgebuehr()).isEqualByComparingTo(Projekt.VERWALTUNGSGEBUEHR);
             assertThat(result.adressen()).hasSize(1);
 
             final ProjektAdresse adresse = result.adressen().getFirst();
@@ -82,7 +83,7 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     BEGINN, ENDE, null, 1, false);
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, List.of(adresse));
+            final Projekt projekt = new Projekt(null, "2026-0001", null, BEGINN, ENDE, null, List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 
@@ -113,7 +114,7 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
                     null, null, 12, 0, false);
-            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", BEGINN, ENDE, List.of(adresse));
+            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", null, BEGINN, ENDE, null, List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 

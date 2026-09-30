@@ -401,7 +401,7 @@ class AbrechnungServiceTest {
     class CreateAbrechnung {
         @Test
         void givenAbrechnung_thenReturnSavedAbrechnung() {
-            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+            final AbrechnungPosition position = new AbrechnungPosition(null, null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
@@ -429,13 +429,13 @@ class AbrechnungServiceTest {
             assertThat(savedNutzungsobjekt.hausnummerBis()).isEqualTo("12");
             assertThat(savedNutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(90);
             assertThat(savedNutzungsobjekt.positionen()).hasSize(1);
-            assertThat(savedNutzungsobjekt.positionen().getFirst().flaeche()).isEqualByComparingTo("36.00");
-            assertThat(savedNutzungsobjekt.positionen().getFirst().haelfte()).isTrue();
+            assertThat(savedNutzungsobjekt.positionen().getFirst().getFlaeche()).isEqualByComparingTo("36.00");
+            assertThat(savedNutzungsobjekt.positionen().getFirst().isHaelfte()).isTrue();
         }
 
         @Test
         void givenAbrechnung_thenSaveItAsTheFirstVersion() {
-            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+            final AbrechnungPosition position = new AbrechnungPosition(null, null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
@@ -581,7 +581,7 @@ class AbrechnungServiceTest {
             vorgaenger.setZeitraumBis(BIS);
             vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
 
-            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
+            final AbrechnungPosition position = new AbrechnungPosition(null, null, VON, BIS, new BigDecimal("15.00"),
                     new BigDecimal("3.00"), new BigDecimal("45.00"), false, new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_A,

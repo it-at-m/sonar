@@ -446,7 +446,10 @@ paths:
       summary: Calculate an Abrechnung.
       description: |-
         Calculate an Abrechnung.
-         The calculation runs on the stored Nutzungsobjekte and Positionen of the Abrechnung
+         The calculation runs on the stored Nutzungsobjekte and Positionen of the Abrechnung, up to the
+         given calculationDate. A Position reaching beyond that date is charged only up to it, and one
+         beginning after it is left out. The Zeitraum stored on the Abrechnung does not limit the
+         calculation, so the calculationDate may fall outside it.
       operationId: calculate
       parameters:
       - name: projektId
@@ -463,11 +466,24 @@ paths:
         schema:
           type: string
           format: uuid
+      - name: calculationDate
+        in: query
+        description: the last day the calculation charges for
+        required: true
+        schema:
+          type: string
+          format: date
       responses:
+        "400":
+          description: the calculationDate is missing or is not a date
         "404":
           description: the Projekt has no Abrechnung with that UUID
-        "204":
-          description: No Content
+        "200":
+          description: the result of the calculation as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculationResponseDTO"
       security:
       - bearerAuth: []
   /abrechnung/{abrechnungId}/widerspruch:
@@ -991,6 +1007,8 @@ components:
           exclusiveMinimum: true
           type: number
         flaeche:
+          minimum: 0
+          exclusiveMinimum: true
           type: number
         haelfte:
           type: boolean
@@ -1054,10 +1072,6 @@ components:
           enum:
           - ENDABRECHNUNG
           - ZWISCHENABRECHNUNG
-        verwaltungsgebuehr:
-          minimum: 0
-          exclusiveMinimum: false
-          type: number
         nutzungsobjekte:
           minItems: 1
           type: array
@@ -1192,8 +1206,6 @@ components:
           enum:
           - ENDABRECHNUNG
           - ZWISCHENABRECHNUNG
-        verwaltungsgebuehr:
-          type: number
         widerspruchVorhanden:
           type: boolean
         neuereVersionVorhanden:
@@ -1202,6 +1214,93 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungNutzungsobjektResponseDTO"
+    AbrechnungUeberspannungenResponseDTO:
+      type: object
+      properties:
+        adresse:
+          type: string
+        berechnungslog:
+          type: string
+        gebuehrUeberspannungen:
+          type: number
+        bescheiddatenUeberspannungen:
+          type: array
+          items:
+            $ref: "#/components/schemas/BescheiddatenUeberspannungResponseDTO"
+    BescheiddatenFlaecheResponseDTO:
+      type: object
+      properties:
+        wocheBeginn:
+          type: integer
+          format: int32
+        wocheEnde:
+          type: integer
+          format: int32
+        wocheDauer:
+          type: integer
+          format: int32
+        flaechenVerteilung:
+          type: string
+        grund:
+          type: string
+        gebuehrenstufe:
+          type: string
+        berechnung:
+          type: string
+        gebuehr:
+          type: number
+    BescheiddatenUeberspannungResponseDTO:
+      type: object
+      properties:
+        monatBeginn:
+          type: integer
+          format: int32
+        monatEnde:
+          type: integer
+          format: int32
+        monatDauer:
+          type: integer
+          format: int32
+        grund:
+          type: string
+        berechnung:
+          type: string
+        gebuehr:
+          type: number
+    CalculationResponseDTO:
+      type: object
+      properties:
+        lfdNr:
+          type: integer
+          format: int32
+        abrechnungszeitraumVon:
+          type: string
+          format: date
+        abrechnungszeitraumBis:
+          type: string
+          format: date
+        zusammenfassung:
+          type: string
+        berechnungslog:
+          type: string
+        gebuehrFlaechen:
+          type: number
+        gebuehrUeberspannungen:
+          type: number
+        gebuehrVerwaltung:
+          type: number
+        gebuehrGesamt:
+          type: number
+        gebuehrZahlung:
+          type: number
+        bescheiddatenFlaechen:
+          type: array
+          items:
+            $ref: "#/components/schemas/BescheiddatenFlaecheResponseDTO"
+        abrechnungenUeberspannungen:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungUeberspannungenResponseDTO"
     WiderspruchRequestDTO:
       required:
       - datumEingang

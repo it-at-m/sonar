@@ -54,6 +54,7 @@ class AbrechnungIntegrationTest {
     private static final String ABRECHNUNG_PATH = "/projekt/{projektId}/abrechnung";
     private static final String ABRECHNUNG_BY_ID_PATH = "/projekt/{projektId}/abrechnung/{abrechnungId}";
     private static final String ABRECHNUNG_VERSION_PATH = "/projekt/{projektId}/abrechnung/{abrechnungId}/version";
+    private static final String ABRECHNUNG_CALCULATE_PATH = "/projekt/{projektId}/abrechnung/{abrechnungId}/calculate";
 
     @Container
     @ServiceConnection
@@ -607,7 +608,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
                     VON, BIS, null, "Bemerkung",
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -657,7 +658,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null,
                     null, null, 12, null,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -684,12 +685,12 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO erste = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
                     null, null, null, null,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungNutzungsobjektRequestDTO zweite = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null,
                     null, null, null, null,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(erste, zweite));
@@ -717,7 +718,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
                     null, null, null, null,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -738,7 +739,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null,
                     null, null, null, null,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -759,7 +760,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
                     null, null, null, null,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, BIS, VON,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -942,7 +943,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO geaendertesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Sendlinger Straße", "1", "3", null, null, Nutzung.NUTZUNG_B,
                     null, null, 5, "Zweite Fassung",
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), false, new BigDecimal("45.00"))));
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(geaendertesNutzungsobjekt));
@@ -1007,7 +1008,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO geaendertesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
                     null, null, null, "Zweite Fassung",
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), false, new BigDecimal("45.00"))));
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(geaendertesNutzungsobjekt));
@@ -1069,7 +1070,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO geaendertesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
                     null, null, null, "Zweite Fassung",
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), false, new BigDecimal("45.00"))));
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(geaendertesNutzungsobjekt));
@@ -1133,7 +1134,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
                     null, null, null, "Zweite Fassung",
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), false, new BigDecimal("45.00"))));
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(nutzungsobjekt));
@@ -1162,7 +1163,7 @@ class AbrechnungIntegrationTest {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
                     null, null, null, null,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), true, new BigDecimal("30.00"))));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -1176,6 +1177,91 @@ class AbrechnungIntegrationTest {
                     .expectStatus().isNotFound();
 
             assertThat(abrechnungRepository.count()).isZero();
+        }
+    }
+
+    @Nested
+    class Calculate {
+
+        @Test
+        void givenStoredAbrechnung_thenReturnTheCalculatedGebuehren() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+            position.setHaelfte(false);
+            position.setAnteilAnFlaeche(new BigDecimal("36.00"));
+
+            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
+            nutzungsobjekt.addPosition(position);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(projektId);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            final UUID abrechnungId = abrechnungRepository.save(abrechnung).getId();
+
+            restTestClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_CALCULATE_PATH)
+                            .queryParam("calculationDate", BIS)
+                            .build(projektId, abrechnungId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectHeader().contentType(MediaType.APPLICATION_JSON)
+                    .expectBody()
+                    .jsonPath("$.lfdNr").isEqualTo(1)
+                    .jsonPath("$.abrechnungszeitraumVon").isEqualTo(VON.toString())
+                    .jsonPath("$.abrechnungszeitraumBis").isEqualTo(BIS.toString())
+                    .jsonPath("$.gebuehrGesamt").isNotEmpty()
+                    .jsonPath("$.berechnungslog").isNotEmpty()
+                    .jsonPath("$.bescheiddatenFlaechen").isNotEmpty();
+        }
+
+        @Test
+        void givenMissingCalculationDate_thenReturnBadRequest() {
+            restTestClient.post()
+                    .uri(ABRECHNUNG_CALCULATE_PATH, projektId, UUID.randomUUID())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .exchange()
+                    .expectStatus().isBadRequest();
+        }
+
+        @Test
+        void givenUnknownAbrechnung_thenReturnNotFound() {
+            restTestClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_CALCULATE_PATH)
+                            .queryParam("calculationDate", BIS)
+                            .build(projektId, UUID.randomUUID()))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenUnknownProjekt_thenReturnNotFound() {
+            restTestClient.post()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_CALCULATE_PATH)
+                            .queryParam("calculationDate", BIS)
+                            .build(UUID.randomUUID(), UUID.randomUUID()))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .exchange()
+                    .expectStatus().isNotFound();
         }
     }
 

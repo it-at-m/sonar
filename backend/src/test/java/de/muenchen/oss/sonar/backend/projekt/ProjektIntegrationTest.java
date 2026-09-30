@@ -612,7 +612,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     BEGINN, ENDE, null, 3, true);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", null, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -655,7 +655,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     null, null, null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", ENDE, BEGINN, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", null, ENDE, BEGINN, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -673,7 +673,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     null, null, 12, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", null, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -702,7 +702,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", null, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -729,7 +729,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
                     BEGINN, ENDE, 12, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", null, BEGINN, ENDE, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -744,7 +744,7 @@ class ProjektIntegrationTest {
 
         @Test
         void givenProjektWithoutAdressen_thenReturnBadRequest() {
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", BEGINN, ENDE, List.of());
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", null, BEGINN, ENDE, List.of());
 
             restTestClient.post()
                     .uri("/projekt")

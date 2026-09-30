@@ -14,13 +14,13 @@ class ProjektTest {
     @Test
     void givenInvertedAbrechnungszeitraum_thenThrow() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Projekt(null, "2026-0001", ENDE, BEGINN, null))
+                .isThrownBy(() -> new Projekt(null, "2026-0001", null, ENDE, BEGINN, null, null))
                 .withMessageContaining("abrechnungEnde");
     }
 
     @Test
     void givenNullAdressen_thenEmptyList() {
-        final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, null);
+        final Projekt projekt = new Projekt(null, "2026-0001", null, BEGINN, ENDE, null, null);
 
         assertThat(projekt.adressen()).isEmpty();
     }

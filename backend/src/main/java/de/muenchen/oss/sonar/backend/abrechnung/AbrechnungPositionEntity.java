@@ -1,7 +1,6 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
 import de.muenchen.oss.sonar.backend.common.BaseEntity;
-import de.muenchen.oss.sonar.backend.common.NotZero;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Table;
@@ -42,8 +41,7 @@ public class AbrechnungPositionEntity extends BaseEntity {
     @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal breite;
 
     @Column(nullable = false, precision = 12, scale = 2)
-    @NotNull @NotZero
-    @Digits(integer = 10, fraction = 2) private BigDecimal flaeche;
+    @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal flaeche;
 
     @Column(nullable = false)
     private boolean haelfte;

@@ -3,7 +3,6 @@ package de.muenchen.oss.sonar.backend.abrechnung.domain;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungsArt;
 import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
-import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -20,7 +19,6 @@ public record Abrechnung(
         LocalDate zeitraumVon,
         LocalDate zeitraumBis,
         AbrechnungsArt abrechnungsArt,
-        BigDecimal verwaltungsgebuehr,
         boolean widerspruchVorhanden,
         boolean neuereVersionVorhanden,
         List<AbrechnungNutzungsobjekt> nutzungsobjekte) {

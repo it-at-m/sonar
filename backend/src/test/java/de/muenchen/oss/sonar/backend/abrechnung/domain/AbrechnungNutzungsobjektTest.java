@@ -16,7 +16,7 @@ class AbrechnungNutzungsobjektTest {
     private static final LocalDate BIS = LocalDate.of(2026, 1, 31);
 
     private static final AbrechnungPosition POSITION = new AbrechnungPosition(
-            null, VON, BIS, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, false, BigDecimal.ZERO);
+            null, null, VON, BIS, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, false, BigDecimal.ZERO);
 
     @Nested
     class TageUnerlaubteNutzung {
