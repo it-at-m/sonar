@@ -358,6 +358,7 @@ describe("abrechnungMapper.ts", () => {
             unerlaubteNutzungBis: new Date("2026-01-10"),
             tageUnerlaubteNutzung: 10,
             bemerkung: "Erste Fassung",
+            aufschlag50prozent: true,
             positionen: [
               {
                 id: "123e4567-e89b-12d3-a456-426614174003",
@@ -366,7 +367,6 @@ describe("abrechnungMapper.ts", () => {
                 laenge: 12,
                 breite: 3,
                 flaeche: 36,
-                haelfte: true,
                 anteilAnFlaeche: 30,
               },
             ],
@@ -396,12 +396,12 @@ describe("abrechnungMapper.ts", () => {
       expect(nutzungsobjekt.unerlaubteNutzungVon).toBe("2026-01-01");
       expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(10);
       expect(nutzungsobjekt.bemerkung).toBe("Erste Fassung");
+      expect(nutzungsobjekt.aufschlag50prozent).toBe(true);
 
       const position = itemAt(nutzungsobjekt.positionen);
       expect(position.beginn).toBe("2026-01-01");
       expect(position.ende).toBe("2026-03-31");
       expect(position.laenge).toBe(12);
-      expect(position.haelfte).toBe(true);
       expect(position.anteilAnFlaeche).toBe(30);
     });
 
@@ -416,6 +416,7 @@ describe("abrechnungMapper.ts", () => {
             art: "FLURSTUECK",
             flurstueck: "1234/5",
             gemarkung: "Sendling",
+            aufschlag50prozent: false,
             positionen: [
               {
                 beginn: new Date("2026-01-01"),
@@ -423,7 +424,6 @@ describe("abrechnungMapper.ts", () => {
                 laenge: 12,
                 breite: 3,
                 flaeche: 36,
-                haelfte: false,
                 anteilAnFlaeche: 36,
               },
             ],

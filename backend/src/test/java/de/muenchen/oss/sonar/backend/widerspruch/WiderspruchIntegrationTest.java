@@ -104,11 +104,11 @@ class WiderspruchIntegrationTest {
         position.setLaenge(new BigDecimal("12.00"));
         position.setBreite(new BigDecimal("3.00"));
         position.setFlaeche(new BigDecimal("36.00"));
-        position.setHaelfte(true);
         position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
         final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
         nutzungsobjekt.addPosition(position);
+        nutzungsobjekt.setAufschlag50prozent(true);
 
         final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
         adressdaten.setArt(Adressart.ADRESSE);
