@@ -27,6 +27,9 @@
     "vite": "6.4.3",
     "mermaid": {
       "dompurify": "3.4.16"
+    },
+    "markdownlint-cli": {
+      "js-yaml": "5.4.1"
     }
   }
 }
