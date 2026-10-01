@@ -101,15 +101,24 @@ function switchToVersion(id: string): void {
   void router.push(`/projekte/${projektId}/abrechnungen/${id}/ansehen`);
 }
 
-async function loadAbrechnung(id: string): Promise<void> {
+async function loadAbrechnung(
+  id: string,
+  isOutdated: () => boolean
+): Promise<void> {
   angezeigteAbrechnung.value = undefined;
   try {
     const geladeneAbrechnung = await ApiFactory.getInstance(
       AbrechnungControllerApi
     ).getAbrechnung(projektId, id);
+    if (isOutdated()) {
+      return;
+    }
     uebernehmen(toAbrechnungForm(geladeneAbrechnung));
     angezeigteAbrechnung.value = geladeneAbrechnung;
   } catch {
+    if (isOutdated()) {
+      return;
+    }
     snackbarStore.push({
       text: "Die Abrechnung konnte nicht geladen werden.",
       color: STATUS_INDICATORS.ERROR,
@@ -118,15 +127,25 @@ async function loadAbrechnung(id: string): Promise<void> {
   }
 }
 
-async function loadVersionen(id: string): Promise<void> {
+async function loadVersionen(
+  id: string,
+  isOutdated: () => boolean
+): Promise<void> {
   // Every member of a chain answers with the same list, so a switch inside it needs no new request.
   if (versionen.value.some((version) => version.id === id)) {
     return;
   }
   versionen.value = [];
   try {
-    versionen.value = await fetchAbrechnungVersionen(projektId, id);
+    const geladeneVersionen = await fetchAbrechnungVersionen(projektId, id);
+    if (isOutdated()) {
+      return;
+    }
+    versionen.value = geladeneVersionen;
   } catch {
+    if (isOutdated()) {
+      return;
+    }
     snackbarStore.push({
       text: "Die Versionen der Abrechnung konnten nicht geladen werden. Ein Wechsel zwischen den Versionen ist daher nicht möglich.",
       color: STATUS_INDICATORS.WARNING,
@@ -136,9 +155,13 @@ async function loadVersionen(id: string): Promise<void> {
 
 watch(
   () => abrechnungId,
-  (id) => {
-    void loadAbrechnung(id);
-    void loadVersionen(id);
+  (id, _previousId, onCleanup) => {
+    // A newer id supersedes both requests, so their answers must not touch the newer state.
+    let outdated = false;
+    onCleanup(() => (outdated = true));
+
+    void loadAbrechnung(id, () => outdated);
+    void loadVersionen(id, () => outdated);
   },
   { immediate: true }
 );

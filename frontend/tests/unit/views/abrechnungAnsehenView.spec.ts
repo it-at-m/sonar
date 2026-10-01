@@ -39,6 +39,44 @@ function stubFetch(
   return fetchSpy;
 }
 
+function deferredFetch() {
+  const pending: {
+    url: string;
+    resolve: (response: Response) => void;
+    reject: (error: Error) => void;
+  }[] = [];
+  const fetchSpy = vi.fn().mockImplementation(
+    (url: string) =>
+      new Promise<Response>((resolve, reject) => {
+        pending.push({ url, resolve, reject });
+      })
+  );
+  vi.stubGlobal("fetch", fetchSpy);
+
+  function take(urlSuffix: string) {
+    const request = pending.find((candidate) =>
+      candidate.url.endsWith(urlSuffix)
+    );
+    if (!request) {
+      throw new Error(`No pending request for ${urlSuffix}`);
+    }
+    pending.splice(pending.indexOf(request), 1);
+    return request;
+  }
+
+  return {
+    fetchSpy,
+    async resolveRequest(urlSuffix: string, body: unknown) {
+      take(urlSuffix).resolve(jsonResponse(body));
+      await flushPromises();
+    },
+    async rejectRequest(urlSuffix: string) {
+      take(urlSuffix).reject(new Error("offline"));
+      await flushPromises();
+    },
+  };
+}
+
 async function mountView(
   fetchSpy: ReturnType<typeof vi.fn>,
   abrechnungId: string
@@ -318,5 +356,73 @@ describe("AbrechnungAnsehenView.vue", () => {
     await mountView(fetchSpy, ZWEITE_VERSION_ID);
 
     expect(push).toHaveBeenCalledWith(`/projekte/${PROJEKT_ID}/abrechnungen`);
+  });
+
+  it("givenLateAnswerOfASupersededVersion_thenKeepTheShownVersion", async () => {
+    const ersteVersion: AbrechnungResponseDTO = {
+      id: ERSTE_VERSION_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 1,
+      geschaeftspartnerId: "1000000001",
+      zustellungsbevollmaechtigterGenutzt: false,
+      zeitraumVon: new Date("2026-01-01"),
+      zeitraumBis: new Date("2026-03-31"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      widerspruchVorhanden: false,
+      neuereVersionVorhanden: true,
+      nutzungsobjekte: [],
+    };
+    const zweiteVersion: AbrechnungResponseDTO = {
+      id: ZWEITE_VERSION_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 2,
+      geschaeftspartnerId: "1000000002",
+      zustellungsbevollmaechtigterGenutzt: false,
+      zeitraumVon: new Date("2026-04-01"),
+      zeitraumBis: new Date("2026-06-30"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      widerspruchVorhanden: false,
+      neuereVersionVorhanden: false,
+      nutzungsobjekte: [],
+    };
+    const { fetchSpy, resolveRequest } = deferredFetch();
+    const { wrapper } = await mountView(fetchSpy, ERSTE_VERSION_ID);
+
+    await wrapper.setProps({ abrechnungId: ZWEITE_VERSION_ID });
+    await flushPromises();
+    await resolveRequest(`/abrechnung/${ZWEITE_VERSION_ID}`, zweiteVersion);
+    await resolveRequest(`/abrechnung/${ERSTE_VERSION_ID}`, ersteVersion);
+
+    expect(wrapper.text()).toContain("Abrechnung, Version 2");
+    expect(
+      wrapper.findComponent({ name: "AbrechnungTabs" }).props("modelValue")
+    ).toMatchObject({ geschaeftspartnerId: "1000000002" });
+  });
+
+  it("givenLateFailureOfASupersededVersion_thenStayOnTheShownVersion", async () => {
+    const zweiteVersion: AbrechnungResponseDTO = {
+      id: ZWEITE_VERSION_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 2,
+      geschaeftspartnerId: "1000000002",
+      zustellungsbevollmaechtigterGenutzt: false,
+      zeitraumVon: new Date("2026-04-01"),
+      zeitraumBis: new Date("2026-06-30"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      widerspruchVorhanden: false,
+      neuereVersionVorhanden: false,
+      nutzungsobjekte: [],
+    };
+    const { fetchSpy, rejectRequest, resolveRequest } = deferredFetch();
+    const { wrapper } = await mountView(fetchSpy, ERSTE_VERSION_ID);
+
+    await wrapper.setProps({ abrechnungId: ZWEITE_VERSION_ID });
+    await flushPromises();
+    await resolveRequest(`/abrechnung/${ZWEITE_VERSION_ID}`, zweiteVersion);
+    await rejectRequest(`/abrechnung/${ERSTE_VERSION_ID}`);
+
+    expect(push).not.toHaveBeenCalled();
+    expect(useSnackbarStore().queue).toHaveLength(0);
+    expect(wrapper.text()).toContain("Abrechnung, Version 2");
   });
 });
