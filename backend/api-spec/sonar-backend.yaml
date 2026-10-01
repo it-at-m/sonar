@@ -439,6 +439,53 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
+  /projekt/{projektId}/abrechnung/{abrechnungId}/calculation:
+    post:
+      tags:
+      - abrechnung-controller
+      summary: Store the result of a calculation.
+      description: |-
+        Store the result of a calculation.
+         Runs the same calculation as the preview and keeps its result. A later calculation of the
+         Abrechnung then charges only what this one left over: its Zahlbetrag is the difference, while
+         its Gesamtbetrag still covers the whole Zeitraum. An Abrechnung may be calculated and stored
+         more than once.
+      operationId: saveCalculation
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the Abrechnung to calculate and store
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: calculationDate
+        in: query
+        description: the last day the calculation charges for
+        required: true
+        schema:
+          type: string
+          format: date
+      responses:
+        "400":
+          description: the calculationDate is missing or is not a date
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "201":
+          description: the stored result of the calculation as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CalculationResponseDTO"
+      security:
+      - bearerAuth: []
   /projekt/{projektId}/abrechnung/{abrechnungId}/calculate:
     post:
       tags:

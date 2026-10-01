@@ -5,7 +5,6 @@ import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.CalculationDTOMapper;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.CalculationResponseDTO;
-import de.muenchen.oss.sonar.backend.berechnung.BerechnungService;
 import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfiguration;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.Explode;
@@ -44,11 +43,13 @@ import org.springframework.web.bind.annotation.RestController;
 public class AbrechnungController {
 
     private static final String PROJEKT_ID = "projektId";
+    private static final String ABRECHNUNG_ID = "abrechnungId";
     private static final String STATUS_BAD_REQUEST = "400";
     private static final String STATUS_NOT_FOUND = "404";
+    private static final String DESCRIPTION_ABRECHNUNG_NOT_FOUND = "the Projekt has no Abrechnung with that UUID";
 
     private final AbrechnungService abrechnungService;
-    private final BerechnungService berechnungService;
+    private final CalculationService calculationService;
     private final AbrechnungDTOMapper abrechnungDTOMapper;
     private final CalculationDTOMapper calculationDTOMapper;
 
@@ -110,9 +111,9 @@ public class AbrechnungController {
      */
     @GetMapping("/{abrechnungId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = DESCRIPTION_ABRECHNUNG_NOT_FOUND, content = @Content)
     public AbrechnungResponseDTO getAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
-            @PathVariable("abrechnungId") final UUID abrechnungId) {
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId) {
         return abrechnungDTOMapper.toDTO(abrechnungService.getAbrechnung(projektId, abrechnungId));
     }
 
@@ -150,10 +151,10 @@ public class AbrechnungController {
     @PostMapping("/{abrechnungId}/version")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = "the details of the new version are invalid", content = @Content)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = DESCRIPTION_ABRECHNUNG_NOT_FOUND, content = @Content)
     @ApiResponse(responseCode = "409", description = "the Abrechnung already has a newer version", content = @Content)
     public AbrechnungResponseDTO saveAbrechnungVersion(@PathVariable(PROJEKT_ID) final UUID projektId,
-            @PathVariable("abrechnungId") final UUID abrechnungId,
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId,
             @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
         return abrechnungDTOMapper.toDTO(abrechnungService.createNextVersion(abrechnungId,
                 abrechnungDTOMapper.toAbrechnung(projektId, abrechnungRequestDTO)));
@@ -174,11 +175,33 @@ public class AbrechnungController {
     @PostMapping("/{abrechnungId}/calculate")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = "the calculationDate is missing or is not a date", content = @Content)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = DESCRIPTION_ABRECHNUNG_NOT_FOUND, content = @Content)
     public CalculationResponseDTO calculate(@PathVariable(PROJEKT_ID) final UUID projektId,
-            @PathVariable("abrechnungId") final UUID abrechnungId,
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate calculationDate) {
-        return calculationDTOMapper.toDTO(berechnungService.calculate(projektId, abrechnungId, calculationDate));
+        return calculationDTOMapper.toDTO(calculationService.calculate(projektId, abrechnungId, calculationDate));
+    }
+
+    /**
+     * Store the result of a calculation.
+     * Runs the same calculation as the preview and keeps its result. A later calculation of the
+     * Abrechnung then charges only what this one left over: its Zahlbetrag is the difference, while
+     * its Gesamtbetrag still covers the whole Zeitraum. An Abrechnung may be calculated and stored
+     * more than once.
+     *
+     * @param projektId the UUID of the Projekt the Abrechnung belongs to
+     * @param abrechnungId the UUID of the Abrechnung to calculate and store
+     * @param calculationDate the last day the calculation charges for
+     * @return the stored result of the calculation as a DTO
+     */
+    @PostMapping("/{abrechnungId}/calculation")
+    @ResponseStatus(HttpStatus.CREATED)
+    @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = "the calculationDate is missing or is not a date", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = DESCRIPTION_ABRECHNUNG_NOT_FOUND, content = @Content)
+    public CalculationResponseDTO saveCalculation(@PathVariable(PROJEKT_ID) final UUID projektId,
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate calculationDate) {
+        return calculationDTOMapper.toDTO(calculationService.calculateAndStore(projektId, abrechnungId, calculationDate));
     }
 
 }

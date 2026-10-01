@@ -72,7 +72,7 @@
                 control-variant="hidden"
                 density="compact"
                 :precision="2"
-                :rules="[requiredRule, notZeroRule]"
+                :rules="[requiredRule, greaterThanZeroRule]"
               />
             </td>
             <td>
@@ -130,7 +130,6 @@ import { createAbrechnungPosition } from "@/util/abrechnungPositionForm";
 import {
   endeNotBeforeBeginn,
   greaterThanZeroRule,
-  notZeroRule,
   requiredRule,
 } from "@/util/validationRules";
 
