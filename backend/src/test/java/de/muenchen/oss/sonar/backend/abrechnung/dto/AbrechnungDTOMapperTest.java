@@ -7,6 +7,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
@@ -36,14 +37,15 @@ class AbrechnungDTOMapperTest {
                     VON, BIS, null, "Bemerkung", List.of(position));
             final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), LocalDate.of(2026, 4, 1), null, null,
                     null, null, false, false, null);
-            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), "1000000001", true,
+            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 2, null, "1000000001", true,
                     "2000000002", ZustellungsbevollmaechtigterTyp.VORMUND, VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG,
-                    widerspruch, List.of(nutzungsobjekt));
+                    widerspruch, true, List.of(nutzungsobjekt));
 
             final AbrechnungResponseDTO result = abrechnungDTOMapper.toDTO(abrechnung);
 
             assertThat(result.id()).isEqualTo(abrechnung.id());
             assertThat(result.projektId()).isEqualTo(abrechnung.projektId());
+            assertThat(result.versionsnummer()).isEqualTo(2);
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
             assertThat(result.zustellungsbevollmaechtigterGenutzt()).isTrue();
             assertThat(result.zustellungsbevollmaechtigterId()).isEqualTo("2000000002");
@@ -52,6 +54,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.zeitraumBis()).isEqualTo(BIS);
             assertThat(result.abrechnungsArt()).isEqualTo(AbrechnungsArt.ZWISCHENABRECHNUNG);
             assertThat(result.widerspruchVorhanden()).isTrue();
+            assertThat(result.neuereVersionVorhanden()).isTrue();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjektResponseDTO nutzungsobjektDTO = result.nutzungsobjekte().getFirst();
@@ -71,6 +74,16 @@ class AbrechnungDTOMapperTest {
             assertThat(positionDTO.flaeche()).isEqualByComparingTo("36.00");
             assertThat(positionDTO.haelfte()).isTrue();
             assertThat(positionDTO.anteilAnFlaeche()).isEqualByComparingTo("30.00");
+        }
+
+        @Test
+        void givenAbrechnungVersion_thenReturnsCorrectDTO() {
+            final AbrechnungVersion abrechnungVersion = new AbrechnungVersion(UUID.randomUUID(), 2, UUID.randomUUID());
+
+            final AbrechnungVersionResponseDTO result = abrechnungDTOMapper.toDTO(abrechnungVersion);
+
+            assertThat(result.id()).isEqualTo(abrechnungVersion.id());
+            assertThat(result.versionsnummer()).isEqualTo(2);
         }
     }
 
@@ -94,6 +107,7 @@ class AbrechnungDTOMapperTest {
             assertThat(result.projektId()).isEqualTo(projektId);
             assertThat(result.geschaeftspartnerId()).isEqualTo("1000000001");
             assertThat(result.isWiderspruchVorhanden()).isFalse();
+            assertThat(result.neuereVersionVorhanden()).isFalse();
             assertThat(result.nutzungsobjekte()).hasSize(1);
 
             final AbrechnungNutzungsobjekt nutzungsobjekt = result.nutzungsobjekte().getFirst();

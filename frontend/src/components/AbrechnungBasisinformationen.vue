@@ -165,7 +165,8 @@ function watchLookup(
         lookupState.value = { ...result, loading: false };
       }
     },
-    { debounce: LOOKUP_DEBOUNCE_MS }
+    // immediate, because a form that already carries an id never changes it
+    { debounce: LOOKUP_DEBOUNCE_MS, immediate: true }
   );
 }
 

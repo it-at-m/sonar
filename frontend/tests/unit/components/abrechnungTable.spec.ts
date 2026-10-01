@@ -1,10 +1,11 @@
 import type { AbrechnungTableRow } from "@/types/abrechnung/AbrechnungTableRow";
 
-import { mdiChatAlert, mdiChatPlus } from "@mdi/js";
+import { mdiChatAlert, mdiChatPlus, mdiFileDocumentPlus } from "@mdi/js";
 import { mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
 import AbrechnungTable from "@/components/AbrechnungTable.vue";
+import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
 import vuetify from "@/plugins/vuetify";
 
 const PROJEKT_ID = "123e4567-e89b-12d3-a456-426614174000";
@@ -24,6 +25,10 @@ function mountTable(rows: AbrechnungTableRow[] = []) {
   });
 }
 
+function versionenMenu(wrapper: ReturnType<typeof mountTable>) {
+  return wrapper.findComponent(AbrechnungVersionenMenu);
+}
+
 function widerspruchButton(wrapper: ReturnType<typeof mountTable>) {
   return wrapper.find('[aria-label*="Widerspruch"]');
 }
@@ -36,6 +41,14 @@ function widerspruchButtonComponent(wrapper: ReturnType<typeof mountTable>) {
   return wrapper
     .findAllComponents({ name: "VBtn" })
     .find((button) => button.attributes("aria-label")?.includes("Widerspruch"));
+}
+
+function neueVersionButton(wrapper: ReturnType<typeof mountTable>) {
+  return wrapper.find('[aria-label*="Neue Version"]');
+}
+
+function neueVersionIconPath(wrapper: ReturnType<typeof mountTable>) {
+  return neueVersionButton(wrapper).find(".v-icon path").attributes("d");
 }
 
 describe("AbrechnungTable.vue", () => {
@@ -96,6 +109,7 @@ describe("AbrechnungTable.vue", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -121,6 +135,7 @@ describe("AbrechnungTable.vue", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -171,6 +186,7 @@ describe("AbrechnungTable.vue", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -187,6 +203,7 @@ describe("AbrechnungTable.vue", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -203,6 +220,7 @@ describe("AbrechnungTable.vue", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -215,5 +233,144 @@ describe("AbrechnungTable.vue", () => {
     expect(wrapper.findComponent({ name: "VTooltip" }).props("text")).toBe(
       "Es besteht bereits ein Widerspruch."
     );
+  });
+
+  it("givenSingleVersion_thenLinkStraightToIt", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    const button = wrapper.find('[aria-label*="ansehen"]');
+
+    expect(button.exists()).toBe(true);
+    expect(button.classes()).not.toContain("v-btn--disabled");
+    expect(button.attributes("aria-label")).toBe(
+      "Abrechnung 1000000001 ansehen"
+    );
+    expect(
+      wrapper
+        .findAllComponents({ name: "VBtn" })
+        .find((candidate) =>
+          candidate.attributes("aria-label")?.includes("ansehen")
+        )
+        ?.props("to")
+    ).toBe(
+      "/projekte/123e4567-e89b-12d3-a456-426614174000/abrechnungen/123e4567-e89b-12d3-a456-426614174001/ansehen"
+    );
+  });
+
+  it("givenSeveralVersionen_thenOfferNoDirectAnsehenLink", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 2,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(wrapper.find('[aria-label*="ansehen"]').exists()).toBe(false);
+    expect(versionenMenu(wrapper).exists()).toBe(true);
+  });
+
+  it("givenNeueVersionColumn_thenItIsNotMarkedSortable", () => {
+    const wrapper = mountTable();
+
+    const neueVersion = wrapper
+      .findAll("th")
+      .find((header) => header.text().startsWith("Neue Version"));
+
+    expect(neueVersion?.classes()).not.toContain("v-data-table__th--sortable");
+  });
+
+  it("givenAbrechnungWithSeveralVersionen_thenOfferAVersionenMenu", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 2,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(versionenMenu(wrapper).exists()).toBe(true);
+  });
+
+  it("givenFirstVersion_thenOfferNoVersionenMenu", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(versionenMenu(wrapper).exists()).toBe(false);
+  });
+
+  it("givenVersionenMenu_thenPointItAtTheAbrechnungOfThatRow", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 2,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(versionenMenu(wrapper).props("abrechnungId")).toBe(
+      "123e4567-e89b-12d3-a456-426614174001"
+    );
+    expect(versionenMenu(wrapper).props("projektId")).toBe(PROJEKT_ID);
+  });
+
+  it("givenLatestVersion_thenOfferToCreateANewVersion", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    const button = neueVersionButton(wrapper);
+
+    expect(button.exists()).toBe(true);
+    expect(button.classes()).not.toContain("v-btn--disabled");
+    expect(button.attributes("aria-label")).toBe(
+      "Neue Version der Abrechnung 1000000001 anlegen"
+    );
+    expect(neueVersionIconPath(wrapper)).toBe(mdiFileDocumentPlus);
   });
 });

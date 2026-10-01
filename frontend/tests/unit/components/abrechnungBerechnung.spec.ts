@@ -5,13 +5,17 @@ import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 
-function mountBerechnung(invalidNutzungsobjekte: number[] = []) {
+function mountBerechnung(
+  invalidNutzungsobjekte: number[] = [],
+  readonly = false
+) {
   const { abrechnung } = useAbrechnungForm();
   const wrapper = shallowMount(AbrechnungBerechnung, {
     props: {
       modelValue: abrechnung.value,
       suggestions: [],
       invalidNutzungsobjekte,
+      readonly,
     },
     global: { renderStubDefaultSlot: true },
   });
@@ -111,5 +115,25 @@ describe("AbrechnungBerechnung.vue", () => {
     expect(tabs[0]?.findComponent({ name: "v-icon" }).exists()).toBe(false);
     expect(tabs[1]?.findComponent({ name: "v-icon" }).exists()).toBe(true);
     expect(tabs[1]?.attributes("aria-label")).toBe("Adresse 2 enthält Fehler");
+  });
+
+  it("givenReadonly_thenOfferNoNutzungsobjektToAdd", () => {
+    const { wrapper } = mountBerechnung([], true);
+
+    const button = wrapper
+      .findAllComponents({ name: "v-btn" })
+      .find((candidate) =>
+        candidate.text().includes("Adresse/Flurstück hinzufügen")
+      );
+
+    expect(button).toBeUndefined();
+  });
+
+  it("givenReadonly_thenPassItOnToTheNutzungsobjekte", () => {
+    const { wrapper } = mountBerechnung([], true);
+
+    expect(
+      wrapper.findComponent(AbrechnungNutzungsobjektPanel).props("readonly")
+    ).toBe(true);
   });
 });

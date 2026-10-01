@@ -66,6 +66,7 @@
       </v-tab>
     </v-tabs>
     <v-btn
+      v-if="!readonly"
       class="ml-2 flex-shrink-0"
       :prepend-icon="mdiPlus"
       variant="text"
@@ -87,6 +88,7 @@
         :model-value="tab.nutzungsobjekt"
         :id-prefix="tab.idPrefix"
         :label="tab.label"
+        :readonly="readonly"
         :removable="nutzungsobjektTabs.length > 1"
         :suggestions="suggestions"
         @remove="removeNutzungsobjekt(tab.index)"
@@ -114,9 +116,10 @@ import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
 
 const abrechnung = defineModel<AbrechnungForm>({ required: true });
 
-const props = defineProps<{
+const { invalidNutzungsobjekte, readonly = false } = defineProps<{
   suggestions: ProjektAdresseSuggestion[];
   invalidNutzungsobjekte: number[];
+  readonly?: boolean;
 }>();
 
 const activeNutzungsobjekt = ref(abrechnung.value.nutzungsobjekte[0]?.id ?? "");
@@ -127,7 +130,7 @@ const nutzungsobjektTabs = computed(() =>
     index,
     label: adresseLabel(nutzungsobjekt, index + 1),
     idPrefix: nutzungsobjektIdPrefix(index),
-    invalid: props.invalidNutzungsobjekte.includes(index),
+    invalid: invalidNutzungsobjekte.includes(index),
   }))
 );
 

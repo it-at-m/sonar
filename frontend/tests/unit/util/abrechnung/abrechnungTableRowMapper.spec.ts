@@ -81,5 +81,17 @@ describe("abrechnungTableRowMapper.ts", () => {
 
       expect(row.widerspruchVorhanden).toBe(false);
     });
+
+    it("givenVersionsnummer_thenKeepIt", () => {
+      expect(toAbrechnungTableRow({ versionsnummer: 3 }).versionsnummer).toBe(
+        3
+      );
+    });
+
+    it("givenMissingVersionsnummer_thenTreatItAsTheFirstVersion", () => {
+      const row = toAbrechnungTableRow({ versionsnummer: undefined });
+
+      expect(row.versionsnummer).toBe(1);
+    });
   });
 });

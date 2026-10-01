@@ -7,6 +7,7 @@
       <span class="text-title-medium">{{ label }}</span>
       <v-spacer />
       <v-btn
+        v-if="!readonly"
         :aria-label="`${label} entfernen`"
         :disabled="!removable"
         :icon="mdiDelete"
@@ -15,7 +16,7 @@
       />
     </v-card-title>
     <v-card-text>
-      <v-menu v-if="suggestions.length > 0">
+      <v-menu v-if="!readonly && suggestions.length > 0">
         <template #activator="{ props: activatorProps }">
           <v-btn
             v-bind="activatorProps"
@@ -48,6 +49,7 @@
       <abrechnung-positionen-table
         v-model="nutzungsobjekt.positionen"
         :id-prefix="`${idPrefix}-position`"
+        :readonly="readonly"
       />
 
       <unerlaubte-nutzung-fields
@@ -91,11 +93,12 @@ const nutzungsobjekt = defineModel<AbrechnungNutzungsobjektForm>({
   required: true,
 });
 
-defineProps<{
+const { readonly = false } = defineProps<{
   idPrefix: string;
   label: string;
   removable: boolean;
   suggestions: ProjektAdresseSuggestion[];
+  readonly?: boolean;
 }>();
 
 const emit = defineEmits<{ remove: [] }>();
