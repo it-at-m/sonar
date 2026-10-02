@@ -30,11 +30,11 @@ public class AbrechnungPositionEntity extends BaseEntity {
     @Column(nullable = false)
     @NotNull private LocalDate ende;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal laenge;
+    @Column(precision = 12, scale = 2)
+    @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal laenge;
 
-    @Column(nullable = false, precision = 12, scale = 2)
-    @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal breite;
+    @Column(precision = 12, scale = 2)
+    @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal breite;
 
     @Column(nullable = false, precision = 12, scale = 2)
     @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal flaeche;
