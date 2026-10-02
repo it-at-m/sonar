@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.abrechnung.dto;
+package de.muenchen.oss.sonar.backend.calculation.dto;
 
 import java.math.BigDecimal;
 

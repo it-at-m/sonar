@@ -1,6 +1,7 @@
-package de.muenchen.oss.sonar.backend.abrechnung.dto;
+package de.muenchen.oss.sonar.backend.calculation.dto;
 
-import de.muenchen.oss.sonar.backend.abrechnung.Calculation;
+import de.muenchen.oss.sonar.backend.calculation.Calculation;
+import java.util.List;
 import org.mapstruct.Mapper;
 import org.mapstruct.ReportingPolicy;
 
@@ -8,5 +9,7 @@ import org.mapstruct.ReportingPolicy;
 public interface CalculationDTOMapper {
 
     CalculationResponseDTO toDTO(Calculation calculation);
+
+    List<CalculationResponseDTO> toDTOs(List<Calculation> calculations);
 
 }

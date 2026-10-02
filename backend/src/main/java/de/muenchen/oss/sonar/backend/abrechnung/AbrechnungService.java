@@ -69,6 +69,11 @@ public class AbrechnungService {
                 abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId));
     }
 
+    @Transactional(readOnly = true)
+    public boolean existsAbrechnung(final UUID projektId, final UUID abrechnungId) {
+        return abrechnungRepository.existsByIdAndProjektId(abrechnungId, projektId);
+    }
+
     @Transactional
     public Abrechnung createAbrechnung(final Abrechnung abrechnung) {
         if (!projektService.existsProjekt(abrechnung.projektId())) {

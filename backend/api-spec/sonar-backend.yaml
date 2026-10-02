@@ -440,9 +440,49 @@ paths:
       security:
       - bearerAuth: []
   /projekt/{projektId}/abrechnung/{abrechnungId}/calculation:
+    get:
+      tags:
+      - calculation-controller
+      summary: List the stored calculations of an Abrechnung.
+      description: |-
+        List the stored calculations of an Abrechnung.
+         Returns one entry per stored calculation, oldest first, with everything it carried when it was
+         stored: its Zusammenfassung, its Berechnungslog and its Bescheiddaten. Nothing is calculated
+         again, so an Abrechnung that was edited after a calculation was stored does not change the
+         answer.
+      operationId: getCalculations
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the Abrechnung the calculations belong to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "200":
+          description: "the stored calculations as DTOs, empty when the Abrechnung\
+            \ was never calculated"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/CalculationResponseDTO"
+      security:
+      - bearerAuth: []
     post:
       tags:
-      - abrechnung-controller
+      - calculation-controller
       summary: Store the result of a calculation.
       description: |-
         Store the result of a calculation.
@@ -450,7 +490,7 @@ paths:
          Abrechnung then charges only what this one left over: its Zahlbetrag is the difference, while
          its Gesamtbetrag still covers the whole Zeitraum. An Abrechnung may be calculated and stored
          more than once.
-      operationId: saveCalculation
+      operationId: storeCalculation
       parameters:
       - name: projektId
         in: path
@@ -486,10 +526,10 @@ paths:
                 $ref: "#/components/schemas/CalculationResponseDTO"
       security:
       - bearerAuth: []
-  /projekt/{projektId}/abrechnung/{abrechnungId}/calculate:
+  /projekt/{projektId}/abrechnung/{abrechnungId}/calculation/preview:
     post:
       tags:
-      - abrechnung-controller
+      - calculation-controller
       summary: Calculate an Abrechnung.
       description: |-
         Calculate an Abrechnung.
@@ -497,7 +537,7 @@ paths:
          given calculationDate. A Position reaching beyond that date is charged only up to it, and one
          beginning after it is left out. The Zeitraum stored on the Abrechnung does not limit the
          calculation, so the calculationDate may fall outside it.
-      operationId: calculate
+      operationId: previewCalculation
       parameters:
       - name: projektId
         in: path

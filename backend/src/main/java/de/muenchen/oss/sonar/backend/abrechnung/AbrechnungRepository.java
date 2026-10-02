@@ -21,6 +21,8 @@ public interface AbrechnungRepository extends CrudRepository<AbrechnungEntity, U
 
     Optional<AbrechnungEntity> findByIdAndProjektId(UUID id, UUID projektId);
 
+    boolean existsByIdAndProjektId(UUID id, UUID projektId);
+
     boolean existsByVorgaengerAbrechnungId(UUID vorgaengerAbrechnungId);
 
 }

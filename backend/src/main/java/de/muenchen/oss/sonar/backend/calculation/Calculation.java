@@ -1,4 +1,4 @@
-package de.muenchen.oss.sonar.backend.abrechnung;
+package de.muenchen.oss.sonar.backend.calculation;
 
 import de.muenchen.oss.sonar.backend.berechnung.abrechnung.AbrechnungUeberspannungen;
 import de.muenchen.oss.sonar.backend.berechnung.abrechnung.BescheiddatenFlaeche;
