@@ -20,7 +20,7 @@
     <template v-if="isAdresse">
       <v-col
         cols="12"
-        md="5"
+        md="3"
       >
         <v-text-field
           :id="`${idPrefix}-adresse`"
@@ -59,7 +59,7 @@
     <template v-else>
       <v-col
         cols="12"
-        md="5"
+        md="3"
       >
         <v-text-field
           :id="`${idPrefix}-flurstueck`"
@@ -85,7 +85,7 @@
 
     <v-col
       cols="12"
-      md="3"
+      :md="lastCols"
     >
       <v-select
         :id="`${idPrefix}-nutzung`"
@@ -95,13 +95,21 @@
         label="Nutzung"
       />
     </v-col>
+
+    <v-col
+      v-if="hasAfterNutzung"
+      cols="12"
+      md="2"
+    >
+      <slot name="after-nutzung" />
+    </v-col>
   </v-row>
 </template>
 
 <script setup lang="ts">
 import type { Adresse } from "@/types/common/Adresse";
 
-import { computed } from "vue";
+import { computed, useSlots } from "vue";
 
 import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
 import { clearFieldsOfUnselectedArt } from "@/util/common/adresseForm";
@@ -117,6 +125,12 @@ defineProps<{
 const isAdresse = computed(
   () => adresse.value.art === ProjektAdresseRequestDTOArtEnum.ADRESSE
 );
+
+const slots = useSlots();
+
+const hasAfterNutzung = computed(() => slots["after-nutzung"] !== undefined);
+
+const lastCols = computed(() => (hasAfterNutzung.value ? 3 : 5));
 </script>
 
 <style scoped>

@@ -6,5 +6,6 @@ export interface AbrechnungNutzungsobjektForm
   extends Adresse, UnerlaubteNutzung {
   id: string;
   bemerkung: string;
+  aufschlag50prozent: boolean;
   positionen: AbrechnungPositionForm[];
 }

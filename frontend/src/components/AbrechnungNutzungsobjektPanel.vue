@@ -42,7 +42,16 @@
       <adresse-fields
         :id-prefix="idPrefix"
         :model-value="nutzungsobjekt"
-      />
+      >
+        <template #after-nutzung>
+          <v-checkbox
+            :id="`${idPrefix}-aufschlag50prozent`"
+            v-model="nutzungsobjekt.aufschlag50prozent"
+            hide-details
+            label="Aufschlag 50 %"
+          />
+        </template>
+      </adresse-fields>
 
       <h3 class="text-title-small mt-2 mb-2">Positionen</h3>
 
