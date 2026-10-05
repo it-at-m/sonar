@@ -40,6 +40,7 @@ public class AbrechnungService {
     private final AbrechnungRepository abrechnungRepository;
     private final ProjektService projektService;
     private final AbrechnungEntityMapper abrechnungEntityMapper;
+    private final NutzungsobjektService nutzungsobjektService;
 
     @Transactional(readOnly = true)
     public Page<Abrechnung> getAbrechnungenOfProjekt(final UUID projektId, final int pageNumber, final int pageSize,
@@ -109,7 +110,7 @@ public class AbrechnungService {
         if (!projektService.existsProjekt(abrechnung.projektId())) {
             throw new NotFoundException(String.format(MSG_NOT_FOUND, abrechnung.projektId()));
         }
-        final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
+        final AbrechnungEntity abrechnungEntity = toAbrechnungEntity(abrechnung);
         abrechnungEntity.setVersionsnummer(FIRST_VERSION_NUMBER);
         log.debug("Create Abrechnung {}", abrechnungEntity);
         return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(abrechnungEntity), false);
@@ -126,11 +127,15 @@ public class AbrechnungService {
         if (abrechnungRepository.existsByVorgaengerAbrechnungId(vorgaengerAbrechnungId)) {
             throw new ConflictException(String.format(MSG_NEWER_VERSION_ALREADY_EXISTS, vorgaengerAbrechnungId));
         }
-        final AbrechnungEntity nextVersion = abrechnungEntityMapper.toEntity(abrechnung);
+        final AbrechnungEntity nextVersion = toAbrechnungEntity(abrechnung);
         nextVersion.setVersionsnummer(vorgaenger.getVersionsnummer() + 1);
         nextVersion.setVorgaengerAbrechnungId(vorgaengerAbrechnungId);
         log.debug("Create next version of Abrechnung {}: {}", vorgaengerAbrechnungId, nextVersion);
         return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(nextVersion), false);
+    }
+
+    private AbrechnungEntity toAbrechnungEntity(final Abrechnung abrechnung) {
+        return abrechnungEntityMapper.toEntity(abrechnung, nutzungsobjektService.selectedPreexistingNutzungsobjekte(abrechnung));
     }
 
     private Sort resolveSortWithInputOrDefaults(final List<AbrechnungSortBy> sortBy, final List<Sort.Direction> directions) {

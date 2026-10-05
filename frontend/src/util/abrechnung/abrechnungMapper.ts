@@ -47,6 +47,7 @@ function toNutzungsobjektRequestDTO(
   nutzungsobjekt: AbrechnungNutzungsobjektForm
 ): AbrechnungNutzungsobjektRequestDTO {
   return {
+    id: nutzungsobjekt.uebernommenesNutzungsobjektId ?? undefined,
     ...toAdresseRequestFields(nutzungsobjekt),
     ...toUnerlaubteNutzungRequestFields(nutzungsobjekt),
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
@@ -85,6 +86,7 @@ function toNutzungsobjektForm(
   const positionen = (nutzungsobjekt.positionen ?? []).map(toPositionForm);
   return {
     id: crypto.randomUUID(),
+    uebernommenesNutzungsobjektId: null,
     art: nutzungsobjekt.art ?? ProjektAdresseRequestDTOArtEnum.ADRESSE,
     adresse: nutzungsobjekt.adresse ?? "",
     hausnummerVon: nutzungsobjekt.hausnummerVon ?? "",
