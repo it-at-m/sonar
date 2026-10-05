@@ -1,8 +1,9 @@
 {
   "_comment": "TEMPORARY TRANSITIVE DEPENDENCY OVERRIDES FOR SECURITY FIXES",
   "overrides": {
-    "basic-ftp": "6.2.2",
-    "http-cache-semantics": "4.3.0"
+    "get-uri": {
+      "basic-ftp": "6.2.2"
+    }
   },
   "name": "sonar-frontend",
   "version": "0.0.1",
