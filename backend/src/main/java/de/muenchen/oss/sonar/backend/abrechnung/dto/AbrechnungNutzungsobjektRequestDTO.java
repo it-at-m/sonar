@@ -28,6 +28,7 @@ public record AbrechnungNutzungsobjektRequestDTO(
         LocalDate unerlaubteNutzungBis,
         @Min(1) Integer tageUnerlaubteNutzung,
         @Size(max = 10_000) String bemerkung,
+        boolean aufschlag50prozent,
         @NotEmpty List<@Valid AbrechnungPositionRequestDTO> positionen) implements Adresse, UnerlaubteNutzung {
 
     /**

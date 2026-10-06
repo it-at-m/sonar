@@ -39,9 +39,6 @@ public class AbrechnungPositionEntity extends BaseEntity {
     @Column(nullable = false, precision = 12, scale = 2)
     @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal flaeche;
 
-    @Column(nullable = false)
-    private boolean haelfte;
-
     @Column(nullable = false, precision = 12, scale = 2)
     @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) private BigDecimal anteilAnFlaeche;
 

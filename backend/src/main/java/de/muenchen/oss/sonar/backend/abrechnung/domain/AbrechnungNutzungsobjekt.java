@@ -20,6 +20,7 @@ public record AbrechnungNutzungsobjekt(
         LocalDate unerlaubteNutzungBis,
         Integer tageUnerlaubteNutzung,
         String bemerkung,
+        boolean aufschlag50prozent,
         List<AbrechnungPosition> positionen) {
 
     /**

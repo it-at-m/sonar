@@ -19,6 +19,7 @@ public record AbrechnungNutzungsobjektResponseDTO(
         LocalDate unerlaubteNutzungBis,
         Integer tageUnerlaubteNutzung,
         String bemerkung,
+        boolean aufschlag50prozent,
         List<AbrechnungPositionResponseDTO> positionen) {
 
     /**

@@ -960,6 +960,8 @@ components:
           maxLength: 10000
           minLength: 0
           type: string
+        aufschlag50prozent:
+          type: boolean
         positionen:
           minItems: 1
           type: array
@@ -993,8 +995,6 @@ components:
           minimum: 0
           exclusiveMinimum: true
           type: number
-        haelfte:
-          type: boolean
         anteilAnFlaeche:
           minimum: 0
           exclusiveMinimum: true
@@ -1103,6 +1103,8 @@ components:
           format: int32
         bemerkung:
           type: string
+        aufschlag50prozent:
+          type: boolean
         positionen:
           type: array
           items:
@@ -1125,8 +1127,6 @@ components:
           type: number
         flaeche:
           type: number
-        haelfte:
-          type: boolean
         anteilAnFlaeche:
           type: number
     AbrechnungResponseDTO:

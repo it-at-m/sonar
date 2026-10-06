@@ -49,6 +49,13 @@ describe("abrechnungNutzungsobjektForm.ts", () => {
       expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
     });
 
+    it("givenAufschlag50prozent_thenReturnTrue", () => {
+      const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+      nutzungsobjekt.aufschlag50prozent = true;
+
+      expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
+    });
+
     it("givenTageUnerlaubteNutzung_thenReturnTrue", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
       nutzungsobjekt.tageUnerlaubteNutzung = 3;

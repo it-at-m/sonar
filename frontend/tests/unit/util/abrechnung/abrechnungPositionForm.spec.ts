@@ -19,12 +19,6 @@ describe("abrechnungPositionForm.ts", () => {
       expect(isAbrechnungPositionDirty(createAbrechnungPosition())).toBe(false);
     });
 
-    it("givenHaelfte_thenReturnTrue", () => {
-      const position = positionWith({ haelfte: true });
-
-      expect(isAbrechnungPositionDirty(position)).toBe(true);
-    });
-
     it("givenFlaeche_thenReturnTrue", () => {
       const position = positionWith({ flaeche: 36 });
 

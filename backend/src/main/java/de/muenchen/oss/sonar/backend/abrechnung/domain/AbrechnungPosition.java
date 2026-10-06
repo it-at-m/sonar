@@ -12,7 +12,6 @@ public record AbrechnungPosition(
         BigDecimal laenge,
         BigDecimal breite,
         BigDecimal flaeche,
-        boolean haelfte,
         BigDecimal anteilAnFlaeche) {
 
     public AbrechnungPosition {

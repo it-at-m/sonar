@@ -25,11 +25,33 @@
   "overrides": {
     "esbuild": "0.25.12",
     "vite": "6.4.3",
+    "vitepress": {
+      "postcss": {
+        "source-map-js": "1.2.2"
+      }
+    },
+    "@muenchen/prettier-codeformat": {
+      "@ianvs/prettier-plugin-sort-imports": {
+        "@vue/compiler-sfc": {
+          "source-map-js": "1.2.2",
+          "@vue/compiler-core": {
+            "source-map-js": "1.2.2"
+          }
+        }
+      }
+    },
     "mermaid": {
+      "katex": "0.18.2",
       "dompurify": "3.4.16"
     },
     "markdownlint-cli": {
-      "js-yaml": "5.4.1"
+      "js-yaml": "5.4.1",
+      "smol-toml": "1.9.0",
+      "markdownlint": {
+        "micromark-extension-math": {
+          "katex": "0.18.2"
+        }
+      }
     }
   }
 }

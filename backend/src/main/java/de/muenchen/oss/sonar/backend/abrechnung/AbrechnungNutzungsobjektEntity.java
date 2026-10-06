@@ -39,6 +39,9 @@ public class AbrechnungNutzungsobjektEntity extends BaseEntity {
     @Column(length = 10_000)
     @Size(max = 10_000) private String bemerkung;
 
+    @Column(nullable = false)
+    private boolean aufschlag50prozent;
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "nutzungsobjekt_id", nullable = false)
     @OrderColumn(name = "sort_order", nullable = false)

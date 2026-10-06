@@ -86,11 +86,11 @@ class AbrechnungServiceTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setHaelfte(true);
             erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungNutzungsobjektEntity erstesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
             erstesNutzungsobjekt.addPosition(erstePosition);
+            erstesNutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable ersteAdressdaten = erstesNutzungsobjekt.getAdressdaten();
             ersteAdressdaten.setArt(Adressart.ADRESSE);
@@ -113,11 +113,11 @@ class AbrechnungServiceTest {
             zweitePosition.setLaenge(new BigDecimal("12.00"));
             zweitePosition.setBreite(new BigDecimal("3.00"));
             zweitePosition.setFlaeche(new BigDecimal("36.00"));
-            zweitePosition.setHaelfte(true);
             zweitePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungNutzungsobjektEntity zweitesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
             zweitesNutzungsobjekt.addPosition(zweitePosition);
+            zweitesNutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable zweiteAdressdaten = zweitesNutzungsobjekt.getAdressdaten();
             zweiteAdressdaten.setArt(Adressart.ADRESSE);
@@ -157,11 +157,11 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setHaelfte(true);
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
             nutzungsobjekt.addPosition(position);
+            nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
             adressdaten.setArt(Adressart.ADRESSE);
@@ -189,11 +189,11 @@ class AbrechnungServiceTest {
             anderePosition.setLaenge(new BigDecimal("12.00"));
             anderePosition.setBreite(new BigDecimal("3.00"));
             anderePosition.setFlaeche(new BigDecimal("36.00"));
-            anderePosition.setHaelfte(true);
             anderePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungNutzungsobjektEntity anderesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
             anderesNutzungsobjekt.addPosition(anderePosition);
+            anderesNutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable andereAdressdaten = anderesNutzungsobjekt.getAdressdaten();
             andereAdressdaten.setArt(Adressart.ADRESSE);
@@ -230,11 +230,11 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setHaelfte(true);
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
             nutzungsobjekt.addPosition(position);
+            nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
             adressdaten.setArt(Adressart.ADRESSE);
@@ -395,10 +395,10 @@ class AbrechnungServiceTest {
         @Test
         void givenAbrechnung_thenReturnSavedAbrechnung() {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
-                    VON, BIS, null, "Bemerkung", List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -421,18 +421,18 @@ class AbrechnungServiceTest {
             assertThat(savedNutzungsobjekt.adresse()).isEqualTo("Marienplatz");
             assertThat(savedNutzungsobjekt.hausnummerBis()).isEqualTo("12");
             assertThat(savedNutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(90);
+            assertThat(savedNutzungsobjekt.aufschlag50prozent()).isTrue();
             assertThat(savedNutzungsobjekt.positionen()).hasSize(1);
             assertThat(savedNutzungsobjekt.positionen().getFirst().flaeche()).isEqualByComparingTo("36.00");
-            assertThat(savedNutzungsobjekt.positionen().getFirst().haelfte()).isTrue();
         }
 
         @Test
         void givenAbrechnung_thenSaveItAsTheFirstVersion() {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
-                    null, null, null, null, List.of(position));
+                    null, null, null, null, true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -475,11 +475,11 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setHaelfte(true);
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
             nutzungsobjekt.addPosition(position);
+            nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
             adressdaten.setArt(Adressart.ADRESSE);
@@ -518,11 +518,11 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setHaelfte(true);
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
             nutzungsobjekt.addPosition(position);
+            nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
             adressdaten.setArt(Adressart.ADRESSE);
@@ -691,10 +691,10 @@ class AbrechnungServiceTest {
             vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
 
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
-                    new BigDecimal("3.00"), new BigDecimal("45.00"), false, new BigDecimal("45.00"));
+                    new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_A,
-                    null, null, null, null, List.of(position));
+                    null, null, null, null, false, List.of(position));
             final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000002", false, null, null,
                     VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
