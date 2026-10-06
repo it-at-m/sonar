@@ -1,6 +1,35 @@
 {
   "_comment": "TEMPORARY TRANSITIVE DEPENDENCY OVERRIDES FOR SECURITY FIXES",
-  "overrides": {},
+  "overrides": {
+    "get-uri": {
+      "basic-ftp": "6.2.2"
+    },
+    "vite": {
+      "postcss": {
+        "source-map-js": "1.2.2"
+      }
+    },
+    "vue-router": {
+      "@vue/compiler-sfc": {
+        "source-map-js": "1.2.2",
+        "@vue/compiler-core": {
+          "source-map-js": "1.2.2"
+        }
+      }
+    },
+    "@vue/test-utils": {
+      "@vue/compiler-dom": {
+        "@vue/compiler-core": {
+          "source-map-js": "1.2.2"
+        }
+      }
+    },
+    "jsdom": {
+      "css-tree": {
+        "source-map-js": "1.2.2"
+      }
+    }
+  },
   "name": "sonar-frontend",
   "version": "0.0.1",
   "type": "module",
