@@ -16,7 +16,7 @@ class AbrechnungNutzungsobjektTest {
     private static final LocalDate BIS = LocalDate.of(2026, 1, 31);
 
     private static final AbrechnungPosition POSITION = new AbrechnungPosition(
-            null, VON, BIS, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, false, BigDecimal.ZERO);
+            null, VON, BIS, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ZERO);
 
     @Nested
     class TageUnerlaubteNutzung {
@@ -24,7 +24,7 @@ class AbrechnungNutzungsobjektTest {
         void givenZeitraum_thenDeriveTheTageInclusive() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    VON, BIS, null, null, List.of(POSITION));
+                    VON, BIS, null, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(31);
         }
@@ -33,7 +33,7 @@ class AbrechnungNutzungsobjektTest {
         void givenOnlyTage_thenKeepThem() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    null, null, 12, null, List.of(POSITION));
+                    null, null, 12, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(12);
         }
@@ -42,7 +42,7 @@ class AbrechnungNutzungsobjektTest {
         void givenMatchingZeitraumAndTage_thenKeepThem() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    VON, BIS, 31, null, List.of(POSITION));
+                    VON, BIS, 31, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(31);
         }
@@ -51,14 +51,14 @@ class AbrechnungNutzungsobjektTest {
         void givenContradictingTage_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    VON, BIS, 12, null, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
+                    VON, BIS, 12, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenNeitherZeitraumNorTage_thenLeaveThemEmpty() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    null, null, null, null, List.of(POSITION));
+                    null, null, null, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isNull();
         }
@@ -70,21 +70,21 @@ class AbrechnungNutzungsobjektTest {
         void givenOnlyBeginn_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    VON, null, null, null, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
+                    VON, null, null, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenOnlyEnde_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    null, BIS, null, null, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
+                    null, BIS, null, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenInvertedZeitraum_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    BIS, VON, null, null, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
+                    BIS, VON, null, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
     }
 
@@ -94,7 +94,7 @@ class AbrechnungNutzungsobjektTest {
         void givenNoPositionen_thenReturnAnEmptyList() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
-                    null, null, null, null, null);
+                    null, null, null, null, false, null);
 
             assertThat(nutzungsobjekt.positionen()).isEmpty();
         }

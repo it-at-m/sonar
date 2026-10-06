@@ -14,7 +14,7 @@ class AbrechnungPositionTest {
     private static final LocalDate ENDE = LocalDate.of(2026, 3, 31);
 
     private static AbrechnungPosition positionWith(final LocalDate beginn, final LocalDate ende) {
-        return new AbrechnungPosition(null, beginn, ende, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, false, BigDecimal.ZERO);
+        return new AbrechnungPosition(null, beginn, ende, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ONE, BigDecimal.ZERO);
     }
 
     @Nested

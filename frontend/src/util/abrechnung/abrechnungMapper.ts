@@ -50,6 +50,7 @@ function toNutzungsobjektRequestDTO(
     ...toAdresseRequestFields(nutzungsobjekt),
     ...toUnerlaubteNutzungRequestFields(nutzungsobjekt),
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
+    aufschlag50prozent: nutzungsobjekt.aufschlag50prozent,
     positionen: nutzungsobjekt.positionen.map(toPositionRequestDTO),
   };
 }
@@ -95,6 +96,7 @@ function toNutzungsobjektForm(
     unerlaubteNutzungBis: toIsoDateString(nutzungsobjekt.unerlaubteNutzungBis),
     tageUnerlaubteNutzung: nutzungsobjekt.tageUnerlaubteNutzung ?? null,
     bemerkung: nutzungsobjekt.bemerkung ?? "",
+    aufschlag50prozent: nutzungsobjekt.aufschlag50prozent ?? false,
     positionen:
       positionen.length > 0 ? positionen : [createAbrechnungPosition()],
   };
@@ -110,7 +112,6 @@ function toPositionForm(
     laenge: position.laenge ?? null,
     breite: position.breite ?? null,
     flaeche: position.flaeche ?? null,
-    haelfte: position.haelfte ?? false,
     anteilAnFlaeche: position.anteilAnFlaeche ?? null,
   };
 }
@@ -126,7 +127,6 @@ function toPositionRequestDTO(
     laenge: position.laenge ?? 0,
     breite: position.breite ?? 0,
     flaeche: position.flaeche ?? 0,
-    haelfte: position.haelfte,
     anteilAnFlaeche: position.anteilAnFlaeche ?? 0,
   };
 }

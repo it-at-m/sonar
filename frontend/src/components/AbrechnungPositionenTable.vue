@@ -9,7 +9,6 @@
             <th>Länge (m)</th>
             <th>Breite (m)</th>
             <th>Fläche (m²)</th>
-            <th>50 %</th>
             <th>Anteil Fläche (m²)</th>
             <th v-if="!readonly" />
           </tr>
@@ -73,14 +72,6 @@
                 density="compact"
                 :precision="2"
                 :rules="[requiredRule, greaterThanZeroRule]"
-              />
-            </td>
-            <td>
-              <v-checkbox
-                v-model="position.haelfte"
-                :aria-label="`50 % für Position ${index + 1}`"
-                density="compact"
-                hide-details
               />
             </td>
             <td>

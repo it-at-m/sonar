@@ -28,10 +28,10 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenAbrechnung_thenDropTheIdsAndKeepTheChildren() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
-                    VON, BIS, null, "Bemerkung", List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -46,21 +46,21 @@ class AbrechnungEntityMapperTest {
             assertThat(nutzungsobjektEntity.getId()).isNull();
             assertThat(nutzungsobjektEntity.getAdressdaten().getAdresse()).isEqualTo("Marienplatz");
             assertThat(nutzungsobjektEntity.getAdressdaten().getTageUnerlaubteNutzung()).isEqualTo(90);
+            assertThat(nutzungsobjektEntity.isAufschlag50prozent()).isTrue();
             assertThat(nutzungsobjektEntity.getPositionen()).hasSize(1);
 
             final AbrechnungPositionEntity positionEntity = nutzungsobjektEntity.getPositionen().getFirst();
             assertThat(positionEntity.getId()).isNull();
             assertThat(positionEntity.getFlaeche()).isEqualByComparingTo("36.00");
-            assertThat(positionEntity.isHaelfte()).isTrue();
         }
 
         @Test
         void givenAbrechnung_thenLeaveThePlaceInTheChainOfVersionsUnset() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
-                    VON, BIS, null, "Bemerkung", List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 3, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -76,10 +76,10 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenPersistedEntity_thenReturnItWithItsIds() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
-                    VON, BIS, null, "Bemerkung", List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -108,10 +108,10 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenWiderspruch_thenCarryItIntoTheAbrechnung() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
-                    VON, BIS, null, "Bemerkung", List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             final AbrechnungEntity entity = abrechnungEntityMapper.toEntity(abrechnung);
@@ -137,10 +137,10 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenNeuereVersionVorhanden_thenCarryTheFlagIntoTheAbrechnung() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), true, new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
-                    VON, BIS, null, "Bemerkung", List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             final AbrechnungEntity entity = abrechnungEntityMapper.toEntity(abrechnung);
