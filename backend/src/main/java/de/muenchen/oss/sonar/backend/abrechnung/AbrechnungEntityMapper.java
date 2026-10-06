@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import org.mapstruct.CollectionMappingStrategy;
@@ -33,5 +34,8 @@ public interface AbrechnungEntityMapper {
 
     @Mapping(target = "id", ignore = true)
     AbrechnungPositionEntity toEntity(AbrechnungPosition abrechnungPosition);
+
+    @Mapping(target = "id", ignore = true)
+    AbrechnungMastEntity toEntity(AbrechnungMast abrechnungMast);
 
 }

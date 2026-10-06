@@ -11,7 +11,6 @@ import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -45,7 +44,15 @@ public class AbrechnungNutzungsobjektEntity extends BaseEntity {
     @BatchSize(size = 25)
     @Setter(AccessLevel.NONE)
     @ToString.Exclude
-    @NotEmpty private List<AbrechnungPositionEntity> positionen = new ArrayList<>();
+    private List<AbrechnungPositionEntity> positionen = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "nutzungsobjekt_id", nullable = false)
+    @OrderColumn(name = "sort_order", nullable = false)
+    @BatchSize(size = 25)
+    @Setter(AccessLevel.NONE)
+    @ToString.Exclude
+    private List<AbrechnungMastEntity> masten = new ArrayList<>();
 
     public List<AbrechnungPositionEntity> getPositionen() {
         return Collections.unmodifiableList(positionen);
@@ -53,6 +60,14 @@ public class AbrechnungNutzungsobjektEntity extends BaseEntity {
 
     public void addPosition(final AbrechnungPositionEntity position) {
         positionen.add(position);
+    }
+
+    public List<AbrechnungMastEntity> getMasten() {
+        return Collections.unmodifiableList(masten);
+    }
+
+    public void addMast(final AbrechnungMastEntity mast) {
+        masten.add(mast);
     }
 
 }

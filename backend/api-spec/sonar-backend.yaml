@@ -443,14 +443,14 @@ paths:
     get:
       tags:
       - calculation-controller
-      summary: List the stored calculations of an Abrechnung.
+      summary: Read the stored calculation of an Abrechnung.
       description: |-
-        List the stored calculations of an Abrechnung.
-         Returns one entry per stored calculation, oldest first, with everything it carried when it was
-         stored: its Zusammenfassung, its Berechnungslog and its Bescheiddaten. Nothing is calculated
-         again, so an Abrechnung that was edited after a calculation was stored does not change the
-         answer.
-      operationId: getCalculations
+        Read the stored calculation of an Abrechnung.
+         An Abrechnung is calculated once, and the answer carries everything that calculation held when
+         it was stored: its Zusammenfassung, its Berechnungslog and its Bescheiddaten. Nothing is
+         calculated again, so an Abrechnung that was edited after its calculation was stored does not
+         change the answer.
+      operationId: getCalculation
       parameters:
       - name: projektId
         in: path
@@ -461,23 +461,21 @@ paths:
           format: uuid
       - name: abrechnungId
         in: path
-        description: the UUID of the Abrechnung the calculations belong to
+        description: the UUID of the Abrechnung the calculation belongs to
         required: true
         schema:
           type: string
           format: uuid
       responses:
         "404":
-          description: the Projekt has no Abrechnung with that UUID
-        "200":
-          description: "the stored calculations as DTOs, empty when the Abrechnung\
+          description: "the Projekt has no Abrechnung with that UUID, or the Abrechnung\
             \ was never calculated"
+        "200":
+          description: the stored calculation as a DTO
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/CalculationResponseDTO"
+                $ref: "#/components/schemas/CalculationResponseDTO"
       security:
       - bearerAuth: []
     post:
@@ -486,10 +484,10 @@ paths:
       summary: Store the result of a calculation.
       description: |-
         Store the result of a calculation.
-         Runs the same calculation as the preview and keeps its result. A later calculation of the
-         Abrechnung then charges only what this one left over: its Zahlbetrag is the difference, while
-         its Gesamtbetrag still covers the whole Zeitraum. An Abrechnung may be calculated and stored
-         more than once.
+         Runs the same calculation as the preview and keeps its result. An Abrechnung carries at most one
+         calculation, so a second one is refused. A further Abrechnung of the Projekt then charges only
+         what this one left over: its Zahlbetrag is the difference, while its Gesamtbetrag still covers
+         the whole Zeitraum.
       operationId: storeCalculation
       parameters:
       - name: projektId
@@ -518,6 +516,8 @@ paths:
           description: the calculationDate is missing or is not a date
         "404":
           description: the Projekt has no Abrechnung with that UUID
+        "409":
+          description: the Abrechnung already has a calculation
         "201":
           description: the stored result of the calculation as a DTO
           content:
@@ -1009,10 +1009,21 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektAdresseResponseDTO"
+    AbrechnungMastRequestDTO:
+      required:
+      - beginn
+      - ende
+      type: object
+      properties:
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
     AbrechnungNutzungsobjektRequestDTO:
       required:
       - art
-      - positionen
       type: object
       properties:
         art:
@@ -1061,10 +1072,13 @@ components:
           minLength: 0
           type: string
         positionen:
-          minItems: 1
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungPositionRequestDTO"
+        masten:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungMastRequestDTO"
     AbrechnungPositionRequestDTO:
       required:
       - anteilAnFlaeche
@@ -1169,6 +1183,18 @@ components:
          <p>
          An Abrechnung is created below its Projekt, so the path decides which one it belongs to.
          </p>
+    AbrechnungMastResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
     AbrechnungNutzungsobjektResponseDTO:
       type: object
       properties:
@@ -1211,6 +1237,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungPositionResponseDTO"
+        masten:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungMastResponseDTO"
     AbrechnungPositionResponseDTO:
       type: object
       properties:

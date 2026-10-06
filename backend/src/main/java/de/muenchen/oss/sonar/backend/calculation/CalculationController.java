@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import java.time.LocalDate;
-import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.springframework.format.annotation.DateTimeFormat;
@@ -31,22 +30,22 @@ public class CalculationController {
     private final CalculationDTOMapper calculationDTOMapper;
 
     /**
-     * List the stored calculations of an Abrechnung.
-     * Returns one entry per stored calculation, oldest first, with everything it carried when it was
-     * stored: its Zusammenfassung, its Berechnungslog and its Bescheiddaten. Nothing is calculated
-     * again, so an Abrechnung that was edited after a calculation was stored does not change the
-     * answer.
+     * Read the stored calculation of an Abrechnung.
+     * An Abrechnung is calculated once, and the answer carries everything that calculation held when
+     * it was stored: its Zusammenfassung, its Berechnungslog and its Bescheiddaten. Nothing is
+     * calculated again, so an Abrechnung that was edited after its calculation was stored does not
+     * change the answer.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
-     * @param abrechnungId the UUID of the Abrechnung the calculations belong to
-     * @return the stored calculations as DTOs, empty when the Abrechnung was never calculated
+     * @param abrechnungId the UUID of the Abrechnung the calculation belongs to
+     * @return the stored calculation as a DTO
      */
     @GetMapping("/calculation")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = "404", description = "the Projekt has no Abrechnung with that UUID", content = @Content)
-    public List<CalculationResponseDTO> getCalculations(@PathVariable("projektId") final UUID projektId,
+    @ApiResponse(responseCode = "404", description = "the Projekt has no Abrechnung with that UUID, or the Abrechnung was never calculated", content = @Content)
+    public CalculationResponseDTO getCalculation(@PathVariable("projektId") final UUID projektId,
             @PathVariable("abrechnungId") final UUID abrechnungId) {
-        return calculationDTOMapper.toDTOs(calculationService.getCalculations(projektId, abrechnungId));
+        return calculationDTOMapper.toDTO(calculationService.getCalculation(projektId, abrechnungId));
     }
 
     /**
@@ -73,10 +72,10 @@ public class CalculationController {
 
     /**
      * Store the result of a calculation.
-     * Runs the same calculation as the preview and keeps its result. A later calculation of the
-     * Abrechnung then charges only what this one left over: its Zahlbetrag is the difference, while
-     * its Gesamtbetrag still covers the whole Zeitraum. An Abrechnung may be calculated and stored
-     * more than once.
+     * Runs the same calculation as the preview and keeps its result. An Abrechnung carries at most one
+     * calculation, so a second one is refused. A further Abrechnung of the Projekt then charges only
+     * what this one left over: its Zahlbetrag is the difference, while its Gesamtbetrag still covers
+     * the whole Zeitraum.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungId the UUID of the Abrechnung to calculate and store
@@ -87,6 +86,7 @@ public class CalculationController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the calculationDate is missing or is not a date", content = @Content)
     @ApiResponse(responseCode = "404", description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    @ApiResponse(responseCode = "409", description = "the Abrechnung already has a calculation", content = @Content)
     public CalculationResponseDTO storeCalculation(@PathVariable("projektId") final UUID projektId,
             @PathVariable("abrechnungId") final UUID abrechnungId,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate calculationDate) {

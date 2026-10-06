@@ -36,7 +36,7 @@ public class CalculationEntity extends BaseEntity {
 
     private static final String TEXT = "text";
 
-    @Column(name = "abrechnung_id", nullable = false)
+    @Column(name = "abrechnung_id", nullable = false, unique = true)
     @NotNull private UUID abrechnungId;
 
     @Column(name = "lfd_nr", nullable = false)
