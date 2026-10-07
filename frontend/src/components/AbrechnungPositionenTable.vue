@@ -156,3 +156,18 @@ function removePosition(index: number): void {
   positionen.value.splice(index, 1);
 }
 </script>
+
+<style scoped>
+:deep(.v-input__details) {
+  width: 0;
+  min-width: 100%;
+}
+
+:deep(.v-messages__message) {
+  line-height: normal;
+}
+
+td {
+  vertical-align: top;
+}
+</style>
