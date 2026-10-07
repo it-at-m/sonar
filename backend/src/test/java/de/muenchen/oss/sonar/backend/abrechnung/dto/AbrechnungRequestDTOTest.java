@@ -305,6 +305,33 @@ class AbrechnungRequestDTOTest {
     }
 
     @Nested
+    class Flaeche {
+        @Test
+        void givenOnlyFlaeche_thenNoViolation() {
+            final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, null, null,
+                    new BigDecimal("36.00"), new BigDecimal("30.00"));
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
+        }
+
+        @Test
+        void givenNoFlaeche_thenViolation() {
+            final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, null, null, null,
+                    new BigDecimal("30.00"));
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            assertThat(validator.validate(requestDTO)).hasSize(1);
+        }
+    }
+
+    @Nested
     class Nutzungsobjekte {
         @Test
         void givenNoNutzungsobjekte_thenViolation() {
