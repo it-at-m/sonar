@@ -1,57 +1,20 @@
 package de.muenchen.oss.sonar.backend.berechnung.abrechnung;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
+import java.util.List;
+import lombok.Builder;
 
-/**
- * Ported from the prototype and kept the way it was written there.
- * Cleaning up the naming, the method sizes and the mutability belongs to the refactoring, so PMD is
- * silenced for the whole class until then.
- */
-@SuppressWarnings("PMD")
-public class AbrechnungUeberspannungen {
+@Builder(builderClassName = "Builder")
+public record AbrechnungUeberspannungen(
+        String adresse,
+        String berechnungslog,
+        BigDecimal gebuehrUeberspannungen,
+        List<BescheiddatenUeberspannung> bescheiddatenUeberspannungen) {
 
-    private final ArrayList<BescheiddatenUeberspannung> bescheiddatenUeberspannungen;
-    private String adresse;
-    private String berechnungslog;
-    private BigDecimal gebuehrUeberspannungen;
-
-    public AbrechnungUeberspannungen() {
-        this.bescheiddatenUeberspannungen = new ArrayList<BescheiddatenUeberspannung>();
-        this.adresse = "";
-        this.berechnungslog = "";
-        this.gebuehrUeberspannungen = BigDecimal.ZERO;
-    }
-
-    public void addBescheiddatenUeberspannung(BescheiddatenUeberspannung ueDaten) {
-        bescheiddatenUeberspannungen.add(ueDaten);
-    }
-
-    public ArrayList<BescheiddatenUeberspannung> getBescheiddatenUeberspannungen() {
-        return bescheiddatenUeberspannungen;
-    }
-
-    public String getAdresse() {
-        return adresse;
-    }
-
-    public void setAdresse(String adresse) {
-        this.adresse = adresse;
-    }
-
-    public void appendToBerechnungslog(String text) {
-        berechnungslog = berechnungslog.concat(text);
-    }
-
-    public String getBerechnungslog() {
-        return berechnungslog;
-    }
-
-    public BigDecimal getGebuehrUeberspannungen() {
-        return gebuehrUeberspannungen;
-    }
-
-    public void setGebuehrUeberspannungen(BigDecimal gebuehrUeberspannungen) {
-        this.gebuehrUeberspannungen = gebuehrUeberspannungen;
+    public AbrechnungUeberspannungen {
+        adresse = adresse == null ? "" : adresse;
+        berechnungslog = berechnungslog == null ? "" : berechnungslog;
+        gebuehrUeberspannungen = gebuehrUeberspannungen == null ? BigDecimal.ZERO : gebuehrUeberspannungen;
+        bescheiddatenUeberspannungen = bescheiddatenUeberspannungen == null ? List.of() : List.copyOf(bescheiddatenUeberspannungen);
     }
 }

@@ -7,6 +7,7 @@ import java.util.UUID;
 
 public record AbrechnungPosition(
         UUID id,
+        String bezeichnung,
         LocalDate beginn,
         LocalDate ende,
         BigDecimal laenge,
