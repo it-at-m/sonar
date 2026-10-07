@@ -28,6 +28,11 @@
       "css-tree": {
         "source-map-js": "1.2.2"
       }
+    },
+    "@openapitools/openapi-generator-cli": {
+      "concurrently": {
+        "shell-quote": "1.11.0"
+      }
     }
   },
   "name": "sonar-frontend",
