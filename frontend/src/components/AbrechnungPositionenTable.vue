@@ -44,23 +44,25 @@
             <td>
               <v-number-input
                 :id="`${idPrefix}-laenge-${index}`"
-                v-model="position.laenge"
                 :aria-label="`Länge der Position ${index + 1}`"
                 control-variant="hidden"
                 density="compact"
+                :model-value="position.laenge"
                 :precision="2"
-                :rules="[requiredRule, greaterThanZeroRule]"
+                :rules="[laengeRule(position), greaterThanZeroRule]"
+                @update:model-value="setLaenge(position, $event)"
               />
             </td>
             <td>
               <v-number-input
                 :id="`${idPrefix}-breite-${index}`"
-                v-model="position.breite"
                 :aria-label="`Breite der Position ${index + 1}`"
                 control-variant="hidden"
                 density="compact"
+                :model-value="position.breite"
                 :precision="2"
-                :rules="[requiredRule, greaterThanZeroRule]"
+                :rules="[breiteRule(position), greaterThanZeroRule]"
+                @update:model-value="setBreite(position, $event)"
               />
             </td>
             <td>
@@ -70,8 +72,14 @@
                 :aria-label="`Fläche der Position ${index + 1}`"
                 control-variant="hidden"
                 density="compact"
+                :disabled="hasLaengeUndBreite(position)"
                 :precision="2"
                 :rules="[requiredRule, greaterThanZeroRule]"
+                :title="
+                  hasLaengeUndBreite(position)
+                    ? 'Aus Länge und Breite berechnet'
+                    : 'Alternativ zu Länge und Breite eintragbar'
+                "
               />
             </td>
             <td>
@@ -117,7 +125,16 @@ import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositi
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
 
-import { createAbrechnungPosition } from "@/util/abrechnung/abrechnungPositionForm";
+import {
+  createAbrechnungPosition,
+  hasLaengeUndBreite,
+  setBreite,
+  setLaenge,
+} from "@/util/abrechnung/abrechnungPositionForm";
+import {
+  breiteRule,
+  laengeRule,
+} from "@/util/abrechnung/abrechnungPositionRules";
 import {
   endeNotBeforeBeginn,
   greaterThanZeroRule,
@@ -139,3 +156,18 @@ function removePosition(index: number): void {
   positionen.value.splice(index, 1);
 }
 </script>
+
+<style scoped>
+:deep(.v-input__details) {
+  width: 0;
+  min-width: 100%;
+}
+
+:deep(.v-messages__message) {
+  line-height: normal;
+}
+
+td {
+  vertical-align: top;
+}
+</style>

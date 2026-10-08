@@ -971,10 +971,8 @@ components:
       required:
       - anteilAnFlaeche
       - beginn
-      - breite
       - ende
       - flaeche
-      - laenge
       type: object
       properties:
         beginn:
