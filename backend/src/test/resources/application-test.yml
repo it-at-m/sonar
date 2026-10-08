@@ -18,3 +18,10 @@ refarch:
     logging-mode: all
     client-id: test-client
     permissions-uri: http://localhost/permissions
+
+sonar:
+  geschaeftspartner:
+    client:
+      url: http://localhost/geschaeftspartner
+      username: test
+      password: test

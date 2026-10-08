@@ -90,5 +90,8 @@ info:
 sonar:
   geschaeftspartner:
     client:
-      # SOAP endpoint of the system owning the Geschäftspartner master data. The profiles "local" and "test" answer with canned data and need no endpoint. Every other profile must supply one, otherwise the Geschäftspartner endpoint answers with 502
+      # SOAP endpoint of the system owning the Geschäftspartner master data. All properties are mandatory; local and test profiles use harmless placeholder values because they answer with canned data.
       # url: https://example.muenchen.de/v1/geschaeftspartner
+      # HTTP Basic Authentication credentials. Supply these through externalized secret configuration, never in this file.
+      # username:
+      # password:

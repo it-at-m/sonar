@@ -64,3 +64,10 @@ refarch:
     logging-mode: all
     client-id: ${sso.client}
     permissions-uri: ${sso.url}/auth/realms/${sso.realm}/protocol/openid-connect/token
+
+sonar:
+  geschaeftspartner:
+    client:
+      url: http://localhost/geschaeftspartner
+      username: local
+      password: local
