@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: sonar-backend
   description: New Backend for the old Application SonAbr
-  version: 0.0.3-SNAPSHOT
+  version: 0.1.1-SNAPSHOT
 servers:
 - url: http://localhost:8086
   description: Generated server url
