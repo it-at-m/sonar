@@ -4,18 +4,17 @@ import de.muenchen.oss.sonar.backend.geschaeftspartner.GeschaeftspartnerProperti
 import de.muenchen.oss.sonar.backend.geschaeftspartner.client.GeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.client.MockGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.client.SoapGeschaeftspartnerClient;
-import de.muenchen.oss.sonar.backend.geschaeftspartner.client.UnconfiguredGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.dto.GeschaeftspartnerDTOMapper;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.ws.ZFMCAGPMIFBUPAREADRFCPortType;
-import lombok.extern.slf4j.Slf4j;
+import org.apache.cxf.configuration.security.AuthorizationPolicy;
+import org.apache.cxf.frontend.ClientProxy;
 import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
+import org.apache.cxf.transport.http.HTTPConduit;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.HttpStatus;
 
 @Configuration
-@Slf4j
 public class GeschaeftspartnerClientConfiguration {
 
     /** Canned data, because neither profile has a system to call. */
@@ -30,16 +29,15 @@ public class GeschaeftspartnerClientConfiguration {
     @Profile("!local & !test")
     public GeschaeftspartnerClient geschaeftspartnerClient(final GeschaeftspartnerProperties properties,
             final GeschaeftspartnerDTOMapper geschaeftspartnerDTOMapper) {
-        if (properties.getUrl() == null || properties.getUrl().isBlank()) {
-            log.error("sonar.geschaeftspartner.client.url is not set, every lookup of a Geschaeftspartner answers with {}",
-                    HttpStatus.BAD_GATEWAY);
-            return new UnconfiguredGeschaeftspartnerClient();
-        }
-
         final JaxWsProxyFactoryBean factory = new JaxWsProxyFactoryBean();
         factory.setServiceClass(ZFMCAGPMIFBUPAREADRFCPortType.class);
         factory.setAddress(properties.getUrl());
         final ZFMCAGPMIFBUPAREADRFCPortType port = factory.create(ZFMCAGPMIFBUPAREADRFCPortType.class);
+        final AuthorizationPolicy authorization = new AuthorizationPolicy();
+        authorization.setAuthorizationType("Basic");
+        authorization.setUserName(properties.getUsername());
+        authorization.setPassword(properties.getPassword());
+        ((HTTPConduit) ClientProxy.getClient(port).getConduit()).setAuthorization(authorization);
 
         return new SoapGeschaeftspartnerClient(port, geschaeftspartnerDTOMapper);
     }

@@ -11,8 +11,8 @@ import java.time.LocalDate;
 public record AbrechnungPositionRequestDTO(
         @NotNull LocalDate beginn,
         @NotNull LocalDate ende,
-        @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal laenge,
-        @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal breite,
+        @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal laenge,
+        @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal breite,
         @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal flaeche,
         @NotNull @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal anteilAnFlaeche) {
 }

@@ -129,5 +129,17 @@ class AbrechnungDTOMapperTest {
 
             assertThat(result.flaeche()).isEqualByComparingTo("5.00");
         }
+
+        @Test
+        void givenOnlyFlaeche_thenKeepItAsGiven() {
+            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
+                    VON, BIS, null, null, new BigDecimal("5.00"), BigDecimal.ZERO);
+
+            final AbrechnungPosition result = abrechnungDTOMapper.toAbrechnungPosition(positionDTO);
+
+            assertThat(result.laenge()).isNull();
+            assertThat(result.breite()).isNull();
+            assertThat(result.flaeche()).isEqualByComparingTo("5.00");
+        }
     }
 }

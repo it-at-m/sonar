@@ -698,6 +698,43 @@ class AbrechnungIntegrationTest {
         }
 
         @Test
+        void givenOnlyFlaeche_thenAbrechnungIsSavedWithoutLaengeUndBreite() {
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, null, null, null, false,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, null, null,
+                            new BigDecimal("36.00"), new BigDecimal("30.00"))));
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            final AbrechnungResponseDTO responseDTO = restTestClient.post()
+                    .uri(ABRECHNUNG_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(AbrechnungResponseDTO.class)
+                    .value(dto -> {
+                        assertThat(dto.nutzungsobjekte().getFirst().positionen().getFirst().laenge()).isNull();
+                        assertThat(dto.nutzungsobjekte().getFirst().positionen().getFirst().breite()).isNull();
+                        assertThat(dto.nutzungsobjekte().getFirst().positionen().getFirst().flaeche())
+                                .isEqualByComparingTo("36.00");
+                    })
+                    .returnResult()
+                    .getResponseBody();
+
+            assertThat(responseDTO).isNotNull();
+            transactionTemplate.executeWithoutResult(status -> {
+                final AbrechnungPositionEntity persisted = abrechnungRepository.findById(responseDTO.id()).orElseThrow()
+                        .getNutzungsobjekte().getFirst().getPositionen().getFirst();
+                assertThat(persisted.getLaenge()).isNull();
+                assertThat(persisted.getBreite()).isNull();
+                assertThat(persisted.getFlaeche()).isEqualByComparingTo("36.00");
+            });
+        }
+
+        @Test
         void givenSeveralNutzungsobjekte_thenKeepTheOrderTheyWereEnteredIn() {
             final AbrechnungNutzungsobjektRequestDTO erste = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,

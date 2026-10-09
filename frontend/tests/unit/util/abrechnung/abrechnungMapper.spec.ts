@@ -88,6 +88,34 @@ describe("abrechnungMapper.ts", () => {
       expect(positionRequestDTO.anteilAnFlaeche).toBe(30);
     });
 
+    it("givenOnlyFlaeche_thenLeaveOutLaengeUndBreite", () => {
+      const { abrechnung } = useAbrechnungForm();
+      abrechnung.value.geschaeftspartnerId = "1000000001";
+      abrechnung.value.zeitraumVon = "2026-01-01";
+      abrechnung.value.zeitraumBis = "2026-03-31";
+      abrechnung.value.abrechnungsArt =
+        AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.adresse = "Marienplatz";
+      nutzungsobjekt.hausnummerVon = "8";
+
+      const position = itemAt(nutzungsobjekt.positionen);
+      position.beginn = "2026-01-01";
+      position.ende = "2026-03-31";
+      position.flaeche = 36;
+      position.anteilAnFlaeche = 30;
+
+      const positionRequestDTO = itemAt(
+        itemAt(toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte)
+          .positionen
+      );
+
+      expect(positionRequestDTO.laenge).toBeUndefined();
+      expect(positionRequestDTO.breite).toBeUndefined();
+      expect(positionRequestDTO.flaeche).toBe(36);
+    });
+
     it("givenArtAdresse_thenLeaveOutFlurstueckAndGemarkung", () => {
       const { abrechnung } = useAbrechnungForm();
       abrechnung.value.geschaeftspartnerId = " 1000000001 ";
