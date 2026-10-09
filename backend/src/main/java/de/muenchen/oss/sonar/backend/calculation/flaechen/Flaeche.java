@@ -64,6 +64,10 @@ public record Flaeche(
         return !beginn.isAfter(berechnungsEnde);
     }
 
+    public boolean isWirksamIn(final int woche) {
+        return ersteWoche <= woche && isImAbrechnungszeitraum();
+    }
+
     public boolean isLaengerAlsEinTag() {
         return berechnungsEnde.isAfter(beginn);
     }

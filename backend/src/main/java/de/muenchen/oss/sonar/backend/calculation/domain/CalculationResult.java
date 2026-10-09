@@ -1,7 +1,5 @@
-package de.muenchen.oss.sonar.backend.calculation;
+package de.muenchen.oss.sonar.backend.calculation.domain;
 
-import de.muenchen.oss.sonar.backend.berechnung.abrechnung.AbrechnungUeberspannungen;
-import de.muenchen.oss.sonar.backend.berechnung.abrechnung.BescheiddatenFlaeche;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -20,7 +18,7 @@ public record CalculationResult(
         BigDecimal gebuehrGesamt,
         BigDecimal gebuehrZahlung,
         List<BescheiddatenFlaeche> bescheiddatenFlaechen,
-        List<AbrechnungUeberspannungen> abrechnungenUeberspannungen) {
+        List<Ueberspannungsabrechnung> abrechnungenUeberspannungen) {
 
     /**
      * A missing list becomes an empty one: MapStruct maps a null collection to null, and
