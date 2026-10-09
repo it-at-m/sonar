@@ -699,7 +699,7 @@ class AbrechnungIntegrationTest {
 
         @Test
         void givenOnlyFlaeche_thenAbrechnungIsSavedWithoutLaengeUndBreite() {
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
                     null, null, null, null, false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, null, null,
@@ -727,7 +727,7 @@ class AbrechnungIntegrationTest {
             assertThat(responseDTO).isNotNull();
             transactionTemplate.executeWithoutResult(status -> {
                 final AbrechnungPositionEntity persisted = abrechnungRepository.findById(responseDTO.id()).orElseThrow()
-                        .getNutzungsobjekte().getFirst().getPositionen().getFirst();
+                        .getPositionen().getFirst();
                 assertThat(persisted.getLaenge()).isNull();
                 assertThat(persisted.getBreite()).isNull();
                 assertThat(persisted.getFlaeche()).isEqualByComparingTo("36.00");

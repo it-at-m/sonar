@@ -311,7 +311,7 @@ class AbrechnungRequestDTOTest {
         void givenOnlyFlaeche_thenNoViolation() {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, null, null,
                     new BigDecimal("36.00"), new BigDecimal("30.00"));
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -323,7 +323,7 @@ class AbrechnungRequestDTOTest {
         void givenNoFlaeche_thenViolation() {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, null, null, null,
                     new BigDecimal("30.00"));
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
