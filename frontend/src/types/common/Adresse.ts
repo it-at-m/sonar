@@ -1,6 +1,6 @@
 import type {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 
 // The Nutzungsobjekt DTO declares the same Art and Nutzung values as the Projekt Adresse DTO.
@@ -12,5 +12,6 @@ export interface Adresse {
   hausnummerBis: string;
   flurstueck: string;
   gemarkung: string;
-  nutzung: ProjektAdresseRequestDTONutzungEnum | null;
+  nutzungen: ProjektAdresseRequestDTONutzungenEnum[];
+  nutzungSonstiges: string;
 }

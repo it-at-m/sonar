@@ -74,7 +74,7 @@ class ProjektIntegrationTest {
         adressdaten.setArt(Adressart.ADRESSE);
         adressdaten.setAdresse("Marienplatz");
         adressdaten.setHausnummerVon("8");
-        adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+        adresse.addNutzung(Nutzung.BAUZAUN);
         adressdaten.setUnerlaubteNutzungVon(BEGINN);
         adressdaten.setUnerlaubteNutzungBis(ENDE);
 
@@ -117,7 +117,7 @@ class ProjektIntegrationTest {
             adressdaten0003.setArt(Adressart.ADRESSE);
             adressdaten0003.setAdresse("Marienplatz");
             adressdaten0003.setHausnummerVon("8");
-            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            adresse0003.addNutzung(Nutzung.BAUZAUN);
             adressdaten0003.setUnerlaubteNutzungVon(BEGINN);
             adressdaten0003.setUnerlaubteNutzungBis(ENDE);
 
@@ -136,7 +136,7 @@ class ProjektIntegrationTest {
             adressdaten0002.setArt(Adressart.ADRESSE);
             adressdaten0002.setAdresse("Marienplatz");
             adressdaten0002.setHausnummerVon("8");
-            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            adresse0002.addNutzung(Nutzung.BAUZAUN);
             adressdaten0002.setUnerlaubteNutzungVon(BEGINN);
             adressdaten0002.setUnerlaubteNutzungBis(ENDE);
 
@@ -186,7 +186,7 @@ class ProjektIntegrationTest {
             adressdaten0003.setArt(Adressart.ADRESSE);
             adressdaten0003.setAdresse("Marienplatz");
             adressdaten0003.setHausnummerVon("8");
-            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            adresse0003.addNutzung(Nutzung.BAUZAUN);
             adressdaten0003.setUnerlaubteNutzungVon(BEGINN);
             adressdaten0003.setUnerlaubteNutzungBis(ENDE);
 
@@ -205,7 +205,7 @@ class ProjektIntegrationTest {
             adressdaten0002.setArt(Adressart.ADRESSE);
             adressdaten0002.setAdresse("Marienplatz");
             adressdaten0002.setHausnummerVon("8");
-            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            adresse0002.addNutzung(Nutzung.BAUZAUN);
             adressdaten0002.setUnerlaubteNutzungVon(BEGINN);
             adressdaten0002.setUnerlaubteNutzungBis(ENDE);
 
@@ -241,7 +241,7 @@ class ProjektIntegrationTest {
             adressdaten0002.setArt(Adressart.ADRESSE);
             adressdaten0002.setAdresse("Marienplatz");
             adressdaten0002.setHausnummerVon("8");
-            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            adresse0002.addNutzung(Nutzung.BAUZAUN);
             adressdaten0002.setUnerlaubteNutzungVon(LocalDate.of(2025, 1, 1));
             adressdaten0002.setUnerlaubteNutzungBis(ENDE);
 
@@ -260,7 +260,7 @@ class ProjektIntegrationTest {
             adressdaten0003.setArt(Adressart.ADRESSE);
             adressdaten0003.setAdresse("Marienplatz");
             adressdaten0003.setHausnummerVon("8");
-            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            adresse0003.addNutzung(Nutzung.BAUZAUN);
             adressdaten0003.setUnerlaubteNutzungVon(LocalDate.of(2024, 1, 1));
             adressdaten0003.setUnerlaubteNutzungBis(ENDE);
 
@@ -309,7 +309,7 @@ class ProjektIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresse.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(BEGINN);
             adressdaten.setUnerlaubteNutzungBis(ENDE);
 
@@ -344,7 +344,7 @@ class ProjektIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresse.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(BEGINN);
             adressdaten.setUnerlaubteNutzungBis(ENDE);
 
@@ -379,7 +379,7 @@ class ProjektIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresse.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
             adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
@@ -414,7 +414,7 @@ class ProjektIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresse.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
             adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
@@ -465,7 +465,7 @@ class ProjektIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresse.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
             adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
@@ -501,7 +501,7 @@ class ProjektIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresse.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(LocalDate.of(2027, 1, 1));
             adressdaten.setUnerlaubteNutzungBis(LocalDate.of(2027, 3, 31));
 
@@ -582,7 +582,7 @@ class ProjektIntegrationTest {
                         assertThat(adresse.art()).isEqualTo(Adressart.ADRESSE);
                         assertThat(adresse.adresse()).isEqualTo("Marienplatz");
                         assertThat(adresse.hausnummerVon()).isEqualTo("8");
-                        assertThat(adresse.nutzung()).isEqualTo(Nutzung.NUTZUNG_A);
+                        assertThat(adresse.nutzungen()).containsExactly(Nutzung.BAUZAUN);
                     });
         }
 
@@ -610,7 +610,7 @@ class ProjektIntegrationTest {
         @Test
         void givenProjekt_thenProjektIsSaved() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 3, true);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", BEGINN, ENDE, List.of(adresseDTO));
 
@@ -642,7 +642,7 @@ class ProjektIntegrationTest {
                 assertThat(adressdaten.getArt()).isEqualTo(Adressart.FLURSTUECK);
                 assertThat(adressdaten.getFlurstueck()).isEqualTo("1234/5");
                 assertThat(adressdaten.getGemarkung()).isEqualTo("Sendling");
-                assertThat(adressdaten.getNutzung()).isEqualTo(Nutzung.NUTZUNG_B);
+                assertThat(adresse.getNutzungen()).containsExactly(Nutzung.CONTAINER);
                 assertThat(adressdaten.getUnerlaubteNutzungVon()).isEqualTo(BEGINN);
                 assertThat(adressdaten.getUnerlaubteNutzungBis()).isEqualTo(ENDE);
                 assertThat(adresse.getAnzahlMahnungen()).isEqualTo(3);
@@ -651,9 +651,56 @@ class ProjektIntegrationTest {
         }
 
         @Test
+        void givenSeveralNutzungen_thenAllOfThemAreSavedWithTheBeschreibung() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null,
+                    List.of(Nutzung.SONSTIGES, Nutzung.BAUZAUN, Nutzung.CONTAINER), "Gerüst über dem Gehweg",
+                    null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", BEGINN, ENDE, List.of(adresseDTO));
+
+            final ProjektResponseDTO responseDTO = restTestClient.post()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(ProjektResponseDTO.class)
+                    .returnResult()
+                    .getResponseBody();
+
+            assertThat(responseDTO).isNotNull();
+            transactionTemplate.executeWithoutResult(status -> {
+                final ProjektEntity projekt = projektRepository.findById(responseDTO.id()).orElseThrow();
+                final ProjektAdresseEntity adresse = projekt.getAdressen().getFirst();
+                assertThat(adresse.getNutzungen())
+                        .containsExactlyInAnyOrder(Nutzung.BAUZAUN, Nutzung.CONTAINER, Nutzung.SONSTIGES);
+                assertThat(adresse.getAdressdaten().getNutzungSonstiges()).isEqualTo("Gerüst über dem Gehweg");
+            });
+        }
+
+        @Test
+        void givenBeschreibungWithAndererNutzung_thenReturnBadRequest() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), "Gerüst über dem Gehweg",
+                    null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0004", BEGINN, ENDE, List.of(adresseDTO));
+
+            restTestClient.post()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+
+            assertThat(projektRepository.count()).isEqualTo(1);
+        }
+
+        @Test
         void givenInvertedAbrechnungszeitraum_thenReturnBadRequest() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", ENDE, BEGINN, List.of(adresseDTO));
 
@@ -671,7 +718,7 @@ class ProjektIntegrationTest {
         @Test
         void givenTageInsteadOfZeitraum_thenProjektIsSavedWithThoseTage() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     null, null, 12, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", BEGINN, ENDE, List.of(adresseDTO));
 
@@ -700,7 +747,7 @@ class ProjektIntegrationTest {
         @Test
         void givenZeitraum_thenTageAreDerivedFromIt() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", BEGINN, ENDE, List.of(adresseDTO));
 
@@ -727,7 +774,7 @@ class ProjektIntegrationTest {
         @Test
         void givenZeitraumAndTage_thenReturnBadRequest() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, 12, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", BEGINN, ENDE, List.of(adresseDTO));
 

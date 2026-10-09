@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungsArt;
 import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
 import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.common.Nutzung;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.Validation;
 import jakarta.validation.Validator;
@@ -53,7 +54,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -65,7 +66,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, BIS, VON,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -80,7 +81,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", true, "2000000002",
                     ZustellungsbevollmaechtigterTyp.VORMUND, VON, BIS, AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -92,7 +93,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", true, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -104,7 +105,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, "2000000002", null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -119,7 +120,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -131,7 +132,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", null, null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", null, null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -143,7 +144,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -155,7 +156,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -170,7 +171,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null, null, null, null, null, false, List.of(position));
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -182,7 +183,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", null, null, null, null, null, null, false, List.of(position));
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -194,7 +195,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.FLURSTUECK, "Marienplatz", null, null, "1234/5", "Sendling", null, null, null, null, null, false,
+                    Adressart.FLURSTUECK, "Marienplatz", null, null, "1234/5", "Sendling", null, null, null, null, null, null, false,
                     List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -210,7 +211,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, VON, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, VON, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -222,7 +223,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, VON, BIS, 12, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, VON, BIS, 12, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -236,7 +237,7 @@ class AbrechnungRequestDTOTest {
         @Test
         void givenNoPositionen_thenViolation() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of());
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -248,7 +249,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(BIS, VON, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -260,7 +261,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, BigDecimal.ZERO,
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -272,7 +273,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), BigDecimal.ZERO, new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -284,7 +285,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), BigDecimal.ZERO);
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -296,7 +297,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("10000000000.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -311,7 +312,7 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, null, null,
                     new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
@@ -323,11 +324,40 @@ class AbrechnungRequestDTOTest {
             final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, null, null, null,
                     new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, false, List.of(position));
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
 
             assertThat(validator.validate(requestDTO)).hasSize(1);
+        }
+    }
+
+    @Nested
+    class NutzungSonstiges {
+        @Test
+        void givenSonstigesWithBeschreibung_thenNoViolation() {
+            final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.SONSTIGES), "Gerüst über dem Gehweg", null, null, null,
+                    null, false, List.of(position));
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
+        }
+
+        @Test
+        void givenAndereNutzungWithBeschreibung_thenViolation() {
+            final AbrechnungPositionRequestDTO position = new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), "Gerüst über dem Gehweg", null, null, null,
+                    null, false, List.of(position));
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            assertThat(messagesOf(requestDTO)).containsExactly("Eine Beschreibung der Nutzung ist nur zu Sonstiges anzugeben.");
         }
     }
 

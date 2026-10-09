@@ -36,10 +36,11 @@ export function projektAdresseSuggestionTitle(
 export function projektAdresseSuggestionSubtitle(
   suggestion: ProjektAdresseSuggestion
 ): string {
-  return (
-    NUTZUNG_OPTIONS.find((option) => option.value === suggestion.nutzung)
-      ?.title ?? ""
-  );
+  return NUTZUNG_OPTIONS.filter((option) =>
+    suggestion.nutzungen.includes(option.value)
+  )
+    .map((option) => option.title)
+    .join(", ");
 }
 
 export function applyProjektAdresseSuggestion(

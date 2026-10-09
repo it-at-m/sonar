@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.projekt.dto;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public record ProjektAdresseResponseDTO(
@@ -13,10 +14,15 @@ public record ProjektAdresseResponseDTO(
         String hausnummerBis,
         String flurstueck,
         String gemarkung,
-        Nutzung nutzung,
+        List<Nutzung> nutzungen,
+        String nutzungSonstiges,
         LocalDate unerlaubteNutzungVon,
         LocalDate unerlaubteNutzungBis,
         Integer tageUnerlaubteNutzung,
         Integer anzahlMahnungen,
         boolean sondernutzungErlaubt) {
+
+    public ProjektAdresseResponseDTO {
+        nutzungen = Nutzung.distinctSorted(nutzungen);
+    }
 }
