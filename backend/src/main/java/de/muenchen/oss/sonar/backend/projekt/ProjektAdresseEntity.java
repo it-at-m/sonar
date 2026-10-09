@@ -15,6 +15,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Size;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -46,6 +47,8 @@ public class ProjektAdresseEntity extends BaseEntity {
     @Setter(AccessLevel.NONE)
     @ToString.Exclude
     private Set<Nutzung> nutzungen = new LinkedHashSet<>();
+
+    @Size(max = 255) private String nutzungSonstiges;
 
     @Column(nullable = false)
     @NotNull @Min(0) private Integer anzahlMahnungen;

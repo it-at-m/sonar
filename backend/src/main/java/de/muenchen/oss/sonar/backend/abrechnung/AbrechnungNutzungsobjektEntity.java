@@ -52,6 +52,8 @@ public class AbrechnungNutzungsobjektEntity extends BaseEntity {
     @ToString.Exclude
     private Set<Nutzung> nutzungen = new LinkedHashSet<>();
 
+    @Size(max = 255) private String nutzungSonstiges;
+
     @Column(length = 10_000)
     @Size(max = 10_000) private String bemerkung;
 

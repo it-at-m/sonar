@@ -675,7 +675,7 @@ class ProjektIntegrationTest {
                 final ProjektAdresseEntity adresse = projekt.getAdressen().getFirst();
                 assertThat(adresse.getNutzungen())
                         .containsExactlyInAnyOrder(Nutzung.BAUZAUN, Nutzung.CONTAINER, Nutzung.SONSTIGES);
-                assertThat(adresse.getAdressdaten().getNutzungSonstiges()).isEqualTo("Gerüst über dem Gehweg");
+                assertThat(adresse.getNutzungSonstiges()).isEqualTo("Gerüst über dem Gehweg");
             });
         }
 

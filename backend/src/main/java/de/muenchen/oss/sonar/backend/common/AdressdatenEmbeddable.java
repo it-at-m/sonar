@@ -39,8 +39,6 @@ public class AdressdatenEmbeddable implements Serializable {
 
     @Size(max = 255) private String gemarkung;
 
-    @Size(max = 255) private String nutzungSonstiges;
-
     private LocalDate unerlaubteNutzungVon;
 
     private LocalDate unerlaubteNutzungBis;
