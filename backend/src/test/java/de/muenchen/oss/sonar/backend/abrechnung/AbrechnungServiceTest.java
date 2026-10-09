@@ -23,6 +23,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
@@ -54,6 +55,9 @@ class AbrechnungServiceTest {
 
     @Mock
     private ProjektService projektService;
+
+    @Mock
+    private NutzungsobjektService nutzungsobjektService;
 
     @Spy
     private final AbrechnungEntityMapper abrechnungEntityMapper = Mappers.getMapper(AbrechnungEntityMapper.class);
@@ -88,8 +92,8 @@ class AbrechnungServiceTest {
             erstePosition.setFlaeche(new BigDecimal("36.00"));
             erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-            final AbrechnungNutzungsobjektEntity erstesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-            erstesNutzungsobjekt.addPosition(erstePosition);
+            final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
+            erstesNutzungsobjekt.setId(UUID.randomUUID());
             erstesNutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable ersteAdressdaten = erstesNutzungsobjekt.getAdressdaten();
@@ -105,7 +109,9 @@ class AbrechnungServiceTest {
             ersteAbrechnung.setZeitraumVon(VON);
             ersteAbrechnung.setZeitraumBis(BIS);
             ersteAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            erstePosition.setNutzungsobjekt(erstesNutzungsobjekt);
             ersteAbrechnung.addNutzungsobjekt(erstesNutzungsobjekt);
+            ersteAbrechnung.addPosition(erstePosition);
 
             final AbrechnungPositionEntity zweitePosition = new AbrechnungPositionEntity();
             zweitePosition.setBeginn(VON);
@@ -115,8 +121,8 @@ class AbrechnungServiceTest {
             zweitePosition.setFlaeche(new BigDecimal("36.00"));
             zweitePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-            final AbrechnungNutzungsobjektEntity zweitesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-            zweitesNutzungsobjekt.addPosition(zweitePosition);
+            final NutzungsobjektEntity zweitesNutzungsobjekt = new NutzungsobjektEntity();
+            zweitesNutzungsobjekt.setId(UUID.randomUUID());
             zweitesNutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable zweiteAdressdaten = zweitesNutzungsobjekt.getAdressdaten();
@@ -132,7 +138,9 @@ class AbrechnungServiceTest {
             zweiteAbrechnung.setZeitraumVon(VON);
             zweiteAbrechnung.setZeitraumBis(BIS);
             zweiteAbrechnung.setAbrechnungsArt(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            zweitePosition.setNutzungsobjekt(zweitesNutzungsobjekt);
             zweiteAbrechnung.addNutzungsobjekt(zweitesNutzungsobjekt);
+            zweiteAbrechnung.addPosition(zweitePosition);
 
             final List<AbrechnungEntity> abrechnungen = List.of(ersteAbrechnung, zweiteAbrechnung);
 
@@ -159,8 +167,8 @@ class AbrechnungServiceTest {
             position.setFlaeche(new BigDecimal("36.00"));
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-            nutzungsobjekt.addPosition(position);
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setId(UUID.randomUUID());
             nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
@@ -176,7 +184,9 @@ class AbrechnungServiceTest {
             mitWiderspruch.setZeitraumVon(VON);
             mitWiderspruch.setZeitraumBis(BIS);
             mitWiderspruch.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
             mitWiderspruch.addNutzungsobjekt(nutzungsobjekt);
+            mitWiderspruch.addPosition(position);
 
             final WiderspruchEntity widerspruch = new WiderspruchEntity();
             widerspruch.setId(UUID.randomUUID());
@@ -191,8 +201,8 @@ class AbrechnungServiceTest {
             anderePosition.setFlaeche(new BigDecimal("36.00"));
             anderePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-            final AbrechnungNutzungsobjektEntity anderesNutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-            anderesNutzungsobjekt.addPosition(anderePosition);
+            final NutzungsobjektEntity anderesNutzungsobjekt = new NutzungsobjektEntity();
+            anderesNutzungsobjekt.setId(UUID.randomUUID());
             anderesNutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable andereAdressdaten = anderesNutzungsobjekt.getAdressdaten();
@@ -208,7 +218,9 @@ class AbrechnungServiceTest {
             ohneWiderspruch.setZeitraumVon(VON);
             ohneWiderspruch.setZeitraumBis(BIS);
             ohneWiderspruch.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            anderePosition.setNutzungsobjekt(anderesNutzungsobjekt);
             ohneWiderspruch.addNutzungsobjekt(anderesNutzungsobjekt);
+            ohneWiderspruch.addPosition(anderePosition);
 
             final Pageable pageRequest = PageRequest.of(0, 10, DEFAULT_SORT);
             final List<AbrechnungEntity> abrechnungen = List.of(mitWiderspruch, ohneWiderspruch);
@@ -232,8 +244,8 @@ class AbrechnungServiceTest {
             position.setFlaeche(new BigDecimal("36.00"));
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-            nutzungsobjekt.addPosition(position);
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setId(UUID.randomUUID());
             nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
@@ -252,7 +264,9 @@ class AbrechnungServiceTest {
             neueste.setZeitraumVon(VON);
             neueste.setZeitraumBis(BIS);
             neueste.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
             neueste.addNutzungsobjekt(nutzungsobjekt);
+            neueste.addPosition(position);
 
             final Pageable pageRequest = PageRequest.of(0, 10, DEFAULT_SORT);
             final List<AbrechnungEntity> abrechnungen = List.of(neueste);
@@ -407,6 +421,9 @@ class AbrechnungServiceTest {
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(savedId);
+                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
+                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
+                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
                 return toSave;
             });
 
@@ -440,6 +457,9 @@ class AbrechnungServiceTest {
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(UUID.randomUUID());
+                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
+                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
+                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
                 return toSave;
             });
 
@@ -451,6 +471,46 @@ class AbrechnungServiceTest {
             assertThat(savedCaptor.getValue().getVorgaengerAbrechnungId()).isNull();
             assertThat(result.versionsnummer()).isEqualTo(1);
             assertThat(result.neuereVersionVorhanden()).isFalse();
+        }
+
+        @Test
+        void givenUebernommenesNutzungsobjekt_thenBillTheStoredOneInsteadOfACopy() {
+            final UUID nutzungsobjektId = UUID.randomUUID();
+            final NutzungsobjektEntity gespeichertesNutzungsobjekt = new NutzungsobjektEntity();
+            gespeichertesNutzungsobjekt.setId(nutzungsobjektId);
+
+            final AdressdatenEmbeddable gespeicherteAdressdaten = gespeichertesNutzungsobjekt.getAdressdaten();
+            gespeicherteAdressdaten.setArt(Adressart.ADRESSE);
+            gespeicherteAdressdaten.setAdresse("Marienplatz");
+            gespeicherteAdressdaten.setHausnummerVon("8");
+
+            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    nutzungsobjektId, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
+                    null, null, null, "Wird ignoriert", false, List.of(position));
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
+
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(nutzungsobjektService.selectedPreexistingNutzungsobjekte(abrechnung))
+                    .thenReturn(Map.of(nutzungsobjektId, gespeichertesNutzungsobjekt));
+            when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
+                final AbrechnungEntity toSave = invocation.getArgument(0);
+                toSave.setId(UUID.randomUUID());
+                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
+                return toSave;
+            });
+
+            final Abrechnung result = unitUnderTest.createAbrechnung(abrechnung);
+
+            final ArgumentCaptor<AbrechnungEntity> savedCaptor = ArgumentCaptor.forClass(AbrechnungEntity.class);
+            verify(abrechnungRepository).save(savedCaptor.capture());
+            assertThat(savedCaptor.getValue().getNutzungsobjekte()).containsExactly(gespeichertesNutzungsobjekt);
+            assertThat(savedCaptor.getValue().getPositionen().getFirst().getNutzungsobjekt()).isSameAs(gespeichertesNutzungsobjekt);
+            assertThat(result.nutzungsobjekte().getFirst().id()).isEqualTo(nutzungsobjektId);
+            assertThat(result.nutzungsobjekte().getFirst().adresse()).isEqualTo("Marienplatz");
+            assertThat(result.nutzungsobjekte().getFirst().positionen()).hasSize(1);
         }
 
         @Test
@@ -477,8 +537,8 @@ class AbrechnungServiceTest {
             position.setFlaeche(new BigDecimal("36.00"));
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-            nutzungsobjekt.addPosition(position);
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setId(UUID.randomUUID());
             nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
@@ -496,7 +556,9 @@ class AbrechnungServiceTest {
             abrechnung.setZeitraumVon(VON);
             abrechnung.setZeitraumBis(BIS);
             abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
             abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
 
             when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
             when(abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId)).thenReturn(false);
@@ -520,8 +582,8 @@ class AbrechnungServiceTest {
             position.setFlaeche(new BigDecimal("36.00"));
             position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-            final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-            nutzungsobjekt.addPosition(position);
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setId(UUID.randomUUID());
             nutzungsobjekt.setAufschlag50prozent(true);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
@@ -539,7 +601,9 @@ class AbrechnungServiceTest {
             abrechnung.setZeitraumVon(VON);
             abrechnung.setZeitraumBis(BIS);
             abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
             abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
 
             when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
             when(abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId)).thenReturn(true);
@@ -704,6 +768,9 @@ class AbrechnungServiceTest {
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(savedId);
+                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
+                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
+                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
                 return toSave;
             });
 

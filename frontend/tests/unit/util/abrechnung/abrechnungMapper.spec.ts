@@ -360,6 +360,64 @@ describe("abrechnungMapper.ts", () => {
 
       expect(() => toAbrechnungRequestDTO(abrechnung.value)).toThrow();
     });
+
+    it("givenNewNutzungsobjekt_thenSendNoId", () => {
+      const { abrechnung } = useAbrechnungForm();
+      abrechnung.value.geschaeftspartnerId = "1000000001";
+      abrechnung.value.zeitraumVon = "2026-01-01";
+      abrechnung.value.zeitraumBis = "2026-03-31";
+      abrechnung.value.abrechnungsArt =
+        AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.adresse = "Marienplatz";
+      nutzungsobjekt.hausnummerVon = "8";
+
+      const position = itemAt(nutzungsobjekt.positionen);
+      position.beginn = "2026-01-01";
+      position.ende = "2026-03-31";
+      position.laenge = 12;
+      position.breite = 3;
+      position.flaeche = 36;
+      position.anteilAnFlaeche = 30;
+
+      const nutzungsobjektRequestDTO = itemAt(
+        toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
+      );
+
+      expect(nutzungsobjektRequestDTO.id).toBeUndefined();
+    });
+
+    it("givenUebernommenesNutzungsobjekt_thenNameItSoTheStoredOneIsBilled", () => {
+      const { abrechnung } = useAbrechnungForm();
+      abrechnung.value.geschaeftspartnerId = "1000000001";
+      abrechnung.value.zeitraumVon = "2026-01-01";
+      abrechnung.value.zeitraumBis = "2026-03-31";
+      abrechnung.value.abrechnungsArt =
+        AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.uebernommenesNutzungsobjektId =
+        "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d";
+      nutzungsobjekt.adresse = "Marienplatz";
+      nutzungsobjekt.hausnummerVon = "8";
+
+      const position = itemAt(nutzungsobjekt.positionen);
+      position.beginn = "2026-01-01";
+      position.ende = "2026-03-31";
+      position.laenge = 12;
+      position.breite = 3;
+      position.flaeche = 36;
+      position.anteilAnFlaeche = 30;
+
+      const nutzungsobjektRequestDTO = itemAt(
+        toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
+      );
+
+      expect(nutzungsobjektRequestDTO.id).toBe(
+        "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d"
+      );
+    });
   });
 
   describe("toAbrechnungForm", () => {
@@ -425,6 +483,7 @@ describe("abrechnungMapper.ts", () => {
       expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(10);
       expect(nutzungsobjekt.bemerkung).toBe("Erste Fassung");
       expect(nutzungsobjekt.aufschlag50prozent).toBe(true);
+      expect(nutzungsobjekt.uebernommenesNutzungsobjektId).toBeNull();
 
       const position = itemAt(nutzungsobjekt.positionen);
       expect(position.beginn).toBe("2026-01-01");

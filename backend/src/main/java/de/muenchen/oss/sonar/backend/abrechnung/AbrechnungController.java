@@ -4,6 +4,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungDTOMapper;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungVersionResponseDTO;
+import de.muenchen.oss.sonar.backend.abrechnung.dto.NutzungsobjektResponseDTO;
 import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfiguration;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.enums.Explode;
@@ -43,6 +44,7 @@ public class AbrechnungController {
     private static final String STATUS_NOT_FOUND = "404";
 
     private final AbrechnungService abrechnungService;
+    private final NutzungsobjektService nutzungsobjektService;
     private final AbrechnungDTOMapper abrechnungDTOMapper;
 
     /**
@@ -91,6 +93,23 @@ public class AbrechnungController {
             ) final List<Sort.Direction> sortDirection) {
         return abrechnungService.getAbrechnungenOfProjekt(projektId, pageNumber, pageSize, sortBy, sortDirection)
                 .map(abrechnungDTOMapper::toDTO);
+    }
+
+    /**
+     * Retrieve the Nutzungsobjekte of a Projekt.
+     * Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
+     * The order is by Adresse and Flurstück.
+     *
+     * @param projektId the UUID of the Projekt the Nutzungsobjekte belong to
+     * @return the Nutzungsobjekte of the Projekt represented as DTOs
+     */
+    @GetMapping("/nutzungsobjekt")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    public List<NutzungsobjektResponseDTO> getNutzungsobjekte(@PathVariable(PROJEKT_ID) final UUID projektId) {
+        return nutzungsobjektService.getNutzungsobjekteOfProjekt(projektId).stream()
+                .map(abrechnungDTOMapper::toDTO)
+                .toList();
     }
 
     /**

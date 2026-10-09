@@ -9,10 +9,13 @@ import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.JoinColumn;
+import jakarta.persistence.JoinTable;
+import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OneToOne;
 import jakarta.persistence.OrderColumn;
 import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -76,20 +79,44 @@ public class AbrechnungEntity extends BaseEntity {
     @ToString.Exclude
     private WiderspruchEntity widerspruch;
 
+    @ManyToMany(cascade = CascadeType.PERSIST)
+    @JoinTable(
+            name = "abrechnung_nutzungsobjekt",
+            joinColumns = @JoinColumn(name = "abrechnung_id", nullable = false),
+            inverseJoinColumns = @JoinColumn(name = "nutzungsobjekt_id", nullable = false),
+            uniqueConstraints = @UniqueConstraint(
+                    name = "uq_abrechnung_nutzungsobjekt__nutzungsobjekt_id",
+                    columnNames = { "abrechnung_id", "nutzungsobjekt_id" }
+            )
+    )
+    @OrderColumn(name = "sort_order", nullable = false)
+    @BatchSize(size = 25)
+    @Setter(AccessLevel.NONE)
+    @ToString.Exclude
+    @NotEmpty private List<NutzungsobjektEntity> nutzungsobjekte = new ArrayList<>();
+
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "abrechnung_id", nullable = false)
     @OrderColumn(name = "sort_order", nullable = false)
     @BatchSize(size = 25)
     @Setter(AccessLevel.NONE)
     @ToString.Exclude
-    @NotEmpty private List<AbrechnungNutzungsobjektEntity> nutzungsobjekte = new ArrayList<>();
+    @NotEmpty private List<AbrechnungPositionEntity> positionen = new ArrayList<>();
 
-    public List<AbrechnungNutzungsobjektEntity> getNutzungsobjekte() {
+    public List<NutzungsobjektEntity> getNutzungsobjekte() {
         return Collections.unmodifiableList(nutzungsobjekte);
     }
 
-    public void addNutzungsobjekt(final AbrechnungNutzungsobjektEntity nutzungsobjekt) {
+    public void addNutzungsobjekt(final NutzungsobjektEntity nutzungsobjekt) {
         nutzungsobjekte.add(nutzungsobjekt);
+    }
+
+    public List<AbrechnungPositionEntity> getPositionen() {
+        return Collections.unmodifiableList(positionen);
+    }
+
+    public void addPosition(final AbrechnungPositionEntity position) {
+        positionen.add(position);
     }
 
 }

@@ -581,6 +581,37 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
+  /projekt/{projektId}/abrechnung/nutzungsobjekt:
+    get:
+      tags:
+      - abrechnung-controller
+      summary: Retrieve the Nutzungsobjekte of a Projekt.
+      description: |-
+        Retrieve the Nutzungsobjekte of a Projekt.
+         Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
+         The order is by Adresse and Flurstück.
+      operationId: getNutzungsobjekte
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Nutzungsobjekte belong to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: the Nutzungsobjekte of the Projekt represented as DTOs
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/NutzungsobjektResponseDTO"
+      security:
+      - bearerAuth: []
   /geschaeftspartner/{geschaeftspartnerId}:
     get:
       tags:
@@ -915,6 +946,9 @@ components:
       - positionen
       type: object
       properties:
+        id:
+          type: string
+          format: uuid
         art:
           type: string
           enum:
@@ -1299,6 +1333,46 @@ components:
         versionsnummer:
           type: integer
           format: int32
+    NutzungsobjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzung:
+          type: string
+          enum:
+          - NUTZUNG_A
+          - NUTZUNG_B
+          - NUTZUNG_C
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          type: integer
+          format: int32
+        bemerkung:
+          type: string
+        aufschlag50prozent:
+          type: boolean
     GeschaeftspartnerResponseDTO:
       type: object
       properties:
