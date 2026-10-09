@@ -96,7 +96,7 @@ class AbrechnungServiceTest {
             ersteAdressdaten.setArt(Adressart.ADRESSE);
             ersteAdressdaten.setAdresse("Marienplatz");
             ersteAdressdaten.setHausnummerVon("8");
-            ersteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            erstesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ersteAbrechnung = new AbrechnungEntity();
             ersteAbrechnung.setId(UUID.randomUUID());
@@ -123,7 +123,7 @@ class AbrechnungServiceTest {
             zweiteAdressdaten.setArt(Adressart.ADRESSE);
             zweiteAdressdaten.setAdresse("Marienplatz");
             zweiteAdressdaten.setHausnummerVon("8");
-            zweiteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            zweitesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity zweiteAbrechnung = new AbrechnungEntity();
             zweiteAbrechnung.setId(UUID.randomUUID());
@@ -167,7 +167,7 @@ class AbrechnungServiceTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity mitWiderspruch = new AbrechnungEntity();
             mitWiderspruch.setId(UUID.randomUUID());
@@ -199,7 +199,7 @@ class AbrechnungServiceTest {
             andereAdressdaten.setArt(Adressart.ADRESSE);
             andereAdressdaten.setAdresse("Sendlinger Straße");
             andereAdressdaten.setHausnummerVon("1");
-            andereAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            anderesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ohneWiderspruch = new AbrechnungEntity();
             ohneWiderspruch.setId(UUID.randomUUID());
@@ -240,7 +240,7 @@ class AbrechnungServiceTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final UUID vorgaengerId = UUID.randomUUID();
             final AbrechnungEntity neueste = new AbrechnungEntity();
@@ -397,7 +397,7 @@ class AbrechnungServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
@@ -431,7 +431,7 @@ class AbrechnungServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
@@ -485,7 +485,7 @@ class AbrechnungServiceTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final UUID abrechnungId = UUID.randomUUID();
             final AbrechnungEntity abrechnung = new AbrechnungEntity();
@@ -528,7 +528,7 @@ class AbrechnungServiceTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final UUID abrechnungId = UUID.randomUUID();
             final AbrechnungEntity abrechnung = new AbrechnungEntity();
@@ -693,7 +693,7 @@ class AbrechnungServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
                     new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_A,
+                    null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position));
             final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000002", false, null, null,
                     VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, null, false, List.of(nutzungsobjekt));

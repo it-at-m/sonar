@@ -4,7 +4,7 @@ import {
   AbrechnungRequestDTOAbrechnungsArtEnum,
   AbrechnungRequestDTOZustellungsbevollmaechtigterTypEnum,
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import {
@@ -33,7 +33,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
 
       const position = itemAt(nutzungsobjekt.positionen);
       position.beginn = "2026-01-01";
@@ -51,9 +53,9 @@ describe("abrechnungMapper.ts", () => {
       );
       expect(requestDTO.zeitraumVon).toEqual(new Date("2026-01-01"));
       expect(itemAt(requestDTO.nutzungsobjekte).adresse).toBe("Marienplatz");
-      expect(itemAt(requestDTO.nutzungsobjekte).nutzung).toBe(
-        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A
-      );
+      expect(itemAt(requestDTO.nutzungsobjekte).nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ]);
     });
 
     it("givenPosition_thenSendEveryMeasurement", () => {
@@ -67,7 +69,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
 
       const position = itemAt(nutzungsobjekt.positionen);
       position.beginn = "2026-01-01";
@@ -127,7 +131,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
       nutzungsobjekt.flurstueck = "1234/5";
       nutzungsobjekt.gemarkung = "Sendling";
 
@@ -160,7 +166,9 @@ describe("abrechnungMapper.ts", () => {
       nutzungsobjekt.art = ProjektAdresseRequestDTOArtEnum.FLURSTUECK;
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
       nutzungsobjekt.flurstueck = "1234/5";
       nutzungsobjekt.gemarkung = "Sendling";
 
@@ -193,7 +201,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
 
       const position = itemAt(nutzungsobjekt.positionen);
       position.beginn = "2026-01-01";
@@ -221,7 +231,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
       nutzungsobjekt.unerlaubteNutzungVon = "2026-01-01";
       nutzungsobjekt.unerlaubteNutzungBis = "2026-01-31";
       nutzungsobjekt.tageUnerlaubteNutzung = 31;
@@ -255,7 +267,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
       nutzungsobjekt.tageUnerlaubteNutzung = 12;
 
       const position = itemAt(nutzungsobjekt.positionen);
@@ -288,7 +302,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
 
       const position = itemAt(nutzungsobjekt.positionen);
       position.beginn = "2026-01-01";
@@ -320,7 +336,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
 
       const position = itemAt(nutzungsobjekt.positionen);
       position.beginn = "2026-01-01";
@@ -348,7 +366,9 @@ describe("abrechnungMapper.ts", () => {
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
       nutzungsobjekt.adresse = " Marienplatz ";
       nutzungsobjekt.hausnummerVon = "8";
-      nutzungsobjekt.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      nutzungsobjekt.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ];
 
       const position = itemAt(nutzungsobjekt.positionen);
       position.beginn = "2026-01-01";
@@ -381,7 +401,7 @@ describe("abrechnungMapper.ts", () => {
             adresse: "Marienplatz",
             hausnummerVon: "8",
             hausnummerBis: "12",
-            nutzung: "NUTZUNG_A",
+            nutzungen: ["BAUZAUN"],
             unerlaubteNutzungVon: new Date("2026-01-01"),
             unerlaubteNutzungBis: new Date("2026-01-10"),
             tageUnerlaubteNutzung: 10,
@@ -418,9 +438,9 @@ describe("abrechnungMapper.ts", () => {
       expect(nutzungsobjekt.art).toBe(ProjektAdresseRequestDTOArtEnum.ADRESSE);
       expect(nutzungsobjekt.adresse).toBe("Marienplatz");
       expect(nutzungsobjekt.hausnummerBis).toBe("12");
-      expect(nutzungsobjekt.nutzung).toBe(
-        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A
-      );
+      expect(nutzungsobjekt.nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ]);
       expect(nutzungsobjekt.unerlaubteNutzungVon).toBe("2026-01-01");
       expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(10);
       expect(nutzungsobjekt.bemerkung).toBe("Erste Fassung");

@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 import {
@@ -38,7 +38,8 @@ function suggestion(
     hausnummerBis: "",
     flurstueck: "",
     gemarkung: "",
-    nutzung: null,
+    nutzungen: [],
+    nutzungSonstiges: "",
     unerlaubteNutzungVon: "",
     unerlaubteNutzungBis: "",
     tageUnerlaubteNutzung: null,
@@ -152,10 +153,26 @@ describe("projektAdresseSuggestion.ts", () => {
   describe("projektAdresseSuggestionSubtitle", () => {
     it("givenNutzung_thenNameIt", () => {
       const subtitle = projektAdresseSuggestionSubtitle(
-        suggestion({ nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B })
+        suggestion({
+          nutzungen: [ProjektAdresseRequestDTONutzungenEnum.CONTAINER],
+        })
       );
 
-      expect(subtitle).toBe("Nutzung B");
+      expect(subtitle).toBe("Container");
+    });
+
+    it("givenSeveralNutzungen_thenNameThemInTheOrderOfTheOptions", () => {
+      const subtitle = projektAdresseSuggestionSubtitle(
+        suggestion({
+          nutzungen: [
+            ProjektAdresseRequestDTONutzungenEnum.SONSTIGES,
+            ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+            ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+          ],
+        })
+      );
+
+      expect(subtitle).toBe("Bauzaun, Container, Sonstiges");
     });
 
     it("givenNoNutzung_thenStayEmptySoTheEntryShowsOneLine", () => {
@@ -170,7 +187,7 @@ describe("projektAdresseSuggestion.ts", () => {
       applyProjektAdresseSuggestion(
         nutzungsobjekt,
         suggestion({
-          nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B,
+          nutzungen: [ProjektAdresseRequestDTONutzungenEnum.CONTAINER],
           unerlaubteNutzungVon: "2026-01-01",
           unerlaubteNutzungBis: "2026-01-31",
           tageUnerlaubteNutzung: 31,
@@ -180,9 +197,9 @@ describe("projektAdresseSuggestion.ts", () => {
       expect(nutzungsobjekt.art).toBe(ProjektAdresseRequestDTOArtEnum.ADRESSE);
       expect(nutzungsobjekt.adresse).toBe("Marienplatz");
       expect(nutzungsobjekt.hausnummerVon).toBe("8");
-      expect(nutzungsobjekt.nutzung).toBe(
-        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B
-      );
+      expect(nutzungsobjekt.nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+      ]);
       expect(nutzungsobjekt.unerlaubteNutzungVon).toBe("2026-01-01");
       expect(nutzungsobjekt.unerlaubteNutzungBis).toBe("2026-01-31");
       expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(31);

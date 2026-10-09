@@ -114,7 +114,7 @@ class WiderspruchIntegrationTest {
         adressdaten.setArt(Adressart.ADRESSE);
         adressdaten.setAdresse("Marienplatz");
         adressdaten.setHausnummerVon("8");
-        adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+        nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
         final AbrechnungEntity abrechnung = new AbrechnungEntity();
         abrechnung.setProjektId(projektId);

@@ -37,7 +37,7 @@ class ProjektEntityMapperTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresseEntity.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(BEGINN);
             adressdaten.setUnerlaubteNutzungBis(ENDE);
             adressdaten.setTageUnerlaubteNutzung(90);
@@ -66,7 +66,7 @@ class ProjektEntityMapperTest {
             assertThat(adresse.hausnummerBis()).isEqualTo(adressdaten.getHausnummerBis());
             assertThat(adresse.flurstueck()).isEqualTo(adressdaten.getFlurstueck());
             assertThat(adresse.gemarkung()).isEqualTo(adressdaten.getGemarkung());
-            assertThat(adresse.nutzung()).isEqualTo(adressdaten.getNutzung());
+            assertThat(adresse.nutzungen()).containsExactlyElementsOf(adresseEntity.getNutzungen());
             assertThat(adresse.unerlaubteNutzungVon()).isEqualTo(adressdaten.getUnerlaubteNutzungVon());
             assertThat(adresse.unerlaubteNutzungBis()).isEqualTo(adressdaten.getUnerlaubteNutzungBis());
             assertThat(adresse.tageUnerlaubteNutzung()).isEqualTo(adressdaten.getTageUnerlaubteNutzung());
@@ -80,7 +80,7 @@ class ProjektEntityMapperTest {
         @Test
         void givenProjekt_thenReturnsCorrectEntity() {
             final ProjektAdresse adresse = new ProjektAdresse(
-                    null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, false);
             final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, List.of(adresse));
 
@@ -100,7 +100,7 @@ class ProjektEntityMapperTest {
             assertThat(adressdaten.getHausnummerBis()).isEqualTo(adresse.hausnummerBis());
             assertThat(adressdaten.getFlurstueck()).isEqualTo(adresse.flurstueck());
             assertThat(adressdaten.getGemarkung()).isEqualTo(adresse.gemarkung());
-            assertThat(adressdaten.getNutzung()).isEqualTo(adresse.nutzung());
+            assertThat(adresseEntity.getNutzungen()).containsExactlyElementsOf(adresse.nutzungen());
             assertThat(adressdaten.getUnerlaubteNutzungVon()).isEqualTo(adresse.unerlaubteNutzungVon());
             assertThat(adressdaten.getUnerlaubteNutzungBis()).isEqualTo(adresse.unerlaubteNutzungBis());
             assertThat(adressdaten.getTageUnerlaubteNutzung()).isEqualTo(adresse.tageUnerlaubteNutzung());
@@ -111,7 +111,7 @@ class ProjektEntityMapperTest {
         @Test
         void givenProjektWithId_thenIdIsNotCarriedOver() {
             final ProjektAdresse adresse = new ProjektAdresse(
-                    UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, 12, 0, false);
             final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", BEGINN, ENDE, List.of(adresse));
 

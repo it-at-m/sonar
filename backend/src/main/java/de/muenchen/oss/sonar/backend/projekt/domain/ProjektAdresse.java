@@ -4,6 +4,7 @@ import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 
 public record ProjektAdresse(
@@ -14,7 +15,8 @@ public record ProjektAdresse(
         String hausnummerBis,
         String flurstueck,
         String gemarkung,
-        Nutzung nutzung,
+        List<Nutzung> nutzungen,
+        String nutzungSonstiges,
         LocalDate unerlaubteNutzungVon,
         LocalDate unerlaubteNutzungBis,
         Integer tageUnerlaubteNutzung,
@@ -41,5 +43,6 @@ public record ProjektAdresse(
             throw new IllegalArgumentException("tageUnerlaubteNutzung contradicts the given Zeitraum");
         }
         tageUnerlaubteNutzung = derived;
+        nutzungen = Nutzung.distinctSorted(nutzungen);
     }
 }

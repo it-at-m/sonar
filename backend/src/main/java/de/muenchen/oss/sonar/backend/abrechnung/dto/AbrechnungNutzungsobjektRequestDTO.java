@@ -4,6 +4,8 @@ import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressartValid;
 import de.muenchen.oss.sonar.backend.common.Adresse;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
+import de.muenchen.oss.sonar.backend.common.NutzungValid;
+import de.muenchen.oss.sonar.backend.common.Nutzungsangabe;
 import de.muenchen.oss.sonar.backend.common.UnerlaubteNutzung;
 import de.muenchen.oss.sonar.backend.common.UnerlaubteNutzungValid;
 import jakarta.validation.Valid;
@@ -15,6 +17,7 @@ import java.time.LocalDate;
 import java.util.List;
 
 @AdressartValid
+@NutzungValid
 @UnerlaubteNutzungValid
 public record AbrechnungNutzungsobjektRequestDTO(
         @NotNull Adressart art,
@@ -23,19 +26,21 @@ public record AbrechnungNutzungsobjektRequestDTO(
         @Size(min = 1, max = 20) String hausnummerBis,
         @Size(min = 1, max = 255) String flurstueck,
         @Size(min = 1, max = 255) String gemarkung,
-        Nutzung nutzung,
+        List<Nutzung> nutzungen,
+        @Size(min = 1, max = 255) String nutzungSonstiges,
         LocalDate unerlaubteNutzungVon,
         LocalDate unerlaubteNutzungBis,
         @Min(1) Integer tageUnerlaubteNutzung,
         @Size(max = 10_000) String bemerkung,
         boolean aufschlag50prozent,
-        @NotEmpty List<@Valid AbrechnungPositionRequestDTO> positionen) implements Adresse, UnerlaubteNutzung {
+        @NotEmpty List<@Valid AbrechnungPositionRequestDTO> positionen) implements Adresse, Nutzungsangabe, UnerlaubteNutzung {
 
     /**
      * Copies the positions in, so that the request stays immutable however the caller treats the list
      * it passed. A missing list becomes an empty one, which {@code @NotEmpty} rejects just the same.
      */
     public AbrechnungNutzungsobjektRequestDTO {
+        nutzungen = Nutzung.distinctSorted(nutzungen);
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
     }
 }

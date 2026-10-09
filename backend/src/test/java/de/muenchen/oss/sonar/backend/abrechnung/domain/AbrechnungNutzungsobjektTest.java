@@ -23,7 +23,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenZeitraum_thenDeriveTheTageInclusive() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, BIS, null, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(31);
@@ -32,7 +32,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenOnlyTage_thenKeepThem() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, 12, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(12);
@@ -41,7 +41,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenMatchingZeitraumAndTage_thenKeepThem() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, BIS, 31, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(31);
@@ -50,14 +50,14 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenContradictingTage_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, BIS, 12, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenNeitherZeitraumNorTage_thenLeaveThemEmpty() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(POSITION));
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isNull();
@@ -69,21 +69,21 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenOnlyBeginn_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, null, null, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenOnlyEnde_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, BIS, null, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenInvertedZeitraum_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     BIS, VON, null, null, false, List.of(POSITION))).isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -93,7 +93,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenNoPositionen_thenReturnAnEmptyList() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, null);
 
             assertThat(nutzungsobjekt.positionen()).isEmpty();

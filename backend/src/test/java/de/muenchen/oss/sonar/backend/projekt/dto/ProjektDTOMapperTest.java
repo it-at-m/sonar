@@ -28,7 +28,7 @@ class ProjektDTOMapperTest {
         @Test
         void givenProjekt_thenReturnsCorrectDTO() {
             final ProjektAdresse adresse = new ProjektAdresse(
-                    UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     BEGINN, ENDE, 90, 2, true);
             final Projekt projekt = new Projekt(
                     UUID.randomUUID(), "2026-0001", BEGINN, ENDE, List.of(adresse));
@@ -50,7 +50,7 @@ class ProjektDTOMapperTest {
             assertThat(adresseDTO.hausnummerBis()).isEqualTo(adresse.hausnummerBis());
             assertThat(adresseDTO.flurstueck()).isEqualTo(adresse.flurstueck());
             assertThat(adresseDTO.gemarkung()).isEqualTo(adresse.gemarkung());
-            assertThat(adresseDTO.nutzung()).isEqualTo(adresse.nutzung());
+            assertThat(adresseDTO.nutzungen()).containsExactlyElementsOf(adresse.nutzungen());
             assertThat(adresseDTO.unerlaubteNutzungVon()).isEqualTo(adresse.unerlaubteNutzungVon());
             assertThat(adresseDTO.unerlaubteNutzungBis()).isEqualTo(adresse.unerlaubteNutzungBis());
             assertThat(adresseDTO.tageUnerlaubteNutzung()).isEqualTo(adresse.tageUnerlaubteNutzung());
@@ -64,7 +64,7 @@ class ProjektDTOMapperTest {
         @Test
         void givenRequestDTO_thenReturnsCorrectProjekt() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
@@ -85,7 +85,7 @@ class ProjektDTOMapperTest {
             assertThat(adresse.hausnummerBis()).isEqualTo(adresseDTO.hausnummerBis());
             assertThat(adresse.flurstueck()).isEqualTo(adresseDTO.flurstueck());
             assertThat(adresse.gemarkung()).isEqualTo(adresseDTO.gemarkung());
-            assertThat(adresse.nutzung()).isEqualTo(adresseDTO.nutzung());
+            assertThat(adresse.nutzungen()).containsExactlyElementsOf(adresseDTO.nutzungen());
             assertThat(adresse.unerlaubteNutzungVon()).isEqualTo(adresseDTO.unerlaubteNutzungVon());
             assertThat(adresse.unerlaubteNutzungBis()).isEqualTo(adresseDTO.unerlaubteNutzungBis());
             assertThat(adresse.anzahlMahnungen()).isEqualTo(adresseDTO.anzahlMahnungen());
