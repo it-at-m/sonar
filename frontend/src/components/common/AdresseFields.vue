@@ -4,6 +4,7 @@
     class="art-group"
     inline
     label="Erfassung als"
+    :readonly="readonly"
     @update:model-value="clearFieldsOfUnselectedArt(adresse)"
   >
     <v-radio
@@ -27,6 +28,7 @@
           v-model="adresse.adresse"
           label="Adresse"
           maxlength="255"
+          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -39,6 +41,7 @@
           v-model="adresse.hausnummerVon"
           label="Hausnummer von"
           maxlength="20"
+          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -53,6 +56,7 @@
           label="Hausnummer bis"
           maxlength="20"
           persistent-hint
+          :readonly="readonly"
         />
       </v-col>
     </template>
@@ -66,6 +70,7 @@
           v-model="adresse.flurstueck"
           label="Flurstück"
           maxlength="255"
+          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -78,6 +83,7 @@
           v-model="adresse.gemarkung"
           label="Gemarkung"
           maxlength="255"
+          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -89,10 +95,15 @@
     >
       <v-select
         :id="`${idPrefix}-nutzung`"
-        v-model="adresse.nutzung"
-        clearable
+        v-model="adresse.nutzungen"
+        chips
+        :clearable="!readonly"
+        :closable-chips="!readonly"
         :items="NUTZUNG_OPTIONS"
         label="Nutzung"
+        multiple
+        :readonly="readonly"
+        @update:model-value="clearSonstigesOfUnselectedNutzung(adresse)"
       />
     </v-col>
 
@@ -103,6 +114,21 @@
     >
       <slot name="after-nutzung" />
     </v-col>
+
+    <v-col
+      v-if="isSonstigeNutzung"
+      class="ms-md-auto"
+      cols="12"
+      md="5"
+    >
+      <v-text-field
+        :id="`${idPrefix}-nutzung-sonstiges`"
+        v-model="adresse.nutzungSonstiges"
+        label="Beschreibung der Nutzung"
+        maxlength="255"
+        :readonly="readonly"
+      />
+    </v-col>
   </v-row>
 </template>
 
@@ -111,19 +137,32 @@ import type { Adresse } from "@/types/common/Adresse";
 
 import { computed, useSlots } from "vue";
 
-import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
-import { clearFieldsOfUnselectedArt } from "@/util/common/adresseForm";
+import {
+  ProjektAdresseRequestDTOArtEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
+} from "@/api/generated/sonar-backend";
+import {
+  clearFieldsOfUnselectedArt,
+  clearSonstigesOfUnselectedNutzung,
+} from "@/util/common/adresseForm";
 import { NUTZUNG_OPTIONS } from "@/util/common/nutzungOptions";
 import { requiredRule } from "@/util/validationRules";
 
 const adresse = defineModel<Adresse>({ required: true });
 
-defineProps<{
+const { readonly = false } = defineProps<{
   idPrefix: string;
+  readonly?: boolean;
 }>();
 
 const isAdresse = computed(
   () => adresse.value.art === ProjektAdresseRequestDTOArtEnum.ADRESSE
+);
+
+const isSonstigeNutzung = computed(() =>
+  adresse.value.nutzungen.includes(
+    ProjektAdresseRequestDTONutzungenEnum.SONSTIGES
+  )
 );
 
 const slots = useSlots();

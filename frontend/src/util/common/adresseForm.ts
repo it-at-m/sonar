@@ -1,6 +1,9 @@
 import type { Adresse } from "@/types/common/Adresse";
 
-import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
+import {
+  ProjektAdresseRequestDTOArtEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
+} from "@/api/generated/sonar-backend";
 
 export function clearFieldsOfUnselectedArt(adresse: Adresse): void {
   if (adresse.art === ProjektAdresseRequestDTOArtEnum.ADRESSE) {
@@ -13,6 +16,14 @@ export function clearFieldsOfUnselectedArt(adresse: Adresse): void {
   }
 }
 
+export function clearSonstigesOfUnselectedNutzung(adresse: Adresse): void {
+  if (
+    !adresse.nutzungen.includes(ProjektAdresseRequestDTONutzungenEnum.SONSTIGES)
+  ) {
+    adresse.nutzungSonstiges = "";
+  }
+}
+
 export function isAdresseDirty(adresse: Adresse): boolean {
   return (
     adresse.art !== ProjektAdresseRequestDTOArtEnum.ADRESSE ||
@@ -21,6 +32,7 @@ export function isAdresseDirty(adresse: Adresse): boolean {
     adresse.hausnummerBis !== "" ||
     adresse.flurstueck !== "" ||
     adresse.gemarkung !== "" ||
-    adresse.nutzung !== null
+    adresse.nutzungen.length > 0 ||
+    adresse.nutzungSonstiges !== ""
   );
 }

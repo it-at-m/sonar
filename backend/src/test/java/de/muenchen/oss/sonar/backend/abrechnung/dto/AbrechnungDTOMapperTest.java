@@ -35,7 +35,7 @@ class AbrechnungDTOMapperTest {
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungMast mast = new AbrechnungMast(UUID.randomUUID(), VON, BIS);
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of(mast));
             final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), LocalDate.of(2026, 4, 1), null, null,
                     null, null, false, false, null);
@@ -64,7 +64,7 @@ class AbrechnungDTOMapperTest {
             assertThat(nutzungsobjektDTO.art()).isEqualTo(Adressart.FLURSTUECK);
             assertThat(nutzungsobjektDTO.flurstueck()).isEqualTo("1234/5");
             assertThat(nutzungsobjektDTO.gemarkung()).isEqualTo("Sendling");
-            assertThat(nutzungsobjektDTO.nutzung()).isEqualTo(Nutzung.NUTZUNG_B);
+            assertThat(nutzungsobjektDTO.nutzungen()).containsExactly(Nutzung.CONTAINER);
             assertThat(nutzungsobjektDTO.tageUnerlaubteNutzung()).isEqualTo(90);
             assertThat(nutzungsobjektDTO.bemerkung()).isEqualTo("Bemerkung");
             assertThat(nutzungsobjektDTO.aufschlag50prozent()).isTrue();
@@ -103,8 +103,8 @@ class AbrechnungDTOMapperTest {
             final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
                     VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"),
                     new BigDecimal("30.00"));
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, 12, null, false, List.of(positionDTO), List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
@@ -130,8 +130,8 @@ class AbrechnungDTOMapperTest {
         @Test
         void givenMasten_thenCarryThemIntoTheNutzungsobjekt() {
             final AbrechnungMastRequestDTO mastDTO = new AbrechnungMastRequestDTO(VON, BIS);
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(), List.of(mastDTO));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));

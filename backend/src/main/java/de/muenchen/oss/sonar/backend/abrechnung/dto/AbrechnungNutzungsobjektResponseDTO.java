@@ -14,7 +14,8 @@ public record AbrechnungNutzungsobjektResponseDTO(
         String hausnummerBis,
         String flurstueck,
         String gemarkung,
-        Nutzung nutzung,
+        List<Nutzung> nutzungen,
+        String nutzungSonstiges,
         LocalDate unerlaubteNutzungVon,
         LocalDate unerlaubteNutzungBis,
         Integer tageUnerlaubteNutzung,
@@ -29,6 +30,7 @@ public record AbrechnungNutzungsobjektResponseDTO(
      * collection to null, and {@link List#copyOf} would reject it.
      */
     public AbrechnungNutzungsobjektResponseDTO {
+        nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
         masten = masten == null ? List.of() : List.copyOf(masten);
     }

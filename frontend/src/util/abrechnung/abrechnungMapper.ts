@@ -49,6 +49,7 @@ function toNutzungsobjektRequestDTO(
   nutzungsobjekt: AbrechnungNutzungsobjektForm
 ): AbrechnungNutzungsobjektRequestDTO {
   return {
+    id: nutzungsobjekt.uebernommenesNutzungsobjektId ?? undefined,
     ...toAdresseRequestFields(nutzungsobjekt),
     ...toUnerlaubteNutzungRequestFields(nutzungsobjekt),
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
@@ -87,13 +88,15 @@ function toNutzungsobjektForm(
 ): AbrechnungNutzungsobjektForm {
   return {
     id: crypto.randomUUID(),
+    uebernommenesNutzungsobjektId: null,
     art: nutzungsobjekt.art ?? ProjektAdresseRequestDTOArtEnum.ADRESSE,
     adresse: nutzungsobjekt.adresse ?? "",
     hausnummerVon: nutzungsobjekt.hausnummerVon ?? "",
     hausnummerBis: nutzungsobjekt.hausnummerBis ?? "",
     flurstueck: nutzungsobjekt.flurstueck ?? "",
     gemarkung: nutzungsobjekt.gemarkung ?? "",
-    nutzung: nutzungsobjekt.nutzung ?? null,
+    nutzungen: nutzungsobjekt.nutzungen ?? [],
+    nutzungSonstiges: nutzungsobjekt.nutzungSonstiges ?? "",
     unerlaubteNutzungVon: toIsoDateString(nutzungsobjekt.unerlaubteNutzungVon),
     unerlaubteNutzungBis: toIsoDateString(nutzungsobjekt.unerlaubteNutzungBis),
     tageUnerlaubteNutzung: nutzungsobjekt.tageUnerlaubteNutzung ?? null,

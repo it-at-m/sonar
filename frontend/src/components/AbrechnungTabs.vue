@@ -24,6 +24,7 @@
         ref="berechnung"
         v-model="abrechnung"
         :invalid-nutzungsobjekte="invalidNutzungsobjekte"
+        :nutzungsobjekt-suggestions="nutzungsobjektSuggestions"
         :readonly="readonly"
         :suggestions="suggestions"
       />
@@ -33,6 +34,7 @@
 
 <script setup lang="ts">
 import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
+import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { ref, useTemplateRef } from "vue";
@@ -45,10 +47,12 @@ const abrechnung = defineModel<AbrechnungForm>({ required: true });
 
 const {
   invalidNutzungsobjekte = [],
+  nutzungsobjektSuggestions = [],
   readonly = false,
   suggestions = [],
 } = defineProps<{
   invalidNutzungsobjekte?: number[];
+  nutzungsobjektSuggestions?: NutzungsobjektSuggestion[];
   readonly?: boolean;
   suggestions?: ProjektAdresseSuggestion[];
 }>();

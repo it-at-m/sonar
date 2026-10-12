@@ -2,9 +2,9 @@ import { describe, expect, it } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
   ProjektAdresseResponseDTOArtEnum,
-  ProjektAdresseResponseDTONutzungEnum,
+  ProjektAdresseResponseDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import { toProjektAdresseSuggestion } from "@/util/projekt/projektAdresseMapper";
 
@@ -17,7 +17,7 @@ describe("projektAdresseMapper.ts", () => {
         adresse: "Marienplatz",
         hausnummerVon: "8",
         hausnummerBis: "10",
-        nutzung: ProjektAdresseResponseDTONutzungEnum.NUTZUNG_A,
+        nutzungen: [ProjektAdresseResponseDTONutzungenEnum.BAUZAUN],
         unerlaubteNutzungVon: new Date("2026-01-05"),
         unerlaubteNutzungBis: new Date("2026-01-10"),
         tageUnerlaubteNutzung: 6,
@@ -32,11 +32,27 @@ describe("projektAdresseMapper.ts", () => {
         hausnummerBis: "10",
         flurstueck: "",
         gemarkung: "",
-        nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A,
+        nutzungen: [ProjektAdresseRequestDTONutzungenEnum.BAUZAUN],
+        nutzungSonstiges: "",
         unerlaubteNutzungVon: "2026-01-05",
         unerlaubteNutzungBis: "2026-01-10",
         tageUnerlaubteNutzung: 6,
       });
+    });
+
+    it("givenNutzungSonstiges_thenMapItsBeschreibung", () => {
+      const suggestion = toProjektAdresseSuggestion({
+        art: ProjektAdresseResponseDTOArtEnum.ADRESSE,
+        adresse: "Marienplatz",
+        hausnummerVon: "8",
+        nutzungen: [ProjektAdresseResponseDTONutzungenEnum.SONSTIGES],
+        nutzungSonstiges: "Gerüst über dem Gehweg",
+      });
+
+      expect(suggestion.nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.SONSTIGES,
+      ]);
+      expect(suggestion.nutzungSonstiges).toBe("Gerüst über dem Gehweg");
     });
 
     it("givenFlurstueck_thenMapItWithItsGemarkung", () => {
@@ -61,7 +77,8 @@ describe("projektAdresseMapper.ts", () => {
       expect(suggestion.hausnummerBis).toBe("");
       expect(suggestion.flurstueck).toBe("");
       expect(suggestion.gemarkung).toBe("");
-      expect(suggestion.nutzung).toBeNull();
+      expect(suggestion.nutzungen).toEqual([]);
+      expect(suggestion.nutzungSonstiges).toBe("");
       expect(suggestion.unerlaubteNutzungVon).toBe("");
       expect(suggestion.unerlaubteNutzungBis).toBe("");
       expect(suggestion.tageUnerlaubteNutzung).toBeNull();

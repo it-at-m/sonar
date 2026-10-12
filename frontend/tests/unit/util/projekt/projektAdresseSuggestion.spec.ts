@@ -4,14 +4,12 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 import {
   applyProjektAdresseSuggestion,
   fetchProjektAdresseSuggestions,
-  projektAdresseSuggestionSubtitle,
-  projektAdresseSuggestionTitle,
 } from "@/util/projekt/projektAdresseSuggestion";
 
 const PROJEKT_ID = "0f9d1a3c-0f4e-4b9a-8f4a-9a5d1e2b3c4d";
@@ -38,7 +36,8 @@ function suggestion(
     hausnummerBis: "",
     flurstueck: "",
     gemarkung: "",
-    nutzung: null,
+    nutzungen: [],
+    nutzungSonstiges: "",
     unerlaubteNutzungVon: "",
     unerlaubteNutzungBis: "",
     tageUnerlaubteNutzung: null,
@@ -113,56 +112,6 @@ describe("projektAdresseSuggestion.ts", () => {
     });
   });
 
-  describe("projektAdresseSuggestionTitle", () => {
-    it("givenAdresse_thenNameItWithItsHausnummer", () => {
-      expect(projektAdresseSuggestionTitle(suggestion())).toBe("Marienplatz 8");
-    });
-
-    it("givenSpanOfHausnummern_thenNameBothEnds", () => {
-      const title = projektAdresseSuggestionTitle(
-        suggestion({ hausnummerBis: "10" })
-      );
-
-      expect(title).toBe("Marienplatz 8–10");
-    });
-
-    it("givenAdresseWithoutHausnummer_thenNameOnlyTheStreet", () => {
-      const title = projektAdresseSuggestionTitle(
-        suggestion({ hausnummerVon: "" })
-      );
-
-      expect(title).toBe("Marienplatz");
-    });
-
-    it("givenFlurstueck_thenNameItWithItsGemarkung", () => {
-      const title = projektAdresseSuggestionTitle(
-        suggestion({
-          art: ProjektAdresseRequestDTOArtEnum.FLURSTUECK,
-          adresse: "",
-          hausnummerVon: "",
-          flurstueck: "1234/5",
-          gemarkung: "Sendling",
-        })
-      );
-
-      expect(title).toBe("Flurstück 1234/5, Sendling");
-    });
-  });
-
-  describe("projektAdresseSuggestionSubtitle", () => {
-    it("givenNutzung_thenNameIt", () => {
-      const subtitle = projektAdresseSuggestionSubtitle(
-        suggestion({ nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B })
-      );
-
-      expect(subtitle).toBe("Nutzung B");
-    });
-
-    it("givenNoNutzung_thenStayEmptySoTheEntryShowsOneLine", () => {
-      expect(projektAdresseSuggestionSubtitle(suggestion())).toBe("");
-    });
-  });
-
   describe("applyProjektAdresseSuggestion", () => {
     it("givenSuggestion_thenFillTheAdresseAndTheUnerlaubteNutzung", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
@@ -170,7 +119,7 @@ describe("projektAdresseSuggestion.ts", () => {
       applyProjektAdresseSuggestion(
         nutzungsobjekt,
         suggestion({
-          nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B,
+          nutzungen: [ProjektAdresseRequestDTONutzungenEnum.CONTAINER],
           unerlaubteNutzungVon: "2026-01-01",
           unerlaubteNutzungBis: "2026-01-31",
           tageUnerlaubteNutzung: 31,
@@ -180,9 +129,9 @@ describe("projektAdresseSuggestion.ts", () => {
       expect(nutzungsobjekt.art).toBe(ProjektAdresseRequestDTOArtEnum.ADRESSE);
       expect(nutzungsobjekt.adresse).toBe("Marienplatz");
       expect(nutzungsobjekt.hausnummerVon).toBe("8");
-      expect(nutzungsobjekt.nutzung).toBe(
-        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B
-      );
+      expect(nutzungsobjekt.nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+      ]);
       expect(nutzungsobjekt.unerlaubteNutzungVon).toBe("2026-01-01");
       expect(nutzungsobjekt.unerlaubteNutzungBis).toBe("2026-01-31");
       expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(31);

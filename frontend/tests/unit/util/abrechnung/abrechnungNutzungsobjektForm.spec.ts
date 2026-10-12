@@ -44,7 +44,7 @@ describe("abrechnungNutzungsobjektForm.ts", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
       const position = nutzungsobjekt.positionen[0];
       if (position === undefined) {
-        throw new Error("Ein neues Nutzungsobjekt hat eine Position.");
+        throw new Error("Das Nutzungsobjekt hat keine Position.");
       }
       position.laenge = 12;
 
@@ -75,6 +75,14 @@ describe("abrechnungNutzungsobjektForm.ts", () => {
     it("givenTageUnerlaubteNutzung_thenReturnTrue", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
       nutzungsobjekt.tageUnerlaubteNutzung = 3;
+
+      expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
+    });
+
+    it("givenUebernommenesNutzungsobjekt_thenReturnTrue", () => {
+      const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+      nutzungsobjekt.uebernommenesNutzungsobjektId =
+        "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d";
 
       expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
     });

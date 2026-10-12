@@ -24,7 +24,8 @@ public interface AbrechnungDTOMapper {
     @Mapping(target = "neuereVersionVorhanden", ignore = true)
     Abrechnung toAbrechnung(UUID projektId, AbrechnungRequestDTO abrechnungRequestDTO);
 
-    @Mapping(target = "id", ignore = true)
+    NutzungsobjektResponseDTO toDTO(AbrechnungNutzungsobjekt abrechnungNutzungsobjekt);
+
     AbrechnungNutzungsobjekt toAbrechnungNutzungsobjekt(AbrechnungNutzungsobjektRequestDTO abrechnungNutzungsobjektRequestDTO);
 
     @Mapping(target = "id", ignore = true)
