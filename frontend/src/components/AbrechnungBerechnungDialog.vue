@@ -4,18 +4,18 @@
     density="comfortable"
     :icon="mdiCalculator"
     variant="text"
-    @click="oeffne"
+    @click="openDialog"
   />
 
   <v-dialog
-    v-model="eingabeDialog"
+    v-model="berechnungDialog"
     width="500"
   >
     <v-card>
       <v-card-title>Berechnung erstellen</v-card-title>
       <v-form
         ref="form"
-        @submit.prevent="berechnen"
+        @submit.prevent="createBerechnung"
       >
         <v-card-text>
           <v-text-field
@@ -30,7 +30,7 @@
           <v-spacer />
           <v-btn
             variant="text"
-            @click="eingabeDialog = false"
+            @click="berechnungDialog = false"
           >
             Abbrechen
           </v-btn>
@@ -59,27 +59,27 @@ defineProps<{
 }>();
 
 const form = useTemplateRef("form");
-const eingabeDialog = ref(false);
-const abrechnungsdatum = ref(heute());
+const berechnungDialog = ref(false);
+const abrechnungsdatum = ref(today());
 
-function heute(): string {
+function today(): string {
   const now = new Date();
   const month = String(now.getMonth() + 1).padStart(2, "0");
   const day = String(now.getDate()).padStart(2, "0");
   return `${now.getFullYear()}-${month}-${day}`;
 }
 
-function oeffne(): void {
-  abrechnungsdatum.value = heute();
-  eingabeDialog.value = true;
+function openDialog(): void {
+  abrechnungsdatum.value = today();
+  berechnungDialog.value = true;
 }
 
-async function berechnen(): Promise<void> {
+async function createBerechnung(): Promise<void> {
   const validation = await form.value?.validate();
   if (!validation?.valid) {
     return;
   }
-  eingabeDialog.value = false;
+  berechnungDialog.value = false;
   // The Berechnung itself is not requested yet.
 }
 </script>

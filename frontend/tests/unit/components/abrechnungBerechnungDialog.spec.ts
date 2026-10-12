@@ -20,11 +20,13 @@ function mountDialog() {
   });
 }
 
-function geoeffnet(wrapper: ReturnType<typeof mountDialog>): boolean {
+function isOpen(wrapper: ReturnType<typeof mountDialog>): boolean {
   return wrapper.findComponent({ name: "VDialog" }).props("modelValue");
 }
 
-async function oeffne(wrapper: ReturnType<typeof mountDialog>): Promise<void> {
+async function openDialog(
+  wrapper: ReturnType<typeof mountDialog>
+): Promise<void> {
   await wrapper
     .find('[aria-label*="Berechnung der Abrechnung"]')
     .trigger("click");
@@ -37,19 +39,19 @@ function abrechnungsdatumInput(): HTMLInputElement {
   ) as HTMLInputElement;
 }
 
-async function gibAbrechnungsdatumEin(datum: string): Promise<void> {
+async function fillAbrechnungsdatum(datum: string): Promise<void> {
   abrechnungsdatumInput().value = datum;
   abrechnungsdatumInput().dispatchEvent(new Event("input"));
   await flushPromises();
 }
 
-async function berechnen(): Promise<void> {
+async function submit(): Promise<void> {
   const form = document.querySelector("form") as HTMLFormElement;
   form.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
   await flushPromises();
 }
 
-async function abbrechen(): Promise<void> {
+async function cancel(): Promise<void> {
   const buttons = [...document.querySelectorAll<HTMLElement>("button")];
   buttons.find((button) => button.textContent?.includes("Abbrechen"))?.click();
   await flushPromises();
@@ -95,16 +97,16 @@ describe("AbrechnungBerechnungDialog.vue", () => {
         .find('[aria-label*="Berechnung der Abrechnung"]')
         .attributes("aria-label")
     ).toBe("Berechnung der Abrechnung 1000000001 erstellen");
-    expect(geoeffnet(wrapper)).toBe(false);
+    expect(isOpen(wrapper)).toBe(false);
     expect(abrechnungsdatumInput()).toBeNull();
   });
 
   it("givenClickedButton_thenAskForTheAbrechnungsdatum", async () => {
     const wrapper = mountDialog();
 
-    await oeffne(wrapper);
+    await openDialog(wrapper);
 
-    expect(geoeffnet(wrapper)).toBe(true);
+    expect(isOpen(wrapper)).toBe(true);
     expect(document.body.textContent).toContain("Berechnung erstellen");
     expect(abrechnungsdatumInput()).not.toBeNull();
   });
@@ -112,7 +114,7 @@ describe("AbrechnungBerechnungDialog.vue", () => {
   it("givenOpenedDialog_thenOfferTodayAsAbrechnungsdatum", async () => {
     const wrapper = mountDialog();
 
-    await oeffne(wrapper);
+    await openDialog(wrapper);
 
     expect(abrechnungsdatumInput().value).toBe("2026-09-30");
   });
@@ -120,40 +122,40 @@ describe("AbrechnungBerechnungDialog.vue", () => {
   it("givenEnteredAbrechnungsdatum_thenCloseTheDialog", async () => {
     const wrapper = mountDialog();
 
-    await oeffne(wrapper);
-    await gibAbrechnungsdatumEin("2026-03-31");
-    await berechnen();
+    await openDialog(wrapper);
+    await fillAbrechnungsdatum("2026-03-31");
+    await submit();
 
-    expect(geoeffnet(wrapper)).toBe(false);
+    expect(isOpen(wrapper)).toBe(false);
   });
 
   it("givenMissingAbrechnungsdatum_thenKeepTheDialogOpen", async () => {
     const wrapper = mountDialog();
 
-    await oeffne(wrapper);
-    await gibAbrechnungsdatumEin("");
-    await berechnen();
+    await openDialog(wrapper);
+    await fillAbrechnungsdatum("");
+    await submit();
 
-    expect(geoeffnet(wrapper)).toBe(true);
+    expect(isOpen(wrapper)).toBe(true);
     expect(document.body.textContent).toContain("Pflichtfeld");
   });
 
   it("givenAbbrechen_thenCloseTheDialog", async () => {
     const wrapper = mountDialog();
 
-    await oeffne(wrapper);
-    await abbrechen();
+    await openDialog(wrapper);
+    await cancel();
 
-    expect(geoeffnet(wrapper)).toBe(false);
+    expect(isOpen(wrapper)).toBe(false);
   });
 
   it("givenReopenedDialog_thenStartOnTodayAgain", async () => {
     const wrapper = mountDialog();
 
-    await oeffne(wrapper);
-    await gibAbrechnungsdatumEin("2026-03-31");
-    await abbrechen();
-    await oeffne(wrapper);
+    await openDialog(wrapper);
+    await fillAbrechnungsdatum("2026-03-31");
+    await cancel();
+    await openDialog(wrapper);
 
     expect(abrechnungsdatumInput().value).toBe("2026-09-30");
   });
