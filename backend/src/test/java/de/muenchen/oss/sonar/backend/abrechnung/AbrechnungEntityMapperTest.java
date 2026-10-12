@@ -31,7 +31,7 @@ class AbrechnungEntityMapperTest {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position));
             final UUID projektId = UUID.randomUUID();
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), projektId, 1, null, "1000000001", false, null, null,
@@ -53,7 +53,7 @@ class AbrechnungEntityMapperTest {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 3, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
@@ -69,7 +69,7 @@ class AbrechnungEntityMapperTest {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position));
 
             final NutzungsobjektEntity result = abrechnungEntityMapper.toEntity(nutzungsobjekt);
@@ -79,7 +79,7 @@ class AbrechnungEntityMapperTest {
             assertThat(result.getAdressdaten().getAdresse()).isEqualTo("Marienplatz");
             assertThat(result.getAdressdaten().getHausnummerVon()).isEqualTo("8");
             assertThat(result.getAdressdaten().getHausnummerBis()).isEqualTo("12");
-            assertThat(result.getAdressdaten().getNutzung()).isEqualTo(Nutzung.NUTZUNG_A);
+            assertThat(result.getNutzungen()).containsExactly(Nutzung.BAUZAUN);
             assertThat(result.getAdressdaten().getTageUnerlaubteNutzung()).isEqualTo(90);
             assertThat(result.getBemerkung()).isEqualTo("Bemerkung");
             assertThat(result.isAufschlag50prozent()).isTrue();
@@ -112,13 +112,13 @@ class AbrechnungEntityMapperTest {
             nutzungsobjektEntity.setId(nutzungsobjektId);
             nutzungsobjektEntity.setBemerkung("Bemerkung");
             nutzungsobjektEntity.setAufschlag50prozent(true);
+            nutzungsobjektEntity.addNutzung(Nutzung.BAUZAUN);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjektEntity.getAdressdaten();
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
             adressdaten.setHausnummerBis("12");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
             adressdaten.setUnerlaubteNutzungVon(VON);
             adressdaten.setUnerlaubteNutzungBis(BIS);
             adressdaten.setTageUnerlaubteNutzung(90);
@@ -133,7 +133,7 @@ class AbrechnungEntityMapperTest {
             assertThat(result.adresse()).isEqualTo("Marienplatz");
             assertThat(result.hausnummerVon()).isEqualTo("8");
             assertThat(result.hausnummerBis()).isEqualTo("12");
-            assertThat(result.nutzung()).isEqualTo(Nutzung.NUTZUNG_A);
+            assertThat(result.nutzungen()).containsExactly(Nutzung.BAUZAUN);
             assertThat(result.tageUnerlaubteNutzung()).isEqualTo(90);
             assertThat(result.bemerkung()).isEqualTo("Bemerkung");
             assertThat(result.aufschlag50prozent()).isTrue();
@@ -174,7 +174,7 @@ class AbrechnungEntityMapperTest {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position));
 
             final Abrechnung result = abrechnungEntityMapper.toAbrechnung(entity, false, List.of(nutzungsobjekt));

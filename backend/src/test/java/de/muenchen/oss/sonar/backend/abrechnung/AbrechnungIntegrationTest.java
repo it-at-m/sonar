@@ -126,7 +126,7 @@ class AbrechnungIntegrationTest {
             eigeneAdressdaten.setArt(Adressart.ADRESSE);
             eigeneAdressdaten.setAdresse("Marienplatz");
             eigeneAdressdaten.setHausnummerVon("8");
-            eigeneAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            eigenesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity eigeneAbrechnung = new AbrechnungEntity();
             eigeneAbrechnung.setProjektId(projektId);
@@ -178,7 +178,7 @@ class AbrechnungIntegrationTest {
             fremdeAdressdaten.setArt(Adressart.ADRESSE);
             fremdeAdressdaten.setAdresse("Sendlinger Straße");
             fremdeAdressdaten.setHausnummerVon("1");
-            fremdeAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            fremdesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             fremdePosition.setNutzungsobjekt(fremdesNutzungsobjekt);
             fremdeAbrechnung.addNutzungsobjekt(fremdesNutzungsobjekt);
@@ -216,7 +216,7 @@ class AbrechnungIntegrationTest {
             adressdaten0001.setArt(Adressart.ADRESSE);
             adressdaten0001.setAdresse("Marienplatz");
             adressdaten0001.setHausnummerVon("8");
-            adressdaten0001.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0001.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0001 = new AbrechnungEntity();
             abrechnung0001.setProjektId(projektId);
@@ -245,7 +245,7 @@ class AbrechnungIntegrationTest {
             adressdaten0002.setArt(Adressart.ADRESSE);
             adressdaten0002.setAdresse("Marienplatz");
             adressdaten0002.setHausnummerVon("8");
-            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0002.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0002 = new AbrechnungEntity();
             abrechnung0002.setProjektId(projektId);
@@ -274,7 +274,7 @@ class AbrechnungIntegrationTest {
             adressdaten0003.setArt(Adressart.ADRESSE);
             adressdaten0003.setAdresse("Marienplatz");
             adressdaten0003.setHausnummerVon("8");
-            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0003.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0003 = new AbrechnungEntity();
             abrechnung0003.setProjektId(projektId);
@@ -334,7 +334,7 @@ class AbrechnungIntegrationTest {
             adressdaten0001.setArt(Adressart.ADRESSE);
             adressdaten0001.setAdresse("Marienplatz");
             adressdaten0001.setHausnummerVon("8");
-            adressdaten0001.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0001.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0001 = new AbrechnungEntity();
             abrechnung0001.setProjektId(projektId);
@@ -363,7 +363,7 @@ class AbrechnungIntegrationTest {
             adressdaten0002.setArt(Adressart.ADRESSE);
             adressdaten0002.setAdresse("Marienplatz");
             adressdaten0002.setHausnummerVon("8");
-            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0002.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0002 = new AbrechnungEntity();
             abrechnung0002.setProjektId(projektId);
@@ -409,7 +409,7 @@ class AbrechnungIntegrationTest {
             adressdaten0001.setArt(Adressart.ADRESSE);
             adressdaten0001.setAdresse("Marienplatz");
             adressdaten0001.setHausnummerVon("8");
-            adressdaten0001.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0001.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0001 = new AbrechnungEntity();
             abrechnung0001.setProjektId(projektId);
@@ -438,7 +438,7 @@ class AbrechnungIntegrationTest {
             adressdaten0002.setArt(Adressart.ADRESSE);
             adressdaten0002.setAdresse("Marienplatz");
             adressdaten0002.setHausnummerVon("8");
-            adressdaten0002.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0002.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0002 = new AbrechnungEntity();
             abrechnung0002.setProjektId(projektId);
@@ -467,7 +467,7 @@ class AbrechnungIntegrationTest {
             adressdaten0003.setArt(Adressart.ADRESSE);
             adressdaten0003.setAdresse("Marienplatz");
             adressdaten0003.setHausnummerVon("8");
-            adressdaten0003.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt0003.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung0003 = new AbrechnungEntity();
             abrechnung0003.setProjektId(projektId);
@@ -526,7 +526,7 @@ class AbrechnungIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung = new AbrechnungEntity();
             abrechnung.setProjektId(projektId);
@@ -620,7 +620,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenAdresse_thenAbrechnungIsSaved() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -673,7 +673,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenFlurstueck_thenAbrechnungIsSaved() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null,
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null, null,
                     null, null, 12, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -700,7 +700,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenOnlyFlaeche_thenAbrechnungIsSavedWithoutLaengeUndBreite() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, null, null,
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -737,12 +737,12 @@ class AbrechnungIntegrationTest {
         @Test
         void givenSeveralNutzungsobjekte_thenKeepTheOrderTheyWereEnteredIn() {
             final AbrechnungNutzungsobjektRequestDTO erste = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
             final AbrechnungNutzungsobjektRequestDTO zweite = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null,
+                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -770,7 +770,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenUnknownProjekt_thenReturnNotFound() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -791,7 +791,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenAdresseWithGemarkung_thenReturnBadRequest() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -812,7 +812,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenInvertedZeitraum_thenReturnBadRequest() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -867,7 +867,7 @@ class AbrechnungIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity abrechnung = new AbrechnungEntity();
             abrechnung.setProjektId(projektId);
@@ -917,7 +917,7 @@ class AbrechnungIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity fremdeAbrechnung = new AbrechnungEntity();
             fremdeAbrechnung.setProjektId(projektId);
@@ -983,7 +983,7 @@ class AbrechnungIntegrationTest {
             ersteAdressdaten.setArt(Adressart.ADRESSE);
             ersteAdressdaten.setAdresse("Marienplatz");
             ersteAdressdaten.setHausnummerVon("8");
-            ersteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            erstesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ersteVersion = new AbrechnungEntity();
             ersteVersion.setProjektId(projektId);
@@ -998,7 +998,7 @@ class AbrechnungIntegrationTest {
             final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
 
             final AbrechnungNutzungsobjektRequestDTO geaendertesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Sendlinger Straße", "1", "3", null, null, Nutzung.NUTZUNG_B,
+                    Adressart.ADRESSE, "Sendlinger Straße", "1", "3", null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, 5, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
@@ -1049,7 +1049,7 @@ class AbrechnungIntegrationTest {
             ersteAdressdaten.setArt(Adressart.ADRESSE);
             ersteAdressdaten.setAdresse("Marienplatz");
             ersteAdressdaten.setHausnummerVon("8");
-            ersteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            erstesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ersteVersion = new AbrechnungEntity();
             ersteVersion.setProjektId(projektId);
@@ -1064,7 +1064,7 @@ class AbrechnungIntegrationTest {
             final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
 
             final AbrechnungNutzungsobjektRequestDTO geaendertesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
+                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
@@ -1112,7 +1112,7 @@ class AbrechnungIntegrationTest {
             ersteAdressdaten.setArt(Adressart.ADRESSE);
             ersteAdressdaten.setAdresse("Marienplatz");
             ersteAdressdaten.setHausnummerVon("8");
-            ersteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            erstesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ersteVersion = new AbrechnungEntity();
             ersteVersion.setProjektId(projektId);
@@ -1127,7 +1127,7 @@ class AbrechnungIntegrationTest {
             final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
 
             final AbrechnungNutzungsobjektRequestDTO geaendertesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
+                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
@@ -1177,7 +1177,7 @@ class AbrechnungIntegrationTest {
             ersteAdressdaten.setArt(Adressart.ADRESSE);
             ersteAdressdaten.setAdresse("Marienplatz");
             ersteAdressdaten.setHausnummerVon("8");
-            ersteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            erstesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ersteVersion = new AbrechnungEntity();
             ersteVersion.setProjektId(projektId);
@@ -1192,7 +1192,7 @@ class AbrechnungIntegrationTest {
             final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
 
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
+                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
@@ -1221,7 +1221,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenUnknownAbrechnung_thenReturnNotFound() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -1260,7 +1260,7 @@ class AbrechnungIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ersteVersion = new AbrechnungEntity();
             ersteVersion.setProjektId(projektId);
@@ -1275,7 +1275,7 @@ class AbrechnungIntegrationTest {
             final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
 
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -1335,7 +1335,7 @@ class AbrechnungIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity ersteVersion = new AbrechnungEntity();
             ersteVersion.setProjektId(projektId);
@@ -1350,7 +1350,7 @@ class AbrechnungIntegrationTest {
             final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
 
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -1395,7 +1395,7 @@ class AbrechnungIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity einzigeVersion = new AbrechnungEntity();
             einzigeVersion.setProjektId(projektId);
@@ -1437,7 +1437,7 @@ class AbrechnungIntegrationTest {
             eigeneAdressdaten.setArt(Adressart.ADRESSE);
             eigeneAdressdaten.setAdresse("Marienplatz");
             eigeneAdressdaten.setHausnummerVon("8");
-            eigeneAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            eigenesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity eigeneAbrechnung = new AbrechnungEntity();
             eigeneAbrechnung.setProjektId(projektId);
@@ -1466,7 +1466,7 @@ class AbrechnungIntegrationTest {
             fremdeAdressdaten.setArt(Adressart.ADRESSE);
             fremdeAdressdaten.setAdresse("Sendlinger Straße");
             fremdeAdressdaten.setHausnummerVon("1");
-            fremdeAdressdaten.setNutzung(Nutzung.NUTZUNG_B);
+            fremdesNutzungsobjekt.addNutzung(Nutzung.CONTAINER);
 
             final AbrechnungEntity fremdeAbrechnung = new AbrechnungEntity();
             fremdeAbrechnung.setProjektId(projektId);
@@ -1481,7 +1481,7 @@ class AbrechnungIntegrationTest {
             final UUID fremdeAbrechnungId = abrechnungRepository.save(fremdeAbrechnung).getId();
 
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));
@@ -1524,7 +1524,7 @@ class AbrechnungIntegrationTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AbrechnungEntity fremdeAbrechnung = new AbrechnungEntity();
             fremdeAbrechnung.setProjektId(projektId);
@@ -1596,12 +1596,12 @@ class AbrechnungIntegrationTest {
             final NutzungsobjektEntity gemeinsamesNutzungsobjekt = new NutzungsobjektEntity();
             gemeinsamesNutzungsobjekt.setAufschlag50prozent(true);
             gemeinsamesNutzungsobjekt.setBemerkung("Aus der Erstabrechnung");
+            gemeinsamesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AdressdatenEmbeddable gemeinsameAdressdaten = gemeinsamesNutzungsobjekt.getAdressdaten();
             gemeinsameAdressdaten.setArt(Adressart.ADRESSE);
             gemeinsameAdressdaten.setAdresse("Marienplatz");
             gemeinsameAdressdaten.setHausnummerVon("8");
-            gemeinsameAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
 
             final AbrechnungEntity ersteAbrechnung = new AbrechnungEntity();
             ersteAbrechnung.setProjektId(projektId);
@@ -1772,12 +1772,12 @@ class AbrechnungIntegrationTest {
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
             nutzungsobjekt.setBemerkung("Aus der Erstabrechnung");
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
 
             final AbrechnungEntity ersteAbrechnung = new AbrechnungEntity();
             ersteAbrechnung.setProjektId(projektId);
@@ -1798,7 +1798,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenUebernommenesNutzungsobjekt_thenShowEachAbrechnungOnlyItsOwnPositionen() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
-                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
+                    Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Wird ignoriert", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
@@ -1846,7 +1846,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenUebernommenesNutzungsobjekt_thenStoreItOnlyOnce() {
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
@@ -1891,7 +1891,7 @@ class AbrechnungIntegrationTest {
             final UUID anderesProjektId = projektRepository.save(anderesProjekt).getId();
 
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
@@ -1910,12 +1910,12 @@ class AbrechnungIntegrationTest {
         @Test
         void givenTheSameNutzungsobjektTwice_thenRefuseToCreateTheAbrechnung() {
             final AbrechnungNutzungsobjektRequestDTO erstesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
                             new BigDecimal("45.00"), new BigDecimal("45.00"))));
             final AbrechnungNutzungsobjektRequestDTO zweitesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"), new BigDecimal("30.00"))));

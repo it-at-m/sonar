@@ -56,12 +56,12 @@ class NutzungsobjektServiceTest {
             nutzungsobjekt.setId(UUID.randomUUID());
             nutzungsobjekt.setBemerkung("Aus der Erstabrechnung");
             nutzungsobjekt.setAufschlag50prozent(true);
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
 
             final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
 
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNutzungsobjekteByProjektId(PROJEKT_ID)).thenReturn(List.of(nutzungsobjekt));
@@ -104,7 +104,7 @@ class NutzungsobjektServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    nutzungsobjektId, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    nutzungsobjektId, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
@@ -123,7 +123,7 @@ class NutzungsobjektServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    nutzungsobjektId, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    nutzungsobjektId, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
@@ -140,7 +140,7 @@ class NutzungsobjektServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position));
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));

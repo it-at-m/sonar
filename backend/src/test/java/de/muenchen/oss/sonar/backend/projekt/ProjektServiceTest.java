@@ -78,7 +78,7 @@ class ProjektServiceTest {
             ersteAdressdaten.setArt(Adressart.ADRESSE);
             ersteAdressdaten.setAdresse("Marienplatz");
             ersteAdressdaten.setHausnummerVon("8");
-            ersteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            ersteAdresse.addNutzung(Nutzung.BAUZAUN);
             ersteAdressdaten.setUnerlaubteNutzungVon(BEGINN);
             ersteAdressdaten.setUnerlaubteNutzungBis(ENDE);
 
@@ -96,7 +96,7 @@ class ProjektServiceTest {
             zweiteAdressdaten.setArt(Adressart.ADRESSE);
             zweiteAdressdaten.setAdresse("Marienplatz");
             zweiteAdressdaten.setHausnummerVon("8");
-            zweiteAdressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            zweiteAdresse.addNutzung(Nutzung.BAUZAUN);
             zweiteAdressdaten.setUnerlaubteNutzungVon(BEGINN);
             zweiteAdressdaten.setUnerlaubteNutzungBis(ENDE);
 
@@ -131,7 +131,7 @@ class ProjektServiceTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresse.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(BEGINN);
             adressdaten.setUnerlaubteNutzungBis(ENDE);
 
@@ -196,7 +196,7 @@ class ProjektServiceTest {
             adressdaten.setArt(Adressart.ADRESSE);
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
-            adressdaten.setNutzung(Nutzung.NUTZUNG_A);
+            adresseEntity.addNutzung(Nutzung.BAUZAUN);
             adressdaten.setUnerlaubteNutzungVon(BEGINN);
             adressdaten.setUnerlaubteNutzungBis(ENDE);
 
@@ -233,7 +233,7 @@ class ProjektServiceTest {
         @Test
         void givenProjekt_thenReturnSavedProjekt() {
             final ProjektAdresse adresse = new ProjektAdresse(
-                    null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", Nutzung.NUTZUNG_B,
+                    null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, true);
             final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, List.of(adresse));
 

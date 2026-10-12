@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 import {
@@ -36,7 +36,8 @@ function suggestion(
     hausnummerBis: "",
     flurstueck: "",
     gemarkung: "",
-    nutzung: null,
+    nutzungen: [],
+    nutzungSonstiges: "",
     unerlaubteNutzungVon: "",
     unerlaubteNutzungBis: "",
     tageUnerlaubteNutzung: null,
@@ -118,7 +119,7 @@ describe("projektAdresseSuggestion.ts", () => {
       applyProjektAdresseSuggestion(
         nutzungsobjekt,
         suggestion({
-          nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B,
+          nutzungen: [ProjektAdresseRequestDTONutzungenEnum.CONTAINER],
           unerlaubteNutzungVon: "2026-01-01",
           unerlaubteNutzungBis: "2026-01-31",
           tageUnerlaubteNutzung: 31,
@@ -128,9 +129,9 @@ describe("projektAdresseSuggestion.ts", () => {
       expect(nutzungsobjekt.art).toBe(ProjektAdresseRequestDTOArtEnum.ADRESSE);
       expect(nutzungsobjekt.adresse).toBe("Marienplatz");
       expect(nutzungsobjekt.hausnummerVon).toBe("8");
-      expect(nutzungsobjekt.nutzung).toBe(
-        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B
-      );
+      expect(nutzungsobjekt.nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+      ]);
       expect(nutzungsobjekt.unerlaubteNutzungVon).toBe("2026-01-01");
       expect(nutzungsobjekt.unerlaubteNutzungBis).toBe("2026-01-31");
       expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(31);
