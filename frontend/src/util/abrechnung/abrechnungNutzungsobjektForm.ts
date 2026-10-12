@@ -11,6 +11,7 @@ import { hasUnerlaubteNutzung } from "@/util/common/unerlaubteNutzungForm";
 export function createAbrechnungNutzungsobjekt(): AbrechnungNutzungsobjektForm {
   return {
     id: crypto.randomUUID(),
+    uebernommenesNutzungsobjektId: null,
     art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
     adresse: "",
     hausnummerVon: "",
@@ -31,6 +32,7 @@ export function isAbrechnungNutzungsobjektDirty(
   nutzungsobjekt: AbrechnungNutzungsobjektForm
 ): boolean {
   return (
+    nutzungsobjekt.uebernommenesNutzungsobjektId !== null ||
     isAdresseDirty(nutzungsobjekt) ||
     nutzungsobjekt.bemerkung !== "" ||
     nutzungsobjekt.aufschlag50prozent ||

@@ -95,7 +95,7 @@ class AbrechnungDTOMapperTest {
             final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
                     VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"),
                     new BigDecimal("30.00"));
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
                     null, null, 12, null, false, List.of(positionDTO));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
