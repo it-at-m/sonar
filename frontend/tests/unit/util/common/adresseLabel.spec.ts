@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import {
   adresseLabel,
@@ -20,7 +20,8 @@ function adresse(overrides: Partial<Adresse> = {}): Adresse {
     hausnummerBis: "",
     flurstueck: "",
     gemarkung: "",
-    nutzung: null,
+    nutzungen: [],
+    nutzungSonstiges: "",
     ...overrides,
   };
 }
@@ -76,10 +77,26 @@ describe("adresseLabel.ts", () => {
   describe("nutzungTitle", () => {
     it("givenNutzung_thenNameIt", () => {
       const title = nutzungTitle(
-        adresse({ nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B })
+        adresse({
+          nutzungen: [ProjektAdresseRequestDTONutzungenEnum.CONTAINER],
+        })
       );
 
-      expect(title).toBe("Nutzung B");
+      expect(title).toBe("Container");
+    });
+
+    it("givenSeveralNutzungen_thenNameThemInTheOrderOfTheOptions", () => {
+      const title = nutzungTitle(
+        adresse({
+          nutzungen: [
+            ProjektAdresseRequestDTONutzungenEnum.SONSTIGES,
+            ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+            ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+          ],
+        })
+      );
+
+      expect(title).toBe("Bauzaun, Container, Sonstiges");
     });
 
     it("givenNoNutzung_thenStayEmptySoTheEntryShowsOneLine", () => {

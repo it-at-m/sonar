@@ -29,8 +29,9 @@ export function adresseTitle(adresse: Adresse): string {
 }
 
 export function nutzungTitle(adresse: Adresse): string {
-  return (
-    NUTZUNG_OPTIONS.find((option) => option.value === adresse.nutzung)?.title ??
-    ""
-  );
+  return NUTZUNG_OPTIONS.filter((option) =>
+    adresse.nutzungen.includes(option.value)
+  )
+    .map((option) => option.title)
+    .join(", ");
 }

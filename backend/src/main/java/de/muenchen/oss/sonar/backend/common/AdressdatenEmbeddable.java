@@ -39,10 +39,6 @@ public class AdressdatenEmbeddable implements Serializable {
 
     @Size(max = 255) private String gemarkung;
 
-    @Enumerated(EnumType.STRING)
-    @Column(length = 50)
-    private Nutzung nutzung;
-
     private LocalDate unerlaubteNutzungVon;
 
     private LocalDate unerlaubteNutzungBis;

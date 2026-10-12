@@ -5,7 +5,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import { createProjektAdresse } from "@/util/projekt/projektAdresseForm";
 import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
@@ -47,7 +47,7 @@ describe("projektMapper.ts", () => {
           adresseWith({
             adresse: " Marienplatz ",
             hausnummerVon: "8",
-            nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A,
+            nutzungen: [ProjektAdresseRequestDTONutzungenEnum.BAUZAUN],
             unerlaubteNutzungVon: "2026-01-05",
             unerlaubteNutzungBis: "2026-01-10",
             anzahlMahnungen: 2,
@@ -67,14 +67,113 @@ describe("projektMapper.ts", () => {
       expect(dto.adressen).toHaveLength(1);
       expect(itemAt(dto.adressen).adresse).toBe("Marienplatz");
       expect(itemAt(dto.adressen).hausnummerVon).toBe("8");
-      expect(itemAt(dto.adressen).nutzung).toBe(
-        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A
-      );
+      expect(itemAt(dto.adressen).nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+      ]);
       expect(itemAt(dto.adressen).unerlaubteNutzungVon?.toISOString()).toBe(
         "2026-01-05T00:00:00.000Z"
       );
       expect(itemAt(dto.adressen).anzahlMahnungen).toBe(2);
       expect(itemAt(dto.adressen).sondernutzungErlaubt).toBe(true);
+    });
+
+    it("givenSeveralNutzungen_thenSendAllOfThem", () => {
+      const projekt = projektWith({
+        adressen: [
+          adresseWith({
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            nutzungen: [
+              ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+              ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+              ProjektAdresseRequestDTONutzungenEnum.KRAENE,
+            ],
+          }),
+        ],
+      });
+
+      const dto = toProjektRequestDTO(projekt);
+
+      expect(itemAt(dto.adressen).nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+        ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+        ProjektAdresseRequestDTONutzungenEnum.KRAENE,
+      ]);
+    });
+
+    it("givenSonstigesAmongSeveral_thenSendTheBeschreibung", () => {
+      const projekt = projektWith({
+        adressen: [
+          adresseWith({
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            nutzungen: [
+              ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+              ProjektAdresseRequestDTONutzungenEnum.SONSTIGES,
+            ],
+            nutzungSonstiges: "Gerüst über dem Gehweg",
+          }),
+        ],
+      });
+
+      const dto = toProjektRequestDTO(projekt);
+
+      expect(itemAt(dto.adressen).nutzungSonstiges).toBe(
+        "Gerüst über dem Gehweg"
+      );
+    });
+
+    it("givenNutzungSonstiges_thenSendTheBeschreibungTrimmed", () => {
+      const projekt = projektWith({
+        adressen: [
+          adresseWith({
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            nutzungen: [ProjektAdresseRequestDTONutzungenEnum.SONSTIGES],
+            nutzungSonstiges: " Gerüst über dem Gehweg ",
+          }),
+        ],
+      });
+
+      const dto = toProjektRequestDTO(projekt);
+
+      expect(itemAt(dto.adressen).nutzungSonstiges).toBe(
+        "Gerüst über dem Gehweg"
+      );
+    });
+
+    it("givenAndereNutzung_thenLeaveOutTheBeschreibung", () => {
+      const projekt = projektWith({
+        adressen: [
+          adresseWith({
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            nutzungen: [ProjektAdresseRequestDTONutzungenEnum.BAUZAUN],
+            nutzungSonstiges: "Gerüst über dem Gehweg",
+          }),
+        ],
+      });
+
+      const dto = toProjektRequestDTO(projekt);
+
+      expect(itemAt(dto.adressen).nutzungSonstiges).toBeUndefined();
+    });
+
+    it("givenBlankBeschreibung_thenLeaveItOut", () => {
+      const projekt = projektWith({
+        adressen: [
+          adresseWith({
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            nutzungen: [ProjektAdresseRequestDTONutzungenEnum.SONSTIGES],
+            nutzungSonstiges: "   ",
+          }),
+        ],
+      });
+
+      const dto = toProjektRequestDTO(projekt);
+
+      expect(itemAt(dto.adressen).nutzungSonstiges).toBeUndefined();
     });
 
     it("givenArtFlurstueck_thenLeaveOutAdresseAndHausnummern", () => {
@@ -139,7 +238,7 @@ describe("projektMapper.ts", () => {
 
       const dto = toProjektRequestDTO(projekt);
 
-      expect(itemAt(dto.adressen).nutzung).toBeUndefined();
+      expect(itemAt(dto.adressen).nutzungen).toEqual([]);
       expect(itemAt(dto.adressen).hausnummerBis).toBeUndefined();
       expect(itemAt(dto.adressen).unerlaubteNutzungVon).toBeUndefined();
       expect(itemAt(dto.adressen).unerlaubteNutzungBis).toBeUndefined();

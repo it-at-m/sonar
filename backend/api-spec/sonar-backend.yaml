@@ -836,12 +836,28 @@ components:
           maxLength: 255
           minLength: 1
           type: string
-        nutzung:
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
+          maxLength: 255
+          minLength: 1
           type: string
-          enum:
-          - NUTZUNG_A
-          - NUTZUNG_B
-          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -902,12 +918,26 @@ components:
           type: string
         gemarkung:
           type: string
-        nutzung:
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
           type: string
-          enum:
-          - NUTZUNG_A
-          - NUTZUNG_B
-          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -974,12 +1004,28 @@ components:
           maxLength: 255
           minLength: 1
           type: string
-        nutzung:
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
+          maxLength: 255
+          minLength: 1
           type: string
-          enum:
-          - NUTZUNG_A
-          - NUTZUNG_B
-          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -1118,12 +1164,26 @@ components:
           type: string
         gemarkung:
           type: string
-        nutzung:
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
           type: string
-          enum:
-          - NUTZUNG_A
-          - NUTZUNG_B
-          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date
@@ -1354,12 +1414,26 @@ components:
           type: string
         gemarkung:
           type: string
-        nutzung:
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
           type: string
-          enum:
-          - NUTZUNG_A
-          - NUTZUNG_B
-          - NUTZUNG_C
         unerlaubteNutzungVon:
           type: string
           format: date

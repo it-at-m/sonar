@@ -4,10 +4,11 @@ import { describe, expect, it } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import {
   clearFieldsOfUnselectedArt,
+  clearSonstigesOfUnselectedNutzung,
   isAdresseDirty,
 } from "@/util/common/adresseForm";
 
@@ -19,7 +20,8 @@ function emptyAdresse(): Adresse {
     hausnummerBis: "",
     flurstueck: "",
     gemarkung: "",
-    nutzung: null,
+    nutzungen: [],
+    nutzungSonstiges: "",
   };
 }
 
@@ -56,14 +58,71 @@ describe("adresseForm.ts", () => {
 
     it("givenNutzung_thenKeepItForBothArten", () => {
       const adresse = emptyAdresse();
-      adresse.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B;
+      adresse.nutzungen = [ProjektAdresseRequestDTONutzungenEnum.CONTAINER];
       adresse.art = ProjektAdresseRequestDTOArtEnum.FLURSTUECK;
 
       clearFieldsOfUnselectedArt(adresse);
 
-      expect(adresse.nutzung).toBe(
-        ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B
-      );
+      expect(adresse.nutzungen).toEqual([
+        ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+      ]);
+    });
+  });
+
+  describe("clearSonstigesOfUnselectedNutzung", () => {
+    it("givenNutzungSonstiges_thenKeepTheBeschreibung", () => {
+      const adresse = emptyAdresse();
+      adresse.nutzungen = [ProjektAdresseRequestDTONutzungenEnum.SONSTIGES];
+      adresse.nutzungSonstiges = "Gerüst über dem Gehweg";
+
+      clearSonstigesOfUnselectedNutzung(adresse);
+
+      expect(adresse.nutzungSonstiges).toBe("Gerüst über dem Gehweg");
+    });
+
+    it("givenSonstigesAmongSeveral_thenKeepTheBeschreibung", () => {
+      const adresse = emptyAdresse();
+      adresse.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+        ProjektAdresseRequestDTONutzungenEnum.SONSTIGES,
+      ];
+      adresse.nutzungSonstiges = "Gerüst über dem Gehweg";
+
+      clearSonstigesOfUnselectedNutzung(adresse);
+
+      expect(adresse.nutzungSonstiges).toBe("Gerüst über dem Gehweg");
+    });
+
+    it("givenAndereNutzung_thenDropTheBeschreibung", () => {
+      const adresse = emptyAdresse();
+      adresse.nutzungen = [ProjektAdresseRequestDTONutzungenEnum.BAUZAUN];
+      adresse.nutzungSonstiges = "Gerüst über dem Gehweg";
+
+      clearSonstigesOfUnselectedNutzung(adresse);
+
+      expect(adresse.nutzungSonstiges).toBe("");
+    });
+
+    it("givenSeveralNutzungenWithoutSonstiges_thenDropTheBeschreibung", () => {
+      const adresse = emptyAdresse();
+      adresse.nutzungen = [
+        ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+        ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
+      ];
+      adresse.nutzungSonstiges = "Gerüst über dem Gehweg";
+
+      clearSonstigesOfUnselectedNutzung(adresse);
+
+      expect(adresse.nutzungSonstiges).toBe("");
+    });
+
+    it("givenKeineNutzung_thenDropTheBeschreibung", () => {
+      const adresse = emptyAdresse();
+      adresse.nutzungSonstiges = "Gerüst über dem Gehweg";
+
+      clearSonstigesOfUnselectedNutzung(adresse);
+
+      expect(adresse.nutzungSonstiges).toBe("");
     });
   });
 
@@ -81,7 +140,14 @@ describe("adresseForm.ts", () => {
 
     it("givenNutzung_thenReturnTrue", () => {
       const adresse = emptyAdresse();
-      adresse.nutzung = ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A;
+      adresse.nutzungen = [ProjektAdresseRequestDTONutzungenEnum.BAUZAUN];
+
+      expect(isAdresseDirty(adresse)).toBe(true);
+    });
+
+    it("givenNutzungSonstigesBeschreibung_thenReturnTrue", () => {
+      const adresse = emptyAdresse();
+      adresse.nutzungSonstiges = "Gerüst über dem Gehweg";
 
       expect(isAdresseDirty(adresse)).toBe(true);
     });

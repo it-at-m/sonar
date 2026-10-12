@@ -7,7 +7,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
-  ProjektAdresseRequestDTONutzungEnum,
+  ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import AbrechnungPositionenTable from "@/components/AbrechnungPositionenTable.vue";
@@ -24,7 +24,8 @@ const SUGGESTION: ProjektAdresseSuggestion = {
   hausnummerBis: "",
   flurstueck: "",
   gemarkung: "",
-  nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A,
+  nutzungen: [ProjektAdresseRequestDTONutzungenEnum.BAUZAUN],
+  nutzungSonstiges: "",
   unerlaubteNutzungVon: "2026-01-01",
   unerlaubteNutzungBis: "2026-01-31",
   tageUnerlaubteNutzung: 31,
@@ -38,7 +39,8 @@ const NUTZUNGSOBJEKT_SUGGESTION: NutzungsobjektSuggestion = {
   hausnummerBis: "3",
   flurstueck: "",
   gemarkung: "",
-  nutzung: ProjektAdresseRequestDTONutzungEnum.NUTZUNG_B,
+  nutzungen: [ProjektAdresseRequestDTONutzungenEnum.CONTAINER],
+  nutzungSonstiges: "",
   unerlaubteNutzungVon: "2026-02-01",
   unerlaubteNutzungBis: "2026-02-28",
   tageUnerlaubteNutzung: 28,
@@ -110,7 +112,7 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     const entries = suggestionEntries(wrapper);
     expect(entries).toHaveLength(1);
     expect(entries[0]?.props("title")).toBe("Marienplatz 8");
-    expect(entries[0]?.props("subtitle")).toBe("Nutzung A");
+    expect(entries[0]?.props("subtitle")).toBe("Bauzaun");
   });
 
   it("givenTakenOverProjektAdresse_thenFillTheEntry", async () => {
@@ -121,9 +123,9 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
 
     expect(nutzungsobjekt.adresse).toBe("Marienplatz");
     expect(nutzungsobjekt.hausnummerVon).toBe("8");
-    expect(nutzungsobjekt.nutzung).toBe(
-      ProjektAdresseRequestDTONutzungEnum.NUTZUNG_A
-    );
+    expect(nutzungsobjekt.nutzungen).toEqual([
+      ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
+    ]);
     expect(nutzungsobjekt.unerlaubteNutzungVon).toBe("2026-01-01");
     expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(31);
   });
@@ -175,7 +177,7 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     const entries = nutzungsobjektEntries(wrapper);
     expect(entries).toHaveLength(1);
     expect(entries[0]?.props("title")).toBe("Sendlinger Straße 1–3");
-    expect(entries[0]?.props("subtitle")).toBe("Nutzung B");
+    expect(entries[0]?.props("subtitle")).toBe("Container");
   });
 
   it("givenTakenOverNutzungsobjekt_thenFillTheEntryAndNameTheBilledOne", async () => {

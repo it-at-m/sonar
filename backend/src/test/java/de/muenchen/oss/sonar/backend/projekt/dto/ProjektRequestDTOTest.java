@@ -45,7 +45,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenEndeAfterBeginn_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
@@ -54,7 +54,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenEndeEqualToBeginn_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, BEGINN, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
@@ -63,7 +63,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenEndeBeforeBeginn_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", ENDE, BEGINN, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -78,7 +78,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenAdresseWithHausnummer_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
@@ -87,7 +87,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenAdresseWithoutHausnummer_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", null, null, null, null, null, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", null, null, null, null, null, null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -99,7 +99,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenAdresseWithGemarkung_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null, null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -111,7 +111,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenAdresseWithHausnummerSpan_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, null, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, null, null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
@@ -123,7 +123,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenFlurstueckWithGemarkung_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null, null, null, null, 0, false);
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null, null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
@@ -132,7 +132,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenFlurstueckWithoutGemarkung_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, null, null, null, "1234/5", null, null, null, null, null, 0, false);
+                    Adressart.FLURSTUECK, null, null, null, "1234/5", null, null, null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -144,7 +144,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenFlurstueckWithAdresse_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.FLURSTUECK, "Marienplatz", null, null, "1234/5", "Sendling", null, null, null, null, 0, false);
+                    Adressart.FLURSTUECK, "Marienplatz", null, null, "1234/5", "Sendling", null, null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -159,7 +159,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenCompleteZeitraum_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, BEGINN, ENDE, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, BEGINN, ENDE, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
@@ -168,7 +168,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenOnlyBeginn_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, BEGINN, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, BEGINN, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -180,7 +180,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenOnlyEnde_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, ENDE, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, ENDE, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -192,7 +192,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenInvertedZeitraum_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, ENDE, BEGINN, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, ENDE, BEGINN, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -204,7 +204,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenInvertedZeitraum_thenViolationOnBis() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, ENDE, BEGINN, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, ENDE, BEGINN, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -220,7 +220,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenOnlyTage_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, null, 12, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, null, 12, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
@@ -229,7 +229,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenZeitraumAndTage_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, BEGINN, ENDE, 12, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, BEGINN, ENDE, 12, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
@@ -241,7 +241,7 @@ class ProjektRequestDTOTest {
         @Test
         void givenZeroTage_thenViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, null, 0, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, null, 0, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).hasSize(1);
@@ -250,10 +250,89 @@ class ProjektRequestDTOTest {
         @Test
         void givenNeitherZeitraumNorTage_thenNoViolation() {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
-                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A, null, null, null, 0, false);
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null, null, null, null, 0, false);
             final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
 
             assertThat(validator.validate(requestDTO)).isEmpty();
+        }
+    }
+
+    @Nested
+    class NutzungSonstiges {
+        @Test
+        void givenSonstigesWithBeschreibung_thenNoViolation() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.SONSTIGES), "Gerüst über dem Gehweg", null, null, null,
+                    0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
+        }
+
+        @Test
+        void givenSeveralNutzungenIncludingSonstiges_thenNoViolation() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN, Nutzung.SONSTIGES),
+                    "Gerüst über dem Gehweg", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
+        }
+
+        @Test
+        void givenSeveralNutzungenWithoutSonstiges_thenViolation() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN, Nutzung.CONTAINER),
+                    "Gerüst über dem Gehweg", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
+                    .containsExactly("Eine Beschreibung der Nutzung ist nur zu Sonstiges anzugeben.");
+        }
+
+        @Test
+        void givenSonstigesWithoutBeschreibung_thenNoViolation() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.SONSTIGES), null, null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).isEmpty();
+        }
+
+        @Test
+        void givenAndereNutzungWithBeschreibung_thenViolation() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), "Gerüst über dem Gehweg", null, null, null, 0,
+                    false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
+                    .containsExactly("Eine Beschreibung der Nutzung ist nur zu Sonstiges anzugeben.");
+        }
+
+        @Test
+        void givenNoNutzungWithBeschreibung_thenViolation() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, "Gerüst über dem Gehweg", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            final Set<ConstraintViolation<ProjektRequestDTO>> violations = validator.validate(requestDTO);
+
+            assertThat(violations.stream().map(ConstraintViolation::getMessage).collect(Collectors.toSet()))
+                    .containsExactly("Eine Beschreibung der Nutzung ist nur zu Sonstiges anzugeben.");
+        }
+
+        @Test
+        void givenBlankBeschreibung_thenViolation() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.SONSTIGES), "", null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+
+            assertThat(validator.validate(requestDTO)).hasSize(1);
         }
     }
 
