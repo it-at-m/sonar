@@ -514,6 +514,46 @@ class AbrechnungServiceTest {
         }
 
         @Test
+        void givenSeveralNeueNutzungsobjekte_thenLinkEachPositionToItsOwnNutzungsobjekt() {
+            final AbrechnungPosition positionAmMarienplatz = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+            final AbrechnungNutzungsobjekt marienplatz = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
+                    null, null, null, null, true, List.of(positionAmMarienplatz));
+
+            final AbrechnungPosition positionInDerSendlingerStrasse = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
+                    new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
+            final AbrechnungNutzungsobjekt sendlingerStrasse = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_B,
+                    null, null, null, null, false, List.of(positionInDerSendlingerStrasse));
+
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(marienplatz, sendlingerStrasse));
+
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
+                final AbrechnungEntity toSave = invocation.getArgument(0);
+                toSave.setId(UUID.randomUUID());
+                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
+                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
+                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
+                return toSave;
+            });
+
+            final Abrechnung result = unitUnderTest.createAbrechnung(abrechnung);
+
+            final ArgumentCaptor<AbrechnungEntity> savedCaptor = ArgumentCaptor.forClass(AbrechnungEntity.class);
+            verify(abrechnungRepository).save(savedCaptor.capture());
+            final AbrechnungEntity saved = savedCaptor.getValue();
+            assertThat(saved.getNutzungsobjekte()).hasSize(2);
+            assertThat(saved.getPositionen().getFirst().getNutzungsobjekt()).isSameAs(saved.getNutzungsobjekte().getFirst());
+            assertThat(saved.getPositionen().getLast().getNutzungsobjekt()).isSameAs(saved.getNutzungsobjekte().getLast());
+
+            assertThat(result.nutzungsobjekte()).extracting(AbrechnungNutzungsobjekt::adresse)
+                    .containsExactly("Marienplatz", "Sendlinger Straße");
+        }
+
+        @Test
         void givenUnknownProjekt_thenThrowNotFound() {
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
@@ -609,6 +649,68 @@ class AbrechnungServiceTest {
             when(abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId)).thenReturn(true);
 
             assertThat(unitUnderTest.getAbrechnung(PROJEKT_ID, abrechnungId).neuereVersionVorhanden()).isTrue();
+        }
+
+        @Test
+        void givenSeveralNutzungsobjekte_thenShowEachOfThemOnlyItsOwnPositionen() {
+            final UUID erstesNutzungsobjektId = UUID.randomUUID();
+            final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
+            erstesNutzungsobjekt.setId(erstesNutzungsobjektId);
+            erstesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            erstesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+
+            final UUID zweitesNutzungsobjektId = UUID.randomUUID();
+            final NutzungsobjektEntity zweitesNutzungsobjekt = new NutzungsobjektEntity();
+            zweitesNutzungsobjekt.setId(zweitesNutzungsobjektId);
+            zweitesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            zweitesNutzungsobjekt.getAdressdaten().setAdresse("Sendlinger Straße");
+
+            final AbrechnungPositionEntity positionAmMarienplatz = new AbrechnungPositionEntity();
+            positionAmMarienplatz.setNutzungsobjekt(erstesNutzungsobjekt);
+            positionAmMarienplatz.setBeginn(VON);
+            positionAmMarienplatz.setEnde(BIS);
+            positionAmMarienplatz.setLaenge(new BigDecimal("12.00"));
+            positionAmMarienplatz.setBreite(new BigDecimal("3.00"));
+            positionAmMarienplatz.setFlaeche(new BigDecimal("36.00"));
+            positionAmMarienplatz.setAnteilAnFlaeche(new BigDecimal("30.00"));
+
+            final AbrechnungPositionEntity positionInDerSendlingerStrasse = new AbrechnungPositionEntity();
+            positionInDerSendlingerStrasse.setNutzungsobjekt(zweitesNutzungsobjekt);
+            positionInDerSendlingerStrasse.setBeginn(VON);
+            positionInDerSendlingerStrasse.setEnde(BIS);
+            positionInDerSendlingerStrasse.setLaenge(new BigDecimal("15.00"));
+            positionInDerSendlingerStrasse.setBreite(new BigDecimal("3.00"));
+            positionInDerSendlingerStrasse.setFlaeche(new BigDecimal("45.00"));
+            positionInDerSendlingerStrasse.setAnteilAnFlaeche(new BigDecimal("45.00"));
+
+            final UUID abrechnungId = UUID.randomUUID();
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setId(abrechnungId);
+            abrechnung.setProjektId(PROJEKT_ID);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung.addNutzungsobjekt(erstesNutzungsobjekt);
+            abrechnung.addNutzungsobjekt(zweitesNutzungsobjekt);
+            abrechnung.addPosition(positionAmMarienplatz);
+            abrechnung.addPosition(positionInDerSendlingerStrasse);
+
+            when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
+            when(abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId)).thenReturn(false);
+
+            final Abrechnung result = unitUnderTest.getAbrechnung(PROJEKT_ID, abrechnungId);
+
+            assertThat(result.nutzungsobjekte()).hasSize(2);
+            assertThat(result.nutzungsobjekte().getFirst().id()).isEqualTo(erstesNutzungsobjektId);
+            assertThat(result.nutzungsobjekte().getFirst().positionen())
+                    .extracting(AbrechnungPosition::flaeche)
+                    .containsExactly(new BigDecimal("36.00"));
+            assertThat(result.nutzungsobjekte().getLast().id()).isEqualTo(zweitesNutzungsobjektId);
+            assertThat(result.nutzungsobjekte().getLast().positionen())
+                    .extracting(AbrechnungPosition::flaeche)
+                    .containsExactly(new BigDecimal("45.00"));
         }
 
         @Test
