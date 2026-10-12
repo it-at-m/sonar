@@ -24,6 +24,7 @@ export function createAbrechnungNutzungsobjekt(): AbrechnungNutzungsobjektForm {
     bemerkung: "",
     aufschlag50prozent: false,
     positionen: [createAbrechnungPosition()],
+    masten: [],
   };
 }
 
@@ -35,7 +36,8 @@ export function isAbrechnungNutzungsobjektDirty(
     nutzungsobjekt.bemerkung !== "" ||
     nutzungsobjekt.aufschlag50prozent ||
     hasUnerlaubteNutzung(nutzungsobjekt) ||
-    nutzungsobjekt.positionen.length > 1 ||
-    nutzungsobjekt.positionen.some(isAbrechnungPositionDirty)
+    nutzungsobjekt.positionen.length !== 1 ||
+    nutzungsobjekt.positionen.some(isAbrechnungPositionDirty) ||
+    nutzungsobjekt.masten.length > 0
   );
 }

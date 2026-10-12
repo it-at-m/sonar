@@ -398,7 +398,7 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, Nutzung.NUTZUNG_A,
-                    VON, BIS, null, "Bemerkung", true, List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -432,7 +432,7 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, Nutzung.NUTZUNG_A,
-                    null, null, null, null, true, List.of(position));
+                    null, null, null, null, true, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -694,7 +694,7 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, Nutzung.NUTZUNG_A,
-                    null, null, null, null, false, List.of(position));
+                    null, null, null, null, false, List.of(position), List.of());
             final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000002", false, null, null,
                     VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, null, false, List.of(nutzungsobjekt));
 

@@ -71,6 +71,7 @@ describe("AbrechnungTabs.vue", () => {
           tageUnerlaubteNutzung: null,
           bemerkung: "",
           positionen: [],
+          masten: [],
         },
       ],
     });
@@ -105,6 +106,7 @@ describe("AbrechnungTabs.vue", () => {
           tageUnerlaubteNutzung: null,
           bemerkung: "",
           positionen: [],
+          masten: [],
         },
       ],
     });
@@ -139,6 +141,7 @@ describe("AbrechnungTabs.vue", () => {
           tageUnerlaubteNutzung: null,
           bemerkung: "",
           positionen: [],
+          masten: [],
         },
         {
           id: "nutzungsobjekt-1",
@@ -154,6 +157,7 @@ describe("AbrechnungTabs.vue", () => {
           tageUnerlaubteNutzung: null,
           bemerkung: "",
           positionen: [],
+          masten: [],
         },
       ],
     });
@@ -190,6 +194,7 @@ describe("AbrechnungTabs.vue", () => {
             tageUnerlaubteNutzung: null,
             bemerkung: "",
             positionen: [],
+            masten: [],
           },
         ],
       },
@@ -228,6 +233,7 @@ describe("AbrechnungTabs.vue", () => {
             tageUnerlaubteNutzung: null,
             bemerkung: "",
             positionen: [],
+            masten: [],
           },
         ],
       },

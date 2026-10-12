@@ -59,6 +59,16 @@
         v-model="nutzungsobjekt.positionen"
         :id-prefix="`${idPrefix}-position`"
         :readonly="readonly"
+        :removable="removableEintraege"
+      />
+
+      <h3 class="text-title-small mt-4 mb-2">Masten</h3>
+
+      <abrechnung-masten-table
+        v-model="nutzungsobjekt.masten"
+        :id-prefix="`${idPrefix}-mast`"
+        :readonly="readonly"
+        :removable="removableEintraege"
       />
 
       <unerlaubte-nutzung-fields
@@ -88,7 +98,9 @@ import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/Abrechnung
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiContentCopy, mdiDelete } from "@mdi/js";
+import { computed } from "vue";
 
+import AbrechnungMastenTable from "@/components/AbrechnungMastenTable.vue";
 import AbrechnungPositionenTable from "@/components/AbrechnungPositionenTable.vue";
 import AdresseFields from "@/components/common/AdresseFields.vue";
 import UnerlaubteNutzungFields from "@/components/common/UnerlaubteNutzungFields.vue";
@@ -111,4 +123,11 @@ const { readonly = false } = defineProps<{
 }>();
 
 const emit = defineEmits<{ remove: [] }>();
+
+const removableEintraege = computed(
+  () =>
+    nutzungsobjekt.value.positionen.length +
+      nutzungsobjekt.value.masten.length >
+    1
+);
 </script>

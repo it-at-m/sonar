@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.abrechnung.dto;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
@@ -28,5 +29,8 @@ public interface AbrechnungDTOMapper {
 
     @Mapping(target = "id", ignore = true)
     AbrechnungPosition toAbrechnungPosition(AbrechnungPositionRequestDTO abrechnungPositionRequestDTO);
+
+    @Mapping(target = "id", ignore = true)
+    AbrechnungMast toAbrechnungMast(AbrechnungMastRequestDTO abrechnungMastRequestDTO);
 
 }

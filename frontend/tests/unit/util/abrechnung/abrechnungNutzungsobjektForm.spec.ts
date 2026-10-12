@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
+import { createAbrechnungMast } from "@/util/abrechnung/abrechnungMastForm";
 import {
   createAbrechnungNutzungsobjekt,
   isAbrechnungNutzungsobjektDirty,
@@ -9,11 +10,12 @@ import { createAbrechnungPosition } from "@/util/abrechnung/abrechnungPositionFo
 
 describe("abrechnungNutzungsobjektForm.ts", () => {
   describe("createAbrechnungNutzungsobjekt", () => {
-    it("givenNewNutzungsobjekt_thenStartItAsAdresseWithOnePosition", () => {
+    it("givenNewNutzungsobjekt_thenStartItAsAdresseWithOnePositionAndNoMasten", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
 
       expect(nutzungsobjekt.art).toBe(ProjektAdresseRequestDTOArtEnum.ADRESSE);
       expect(nutzungsobjekt.positionen).toHaveLength(1);
+      expect(nutzungsobjekt.masten).toHaveLength(0);
     });
   });
 
@@ -45,6 +47,20 @@ describe("abrechnungNutzungsobjektForm.ts", () => {
         throw new Error("Ein neues Nutzungsobjekt hat eine Position.");
       }
       position.laenge = 12;
+
+      expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
+    });
+
+    it("givenRemovedPosition_thenReturnTrue", () => {
+      const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+      nutzungsobjekt.positionen = [];
+
+      expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
+    });
+
+    it("givenAddedMast_thenReturnTrue", () => {
+      const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+      nutzungsobjekt.masten.push(createAbrechnungMast());
 
       expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
     });
