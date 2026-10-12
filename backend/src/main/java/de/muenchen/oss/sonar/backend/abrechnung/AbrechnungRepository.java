@@ -21,6 +21,15 @@ public interface AbrechnungRepository extends CrudRepository<AbrechnungEntity, U
     )
     Page<AbrechnungEntity> findNewestVersionsByProjektId(@Param("projektId") UUID projektId, Pageable pageable);
 
+    @Query(
+        "select distinct nutzungsobjekt from AbrechnungEntity abrechnung "
+                + "join abrechnung.nutzungsobjekte nutzungsobjekt "
+                + "where abrechnung.projektId = :projektId "
+                + "order by nutzungsobjekt.adressdaten.adresse, nutzungsobjekt.adressdaten.hausnummerVon, "
+                + "nutzungsobjekt.adressdaten.flurstueck, nutzungsobjekt.adressdaten.gemarkung"
+    )
+    List<NutzungsobjektEntity> findNutzungsobjekteByProjektId(@Param("projektId") UUID projektId);
+
     List<AbrechnungVersion> findByProjektId(UUID projektId);
 
     Optional<AbrechnungEntity> findByIdAndProjektId(UUID id, UUID projektId);

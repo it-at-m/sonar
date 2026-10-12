@@ -10,6 +10,7 @@
         :id="`${idPrefix}-unerlaubt-von`"
         v-model="unerlaubteNutzung.unerlaubteNutzungVon"
         label="Unerlaubte Nutzung von"
+        :readonly="readonly"
         :rules="[unerlaubteNutzungVonRule(unerlaubteNutzung)]"
         type="date"
       />
@@ -22,6 +23,7 @@
         :id="`${idPrefix}-unerlaubt-bis`"
         v-model="unerlaubteNutzung.unerlaubteNutzungBis"
         label="Unerlaubte Nutzung bis"
+        :readonly="readonly"
         :rules="[unerlaubteNutzungBisRule(unerlaubteNutzung)]"
         type="date"
       />
@@ -39,6 +41,7 @@
         :min="1"
         persistent-hint
         :precision="0"
+        :readonly="readonly"
       />
     </v-col>
   </v-row>
@@ -60,8 +63,9 @@ import {
 
 const unerlaubteNutzung = defineModel<UnerlaubteNutzung>({ required: true });
 
-defineProps<{
+const { readonly = false } = defineProps<{
   idPrefix: string;
+  readonly?: boolean;
 }>();
 
 const tageAusZeitraum = computed(() => hasZeitraum(unerlaubteNutzung.value));

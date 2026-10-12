@@ -28,6 +28,7 @@
         ref="tabs"
         v-model="abrechnung"
         :invalid-nutzungsobjekte="invalidNutzungsobjekte"
+        :nutzungsobjekt-suggestions="nutzungsobjektSuggestions"
         :suggestions="suggestions"
       />
 
@@ -61,6 +62,7 @@
 
 <script setup lang="ts">
 import type { AbrechnungResponseDTO } from "@/api/generated/sonar-backend";
+import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiArrowLeft } from "@mdi/js";
@@ -83,6 +85,7 @@ import {
   toAbrechnungRequestDTO,
 } from "@/util/abrechnung/abrechnungMapper";
 import { nutzungsobjektOfError } from "@/util/abrechnung/abrechnungTabs";
+import { fetchNutzungsobjektSuggestions } from "@/util/abrechnung/nutzungsobjektSuggestion";
 import { fetchProjektAdresseSuggestions } from "@/util/projekt/projektAdresseSuggestion";
 
 const { projektId, vorgaengerAbrechnungId = undefined } = defineProps<{
@@ -97,6 +100,7 @@ const form = useTemplateRef("form");
 const tabs = useTemplateRef("tabs");
 const saving = ref(false);
 const suggestions = ref<ProjektAdresseSuggestion[]>([]);
+const nutzungsobjektSuggestions = ref<NutzungsobjektSuggestion[]>([]);
 const loadingVorgaenger = ref(vorgaengerAbrechnungId !== undefined);
 
 const { abrechnung, isDirty, uebernehmen } = useAbrechnungForm();
@@ -213,6 +217,18 @@ async function loadProjektAdressen(): Promise<void> {
   }
 }
 
+async function loadNutzungsobjekte(): Promise<void> {
+  try {
+    nutzungsobjektSuggestions.value =
+      await fetchNutzungsobjektSuggestions(projektId);
+  } catch {
+    snackbarStore.push({
+      text: "Die Nutzungsobjekte des Projekts konnten nicht geladen werden. Sie lassen sich daher nicht übernehmen.",
+      color: STATUS_INDICATORS.WARNING,
+    });
+  }
+}
+
 async function loadVorgaenger(abrechnungId: string): Promise<void> {
   try {
     const vorgaenger = await ApiFactory.getInstance(
@@ -231,6 +247,7 @@ async function loadVorgaenger(abrechnungId: string): Promise<void> {
 
 onMounted(() => {
   void loadProjektAdressen();
+  void loadNutzungsobjekte();
   if (vorgaengerAbrechnungId !== undefined) {
     void loadVorgaenger(vorgaengerAbrechnungId);
   }

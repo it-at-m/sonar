@@ -10,8 +10,6 @@ import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutz
 import {
   applyProjektAdresseSuggestion,
   fetchProjektAdresseSuggestions,
-  projektAdresseSuggestionSubtitle,
-  projektAdresseSuggestionTitle,
 } from "@/util/projekt/projektAdresseSuggestion";
 
 const PROJEKT_ID = "0f9d1a3c-0f4e-4b9a-8f4a-9a5d1e2b3c4d";
@@ -111,72 +109,6 @@ describe("projektAdresseSuggestion.ts", () => {
       await expect(
         fetchProjektAdresseSuggestions(PROJEKT_ID)
       ).rejects.toThrow();
-    });
-  });
-
-  describe("projektAdresseSuggestionTitle", () => {
-    it("givenAdresse_thenNameItWithItsHausnummer", () => {
-      expect(projektAdresseSuggestionTitle(suggestion())).toBe("Marienplatz 8");
-    });
-
-    it("givenSpanOfHausnummern_thenNameBothEnds", () => {
-      const title = projektAdresseSuggestionTitle(
-        suggestion({ hausnummerBis: "10" })
-      );
-
-      expect(title).toBe("Marienplatz 8–10");
-    });
-
-    it("givenAdresseWithoutHausnummer_thenNameOnlyTheStreet", () => {
-      const title = projektAdresseSuggestionTitle(
-        suggestion({ hausnummerVon: "" })
-      );
-
-      expect(title).toBe("Marienplatz");
-    });
-
-    it("givenFlurstueck_thenNameItWithItsGemarkung", () => {
-      const title = projektAdresseSuggestionTitle(
-        suggestion({
-          art: ProjektAdresseRequestDTOArtEnum.FLURSTUECK,
-          adresse: "",
-          hausnummerVon: "",
-          flurstueck: "1234/5",
-          gemarkung: "Sendling",
-        })
-      );
-
-      expect(title).toBe("Flurstück 1234/5, Sendling");
-    });
-  });
-
-  describe("projektAdresseSuggestionSubtitle", () => {
-    it("givenNutzung_thenNameIt", () => {
-      const subtitle = projektAdresseSuggestionSubtitle(
-        suggestion({
-          nutzungen: [ProjektAdresseRequestDTONutzungenEnum.CONTAINER],
-        })
-      );
-
-      expect(subtitle).toBe("Container");
-    });
-
-    it("givenSeveralNutzungen_thenNameThemInTheOrderOfTheOptions", () => {
-      const subtitle = projektAdresseSuggestionSubtitle(
-        suggestion({
-          nutzungen: [
-            ProjektAdresseRequestDTONutzungenEnum.SONSTIGES,
-            ProjektAdresseRequestDTONutzungenEnum.BAUZAUN,
-            ProjektAdresseRequestDTONutzungenEnum.CONTAINER,
-          ],
-        })
-      );
-
-      expect(subtitle).toBe("Bauzaun, Container, Sonstiges");
-    });
-
-    it("givenNoNutzung_thenStayEmptySoTheEntryShowsOneLine", () => {
-      expect(projektAdresseSuggestionSubtitle(suggestion())).toBe("");
     });
   });
 

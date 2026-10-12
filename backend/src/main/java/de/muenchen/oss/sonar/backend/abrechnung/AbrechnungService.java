@@ -4,6 +4,8 @@ import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
@@ -13,8 +15,10 @@ import java.util.ArrayList;
 import java.util.Deque;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
@@ -26,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 @RequiredArgsConstructor
 public class AbrechnungService {
 
@@ -40,6 +45,7 @@ public class AbrechnungService {
     private final AbrechnungRepository abrechnungRepository;
     private final ProjektService projektService;
     private final AbrechnungEntityMapper abrechnungEntityMapper;
+    private final NutzungsobjektService nutzungsobjektService;
 
     @Transactional(readOnly = true)
     public Page<Abrechnung> getAbrechnungenOfProjekt(final UUID projektId, final int pageNumber, final int pageSize,
@@ -52,7 +58,7 @@ public class AbrechnungService {
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
         // The page holds the newest version of each Abrechnung, so none of them has a newer one.
         return abrechnungRepository.findNewestVersionsByProjektId(projektId, pageRequest)
-                .map(abrechnungEntity -> abrechnungEntityMapper.toAbrechnung(abrechnungEntity, false));
+                .map(abrechnungEntity -> toAbrechnung(abrechnungEntity, false));
     }
 
     @Transactional(readOnly = true)
@@ -60,7 +66,7 @@ public class AbrechnungService {
         log.info("Get Abrechnung {} of Projekt {}", abrechnungId, projektId);
         final AbrechnungEntity abrechnungEntity = abrechnungRepository.findByIdAndProjektId(abrechnungId, projektId)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, abrechnungId)));
-        return abrechnungEntityMapper.toAbrechnung(abrechnungEntity, abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId));
+        return toAbrechnung(abrechnungEntity, abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId));
     }
 
     @Transactional(readOnly = true)
@@ -109,10 +115,10 @@ public class AbrechnungService {
         if (!projektService.existsProjekt(abrechnung.projektId())) {
             throw new NotFoundException(String.format(MSG_NOT_FOUND, abrechnung.projektId()));
         }
-        final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
+        final AbrechnungEntity abrechnungEntity = toAbrechnungEntity(abrechnung);
         abrechnungEntity.setVersionsnummer(FIRST_VERSION_NUMBER);
         log.debug("Create Abrechnung {}", abrechnungEntity);
-        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(abrechnungEntity), false);
+        return toAbrechnung(abrechnungRepository.save(abrechnungEntity), false);
     }
 
     /**
@@ -126,11 +132,47 @@ public class AbrechnungService {
         if (abrechnungRepository.existsByVorgaengerAbrechnungId(vorgaengerAbrechnungId)) {
             throw new ConflictException(String.format(MSG_NEWER_VERSION_ALREADY_EXISTS, vorgaengerAbrechnungId));
         }
-        final AbrechnungEntity nextVersion = abrechnungEntityMapper.toEntity(abrechnung);
+        final AbrechnungEntity nextVersion = toAbrechnungEntity(abrechnung);
         nextVersion.setVersionsnummer(vorgaenger.getVersionsnummer() + 1);
         nextVersion.setVorgaengerAbrechnungId(vorgaengerAbrechnungId);
         log.debug("Create next version of Abrechnung {}: {}", vorgaengerAbrechnungId, nextVersion);
-        return abrechnungEntityMapper.toAbrechnung(abrechnungRepository.save(nextVersion), false);
+        return toAbrechnung(abrechnungRepository.save(nextVersion), false);
+    }
+
+    private AbrechnungEntity toAbrechnungEntity(final Abrechnung abrechnung) {
+        final Map<UUID, NutzungsobjektEntity> selectedPreexistingNutzungsobjekte = nutzungsobjektService
+                .selectedPreexistingNutzungsobjekte(abrechnung);
+        final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
+        for (final AbrechnungNutzungsobjekt nutzungsobjekt : abrechnung.nutzungsobjekte()) {
+            final NutzungsobjektEntity nutzungsobjektEntity = nutzungsobjekt.id() == null
+                    ? abrechnungEntityMapper.toEntity(nutzungsobjekt)
+                    : selectedPreexistingNutzungsobjekte.get(nutzungsobjekt.id());
+            abrechnungEntity.addNutzungsobjekt(nutzungsobjektEntity);
+            for (final AbrechnungPosition position : nutzungsobjekt.positionen()) {
+                final AbrechnungPositionEntity positionEntity = abrechnungEntityMapper.toEntity(position);
+                positionEntity.setNutzungsobjekt(nutzungsobjektEntity);
+                abrechnungEntity.addPosition(positionEntity);
+            }
+        }
+        return abrechnungEntity;
+    }
+
+    private Abrechnung toAbrechnung(final AbrechnungEntity abrechnungEntity, final boolean neuereVersionVorhanden) {
+        return abrechnungEntityMapper.toAbrechnung(abrechnungEntity, neuereVersionVorhanden, toNutzungsobjekte(abrechnungEntity));
+    }
+
+    /**
+     * Filters the Positionen of this Abrechnung below the Nutzungsobjekt they name. Several
+     * Abrechnungen bill the same Nutzungsobjekt, and each of them shows only its own Positionen.
+     */
+    private List<AbrechnungNutzungsobjekt> toNutzungsobjekte(final AbrechnungEntity abrechnungEntity) {
+        final Map<UUID, List<AbrechnungPosition>> positionenJeNutzungsobjekt = abrechnungEntity.getPositionen().stream()
+                .collect(Collectors.groupingBy(position -> position.getNutzungsobjekt().getId(),
+                        Collectors.mapping(abrechnungEntityMapper::toPosition, Collectors.toList())));
+        return abrechnungEntity.getNutzungsobjekte().stream()
+                .map(nutzungsobjekt -> abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjekt,
+                        positionenJeNutzungsobjekt.getOrDefault(nutzungsobjekt.getId(), List.of())))
+                .toList();
     }
 
     private Sort resolveSortWithInputOrDefaults(final List<AbrechnungSortBy> sortBy, final List<Sort.Direction> directions) {
