@@ -46,7 +46,7 @@ public record AbrechnungNutzungsobjekt(
             throw new IllegalArgumentException("tageUnerlaubteNutzung contradicts the given Zeitraum");
         }
         tageUnerlaubteNutzung = derived;
-        nutzungen = Nutzung.distinctSorted(nutzungen);
+        nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
     }
 }

@@ -40,7 +40,7 @@ public record AbrechnungNutzungsobjektRequestDTO(
      * it passed. A missing list becomes an empty one, which {@code @NotEmpty} rejects just the same.
      */
     public AbrechnungNutzungsobjektRequestDTO {
-        nutzungen = Nutzung.distinctSorted(nutzungen);
+        nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
     }
 }

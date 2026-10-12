@@ -29,7 +29,7 @@ public record AbrechnungNutzungsobjektResponseDTO(
      * {@link List#copyOf} would reject it.
      */
     public AbrechnungNutzungsobjektResponseDTO {
-        nutzungen = Nutzung.distinctSorted(nutzungen);
+        nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
     }
 }

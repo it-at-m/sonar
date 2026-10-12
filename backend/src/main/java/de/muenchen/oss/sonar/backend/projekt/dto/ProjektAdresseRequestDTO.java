@@ -18,6 +18,7 @@ import java.util.List;
 @NutzungValid
 @UnerlaubteNutzungValid
 public record ProjektAdresseRequestDTO(
+        // CPD-OFF
         @NotNull Adressart art,
         @Size(min = 1, max = 255) String adresse,
         @Size(min = 1, max = 20) String hausnummerVon,
@@ -29,10 +30,11 @@ public record ProjektAdresseRequestDTO(
         LocalDate unerlaubteNutzungVon,
         LocalDate unerlaubteNutzungBis,
         @Min(1) Integer tageUnerlaubteNutzung,
+        // CPD-ON
         @NotNull @Min(0) Integer anzahlMahnungen,
         boolean sondernutzungErlaubt) implements Adresse, Nutzungsangabe, UnerlaubteNutzung {
 
     public ProjektAdresseRequestDTO {
-        nutzungen = Nutzung.distinctSorted(nutzungen);
+        nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
     }
 }

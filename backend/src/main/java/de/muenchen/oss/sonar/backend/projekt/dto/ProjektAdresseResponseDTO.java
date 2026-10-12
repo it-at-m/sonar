@@ -23,6 +23,6 @@ public record ProjektAdresseResponseDTO(
         boolean sondernutzungErlaubt) {
 
     public ProjektAdresseResponseDTO {
-        nutzungen = Nutzung.distinctSorted(nutzungen);
+        nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
     }
 }
