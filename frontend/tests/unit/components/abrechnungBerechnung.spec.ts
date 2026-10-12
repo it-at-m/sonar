@@ -1,13 +1,17 @@
+import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
+
 import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
+import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
 import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 
 function mountBerechnung(
   invalidNutzungsobjekte: number[] = [],
-  readonly = false
+  readonly = false,
+  nutzungsobjektSuggestions: NutzungsobjektSuggestion[] = []
 ) {
   const { abrechnung } = useAbrechnungForm();
   const wrapper = shallowMount(AbrechnungBerechnung, {
@@ -15,6 +19,7 @@ function mountBerechnung(
       modelValue: abrechnung.value,
       suggestions: [],
       invalidNutzungsobjekte,
+      nutzungsobjektSuggestions,
       readonly,
     },
     global: { renderStubDefaultSlot: true },
@@ -135,5 +140,57 @@ describe("AbrechnungBerechnung.vue", () => {
     expect(
       wrapper.findComponent(AbrechnungNutzungsobjektPanel).props("readonly")
     ).toBe(true);
+  });
+
+  it("givenNutzungsobjektTakenOverByOneEntry_thenOfferItToNoOtherEntry", async () => {
+    const erstes: NutzungsobjektSuggestion = {
+      id: "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d",
+      art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
+      adresse: "Marienplatz",
+      hausnummerVon: "8",
+      hausnummerBis: "",
+      flurstueck: "",
+      gemarkung: "",
+      nutzung: null,
+      unerlaubteNutzungVon: "",
+      unerlaubteNutzungBis: "",
+      tageUnerlaubteNutzung: null,
+      bemerkung: "",
+      aufschlag50prozent: false,
+    };
+    const zweites: NutzungsobjektSuggestion = {
+      id: "2f3e4d5c-6b7a-4891-a0b1-c2d3e4f5a6b7",
+      art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
+      adresse: "Sendlinger Straße",
+      hausnummerVon: "1",
+      hausnummerBis: "",
+      flurstueck: "",
+      gemarkung: "",
+      nutzung: null,
+      unerlaubteNutzungVon: "",
+      unerlaubteNutzungBis: "",
+      tageUnerlaubteNutzung: null,
+      bemerkung: "",
+      aufschlag50prozent: false,
+    };
+    const { abrechnung, wrapper } = mountBerechnung([], false, [
+      erstes,
+      zweites,
+    ]);
+    await addNutzungsobjekt(wrapper);
+
+    const ersterEintrag = abrechnung.value.nutzungsobjekte[0];
+    if (ersterEintrag === undefined) {
+      throw new Error("Die Abrechnung hat kein Nutzungsobjekt.");
+    }
+    ersterEintrag.uebernommenesNutzungsobjektId = erstes.id;
+    await wrapper.vm.$nextTick();
+
+    const panels = wrapper.findAllComponents(AbrechnungNutzungsobjektPanel);
+    expect(panels[0]?.props("nutzungsobjektSuggestions")).toEqual([
+      erstes,
+      zweites,
+    ]);
+    expect(panels[1]?.props("nutzungsobjektSuggestions")).toEqual([zweites]);
   });
 });

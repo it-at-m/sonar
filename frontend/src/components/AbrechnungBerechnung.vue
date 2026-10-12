@@ -88,6 +88,7 @@
         :model-value="tab.nutzungsobjekt"
         :id-prefix="tab.idPrefix"
         :label="tab.label"
+        :nutzungsobjekt-suggestions="tab.nutzungsobjektSuggestions"
         :readonly="readonly"
         :removable="nutzungsobjektTabs.length > 1"
         :suggestions="suggestions"
@@ -99,6 +100,7 @@
 
 <script setup lang="ts">
 import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
+import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiAlertCircle, mdiPlus } from "@mdi/js";
@@ -116,9 +118,14 @@ import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
 
 const abrechnung = defineModel<AbrechnungForm>({ required: true });
 
-const { invalidNutzungsobjekte, readonly = false } = defineProps<{
+const {
+  invalidNutzungsobjekte,
+  nutzungsobjektSuggestions = [],
+  readonly = false,
+} = defineProps<{
   suggestions: ProjektAdresseSuggestion[];
   invalidNutzungsobjekte: number[];
+  nutzungsobjektSuggestions?: NutzungsobjektSuggestion[];
   readonly?: boolean;
 }>();
 
@@ -131,8 +138,20 @@ const nutzungsobjektTabs = computed(() =>
     label: adresseLabel(nutzungsobjekt, index + 1),
     idPrefix: nutzungsobjektIdPrefix(index),
     invalid: invalidNutzungsobjekte.includes(index),
+    nutzungsobjektSuggestions: selectableNutzungsobjekte(index),
   }))
 );
+
+function selectableNutzungsobjekte(index: number): NutzungsobjektSuggestion[] {
+  const selectedByOtherEntries = new Set(
+    abrechnung.value.nutzungsobjekte
+      .filter((_, other) => other !== index)
+      .map((other) => other.uebernommenesNutzungsobjektId)
+  );
+  return nutzungsobjektSuggestions.filter(
+    (suggestion) => !selectedByOtherEntries.has(suggestion.id)
+  );
+}
 
 function addNutzungsobjekt(): void {
   const nutzungsobjekt = createAbrechnungNutzungsobjekt();

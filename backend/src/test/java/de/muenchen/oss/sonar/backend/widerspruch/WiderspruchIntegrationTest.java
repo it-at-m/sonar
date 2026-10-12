@@ -6,10 +6,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.muenchen.oss.sonar.backend.TestConstants;
 import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungEntity;
-import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungNutzungsobjektEntity;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungPositionEntity;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungsArt;
+import de.muenchen.oss.sonar.backend.abrechnung.NutzungsobjektEntity;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
@@ -106,8 +106,7 @@ class WiderspruchIntegrationTest {
         position.setFlaeche(new BigDecimal("36.00"));
         position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
-        final AbrechnungNutzungsobjektEntity nutzungsobjekt = new AbrechnungNutzungsobjektEntity();
-        nutzungsobjekt.addPosition(position);
+        final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
         nutzungsobjekt.setAufschlag50prozent(true);
 
         final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
@@ -123,7 +122,9 @@ class WiderspruchIntegrationTest {
         abrechnung.setZeitraumVon(VON);
         abrechnung.setZeitraumBis(BIS);
         abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+        position.setNutzungsobjekt(nutzungsobjekt);
         abrechnung.addNutzungsobjekt(nutzungsobjekt);
+        abrechnung.addPosition(position);
 
         abrechnungId = abrechnungRepository.save(abrechnung).getId();
     }
