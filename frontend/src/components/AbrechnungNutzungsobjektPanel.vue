@@ -49,6 +49,16 @@
       <abrechnung-positionen-table
         v-model="nutzungsobjekt.positionen"
         :id-prefix="`${idPrefix}-position`"
+        :min-length="positionenMinLength"
+        :readonly="readonly"
+      />
+
+      <h3 class="text-title-small mt-4 mb-2">Masten</h3>
+
+      <abrechnung-masten-table
+        v-model="nutzungsobjekt.masten"
+        :id-prefix="`${idPrefix}-mast`"
+        :min-length="mastenMinLength"
         :readonly="readonly"
       />
 
@@ -79,7 +89,9 @@ import type { AbrechnungNutzungsobjektForm } from "@/types/AbrechnungNutzungsobj
 import type { ProjektAdresseSuggestion } from "@/types/ProjektAdresseSuggestion";
 
 import { mdiContentCopy, mdiDelete } from "@mdi/js";
+import { computed } from "vue";
 
+import AbrechnungMastenTable from "@/components/AbrechnungMastenTable.vue";
 import AbrechnungPositionenTable from "@/components/AbrechnungPositionenTable.vue";
 import AdresseFields from "@/components/common/AdresseFields.vue";
 import UnerlaubteNutzungFields from "@/components/common/UnerlaubteNutzungFields.vue";
@@ -102,4 +114,14 @@ const { readonly = false } = defineProps<{
 }>();
 
 const emit = defineEmits<{ remove: [] }>();
+
+// A Nutzungsobjekt needs a Position or a Mast, so each table keeps its last row while the other
+// table is empty. Without the pair of them the form can reach a state the backend then rejects.
+const positionenMinLength = computed(() =>
+  nutzungsobjekt.value.masten.length > 0 ? 0 : 1
+);
+
+const mastenMinLength = computed(() =>
+  nutzungsobjekt.value.positionen.length > 0 ? 0 : 1
+);
 </script>

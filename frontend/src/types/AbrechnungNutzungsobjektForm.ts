@@ -1,3 +1,4 @@
+import type { AbrechnungMastForm } from "@/types/AbrechnungMastForm";
 import type { AbrechnungPositionForm } from "@/types/AbrechnungPositionForm";
 import type { Adresse } from "@/types/Adresse";
 import type { UnerlaubteNutzung } from "@/types/UnerlaubteNutzung";
@@ -7,4 +8,5 @@ export interface AbrechnungNutzungsobjektForm
   id: string;
   bemerkung: string;
   positionen: AbrechnungPositionForm[];
+  masten: AbrechnungMastForm[];
 }

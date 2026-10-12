@@ -439,18 +439,18 @@ paths:
                 $ref: "#/components/schemas/AbrechnungResponseDTO"
       security:
       - bearerAuth: []
-  /projekt/{projektId}/abrechnung/{abrechnungId}/calculation:
+  /projekt/{projektId}/abrechnung/{abrechnungId}/berechnung:
     get:
       tags:
-      - calculation-controller
-      summary: Read the stored calculation of an Abrechnung.
+      - berechnung-controller
+      summary: Read the stored Berechnung of an Abrechnung.
       description: |-
-        Read the stored calculation of an Abrechnung.
-         An Abrechnung is calculated once, and the answer carries everything that calculation held when
+        Read the stored Berechnung of an Abrechnung.
+         An Abrechnung is calculated once, and the answer carries everything that Berechnung held when
          it was stored: its Zusammenfassung, its Berechnungslog and its Bescheiddaten. Nothing is
-         calculated again, so an Abrechnung that was edited after its calculation was stored does not
+         calculated again, so an Abrechnung that was edited after its Berechnung was stored does not
          change the answer.
-      operationId: getCalculation
+      operationId: getBerechnung
       parameters:
       - name: projektId
         in: path
@@ -461,7 +461,7 @@ paths:
           format: uuid
       - name: abrechnungId
         in: path
-        description: the UUID of the Abrechnung the calculation belongs to
+        description: the UUID of the Abrechnung the Berechnung belongs to
         required: true
         schema:
           type: string
@@ -471,24 +471,24 @@ paths:
           description: "the Projekt has no Abrechnung with that UUID, or the Abrechnung\
             \ was never calculated"
         "200":
-          description: the stored calculation as a DTO
+          description: the stored Berechnung as a DTO
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CalculationResponseDTO"
+                $ref: "#/components/schemas/BerechnungResponseDTO"
       security:
       - bearerAuth: []
     post:
       tags:
-      - calculation-controller
-      summary: Store the result of a calculation.
+      - berechnung-controller
+      summary: Store the result of a Berechnung.
       description: |-
-        Store the result of a calculation.
-         Runs the same calculation as the preview and keeps its result. An Abrechnung carries at most one
-         calculation, so a second one is refused. A further Abrechnung of the Projekt then charges only
+        Store the result of a Berechnung.
+         Runs the same Berechnung as the preview and keeps its result. An Abrechnung carries at most one
+         Berechnung, so a second one is refused. A further Abrechnung of the Projekt then charges only
          what this one left over: its Zahlbetrag is the difference, while its Gesamtbetrag still covers
          the whole Zeitraum.
-      operationId: storeCalculation
+      operationId: calculateAndStoreBerechnung
       parameters:
       - name: projektId
         in: path
@@ -504,40 +504,40 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: calculationDate
+      - name: berechnungsdatum
         in: query
-        description: the last day the calculation charges for
+        description: the last day the Berechnung charges for
         required: true
         schema:
           type: string
           format: date
       responses:
         "400":
-          description: the calculationDate is missing or is not a date
+          description: the berechnungsdatum is missing or is not a date
         "404":
           description: the Projekt has no Abrechnung with that UUID
         "409":
-          description: the Abrechnung already has a calculation
+          description: the Abrechnung already has a Berechnung
         "201":
-          description: the stored result of the calculation as a DTO
+          description: the stored result of the Berechnung as a DTO
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CalculationResponseDTO"
+                $ref: "#/components/schemas/BerechnungResponseDTO"
       security:
       - bearerAuth: []
-  /projekt/{projektId}/abrechnung/{abrechnungId}/calculation/preview:
+  /projekt/{projektId}/abrechnung/{abrechnungId}/berechnung/preview:
     post:
       tags:
-      - calculation-controller
+      - berechnung-controller
       summary: Calculate an Abrechnung.
       description: |-
         Calculate an Abrechnung.
-         The calculation runs on the stored Nutzungsobjekte and Positionen of the Abrechnung, up to the
-         given calculationDate. A Position reaching beyond that date is charged only up to it, and one
+         The Berechnung runs on the stored Nutzungsobjekte and Positionen of the Abrechnung, up to the
+         given berechnungsdatum. A Position reaching beyond that date is charged only up to it, and one
          beginning after it is left out. The Zeitraum stored on the Abrechnung does not limit the
-         calculation, so the calculationDate may fall outside it.
-      operationId: previewCalculation
+         Berechnung, so the berechnungsdatum may fall outside it.
+      operationId: previewBerechnung
       parameters:
       - name: projektId
         in: path
@@ -553,24 +553,24 @@ paths:
         schema:
           type: string
           format: uuid
-      - name: calculationDate
+      - name: berechnungsdatum
         in: query
-        description: the last day the calculation charges for
+        description: the last day the Berechnung charges for
         required: true
         schema:
           type: string
           format: date
       responses:
         "400":
-          description: the calculationDate is missing or is not a date
+          description: the berechnungsdatum is missing or is not a date
         "404":
           description: the Projekt has no Abrechnung with that UUID
         "200":
-          description: the result of the calculation as a DTO
+          description: the result of the Berechnung as a DTO
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/CalculationResponseDTO"
+                $ref: "#/components/schemas/BerechnungResponseDTO"
       security:
       - bearerAuth: []
   /abrechnung/{abrechnungId}/widerspruch:
@@ -1344,6 +1344,40 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/BescheiddatenUeberspannungResponseDTO"
+    BerechnungResponseDTO:
+      type: object
+      properties:
+        lfdNr:
+          type: integer
+          format: int32
+        abrechnungszeitraumVon:
+          type: string
+          format: date
+        abrechnungszeitraumBis:
+          type: string
+          format: date
+        zusammenfassung:
+          type: string
+        berechnungslog:
+          type: string
+        gebuehrFlaechen:
+          type: number
+        gebuehrUeberspannungen:
+          type: number
+        gebuehrVerwaltung:
+          type: number
+        gebuehrGesamt:
+          type: number
+        gebuehrZahlung:
+          type: number
+        bescheiddatenFlaechen:
+          type: array
+          items:
+            $ref: "#/components/schemas/BescheiddatenFlaecheResponseDTO"
+        abrechnungenUeberspannungen:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungUeberspannungenResponseDTO"
     BescheiddatenFlaecheResponseDTO:
       type: object
       properties:
@@ -1384,40 +1418,6 @@ components:
           type: string
         gebuehr:
           type: number
-    CalculationResponseDTO:
-      type: object
-      properties:
-        lfdNr:
-          type: integer
-          format: int32
-        abrechnungszeitraumVon:
-          type: string
-          format: date
-        abrechnungszeitraumBis:
-          type: string
-          format: date
-        zusammenfassung:
-          type: string
-        berechnungslog:
-          type: string
-        gebuehrFlaechen:
-          type: number
-        gebuehrUeberspannungen:
-          type: number
-        gebuehrVerwaltung:
-          type: number
-        gebuehrGesamt:
-          type: number
-        gebuehrZahlung:
-          type: number
-        bescheiddatenFlaechen:
-          type: array
-          items:
-            $ref: "#/components/schemas/BescheiddatenFlaecheResponseDTO"
-        abrechnungenUeberspannungen:
-          type: array
-          items:
-            $ref: "#/components/schemas/AbrechnungUeberspannungenResponseDTO"
     WiderspruchRequestDTO:
       required:
       - datumEingang

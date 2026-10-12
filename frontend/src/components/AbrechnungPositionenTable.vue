@@ -97,7 +97,7 @@
             <td v-if="!readonly">
               <v-btn
                 :aria-label="`Position ${index + 1} entfernen`"
-                :disabled="positionen.length === 1"
+                :disabled="positionen.length <= minLength"
                 :icon="mdiDelete"
                 size="small"
                 variant="text"
@@ -135,8 +135,11 @@ import {
 
 const positionen = defineModel<AbrechnungPositionForm[]>({ required: true });
 
-const { readonly = false } = defineProps<{
+// minLength drops to 0 once the Nutzungsobjekt carries Masten, because Masten alone are a valid
+// Nutzungsobjekt and the last Position has to become removable for one to be entered.
+const { readonly = false, minLength = 1 } = defineProps<{
   idPrefix: string;
+  minLength?: number;
   readonly?: boolean;
 }>();
 

@@ -1,4 +1,6 @@
 import type {
+  AbrechnungMastRequestDTO,
+  AbrechnungMastResponseDTO,
   AbrechnungNutzungsobjektRequestDTO,
   AbrechnungNutzungsobjektResponseDTO,
   AbrechnungPositionRequestDTO,
@@ -7,6 +9,7 @@ import type {
   AbrechnungResponseDTO,
 } from "@/api/generated/sonar-backend";
 import type { AbrechnungForm } from "@/composables/abrechnungForm";
+import type { AbrechnungMastForm } from "@/types/AbrechnungMastForm";
 import type { AbrechnungNutzungsobjektForm } from "@/types/AbrechnungNutzungsobjektForm";
 import type { AbrechnungPositionForm } from "@/types/AbrechnungPositionForm";
 
@@ -51,6 +54,7 @@ function toNutzungsobjektRequestDTO(
     ...toUnerlaubteNutzungRequestFields(nutzungsobjekt),
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
     positionen: nutzungsobjekt.positionen.map(toPositionRequestDTO),
+    masten: nutzungsobjekt.masten.map(toMastRequestDTO),
   };
 }
 
@@ -82,6 +86,7 @@ function toNutzungsobjektForm(
   nutzungsobjekt: AbrechnungNutzungsobjektResponseDTO
 ): AbrechnungNutzungsobjektForm {
   const positionen = (nutzungsobjekt.positionen ?? []).map(toPositionForm);
+  const masten = (nutzungsobjekt.masten ?? []).map(toMastForm);
   return {
     id: crypto.randomUUID(),
     art: nutzungsobjekt.art ?? ProjektAdresseRequestDTOArtEnum.ADRESSE,
@@ -95,8 +100,13 @@ function toNutzungsobjektForm(
     unerlaubteNutzungBis: toIsoDateString(nutzungsobjekt.unerlaubteNutzungBis),
     tageUnerlaubteNutzung: nutzungsobjekt.tageUnerlaubteNutzung ?? null,
     bemerkung: nutzungsobjekt.bemerkung ?? "",
+    // A Nutzungsobjekt that only carries Masten keeps its Positionen empty, so the fallback row is
+    // added only where there is nothing at all to show.
     positionen:
-      positionen.length > 0 ? positionen : [createAbrechnungPosition()],
+      positionen.length > 0 || masten.length > 0
+        ? positionen
+        : [createAbrechnungPosition()],
+    masten,
   };
 }
 
@@ -112,6 +122,21 @@ function toPositionForm(
     flaeche: position.flaeche ?? null,
     haelfte: position.haelfte ?? false,
     anteilAnFlaeche: position.anteilAnFlaeche ?? null,
+  };
+}
+
+function toMastForm(mast: AbrechnungMastResponseDTO): AbrechnungMastForm {
+  return {
+    id: crypto.randomUUID(),
+    beginn: toIsoDateString(mast.beginn),
+    ende: toIsoDateString(mast.ende),
+  };
+}
+
+function toMastRequestDTO(mast: AbrechnungMastForm): AbrechnungMastRequestDTO {
+  return {
+    beginn: new Date(mast.beginn),
+    ende: new Date(mast.ende),
   };
 }
 
