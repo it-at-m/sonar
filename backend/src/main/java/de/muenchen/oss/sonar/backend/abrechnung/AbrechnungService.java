@@ -30,6 +30,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @Slf4j
+@SuppressWarnings("PMD.CouplingBetweenObjects")
 @RequiredArgsConstructor
 public class AbrechnungService {
 
