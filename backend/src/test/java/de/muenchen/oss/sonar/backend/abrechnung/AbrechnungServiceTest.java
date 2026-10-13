@@ -412,7 +412,7 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
-                    VON, BIS, null, "Bemerkung", true, List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -449,7 +449,7 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
-                    null, null, null, null, true, List.of(position));
+                    null, null, null, null, true, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -488,7 +488,7 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     nutzungsobjektId, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
-                    null, null, null, "Wird ignoriert", false, List.of(position));
+                    null, null, null, "Wird ignoriert", false, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
@@ -519,13 +519,13 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
             final AbrechnungNutzungsobjekt marienplatz = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
-                    null, null, null, null, true, List.of(positionAmMarienplatz));
+                    null, null, null, null, true, List.of(positionAmMarienplatz), List.of());
 
             final AbrechnungPosition positionInDerSendlingerStrasse = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
                     new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt sendlingerStrasse = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
-                    null, null, null, null, false, List.of(positionInDerSendlingerStrasse));
+                    null, null, null, null, false, List.of(positionInDerSendlingerStrasse), List.of());
 
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(marienplatz, sendlingerStrasse));
@@ -860,7 +860,7 @@ class AbrechnungServiceTest {
                     new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.BAUZAUN), null,
-                    null, null, null, null, false, List.of(position));
+                    null, null, null, null, false, List.of(position), List.of());
             final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000002", false, null, null,
                     VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, null, false, List.of(nutzungsobjekt));
 

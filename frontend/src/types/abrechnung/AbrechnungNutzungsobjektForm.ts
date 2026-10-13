@@ -1,3 +1,4 @@
+import type { AbrechnungMastForm } from "@/types/abrechnung/AbrechnungMastForm";
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
 import type { Adresse } from "@/types/common/Adresse";
 import type { UnerlaubteNutzung } from "@/types/common/UnerlaubteNutzung";
@@ -9,4 +10,5 @@ export interface AbrechnungNutzungsobjektForm
   bemerkung: string;
   aufschlag50prozent: boolean;
   positionen: AbrechnungPositionForm[];
+  masten: AbrechnungMastForm[];
 }

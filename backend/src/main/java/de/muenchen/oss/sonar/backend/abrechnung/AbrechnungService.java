@@ -4,6 +4,7 @@ import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
@@ -153,6 +154,11 @@ public class AbrechnungService {
                 positionEntity.setNutzungsobjekt(nutzungsobjektEntity);
                 abrechnungEntity.addPosition(positionEntity);
             }
+            for (final AbrechnungMast mast : nutzungsobjekt.masten()) {
+                final AbrechnungMastEntity mastEntity = abrechnungEntityMapper.toEntity(mast);
+                mastEntity.setNutzungsobjekt(nutzungsobjektEntity);
+                abrechnungEntity.addMast(mastEntity);
+            }
         }
         return abrechnungEntity;
     }
@@ -162,16 +168,20 @@ public class AbrechnungService {
     }
 
     /**
-     * Filters the Positionen of this Abrechnung below the Nutzungsobjekt they name. Several
-     * Abrechnungen bill the same Nutzungsobjekt, and each of them shows only its own Positionen.
+     * Filters the Positionen and the Masten of this Abrechnung below the Nutzungsobjekt they name.
+     * Several Abrechnungen bill the same Nutzungsobjekt, and each of them shows only its own.
      */
     private List<AbrechnungNutzungsobjekt> toNutzungsobjekte(final AbrechnungEntity abrechnungEntity) {
         final Map<UUID, List<AbrechnungPosition>> positionenJeNutzungsobjekt = abrechnungEntity.getPositionen().stream()
                 .collect(Collectors.groupingBy(position -> position.getNutzungsobjekt().getId(),
                         Collectors.mapping(abrechnungEntityMapper::toPosition, Collectors.toList())));
+        final Map<UUID, List<AbrechnungMast>> mastenJeNutzungsobjekt = abrechnungEntity.getMasten().stream()
+                .collect(Collectors.groupingBy(mast -> mast.getNutzungsobjekt().getId(),
+                        Collectors.mapping(abrechnungEntityMapper::toMast, Collectors.toList())));
         return abrechnungEntity.getNutzungsobjekte().stream()
                 .map(nutzungsobjekt -> abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjekt,
-                        positionenJeNutzungsobjekt.getOrDefault(nutzungsobjekt.getId(), List.of())))
+                        positionenJeNutzungsobjekt.getOrDefault(nutzungsobjekt.getId(), List.of()),
+                        mastenJeNutzungsobjekt.getOrDefault(nutzungsobjekt.getId(), List.of())))
                 .toList();
     }
 

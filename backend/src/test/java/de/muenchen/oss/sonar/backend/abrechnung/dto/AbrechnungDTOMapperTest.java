@@ -5,6 +5,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungsArt;
 import de.muenchen.oss.sonar.backend.abrechnung.ZustellungsbevollmaechtigterTyp;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
@@ -32,9 +33,10 @@ class AbrechnungDTOMapperTest {
         void givenAbrechnung_thenReturnsCorrectDTO() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+            final AbrechnungMast mast = new AbrechnungMast(UUID.randomUUID(), VON, BIS);
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
-                    VON, BIS, null, "Bemerkung", true, List.of(position));
+                    VON, BIS, null, "Bemerkung", true, List.of(position), List.of(mast));
             final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), LocalDate.of(2026, 4, 1), null, null,
                     null, null, false, false, null);
             final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 2, null, "1000000001", true,
@@ -74,6 +76,12 @@ class AbrechnungDTOMapperTest {
             assertThat(positionDTO.breite()).isEqualByComparingTo("3.00");
             assertThat(positionDTO.flaeche()).isEqualByComparingTo("36.00");
             assertThat(positionDTO.anteilAnFlaeche()).isEqualByComparingTo("30.00");
+
+            assertThat(nutzungsobjektDTO.masten()).hasSize(1);
+            final AbrechnungMastResponseDTO mastDTO = nutzungsobjektDTO.masten().getFirst();
+            assertThat(mastDTO.id()).isEqualTo(mast.id());
+            assertThat(mastDTO.beginn()).isEqualTo(VON);
+            assertThat(mastDTO.ende()).isEqualTo(BIS);
         }
 
         @Test
@@ -97,7 +105,7 @@ class AbrechnungDTOMapperTest {
                     new BigDecimal("30.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
-                    null, null, 12, null, false, List.of(positionDTO));
+                    null, null, 12, null, false, List.of(positionDTO), List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
 
@@ -117,6 +125,25 @@ class AbrechnungDTOMapperTest {
             assertThat(nutzungsobjekt.hausnummerBis()).isEqualTo("12");
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(12);
             assertThat(nutzungsobjekt.positionen()).hasSize(1);
+        }
+
+        @Test
+        void givenMasten_thenCarryThemIntoTheNutzungsobjekt() {
+            final AbrechnungMastRequestDTO mastDTO = new AbrechnungMastRequestDTO(VON, BIS);
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false, List.of(), List.of(mastDTO));
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
+
+            final Abrechnung result = abrechnungDTOMapper.toAbrechnung(UUID.randomUUID(), requestDTO);
+
+            final AbrechnungNutzungsobjekt nutzungsobjekt = result.nutzungsobjekte().getFirst();
+            assertThat(nutzungsobjekt.positionen()).isEmpty();
+            assertThat(nutzungsobjekt.masten()).hasSize(1);
+            assertThat(nutzungsobjekt.masten().getFirst().id()).isNull();
+            assertThat(nutzungsobjekt.masten().getFirst().beginn()).isEqualTo(VON);
+            assertThat(nutzungsobjekt.masten().getFirst().ende()).isEqualTo(BIS);
         }
 
         @Test

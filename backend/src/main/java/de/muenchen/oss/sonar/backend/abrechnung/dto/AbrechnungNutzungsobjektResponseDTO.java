@@ -21,15 +21,17 @@ public record AbrechnungNutzungsobjektResponseDTO(
         Integer tageUnerlaubteNutzung,
         String bemerkung,
         boolean aufschlag50prozent,
-        List<AbrechnungPositionResponseDTO> positionen) {
+        List<AbrechnungPositionResponseDTO> positionen,
+        List<AbrechnungMastResponseDTO> masten) {
 
     /**
-     * Copies the positions in, so that the response stays immutable however the caller treats the list
-     * it passed. A missing list becomes an empty one: MapStruct maps a null collection to null, and
-     * {@link List#copyOf} would reject it.
+     * Copies the Positionen and the Masten in, so that the response stays immutable however the caller
+     * treats the lists it passed. A missing list becomes an empty one: MapStruct maps a null
+     * collection to null, and {@link List#copyOf} would reject it.
      */
     public AbrechnungNutzungsobjektResponseDTO {
         nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
+        masten = masten == null ? List.of() : List.copyOf(masten);
     }
 }

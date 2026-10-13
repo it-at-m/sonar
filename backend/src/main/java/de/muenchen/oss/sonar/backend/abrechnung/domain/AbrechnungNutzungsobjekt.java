@@ -22,16 +22,17 @@ public record AbrechnungNutzungsobjekt(
         Integer tageUnerlaubteNutzung,
         String bemerkung,
         boolean aufschlag50prozent,
-        List<AbrechnungPosition> positionen) {
+        List<AbrechnungPosition> positionen,
+        List<AbrechnungMast> masten) {
 
     /**
      * Derives the days here, because the value has to be settled before the Nutzungsobjekt is
      * persisted. Deriving them again when reading a stored one back costs nothing, as the same period
      * yields the same number and directly entered days pass through untouched.
      * <p>
-     * The positions are copied in, so that the Nutzungsobjekt stays immutable however the caller
-     * treats the list it passed. A missing list becomes an empty one: MapStruct maps a null collection
-     * to null, and {@link List#copyOf} would reject it.
+     * The Positionen and the Masten are copied in, so that the Nutzungsobjekt stays immutable however
+     * the caller treats the lists it passed. A missing list becomes an empty one: MapStruct maps a
+     * null collection to null, and {@link List#copyOf} would reject it.
      * </p>
      */
     public AbrechnungNutzungsobjekt {
@@ -48,5 +49,6 @@ public record AbrechnungNutzungsobjekt(
         tageUnerlaubteNutzung = derived;
         nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
+        masten = masten == null ? List.of() : List.copyOf(masten);
     }
 }

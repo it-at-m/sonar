@@ -1,4 +1,6 @@
 import type {
+  AbrechnungMastRequestDTO,
+  AbrechnungMastResponseDTO,
   AbrechnungNutzungsobjektRequestDTO,
   AbrechnungNutzungsobjektResponseDTO,
   AbrechnungPositionRequestDTO,
@@ -7,12 +9,12 @@ import type {
   AbrechnungResponseDTO,
 } from "@/api/generated/sonar-backend";
 import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
+import type { AbrechnungMastForm } from "@/types/abrechnung/AbrechnungMastForm";
 import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/AbrechnungNutzungsobjektForm";
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
 
 import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
-import { createAbrechnungPosition } from "@/util/abrechnung/abrechnungPositionForm";
 import { toAdresseRequestFields } from "@/util/common/adresseMapper";
 import { toUnerlaubteNutzungRequestFields } from "@/util/common/unerlaubteNutzungMapper";
 import { toIsoDateString } from "@/util/formatter";
@@ -53,6 +55,7 @@ function toNutzungsobjektRequestDTO(
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
     aufschlag50prozent: nutzungsobjekt.aufschlag50prozent,
     positionen: nutzungsobjekt.positionen.map(toPositionRequestDTO),
+    masten: nutzungsobjekt.masten.map(toMastRequestDTO),
   };
 }
 
@@ -83,7 +86,6 @@ export function toAbrechnungForm(
 function toNutzungsobjektForm(
   nutzungsobjekt: AbrechnungNutzungsobjektResponseDTO
 ): AbrechnungNutzungsobjektForm {
-  const positionen = (nutzungsobjekt.positionen ?? []).map(toPositionForm);
   return {
     id: crypto.randomUUID(),
     uebernommenesNutzungsobjektId: null,
@@ -100,8 +102,8 @@ function toNutzungsobjektForm(
     tageUnerlaubteNutzung: nutzungsobjekt.tageUnerlaubteNutzung ?? null,
     bemerkung: nutzungsobjekt.bemerkung ?? "",
     aufschlag50prozent: nutzungsobjekt.aufschlag50prozent ?? false,
-    positionen:
-      positionen.length > 0 ? positionen : [createAbrechnungPosition()],
+    positionen: (nutzungsobjekt.positionen ?? []).map(toPositionForm),
+    masten: (nutzungsobjekt.masten ?? []).map(toMastForm),
   };
 }
 
@@ -119,6 +121,14 @@ function toPositionForm(
   };
 }
 
+function toMastForm(mast: AbrechnungMastResponseDTO): AbrechnungMastForm {
+  return {
+    id: crypto.randomUUID(),
+    beginn: toIsoDateString(mast.beginn),
+    ende: toIsoDateString(mast.ende),
+  };
+}
+
 function toPositionRequestDTO(
   position: AbrechnungPositionForm
 ): AbrechnungPositionRequestDTO {
@@ -131,5 +141,12 @@ function toPositionRequestDTO(
     // The values are validated so these fallbacks should never actually be used.
     flaeche: position.flaeche ?? 0,
     anteilAnFlaeche: position.anteilAnFlaeche ?? 0,
+  };
+}
+
+function toMastRequestDTO(mast: AbrechnungMastForm): AbrechnungMastRequestDTO {
+  return {
+    beginn: new Date(mast.beginn),
+    ende: new Date(mast.ende),
   };
 }
