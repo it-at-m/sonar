@@ -970,10 +970,21 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektAdresseResponseDTO"
+    AbrechnungMastRequestDTO:
+      required:
+      - beginn
+      - ende
+      type: object
+      properties:
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
     AbrechnungNutzungsobjektRequestDTO:
       required:
       - art
-      - positionen
       type: object
       properties:
         id:
@@ -1043,10 +1054,13 @@ components:
         aufschlag50prozent:
           type: boolean
         positionen:
-          minItems: 1
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungPositionRequestDTO"
+        masten:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungMastRequestDTO"
     AbrechnungPositionRequestDTO:
       required:
       - anteilAnFlaeche
@@ -1143,6 +1157,18 @@ components:
          <p>
          An Abrechnung is created below its Projekt, so the path decides which one it belongs to.
          </p>
+    AbrechnungMastResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
     AbrechnungNutzungsobjektResponseDTO:
       type: object
       properties:
@@ -1201,6 +1227,10 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungPositionResponseDTO"
+        masten:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungMastResponseDTO"
     AbrechnungPositionResponseDTO:
       type: object
       properties:

@@ -38,6 +38,8 @@ import org.hibernate.annotations.BatchSize;
 @Setter
 @ToString(callSuper = true)
 @NoArgsConstructor
+// The Nutzungsobjekte, the Positionen and the Masten all hang off the same column of this table.
+@SuppressWarnings("PMD.AvoidDuplicateLiterals")
 public class AbrechnungEntity extends BaseEntity {
 
     private static final long serialVersionUID = 1L;
@@ -101,7 +103,15 @@ public class AbrechnungEntity extends BaseEntity {
     @BatchSize(size = 25)
     @Setter(AccessLevel.NONE)
     @ToString.Exclude
-    @NotEmpty private List<AbrechnungPositionEntity> positionen = new ArrayList<>();
+    private List<AbrechnungPositionEntity> positionen = new ArrayList<>();
+
+    @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
+    @JoinColumn(name = "abrechnung_id", nullable = false)
+    @OrderColumn(name = "sort_order", nullable = false)
+    @BatchSize(size = 25)
+    @Setter(AccessLevel.NONE)
+    @ToString.Exclude
+    private List<AbrechnungMastEntity> masten = new ArrayList<>();
 
     public List<NutzungsobjektEntity> getNutzungsobjekte() {
         return Collections.unmodifiableList(nutzungsobjekte);
@@ -117,6 +127,14 @@ public class AbrechnungEntity extends BaseEntity {
 
     public void addPosition(final AbrechnungPositionEntity position) {
         positionen.add(position);
+    }
+
+    public List<AbrechnungMastEntity> getMasten() {
+        return Collections.unmodifiableList(masten);
+    }
+
+    public void addMast(final AbrechnungMastEntity mast) {
+        masten.add(mast);
     }
 
 }

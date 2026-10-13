@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import java.util.List;
@@ -19,13 +20,15 @@ public interface AbrechnungEntityMapper {
 
     @Mapping(target = ".", source = "nutzungsobjektEntity.adressdaten")
     AbrechnungNutzungsobjekt toNutzungsobjekt(NutzungsobjektEntity nutzungsobjektEntity,
-            List<AbrechnungPosition> positionen);
+            List<AbrechnungPosition> positionen, List<AbrechnungMast> masten);
 
     AbrechnungPosition toPosition(AbrechnungPositionEntity abrechnungPositionEntity);
 
+    AbrechnungMast toMast(AbrechnungMastEntity abrechnungMastEntity);
+
     /**
-     * The service assembles the Nutzungsobjekte and the Positionen. It also sets the place in the
-     * chain of versions. That place follows from the Vorgänger and never from the data that was
+     * The service assembles the Nutzungsobjekte, the Positionen and the Masten. It also sets the place
+     * in the chain of versions. That place follows from the Vorgänger and never from the data that was
      * entered.
      */
     @Mapping(target = "id", ignore = true)
@@ -34,6 +37,7 @@ public interface AbrechnungEntityMapper {
     @Mapping(target = "vorgaengerAbrechnungId", ignore = true)
     @Mapping(target = "nutzungsobjekte", ignore = true)
     @Mapping(target = "positionen", ignore = true)
+    @Mapping(target = "masten", ignore = true)
     AbrechnungEntity toEntity(Abrechnung abrechnung);
 
     @Mapping(target = "id", ignore = true)
@@ -43,5 +47,9 @@ public interface AbrechnungEntityMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nutzungsobjekt", ignore = true)
     AbrechnungPositionEntity toEntity(AbrechnungPosition abrechnungPosition);
+
+    @Mapping(target = "id", ignore = true)
+    @Mapping(target = "nutzungsobjekt", ignore = true)
+    AbrechnungMastEntity toEntity(AbrechnungMast abrechnungMast);
 
 }
