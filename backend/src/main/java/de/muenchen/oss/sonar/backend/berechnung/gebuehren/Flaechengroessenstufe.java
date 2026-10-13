@@ -11,11 +11,11 @@ import java.util.Map;
  * Abrechnung is charged at the same Stufe.
  * <p>
  * The Sätze below are the Gebührenordnung. One line is one Stufe, with its Satz per {@link
- * Zeitindex} in the order the Zeitindizes are declared in.
+ * Flaechenzeitindex} in the order those are declared in.
  * </p>
  */
 @SuppressWarnings("PMD.AvoidDuplicateLiterals")
-public enum Gebuehrenstufe {
+public enum Flaechengroessenstufe {
 
     STUFE_1("Gebührenstufe 1", 50, "1.50", "1.50", "1.50", "1.50"),
     STUFE_2("Gebührenstufe 2", 150, "1.50", "2.00", "2.50", "3.00"),
@@ -29,14 +29,14 @@ public enum Gebuehrenstufe {
 
     private final String bezeichnung;
     private final int bisQm;
-    private final Map<Zeitindex, BigDecimal> saetze;
+    private final Map<Flaechenzeitindex, BigDecimal> saetze;
 
-    Gebuehrenstufe(final String bezeichnung, final int bisQm, final String... saetzeJeZeitindex) {
+    Flaechengroessenstufe(final String bezeichnung, final int bisQm, final String... saetzeJeFlaechenzeitindex) {
         this.bezeichnung = bezeichnung;
         this.bisQm = bisQm;
-        this.saetze = new EnumMap<>(Zeitindex.class);
-        for (final Zeitindex zeitindex : Zeitindex.values()) {
-            saetze.put(zeitindex, new BigDecimal(saetzeJeZeitindex[zeitindex.ordinal()]));
+        this.saetze = new EnumMap<>(Flaechenzeitindex.class);
+        for (final Flaechenzeitindex flaechenzeitindex : Flaechenzeitindex.values()) {
+            saetze.put(flaechenzeitindex, new BigDecimal(saetzeJeFlaechenzeitindex[flaechenzeitindex.ordinal()]));
         }
     }
 
@@ -44,8 +44,8 @@ public enum Gebuehrenstufe {
         return bezeichnung;
     }
 
-    public static Gebuehrenstufe from(final int flaecheQm) {
-        for (final Gebuehrenstufe stufe : values()) {
+    public static Flaechengroessenstufe from(final int flaecheQm) {
+        for (final Flaechengroessenstufe stufe : values()) {
             if (flaecheQm <= stufe.bisQm) {
                 return stufe;
             }
@@ -53,8 +53,8 @@ public enum Gebuehrenstufe {
         return STUFE_5;
     }
 
-    public BigDecimal gebuehrensatz(final Zeitindex zeitindex, final boolean isAufschlag50Prozent) {
-        final BigDecimal satz = saetze.get(zeitindex);
+    public BigDecimal gebuehrensatz(final Flaechenzeitindex flaechenzeitindex, final boolean isAufschlag50Prozent) {
+        final BigDecimal satz = saetze.get(flaechenzeitindex);
         return isAufschlag50Prozent
                 ? satz.multiply(AUFSCHLAG_50_PROZENT).setScale(NACHKOMMASTELLEN_GEBUEHRENSATZ, RoundingMode.HALF_UP)
                 : satz;

@@ -1,7 +1,7 @@
 package de.muenchen.oss.sonar.backend.berechnung.ueberspannungen;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
-import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Mastaltersstufe;
+import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Mastzeitindex;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -36,11 +36,11 @@ public record Mast(
 
     public Optional<String> zwischenabrechnungGrund(final int monat) {
 
-        final Mastaltersstufe altersstufe = Mastaltersstufe.from(alterInMonat(monat));
+        final Mastzeitindex mastzeitindex = Mastzeitindex.from(alterInMonat(monat));
 
-        if (altersstufe == Mastaltersstufe.from(alterInMonat(monat) - 1)) {
+        if (mastzeitindex == Mastzeitindex.from(alterInMonat(monat) - 1)) {
             return Optional.empty();
         }
-        return Optional.of("Mast " + nummer + " wechselt in " + altersstufe.getBezeichnung());
+        return Optional.of("Mast " + nummer + " wechselt in " + mastzeitindex.getBezeichnung());
     }
 }

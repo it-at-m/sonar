@@ -1,18 +1,19 @@
 package de.muenchen.oss.sonar.backend.berechnung.flaechen;
 
-import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Gebuehrenstufe;
-import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Zeitindex;
+import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Flaechengroessenstufe;
+import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Flaechenzeitindex;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 
 /**
- * What a Woche is charged on under one Zeitindex, with and without the Aufschlag. Those two decide
- * the Gebührensatz, so the Flächen of all Adressen are gathered by them before anything is charged.
+ * What a Woche is charged on under one Flaechenzeitindex, with and without the Aufschlag. Those two
+ * decide the Gebührensatz, so the Flächen of all Adressen are gathered by them before anything is
+ * charged.
  */
 public record Gebuehrenposten(
-        Gebuehrenstufe gebuehrenstufe,
+        Flaechengroessenstufe flaechengroessenstufe,
         boolean isAufschlag50Prozent,
-        Zeitindex zeitindex,
+        Flaechenzeitindex flaechenzeitindex,
         BigDecimal flaecheQm) {
 
     /** A started square metre is charged as a whole one. */
@@ -21,7 +22,7 @@ public record Gebuehrenposten(
     }
 
     public BigDecimal gebuehrensatz() {
-        return gebuehrenstufe.gebuehrensatz(zeitindex, isAufschlag50Prozent);
+        return flaechengroessenstufe.gebuehrensatz(flaechenzeitindex, isAufschlag50Prozent);
     }
 
     public BigDecimal gebuehr() {

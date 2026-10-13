@@ -97,14 +97,14 @@ public final class Flaechentext {
 
     private static String zeile(final Flaechenverteilung verteilung) {
         return "    " + verteilung.adressbezeichnung() + ": " + verteilung.flaecheQm() + "m² / "
-                + verteilung.zeitindex().getBezeichnung()
+                + verteilung.flaechenzeitindex().getBezeichnung()
                 + " (Fläche: " + verteilung.flaechennamen() + ")"
                 + (verteilung.isAufschlag50Prozent() ? " (50% Aufschlag)" : "")
                 + System.lineSeparator();
     }
 
     /* default */ static String gebuehrenstufe(final Flaechenwoche woche) {
-        return woche.baustellenflaecheQm() + "m² --> " + woche.gebuehrenstufe().getBezeichnung() + System.lineSeparator();
+        return woche.baustellenflaecheQm() + "m² --> " + woche.flaechengroessenstufe().getBezeichnung() + System.lineSeparator();
     }
 
     /* default */ static String gebuehrenstufeOhneWoche() {
@@ -122,7 +122,7 @@ public final class Flaechentext {
     private static String posten(final Gebuehrenposten posten, final BigDecimal gebuehr) {
         return posten.flaecheGerundetQm() + "m² (" + posten.flaecheQm() + "m²) x "
                 + Betragsformat.format(posten.gebuehrensatz()) + "€ ("
-                + posten.gebuehrenstufe().getBezeichnung() + " / " + posten.zeitindex().getBezeichnung() + ") = "
+                + posten.flaechengroessenstufe().getBezeichnung() + " / " + posten.flaechenzeitindex().getBezeichnung() + ") = "
                 + Betragsformat.format(gebuehr) + "€"
                 + (posten.isAufschlag50Prozent() ? " (50%-Aufschlag)" : "")
                 + System.lineSeparator();

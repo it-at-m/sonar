@@ -1,7 +1,7 @@
 package de.muenchen.oss.sonar.backend.berechnung.flaechen;
 
-import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Gebuehrenstufe;
-import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Zeitindex;
+import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Flaechengroessenstufe;
+import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Flaechenzeitindex;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
@@ -15,7 +15,7 @@ import java.util.Map;
 public record Flaechenwoche(
         int woche,
         BigDecimal baustellenflaecheQm,
-        Gebuehrenstufe gebuehrenstufe,
+        Flaechengroessenstufe flaechengroessenstufe,
         List<Flaechenverteilung> verteilung,
         List<Gebuehrenposten> posten,
         String zwischenabrechnungGrund) {
@@ -32,32 +32,34 @@ public record Flaechenwoche(
 
         for (final Flaechenadresse adresse : adressen) {
             final List<Flaechenbeitrag> beitraege = adresse.beitraege(woche);
-            verteilung.addAll(verteilungJeZeitindex(adresse, beitraege));
+            verteilung.addAll(verteilungJeFlaechenzeitindex(adresse, beitraege));
             zwischenabrechnungGrund.append(zwischenabrechnungGrund(adresse, beitraege));
         }
 
         final BigDecimal baustellenflaecheQm = verteilung.stream()
                 .map(Flaechenverteilung::flaecheQm)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
-        final Gebuehrenstufe gebuehrenstufe = Gebuehrenstufe.from(baustellenflaecheQm.setScale(0, RoundingMode.CEILING).intValueExact());
+        final Flaechengroessenstufe flaechengroessenstufe = Flaechengroessenstufe
+                .from(baustellenflaecheQm.setScale(0, RoundingMode.CEILING).intValueExact());
 
-        return new Flaechenwoche(woche, baustellenflaecheQm, gebuehrenstufe, verteilung,
-                postenJeGebuehrensatz(verteilung, gebuehrenstufe), zwischenabrechnungGrund.toString());
+        return new Flaechenwoche(woche, baustellenflaecheQm, flaechengroessenstufe, verteilung,
+                postenJeGebuehrensatz(verteilung, flaechengroessenstufe), zwischenabrechnungGrund.toString());
     }
 
-    private static List<Flaechenverteilung> verteilungJeZeitindex(final Flaechenadresse adresse, final List<Flaechenbeitrag> beitraege) {
+    private static List<Flaechenverteilung> verteilungJeFlaechenzeitindex(final Flaechenadresse adresse,
+            final List<Flaechenbeitrag> beitraege) {
 
-        final Map<Zeitindex, Flaechenverteilung> jeZeitindex = new EnumMap<>(Zeitindex.class);
+        final Map<Flaechenzeitindex, Flaechenverteilung> jeFlaechenzeitindex = new EnumMap<>(Flaechenzeitindex.class);
 
         for (final Flaechenbeitrag beitrag : beitraege) {
-            beitrag.zeitindex().ifPresent(zeitindex -> jeZeitindex.merge(
-                    zeitindex,
-                    new Flaechenverteilung(adresse.adressbezeichnung(), adresse.isAufschlag50Prozent(), zeitindex,
+            beitrag.flaechenzeitindex().ifPresent(flaechenzeitindex -> jeFlaechenzeitindex.merge(
+                    flaechenzeitindex,
+                    new Flaechenverteilung(adresse.adressbezeichnung(), adresse.isAufschlag50Prozent(), flaechenzeitindex,
                             beitrag.flaecheQm(), beitrag.flaeche().bezeichnung()),
                     Flaechenverteilung::plus));
         }
 
-        return List.copyOf(jeZeitindex.values());
+        return List.copyOf(jeFlaechenzeitindex.values());
     }
 
     private static String zwischenabrechnungGrund(final Flaechenadresse adresse, final List<Flaechenbeitrag> beitraege) {
@@ -74,19 +76,24 @@ public record Flaechenwoche(
         return grund.toString();
     }
 
-    private static List<Gebuehrenposten> postenJeGebuehrensatz(final List<Flaechenverteilung> verteilung, final Gebuehrenstufe gebuehrenstufe) {
+    private static List<Gebuehrenposten> postenJeGebuehrensatz(final List<Flaechenverteilung> verteilung,
+            final Flaechengroessenstufe flaechengroessenstufe) {
 
-        final Map<Zeitindex, BigDecimal> ohneAufschlag = new EnumMap<>(Zeitindex.class);
-        final Map<Zeitindex, BigDecimal> mitAufschlag = new EnumMap<>(Zeitindex.class);
+        final Map<Flaechenzeitindex, BigDecimal> ohneAufschlag = new EnumMap<>(Flaechenzeitindex.class);
+        final Map<Flaechenzeitindex, BigDecimal> mitAufschlag = new EnumMap<>(Flaechenzeitindex.class);
 
         for (final Flaechenverteilung adressverteilung : verteilung) {
-            final Map<Zeitindex, BigDecimal> jeZeitindex = adressverteilung.isAufschlag50Prozent() ? mitAufschlag : ohneAufschlag;
-            jeZeitindex.merge(adressverteilung.zeitindex(), adressverteilung.flaecheQm(), BigDecimal::add);
+            final Map<Flaechenzeitindex, BigDecimal> jeFlaechenzeitindex = adressverteilung.isAufschlag50Prozent()
+                    ? mitAufschlag
+                    : ohneAufschlag;
+            jeFlaechenzeitindex.merge(adressverteilung.flaechenzeitindex(), adressverteilung.flaecheQm(), BigDecimal::add);
         }
 
         final List<Gebuehrenposten> posten = new ArrayList<>();
-        ohneAufschlag.forEach((zeitindex, flaecheQm) -> posten.add(new Gebuehrenposten(gebuehrenstufe, false, zeitindex, flaecheQm)));
-        mitAufschlag.forEach((zeitindex, flaecheQm) -> posten.add(new Gebuehrenposten(gebuehrenstufe, true, zeitindex, flaecheQm)));
+        ohneAufschlag.forEach((flaechenzeitindex, flaecheQm) -> posten
+                .add(new Gebuehrenposten(flaechengroessenstufe, false, flaechenzeitindex, flaecheQm)));
+        mitAufschlag.forEach((flaechenzeitindex, flaecheQm) -> posten
+                .add(new Gebuehrenposten(flaechengroessenstufe, true, flaechenzeitindex, flaecheQm)));
         return posten;
     }
 

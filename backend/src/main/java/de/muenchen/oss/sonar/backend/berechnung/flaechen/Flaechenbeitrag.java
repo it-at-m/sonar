@@ -1,19 +1,19 @@
 package de.muenchen.oss.sonar.backend.berechnung.flaechen;
 
-import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Zeitindex;
+import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Flaechenzeitindex;
 import java.math.BigDecimal;
 import java.util.Optional;
 
 public record Flaechenbeitrag(Flaeche flaeche, BigDecimal flaecheQm, int woche, int letzteWocheAdresse) {
 
-    private static final String KEIN_ZEITINDEX = "";
+    private static final String KEIN_FLAECHENZEITINDEX = "";
 
     public boolean isAktiv() {
         return isAktivIn(woche);
     }
 
-    public Optional<Zeitindex> zeitindex() {
-        return zeitindexIn(woche);
+    public Optional<Flaechenzeitindex> flaechenzeitindex() {
+        return flaechenzeitindexIn(woche);
     }
 
     public Optional<String> zwischenabrechnungGrund() {
@@ -30,16 +30,16 @@ public record Flaechenbeitrag(Flaeche flaeche, BigDecimal flaecheQm, int woche, 
             return Optional.empty();
         }
 
-        final Optional<Zeitindex> zeitindex = zeitindexIn(woche);
-        final Optional<Zeitindex> zeitindexVorwoche = zeitindexIn(woche - 1);
+        final Optional<Flaechenzeitindex> flaechenzeitindex = flaechenzeitindexIn(woche);
+        final Optional<Flaechenzeitindex> flaechenzeitindexVorwoche = flaechenzeitindexIn(woche - 1);
 
-        if (zeitindex.equals(zeitindexVorwoche)) {
+        if (flaechenzeitindex.equals(flaechenzeitindexVorwoche)) {
             return Optional.empty();
         }
         if (!isAktivIn(woche) && woche > letzteWocheAdresse) {
             return Optional.of("Fläche nicht mehr aktiv (Fläche " + flaeche.bezeichnung() + ")");
         }
-        return Optional.of("Wechsel von " + bezeichnung(zeitindexVorwoche) + " zu " + bezeichnung(zeitindex)
+        return Optional.of("Wechsel von " + bezeichnung(flaechenzeitindexVorwoche) + " zu " + bezeichnung(flaechenzeitindex)
                 + " (Fläche " + flaeche.bezeichnung() + ")");
     }
 
@@ -50,9 +50,9 @@ public record Flaechenbeitrag(Flaeche flaeche, BigDecimal flaecheQm, int woche, 
                 && flaeche.isImAbrechnungszeitraum();
     }
 
-    private Optional<Zeitindex> zeitindexIn(final int woche) {
+    private Optional<Flaechenzeitindex> flaechenzeitindexIn(final int woche) {
         return isAktivIn(woche)
-                ? Optional.of(Zeitindex.from(woche - flaeche.ersteWoche()))
+                ? Optional.of(Flaechenzeitindex.from(woche - flaeche.ersteWoche()))
                 : Optional.empty();
     }
 
@@ -62,7 +62,7 @@ public record Flaechenbeitrag(Flaeche flaeche, BigDecimal flaecheQm, int woche, 
         return art + aenderung + "m² (Fläche " + flaeche.bezeichnung() + ")";
     }
 
-    private static String bezeichnung(final Optional<Zeitindex> zeitindex) {
-        return zeitindex.map(Zeitindex::getBezeichnung).orElse(KEIN_ZEITINDEX);
+    private static String bezeichnung(final Optional<Flaechenzeitindex> flaechenzeitindex) {
+        return flaechenzeitindex.map(Flaechenzeitindex::getBezeichnung).orElse(KEIN_FLAECHENZEITINDEX);
     }
 }
