@@ -57,6 +57,15 @@
         variant="text"
       />
     </template>
+
+    <template #[`item.berechnung`]="{ item }">
+      <abrechnung-berechnung-dialog
+        v-if="item.id"
+        :abrechnung-id="item.id"
+        :geschaeftspartner-id="item.geschaeftspartnerId"
+        :projekt-id="projektId"
+      />
+    </template>
   </v-data-table-server>
 </template>
 
@@ -71,6 +80,7 @@ import {
   mdiFileDocumentPlus,
 } from "@mdi/js";
 
+import AbrechnungBerechnungDialog from "@/components/AbrechnungBerechnungDialog.vue";
 import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
 
 const HEADERS = [
@@ -82,6 +92,7 @@ const HEADERS = [
   { title: "Ansehen", key: "ansehen", sortable: false },
   { title: "Widerspruch", key: "widerspruch", sortable: false },
   { title: "Neue Version", key: "neueVersion", sortable: false },
+  { title: "Berechnung", key: "berechnung", sortable: false },
 ];
 
 const ITEMS_PER_PAGE_OPTIONS = [10, 25, 50, 100];
