@@ -79,7 +79,7 @@
         v-if="uebernommen && !readonly"
         class="mb-4"
         density="compact"
-        text="Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen gehören zu dieser Abrechnung."
+        text="Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung."
         type="info"
         variant="tonal"
       />
