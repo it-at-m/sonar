@@ -81,7 +81,11 @@ const { readonly = false, removable } = defineProps<{
 }>();
 
 function addMast(): void {
-  masten.value.push(createAbrechnungMast());
+  if (masten.value.length === 0) {
+    masten.value.push(createAbrechnungMast(), createAbrechnungMast());
+  } else {
+    masten.value.push(createAbrechnungMast());
+  }
 }
 
 function removeMast(index: number): void {

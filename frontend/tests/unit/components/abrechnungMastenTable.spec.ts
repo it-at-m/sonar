@@ -36,15 +36,30 @@ function removeButton(wrapper: ReturnType<typeof mountTable>, nummer: number) {
 }
 
 describe("AbrechnungMastenTable.vue", () => {
-  it("givenClickedHinzufuegen_thenAppendAMastWithAnEmptyZeitraum", async () => {
+  it("givenClickedHinzufuegenOnAnEmptyTable_thenAppendTwoMastenWithAnEmptyZeitraum", async () => {
     const masten: AbrechnungMastForm[] = [];
     const wrapper = mountTable(masten);
 
     await addButton(wrapper)?.trigger("click");
 
-    expect(masten).toHaveLength(1);
+    expect(masten).toHaveLength(2);
     expect(masten[0]?.beginn).toBe("");
     expect(masten[0]?.ende).toBe("");
+    expect(masten[1]?.beginn).toBe("");
+    expect(masten[1]?.ende).toBe("");
+  });
+
+  it("givenClickedHinzufuegenWithAMastPresent_thenAppendOneMastWithAnEmptyZeitraum", async () => {
+    const masten: AbrechnungMastForm[] = [
+      { id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
+    ];
+    const wrapper = mountTable(masten);
+
+    await addButton(wrapper)?.trigger("click");
+
+    expect(masten).toHaveLength(2);
+    expect(masten[1]?.beginn).toBe("");
+    expect(masten[1]?.ende).toBe("");
   });
 
   it("givenClickedEntfernen_thenDropThatMast", async () => {
