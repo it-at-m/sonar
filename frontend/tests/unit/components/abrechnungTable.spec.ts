@@ -4,6 +4,7 @@ import { mdiChatAlert, mdiChatPlus, mdiFileDocumentPlus } from "@mdi/js";
 import { mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import AbrechnungBerechnungDialog from "@/components/AbrechnungBerechnungDialog.vue";
 import AbrechnungTable from "@/components/AbrechnungTable.vue";
 import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
 import vuetify from "@/plugins/vuetify";
@@ -49,6 +50,10 @@ function neueVersionButton(wrapper: ReturnType<typeof mountTable>) {
 
 function neueVersionIconPath(wrapper: ReturnType<typeof mountTable>) {
   return neueVersionButton(wrapper).find(".v-icon path").attributes("d");
+}
+
+function berechnungDialog(wrapper: ReturnType<typeof mountTable>) {
+  return wrapper.findComponent(AbrechnungBerechnungDialog);
 }
 
 describe("AbrechnungTable.vue", () => {
@@ -372,5 +377,38 @@ describe("AbrechnungTable.vue", () => {
       "Neue Version der Abrechnung 1000000001 anlegen"
     );
     expect(neueVersionIconPath(wrapper)).toBe(mdiFileDocumentPlus);
+  });
+
+  it("givenBerechnungColumn_thenItIsNotMarkedSortable", () => {
+    const wrapper = mountTable();
+
+    const berechnung = wrapper
+      .findAll("th")
+      .find((header) => header.text().startsWith("Berechnung"));
+
+    expect(berechnung?.classes()).not.toContain("v-data-table__th--sortable");
+  });
+
+  it("givenAbrechnung_thenPointTheBerechnungAtThatRow", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(berechnungDialog(wrapper).props("abrechnungId")).toBe(
+      "123e4567-e89b-12d3-a456-426614174001"
+    );
+    expect(berechnungDialog(wrapper).props("geschaeftspartnerId")).toBe(
+      "1000000001"
+    );
+    expect(berechnungDialog(wrapper).props("projektId")).toBe(PROJEKT_ID);
   });
 });
