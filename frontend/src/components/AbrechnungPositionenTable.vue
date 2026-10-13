@@ -96,7 +96,7 @@
             <td v-if="!readonly">
               <v-btn
                 :aria-label="`Position ${index + 1} entfernen`"
-                :disabled="positionen.length === 1"
+                :disabled="!removable"
                 :icon="mdiDelete"
                 size="small"
                 variant="text"
@@ -143,8 +143,9 @@ import {
 
 const positionen = defineModel<AbrechnungPositionForm[]>({ required: true });
 
-const { readonly = false } = defineProps<{
+const { readonly = false, removable } = defineProps<{
   idPrefix: string;
+  removable: boolean;
   readonly?: boolean;
 }>();
 

@@ -32,7 +32,7 @@ public class NutzungsobjektService {
         }
         log.info("Get the Nutzungsobjekte of Projekt {}", projektId);
         return abrechnungRepository.findNutzungsobjekteByProjektId(projektId).stream()
-                .map(nutzungsobjekt -> abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjekt, List.of()))
+                .map(nutzungsobjekt -> abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjekt, List.of(), List.of()))
                 .toList();
     }
 

@@ -79,7 +79,7 @@
         v-if="uebernommen && !readonly"
         class="mb-4"
         density="compact"
-        text="Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen gehören zu dieser Abrechnung."
+        text="Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung."
         type="info"
         variant="tonal"
       />
@@ -106,6 +106,16 @@
         v-model="nutzungsobjekt.positionen"
         :id-prefix="`${idPrefix}-position`"
         :readonly="readonly"
+        :removable="removableEintraege"
+      />
+
+      <h3 class="text-title-small mt-4 mb-2">Masten</h3>
+
+      <abrechnung-masten-table
+        v-model="nutzungsobjekt.masten"
+        :id-prefix="`${idPrefix}-mast`"
+        :readonly="readonly"
+        :removable="removableEintraege"
       />
 
       <unerlaubte-nutzung-fields
@@ -145,6 +155,7 @@ import {
 } from "@mdi/js";
 import { computed } from "vue";
 
+import AbrechnungMastenTable from "@/components/AbrechnungMastenTable.vue";
 import AbrechnungPositionenTable from "@/components/AbrechnungPositionenTable.vue";
 import AdresseFields from "@/components/common/AdresseFields.vue";
 import UnerlaubteNutzungFields from "@/components/common/UnerlaubteNutzungFields.vue";
@@ -169,5 +180,16 @@ const emit = defineEmits<{ remove: [] }>();
 
 const uebernommen = computed(
   () => nutzungsobjekt.value.uebernommenesNutzungsobjektId !== null
+);
+
+/**
+ * Counted over both tables, because a Nutzungsobjekt has to keep either a Position or a Mast. The
+ * last row left of the two therefore stays.
+ */
+const removableEintraege = computed(
+  () =>
+    nutzungsobjekt.value.positionen.length +
+      nutzungsobjekt.value.masten.length >
+    1
 );
 </script>

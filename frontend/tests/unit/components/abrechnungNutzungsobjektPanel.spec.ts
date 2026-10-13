@@ -9,6 +9,7 @@ import {
   ProjektAdresseRequestDTOArtEnum,
   ProjektAdresseRequestDTONutzungenEnum,
 } from "@/api/generated/sonar-backend";
+import AbrechnungMastenTable from "@/components/AbrechnungMastenTable.vue";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import AbrechnungPositionenTable from "@/components/AbrechnungPositionenTable.vue";
 import AdresseFields from "@/components/common/AdresseFields.vue";
@@ -161,6 +162,56 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     expect(
       wrapper.findComponent(AbrechnungPositionenTable).props("readonly")
     ).toBe(true);
+  });
+
+  it("givenReadonly_thenPassItOnToTheMasten", () => {
+    const wrapper = mountPanel(createAbrechnungNutzungsobjekt(), [], true);
+
+    expect(wrapper.findComponent(AbrechnungMastenTable).props("readonly")).toBe(
+      true
+    );
+  });
+
+  it("givenOnePositionAndNoMasten_thenKeepTheLastRow", () => {
+    const wrapper = mountPanel(createAbrechnungNutzungsobjekt());
+
+    expect(
+      wrapper.findComponent(AbrechnungPositionenTable).props("removable")
+    ).toBe(false);
+    expect(
+      wrapper.findComponent(AbrechnungMastenTable).props("removable")
+    ).toBe(false);
+  });
+
+  it("givenOnePositionAndOneMast_thenAllowRemovingBoth", () => {
+    const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+    nutzungsobjekt.masten.push({
+      id: "123e4567-e89b-12d3-a456-426614174004",
+      beginn: "2026-01-01",
+      ende: "2026-01-31",
+    });
+    const wrapper = mountPanel(nutzungsobjekt);
+
+    expect(
+      wrapper.findComponent(AbrechnungPositionenTable).props("removable")
+    ).toBe(true);
+    expect(
+      wrapper.findComponent(AbrechnungMastenTable).props("removable")
+    ).toBe(true);
+  });
+
+  it("givenNutzungsobjekt_thenOfferItsMasten", () => {
+    const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+    nutzungsobjekt.masten.push({
+      id: "123e4567-e89b-12d3-a456-426614174004",
+      beginn: "2026-01-01",
+      ende: "2026-01-31",
+    });
+    const wrapper = mountPanel(nutzungsobjekt);
+
+    expect(
+      wrapper.findComponent(AbrechnungMastenTable).props("modelValue")
+    ).toStrictEqual(nutzungsobjekt.masten);
   });
 
   it("givenProjektWithoutNutzungsobjekte_thenOfferNothingToTakeOver", () => {

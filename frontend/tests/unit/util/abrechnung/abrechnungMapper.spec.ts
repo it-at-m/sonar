@@ -83,13 +83,44 @@ describe("abrechnungMapper.ts", () => {
 
       const positionRequestDTO = itemAt(
         itemAt(toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte)
-          .positionen
+          .positionen ?? []
       );
 
       expect(positionRequestDTO.laenge).toBe(12);
       expect(positionRequestDTO.breite).toBe(3);
       expect(positionRequestDTO.flaeche).toBe(36);
       expect(positionRequestDTO.anteilAnFlaeche).toBe(30);
+    });
+
+    it("givenMasten_thenSendTheirZeitraeume", () => {
+      const { abrechnung } = useAbrechnungForm();
+      abrechnung.value.geschaeftspartnerId = "1000000001";
+      abrechnung.value.zeitraumVon = "2026-01-01";
+      abrechnung.value.zeitraumBis = "2026-03-31";
+      abrechnung.value.abrechnungsArt =
+        AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.adresse = "Marienplatz";
+      nutzungsobjekt.hausnummerVon = "8";
+      nutzungsobjekt.positionen = [];
+      nutzungsobjekt.masten = [
+        { id: crypto.randomUUID(), beginn: "2026-01-01", ende: "2026-01-31" },
+        { id: crypto.randomUUID(), beginn: "2026-02-01", ende: "2026-02-28" },
+      ];
+
+      const nutzungsobjektRequestDTO = itemAt(
+        toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
+      );
+
+      expect(nutzungsobjektRequestDTO.positionen).toHaveLength(0);
+      expect(nutzungsobjektRequestDTO.masten).toHaveLength(2);
+      expect(itemAt(nutzungsobjektRequestDTO.masten ?? []).beginn).toEqual(
+        new Date("2026-01-01")
+      );
+      expect(itemAt(nutzungsobjektRequestDTO.masten ?? [], 1).ende).toEqual(
+        new Date("2026-02-28")
+      );
     });
 
     it("givenOnlyFlaeche_thenLeaveOutLaengeUndBreite", () => {
@@ -112,7 +143,7 @@ describe("abrechnungMapper.ts", () => {
 
       const positionRequestDTO = itemAt(
         itemAt(toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte)
-          .positionen
+          .positionen ?? []
       );
 
       expect(positionRequestDTO.laenge).toBeUndefined();
@@ -546,8 +577,40 @@ describe("abrechnungMapper.ts", () => {
       expect(itemAt(requestDTO.nutzungsobjekte).flurstueck).toBe("1234/5");
       expect(itemAt(requestDTO.nutzungsobjekte).gemarkung).toBe("Sendling");
       expect(
-        itemAt(itemAt(requestDTO.nutzungsobjekte).positionen).flaeche
+        itemAt(itemAt(requestDTO.nutzungsobjekte).positionen ?? []).flaeche
       ).toBe(36);
+    });
+
+    it("givenNutzungsobjektWithOnlyMasten_thenFillTheFormWithThemAndNoPosition", () => {
+      const form = toAbrechnungForm({
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: new Date("2026-01-01"),
+        zeitraumBis: new Date("2026-03-31"),
+        abrechnungsArt: "ENDABRECHNUNG",
+        nutzungsobjekte: [
+          {
+            id: "123e4567-e89b-12d3-a456-426614174002",
+            art: "ADRESSE",
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            aufschlag50prozent: false,
+            positionen: [],
+            masten: [
+              {
+                id: "123e4567-e89b-12d3-a456-426614174004",
+                beginn: new Date("2026-01-01"),
+                ende: new Date("2026-01-31"),
+              },
+            ],
+          },
+        ],
+      });
+
+      const nutzungsobjekt = itemAt(form.nutzungsobjekte);
+      expect(nutzungsobjekt.positionen).toHaveLength(0);
+      expect(nutzungsobjekt.masten).toHaveLength(1);
+      expect(itemAt(nutzungsobjekt.masten).beginn).toBe("2026-01-01");
+      expect(itemAt(nutzungsobjekt.masten).ende).toBe("2026-01-31");
     });
 
     it("givenAbrechnungWithoutAnyDetails_thenStartWithAnEmptyNutzungsobjekt", () => {
