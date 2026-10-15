@@ -27,6 +27,16 @@ class BetragsformatTest {
         }
 
         @Test
+        void givenBetragHalfwayBetweenTwoNachkommastellen_thenRoundUp() {
+            assertThat(Betragsformat.format(new BigDecimal("1.005"))).isEqualTo("1,01");
+        }
+
+        @Test
+        void givenNegativeBetragHalfwayBetweenTwoNachkommastellen_thenRoundAwayFromZero() {
+            assertThat(Betragsformat.format(new BigDecimal("-1.005"))).isEqualTo("-1,01");
+        }
+
+        @Test
         void givenThousands_thenGroupThemWithADot() {
             assertThat(Betragsformat.format(new BigDecimal("1234567.8"))).isEqualTo("1.234.567,80");
         }
