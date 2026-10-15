@@ -7,9 +7,10 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.mapstruct.ReportingPolicy;
 
-@Mapper(collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED, unmappedTargetPolicy = ReportingPolicy.ERROR)
+@Mapper(collectionMappingStrategy = CollectionMappingStrategy.ADDER_PREFERRED, unmappedTargetPolicy = ReportingPolicy.ERROR, imports = Projekt.class)
 public interface ProjektEntityMapper {
 
+    @Mapping(target = "verwaltungsgebuehr", expression = "java(Projekt.VERWALTUNGSGEBUEHR)")
     Projekt toProjekt(ProjektEntity projektEntity);
 
     @Mapping(target = "id", ignore = true)
