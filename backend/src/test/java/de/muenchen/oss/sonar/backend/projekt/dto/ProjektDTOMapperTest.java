@@ -31,7 +31,7 @@ class ProjektDTOMapperTest {
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     BEGINN, ENDE, 90, 2, true);
             final Projekt projekt = new Projekt(
-                    UUID.randomUUID(), "2026-0001", BEGINN, ENDE, List.of(adresse));
+                    UUID.randomUUID(), "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
 
             final ProjektResponseDTO result = projektDTOMapper.toDTO(projekt);
 
@@ -75,6 +75,7 @@ class ProjektDTOMapperTest {
             assertThat(result.projektnummer()).isEqualTo(requestDTO.projektnummer());
             assertThat(result.abrechnungBeginn()).isEqualTo(requestDTO.abrechnungBeginn());
             assertThat(result.abrechnungEnde()).isEqualTo(requestDTO.abrechnungEnde());
+            assertThat(result.verwaltungsgebuehr()).isEqualByComparingTo(Projekt.VERWALTUNGSGEBUEHR);
             assertThat(result.adressen()).hasSize(1);
 
             final ProjektAdresse adresse = result.adressen().getFirst();
