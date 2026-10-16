@@ -20,19 +20,20 @@ public final class FlaechenadresseService {
                 .sorted(Comparator.comparing(AbrechnungPosition::beginn))
                 .toList();
 
-        final List<Flaeche> flaechen = new ArrayList<>();
+        final List<Flaeche> adressflaechen = new ArrayList<>();
         BigDecimal gesamtflaecheVorher = BigDecimal.ZERO;
 
         for (final AbrechnungPosition position : sortedByBeginn) {
-            final Flaeche flaeche = FlaecheService.from(position, flaechen.size() + 1, berechnungsdatum, beginnWochenlauf,
+            final Flaeche flaeche = FlaecheService.from(position, adressflaechen.size() + 1, berechnungsdatum, beginnWochenlauf,
                     gesamtflaecheVorher);
-            flaechen.add(flaeche);
+            adressflaechen.add(flaeche);
             gesamtflaecheVorher = flaeche.gesamtflaecheAdresse();
         }
 
-        final int letzteWoche = flaechen.stream().mapToInt(Flaeche::letzteWoche).max().orElse(0);
+        final int letzteWoche = adressflaechen.stream().mapToInt(Flaeche::letzteWoche).max().orElse(0);
 
-        return new Flaechenadresse(nutzungsobjekt.adressbezeichnung(), nutzungsobjekt.aufschlag50prozent(), flaechen, letzteWoche);
+        return new Flaechenadresse(nutzungsobjekt.adressbezeichnung(), nutzungsobjekt.aufschlag50prozent(), adressflaechen,
+                letzteWoche);
     }
 
     public static List<Flaechenbeitrag> beitraege(final Flaechenadresse adresse, final int woche) {
