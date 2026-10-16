@@ -15,10 +15,4 @@ public record Flaechenverteilung(
         Flaechenzeitindex flaechenzeitindex,
         BigDecimal flaecheQm,
         String flaechennamen) {
-
-    /* default */ Flaechenverteilung plus(final Flaechenverteilung weitere) {
-        return new Flaechenverteilung(adressbezeichnung, isAufschlag50Prozent, flaechenzeitindex,
-                flaecheQm.add(weitere.flaecheQm),
-                flaechennamen + ", " + weitere.flaechennamen);
-    }
 }
