@@ -27,7 +27,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(spaetere, fruehere), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.from(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.flaechen()).extracting(Flaeche::bezeichnung, Flaeche::beginn)
                     .containsExactly(
@@ -45,7 +45,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(erste, zweite), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.from(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.flaechen()).extracting(flaeche -> flaeche.flaechenaenderung().toString())
                     .containsExactly("100", "50");
@@ -61,7 +61,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(kuerzere, laengere), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.from(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.letzteWoche()).isEqualTo(5);
         }
@@ -74,7 +74,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true, List.of(position), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.from(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.adressbezeichnung()).isEqualTo("Marienplatz 8");
             assertThat(adresse.isAufschlag50Prozent()).isTrue();
@@ -86,7 +86,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.from(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.flaechen()).isEmpty();
             assertThat(adresse.letzteWoche()).isZero();

@@ -13,7 +13,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FlaechenadresseService {
 
-    public static Flaechenadresse from(final AbrechnungNutzungsobjekt nutzungsobjekt, final LocalDate berechnungsdatum,
+    public static Flaechenadresse berechne(final AbrechnungNutzungsobjekt nutzungsobjekt, final LocalDate berechnungsdatum,
             final LocalDate beginnWochenlauf) {
 
         final List<AbrechnungPosition> sortedByBeginn = nutzungsobjekt.positionen().stream()
@@ -24,7 +24,7 @@ public final class FlaechenadresseService {
         BigDecimal gesamtflaecheVorher = BigDecimal.ZERO;
 
         for (final AbrechnungPosition position : sortedByBeginn) {
-            final Flaeche flaeche = FlaecheService.from(position, adressflaechen.size() + 1, berechnungsdatum, beginnWochenlauf,
+            final Flaeche flaeche = FlaecheService.berechne(position, adressflaechen.size() + 1, berechnungsdatum, beginnWochenlauf,
                     gesamtflaecheVorher);
             adressflaechen.add(flaeche);
             gesamtflaecheVorher = flaeche.gesamtflaecheAdresse();

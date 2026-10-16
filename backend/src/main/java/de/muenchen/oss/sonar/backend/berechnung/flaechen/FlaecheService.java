@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FlaecheService {
 
-    public static Flaeche from(final AbrechnungPosition position, final int flaechenNummer, final LocalDate berechnungsdatum,
+    public static Flaeche berechne(final AbrechnungPosition position, final int flaechenNummer, final LocalDate berechnungsdatum,
             final LocalDate beginnWochenlauf, final BigDecimal gesamtflaecheVorher) {
 
         final BigDecimal gesamtflaecheAdresse = withoutTrailingZeros(position.flaeche());
