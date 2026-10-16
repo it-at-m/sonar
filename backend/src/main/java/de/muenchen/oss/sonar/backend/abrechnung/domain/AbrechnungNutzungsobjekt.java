@@ -4,8 +4,11 @@ import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 public record AbrechnungNutzungsobjekt(
         UUID id,
@@ -50,5 +53,19 @@ public record AbrechnungNutzungsobjekt(
         nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
         positionen = positionen == null ? List.of() : List.copyOf(positionen);
         masten = masten == null ? List.of() : List.copyOf(masten);
+    }
+
+    public String adressbezeichnung() {
+        if (art == Adressart.FLURSTUECK) {
+            return "Flurstück " + joinNonBlank(", ", flurstueck, gemarkung);
+        }
+        final String hausnummer = StringUtils.hasText(hausnummerBis)
+                ? hausnummerVon + "–" + hausnummerBis
+                : hausnummerVon;
+        return joinNonBlank(" ", adresse, hausnummer);
+    }
+
+    private static String joinNonBlank(final String separator, final String... teile) {
+        return Arrays.stream(teile).filter(StringUtils::hasText).collect(Collectors.joining(separator));
     }
 }
