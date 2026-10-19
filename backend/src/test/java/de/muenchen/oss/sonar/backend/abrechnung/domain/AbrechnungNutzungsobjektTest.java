@@ -121,4 +121,44 @@ class AbrechnungNutzungsobjektTest {
             assertThat(nutzungsobjekt.masten()).containsExactly(mast);
         }
     }
+
+    @Nested
+    class Adressbezeichnung {
+
+        @Test
+        void givenAdresseWithOneHausnummer_thenNameItWithThatHausnummer() {
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, null, null, null, false, List.of(POSITION), List.of());
+
+            assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Marienplatz 8");
+        }
+
+        @Test
+        void givenAdresseWithHausnummernbereich_thenNameItWithBothHausnummern() {
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", "8", "10", null, null, null, null,
+                    null, null, null, null, false, List.of(POSITION), List.of());
+
+            assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Marienplatz 8–10");
+        }
+
+        @Test
+        void givenAdresseWithoutHausnummer_thenNameItWithTheStrasseAlone() {
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", null, null, null, null, null, null,
+                    null, null, null, null, false, List.of(POSITION), List.of());
+
+            assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Marienplatz");
+        }
+
+        @Test
+        void givenFlurstueck_thenNameItWithTheGemarkung() {
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.FLURSTUECK, null, null, null, "123/4", "Sendling", null, null,
+                    null, null, null, null, false, List.of(POSITION), List.of());
+
+            assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Flurstück 123/4, Sendling");
+        }
+    }
 }
