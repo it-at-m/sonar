@@ -44,7 +44,7 @@ class UeberspannungsmonatServiceTest {
 
             final Ueberspannungsmonat monat = UeberspannungsmonatService.berechne(adresse, 3);
 
-            assertThat(monat.mastenCount()).isEqualTo(1);
+            assertThat(monat.anzahlMasten()).isEqualTo(1);
         }
 
         @Test

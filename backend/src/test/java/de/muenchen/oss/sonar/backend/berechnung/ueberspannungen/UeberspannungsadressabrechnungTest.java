@@ -9,14 +9,14 @@ import org.junit.jupiter.api.Test;
 class UeberspannungsadressabrechnungTest {
 
     @Nested
-    class BescheiddatenUeberspannungen {
+    class Abschnitte {
 
         @Test
-        void givenNoBescheiddaten_thenReturnAnEmptyList() {
+        void givenNoAbschnitte_thenReturnAnEmptyList() {
             final Ueberspannungsadressabrechnung abrechnung = new Ueberspannungsadressabrechnung(
                     "Marienplatz 8", "", BigDecimal.ZERO, null);
 
-            assertThat(abrechnung.bescheiddatenUeberspannungen()).isEmpty();
+            assertThat(abrechnung.abschnitte()).isEmpty();
         }
     }
 }

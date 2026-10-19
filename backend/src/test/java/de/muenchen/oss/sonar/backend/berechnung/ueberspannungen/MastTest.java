@@ -45,46 +45,46 @@ class MastTest {
     }
 
     @Nested
-    class IsActive {
+    class IsAktivIn {
 
         @Test
-        void givenMonatBeforeTheMast_thenItIsNotActive() {
+        void givenMonatBeforeTheMast_thenReturnFalse() {
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
 
-            assertThat(mast.isActive(2)).isFalse();
+            assertThat(mast.isAktivIn(2)).isFalse();
         }
 
         @Test
-        void givenErsterMonatOfTheMast_thenItIsActive() {
+        void givenErsterMonatOfTheMast_thenReturnTrue() {
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
 
-            assertThat(mast.isActive(3)).isTrue();
+            assertThat(mast.isAktivIn(3)).isTrue();
         }
 
         @Test
-        void givenLetzterMonatOfTheMast_thenItIsActive() {
+        void givenLetzterMonatOfTheMast_thenReturnTrue() {
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
 
-            assertThat(mast.isActive(6)).isTrue();
+            assertThat(mast.isAktivIn(6)).isTrue();
         }
 
         @Test
-        void givenMonatAfterTheMast_thenItIsNotActive() {
+        void givenMonatAfterTheMast_thenReturnFalse() {
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
 
-            assertThat(mast.isActive(7)).isFalse();
+            assertThat(mast.isAktivIn(7)).isFalse();
         }
     }
 
     @Nested
-    class RunningMonth {
+    class AlterInMonaten {
 
         @Test
         void givenErsterMonatOfTheMast_thenItIsInItsFirstMonat() {
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
 
-            assertThat(mast.runningMonth(3)).isEqualTo(1);
-            assertThat(mast.runningMonth(6)).isEqualTo(4);
+            assertThat(mast.alterInMonaten(3)).isEqualTo(1);
+            assertThat(mast.alterInMonaten(6)).isEqualTo(4);
         }
     }
 }

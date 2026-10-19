@@ -14,7 +14,7 @@ import org.junit.jupiter.api.Test;
 class UeberspannungsadresseServiceTest {
 
     @Nested
-    class From {
+    class Berechne {
 
         @Test
         void givenMasten_thenNumberThemInTheOrderTheyWereEntered() {

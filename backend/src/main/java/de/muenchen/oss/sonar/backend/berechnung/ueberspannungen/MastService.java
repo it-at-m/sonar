@@ -11,19 +11,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MastService {
 
-    public static Mast berechne(final AbrechnungMast mast, final int nummer, final LocalDate beginnAdresse) {
-        return new Mast(nummer, mast.beginn(), mast.ende(), firstMonth(mast.beginn(), beginnAdresse));
+    public static Mast berechne(final AbrechnungMast mast, final int nummer, final LocalDate beginnMonatslauf) {
+        return new Mast(nummer, mast.beginn(), mast.ende(), firstMonth(mast.beginn(), beginnMonatslauf));
     }
 
-    private static int firstMonth(final LocalDate beginn, final LocalDate beginnAdresse) {
-        return (int) ChronoUnit.MONTHS.between(beginnAdresse, beginn) + 1;
+    private static int firstMonth(final LocalDate beginn, final LocalDate beginnMonatslauf) {
+        return (int) ChronoUnit.MONTHS.between(beginnMonatslauf, beginn) + 1;
     }
 
     public static Optional<String> zwischenabrechnungGrund(final Mast mast, final int monat) {
 
-        final Mastzeitindex mastzeitindex = Mastzeitindex.from(mast.runningMonth(monat));
+        final Mastzeitindex mastzeitindex = Mastzeitindex.from(mast.alterInMonaten(monat));
 
-        if (mastzeitindex == Mastzeitindex.from(mast.runningMonth(monat) - 1)) {
+        if (mastzeitindex == Mastzeitindex.from(mast.alterInMonaten(monat) - 1)) {
             return Optional.empty();
         }
         return Optional.of("Mast " + mast.nummer() + " wechselt in " + mastzeitindex.getBezeichnung());

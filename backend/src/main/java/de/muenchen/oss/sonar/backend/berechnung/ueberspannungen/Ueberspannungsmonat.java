@@ -15,7 +15,7 @@ public record Ueberspannungsmonat(
         posten = List.copyOf(posten);
     }
 
-    public int mastenCount() {
+    public int anzahlMasten() {
         return posten.size();
     }
 

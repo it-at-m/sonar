@@ -17,11 +17,11 @@ public record Mast(
         return ersterMonat + dauerMonate() - 1;
     }
 
-    public boolean isActive(final int monat) {
+    public boolean isAktivIn(final int monat) {
         return monat >= ersterMonat && monat <= letzterMonat();
     }
 
-    public int runningMonth(final int monat) {
+    public int alterInMonaten(final int monat) {
         return monat - ersterMonat + 1;
     }
 }

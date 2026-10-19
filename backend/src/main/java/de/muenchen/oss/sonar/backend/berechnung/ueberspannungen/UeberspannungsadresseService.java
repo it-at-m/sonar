@@ -16,11 +16,11 @@ public final class UeberspannungsadresseService {
 
         final List<AbrechnungMast> erfasst = nutzungsobjekt.masten();
 
-        final LocalDate beginnAdresse = erfasst.stream().map(AbrechnungMast::beginn).min(Comparator.naturalOrder()).orElse(null);
+        final LocalDate beginnMonatslauf = erfasst.stream().map(AbrechnungMast::beginn).min(Comparator.naturalOrder()).orElse(null);
 
         final List<Mast> masten = new ArrayList<>();
         for (final AbrechnungMast mast : erfasst) {
-            masten.add(MastService.berechne(mast, masten.size() + 1, beginnAdresse));
+            masten.add(MastService.berechne(mast, masten.size() + 1, beginnMonatslauf));
         }
 
         final int letzterMonat = masten.stream().mapToInt(Mast::letzterMonat).max().orElse(0);
@@ -30,9 +30,9 @@ public final class UeberspannungsadresseService {
 
     public static List<Mast> activeMastenOldestFirst(final Ueberspannungsadresse adresse, final int monat) {
         return adresse.masten().stream()
-                .filter(mast -> mast.isActive(monat))
+                .filter(mast -> mast.isAktivIn(monat))
                 // The oldest Mast is the erste Mast, so the position in this list becomes the Rang.
-                .sorted(Comparator.comparingInt((final Mast mast) -> mast.runningMonth(monat)).reversed())
+                .sorted(Comparator.comparingInt((final Mast mast) -> mast.alterInMonaten(monat)).reversed())
                 .toList();
     }
 }

@@ -11,7 +11,7 @@ import org.junit.jupiter.api.Test;
 class UeberspannungsmonatTest {
 
     @Nested
-    class MastenCount {
+    class AnzahlMasten {
 
         @Test
         void givenPosten_thenCountThem() {
@@ -20,7 +20,7 @@ class UeberspannungsmonatTest {
             final Ueberspannungsmonat monat = new Ueberspannungsmonat(
                     1, List.of(new Mastposten(1, erster, 1), new Mastposten(2, zweiter, 1)), "");
 
-            assertThat(monat.mastenCount()).isEqualTo(2);
+            assertThat(monat.anzahlMasten()).isEqualTo(2);
         }
     }
 

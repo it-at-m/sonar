@@ -20,7 +20,7 @@ class UeberspannungsadressabrechnungServiceTest {
 
             final Ueberspannungsadressabrechnung abrechnung = UeberspannungsadressabrechnungService.berechne(adresse);
 
-            assertThat(abrechnung.gebuehrUeberspannungen()).isEqualTo(new BigDecimal("150.00"));
+            assertThat(abrechnung.gebuehr()).isEqualTo(new BigDecimal("150.00"));
         }
 
         @Test
@@ -30,7 +30,7 @@ class UeberspannungsadressabrechnungServiceTest {
 
             final Ueberspannungsadressabrechnung abrechnung = UeberspannungsadressabrechnungService.berechne(adresse);
 
-            assertThat(abrechnung.bescheiddatenUeberspannungen()).containsExactly(
+            assertThat(abrechnung.abschnitte()).containsExactly(
                     new BescheiddatenUeberspannung(1, 3, 3, "",
                             "    3 Monate x 50,00€ (1 Masten)" + System.lineSeparator(), new BigDecimal("150.00")));
         }
@@ -43,7 +43,7 @@ class UeberspannungsadressabrechnungServiceTest {
 
             final Ueberspannungsadressabrechnung abrechnung = UeberspannungsadressabrechnungService.berechne(adresse);
 
-            assertThat(abrechnung.bescheiddatenUeberspannungen()).containsExactly(
+            assertThat(abrechnung.abschnitte()).containsExactly(
                     new BescheiddatenUeberspannung(1, 2, 2, "",
                             "    2 Monate x 50,00€ (1 Masten)" + System.lineSeparator(), new BigDecimal("100.00")),
                     new BescheiddatenUeberspannung(3, 6, 4,
@@ -59,7 +59,7 @@ class UeberspannungsadressabrechnungServiceTest {
 
             final Ueberspannungsadressabrechnung abrechnung = UeberspannungsadressabrechnungService.berechne(adresse);
 
-            assertThat(abrechnung.gebuehrUeberspannungen()).isEqualTo(new BigDecimal("300.00"));
+            assertThat(abrechnung.gebuehr()).isEqualTo(new BigDecimal("300.00"));
         }
 
         @Test
@@ -71,7 +71,7 @@ class UeberspannungsadressabrechnungServiceTest {
 
             final Ueberspannungsadressabrechnung abrechnung = UeberspannungsadressabrechnungService.berechne(adresse);
 
-            assertThat(abrechnung.bescheiddatenUeberspannungen()).containsExactly(
+            assertThat(abrechnung.abschnitte()).containsExactly(
                     new BescheiddatenUeberspannung(1, 12, 12, "",
                             "    12 Monate x 65,00€ (3 Masten)" + System.lineSeparator(), new BigDecimal("780.00")),
                     new BescheiddatenUeberspannung(13, 14, 2,
@@ -79,7 +79,7 @@ class UeberspannungsadressabrechnungServiceTest {
                                     + "    Mast 2 wechselt in Altersstufe 2" + System.lineSeparator()
                                     + "    Mast 3 wechselt in Altersstufe 2" + System.lineSeparator(),
                             "    2 Monate x 72,50€ (3 Masten)" + System.lineSeparator(), new BigDecimal("145.00")));
-            assertThat(abrechnung.gebuehrUeberspannungen()).isEqualTo(new BigDecimal("925.00"));
+            assertThat(abrechnung.gebuehr()).isEqualTo(new BigDecimal("925.00"));
         }
 
         @Test
@@ -89,7 +89,7 @@ class UeberspannungsadressabrechnungServiceTest {
 
             final Ueberspannungsadressabrechnung abrechnung = UeberspannungsadressabrechnungService.berechne(adresse);
 
-            assertThat(abrechnung.adresse()).isEqualTo("Flurstück 123, Sendling");
+            assertThat(abrechnung.adressbezeichnung()).isEqualTo("Flurstück 123, Sendling");
         }
 
         @Test

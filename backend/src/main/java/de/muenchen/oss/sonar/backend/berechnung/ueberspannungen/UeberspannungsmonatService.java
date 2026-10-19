@@ -14,7 +14,7 @@ public final class UeberspannungsmonatService {
 
         final List<Mastposten> posten = new ArrayList<>(oldestFirst.size());
         for (final Mast mast : oldestFirst) {
-            posten.add(new Mastposten(posten.size() + 1, mast, mast.runningMonth(monat)));
+            posten.add(new Mastposten(posten.size() + 1, mast, mast.alterInMonaten(monat)));
         }
 
         return new Ueberspannungsmonat(monat, posten, zwischenabrechnungGrund(adresse, monat, oldestFirst.size()));
@@ -25,7 +25,7 @@ public final class UeberspannungsmonatService {
         final StringBuilder grund = new StringBuilder();
 
         for (final Mast mast : adresse.masten()) {
-            if (mast.isActive(monat)) {
+            if (mast.isAktivIn(monat)) {
                 MastService.zwischenabrechnungGrund(mast, monat)
                         .ifPresent(mastGrund -> grund.append("    ").append(mastGrund).append(System.lineSeparator()));
             }

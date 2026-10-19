@@ -8,18 +8,18 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UeberspannungsabrechnungService {
 
-    public static Ueberspannungsabrechnung berechne(final List<Ueberspannungsadresse> ueberspannungsadressen) {
+    public static Ueberspannungsabrechnung berechne(final List<Ueberspannungsadresse> adressen) {
 
-        final List<Ueberspannungsadressabrechnung> adressen = ueberspannungsadressen.stream()
+        final List<Ueberspannungsadressabrechnung> adressabrechnungen = adressen.stream()
                 .map(UeberspannungsadressabrechnungService::berechne)
                 .toList();
 
-        return new Ueberspannungsabrechnung(adressen, summe(adressen));
+        return new Ueberspannungsabrechnung(adressabrechnungen, summe(adressabrechnungen));
     }
 
-    private static BigDecimal summe(final List<Ueberspannungsadressabrechnung> adressen) {
-        return adressen.stream()
-                .map(Ueberspannungsadressabrechnung::gebuehrUeberspannungen)
+    private static BigDecimal summe(final List<Ueberspannungsadressabrechnung> adressabrechnungen) {
+        return adressabrechnungen.stream()
+                .map(Ueberspannungsadressabrechnung::gebuehr)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

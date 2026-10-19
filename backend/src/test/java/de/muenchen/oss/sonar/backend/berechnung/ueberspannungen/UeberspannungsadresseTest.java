@@ -10,7 +10,7 @@ import org.junit.jupiter.api.Test;
 class UeberspannungsadresseTest {
 
     @Nested
-    class EarliestStart {
+    class Beginn {
 
         @Test
         void givenMasten_thenTakeTheEarliestOfThem() {
@@ -18,19 +18,19 @@ class UeberspannungsadresseTest {
             final Mast frueher = new Mast(2, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 4, 30), 1);
             final Ueberspannungsadresse adresse = new Ueberspannungsadresse("Marienplatz 8", List.of(spaeter, frueher), 6);
 
-            assertThat(adresse.earliestStart()).contains(LocalDate.of(2026, 1, 1));
+            assertThat(adresse.beginn()).contains(LocalDate.of(2026, 1, 1));
         }
 
         @Test
         void givenNoMasten_thenGiveNothing() {
             final Ueberspannungsadresse adresse = new Ueberspannungsadresse("Marienplatz 8", List.of(), 0);
 
-            assertThat(adresse.earliestStart()).isEmpty();
+            assertThat(adresse.beginn()).isEmpty();
         }
     }
 
     @Nested
-    class LatestEnd {
+    class Ende {
 
         @Test
         void givenMasten_thenTakeTheLatestOfThem() {
@@ -38,14 +38,14 @@ class UeberspannungsadresseTest {
             final Mast lang = new Mast(2, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30), 1);
             final Ueberspannungsadresse adresse = new Ueberspannungsadresse("Marienplatz 8", List.of(kurz, lang), 6);
 
-            assertThat(adresse.latestEnd()).contains(LocalDate.of(2026, 6, 30));
+            assertThat(adresse.ende()).contains(LocalDate.of(2026, 6, 30));
         }
 
         @Test
         void givenNoMasten_thenGiveNothing() {
             final Ueberspannungsadresse adresse = new Ueberspannungsadresse("Marienplatz 8", List.of(), 0);
 
-            assertThat(adresse.latestEnd()).isEmpty();
+            assertThat(adresse.ende()).isEmpty();
         }
     }
 }

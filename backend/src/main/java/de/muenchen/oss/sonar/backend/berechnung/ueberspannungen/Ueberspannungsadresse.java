@@ -18,11 +18,11 @@ public record Ueberspannungsadresse(
         masten = List.copyOf(masten);
     }
 
-    public Optional<LocalDate> earliestStart() {
+    public Optional<LocalDate> beginn() {
         return masten.stream().map(Mast::beginn).min(Comparator.naturalOrder());
     }
 
-    public Optional<LocalDate> latestEnd() {
+    public Optional<LocalDate> ende() {
         return masten.stream().map(Mast::ende).max(Comparator.naturalOrder());
     }
 }

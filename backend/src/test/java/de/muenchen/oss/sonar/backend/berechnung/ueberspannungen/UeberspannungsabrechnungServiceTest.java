@@ -22,7 +22,7 @@ class UeberspannungsabrechnungServiceTest {
                     new Ueberspannungsadresse("Marienplatz 8", List.of(marienplatz), 3),
                     new Ueberspannungsadresse("Sendlinger Straße 1", List.of(sendlinger), 2)));
 
-            assertThat(abrechnung.adressen()).extracting(Ueberspannungsadressabrechnung::adresse)
+            assertThat(abrechnung.adressen()).extracting(Ueberspannungsadressabrechnung::adressbezeichnung)
                     .containsExactly("Marienplatz 8", "Sendlinger Straße 1");
         }
 
@@ -47,7 +47,7 @@ class UeberspannungsabrechnungServiceTest {
                     new Ueberspannungsadresse("Marienplatz 8", List.of(frueh), 14),
                     new Ueberspannungsadresse("Sendlinger Straße 1", List.of(spaet), 2)));
 
-            assertThat(abrechnung.adressen()).extracting(Ueberspannungsadressabrechnung::gebuehrUeberspannungen)
+            assertThat(abrechnung.adressen()).extracting(Ueberspannungsadressabrechnung::gebuehr)
                     .containsExactly(new BigDecimal("700.00"), new BigDecimal("100.00"));
         }
 

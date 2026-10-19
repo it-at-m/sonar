@@ -45,7 +45,7 @@ public final class Ueberspannungstext {
 
         final StringBuilder protokoll = new StringBuilder()
                 .append("Monat ").append(monat.monat()).append(System.lineSeparator())
-                .append("    Anzahl Masten: ").append(monat.mastenCount()).append(System.lineSeparator());
+                .append("    Anzahl Masten: ").append(monat.anzahlMasten()).append(System.lineSeparator());
 
         for (final Mastposten posten : monat.posten()) {
             protokoll.append("    Mast ").append(posten.mast().nummer()).append(": ").append(posten.alterInMonaten())
@@ -62,6 +62,6 @@ public final class Ueberspannungstext {
 
     /* default */ static String bescheidzeile(final Ueberspannungsmonat letzterMonat, final int dauerMonate) {
         return "    " + dauerMonate + " Monate x " + Betragsformat.format(letzterMonat.gebuehr())
-                + "€ (" + letzterMonat.mastenCount() + " Masten)" + System.lineSeparator();
+                + "€ (" + letzterMonat.anzahlMasten() + " Masten)" + System.lineSeparator();
     }
 }

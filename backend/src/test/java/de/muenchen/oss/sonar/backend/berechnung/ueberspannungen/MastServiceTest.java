@@ -12,7 +12,7 @@ class MastServiceTest {
     private static final LocalDate BEGINN_ADRESSE = LocalDate.of(2026, 1, 1);
 
     @Nested
-    class From {
+    class Berechne {
 
         @Test
         void givenMastStartingWithTheAdresse_thenBeginItInTheFirstMonat() {

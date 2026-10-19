@@ -8,12 +8,12 @@ import java.util.List;
  * reported in the Abschnitte a Zwischenabrechnung cuts them into.
  */
 public record Ueberspannungsadressabrechnung(
-        String adresse,
+        String adressbezeichnung,
         String berechnungslog,
-        BigDecimal gebuehrUeberspannungen,
-        List<BescheiddatenUeberspannung> bescheiddatenUeberspannungen) {
+        BigDecimal gebuehr,
+        List<BescheiddatenUeberspannung> abschnitte) {
 
     public Ueberspannungsadressabrechnung {
-        bescheiddatenUeberspannungen = bescheiddatenUeberspannungen == null ? List.of() : List.copyOf(bescheiddatenUeberspannungen);
+        abschnitte = abschnitte == null ? List.of() : List.copyOf(abschnitte);
     }
 }
