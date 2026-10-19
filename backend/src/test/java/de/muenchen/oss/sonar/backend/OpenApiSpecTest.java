@@ -12,6 +12,7 @@ import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchRepository;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.Map;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.condition.DisabledIfSystemProperty;
 import org.junit.jupiter.api.condition.EnabledIfSystemProperty;
@@ -22,6 +23,9 @@ import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
+import org.yaml.snakeyaml.LoaderOptions;
+import org.yaml.snakeyaml.Yaml;
+import org.yaml.snakeyaml.constructor.SafeConstructor;
 
 /**
  * Keeps the committed OpenAPI specification in sync with the code.
@@ -85,13 +89,15 @@ class OpenApiSpecTest {
             disabledReason = "The specification is being regenerated in this run"
     )
     void givenApplicationContext_thenCommittedSpecificationIsUpToDate() throws Exception {
-        final String expected = Files.readString(SPEC_FILE, StandardCharsets.UTF_8);
+        final Yaml yaml = new Yaml(new SafeConstructor(new LoaderOptions()));
+        final Map<String, Object> expected = yaml.load(Files.readString(SPEC_FILE, StandardCharsets.UTF_8));
 
-        final String generated = generateSpecification();
+        final Map<String, Object> generated = yaml.load(generateSpecification());
 
         assertThat(generated)
                 .as("%s does not match the current API. Regenerate it with: mvn clean test -Dtest=%s -D%s=true",
                         SPEC_FILE, OpenApiSpecTest.class.getSimpleName(), GENERATE_PROPERTY)
+                .usingRecursiveComparison()
                 .isEqualTo(expected);
     }
 
