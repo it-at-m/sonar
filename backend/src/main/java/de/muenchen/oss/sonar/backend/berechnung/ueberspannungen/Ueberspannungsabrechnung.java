@@ -17,19 +17,4 @@ public record Ueberspannungsabrechnung(
     public Ueberspannungsabrechnung {
         adressen = List.copyOf(adressen);
     }
-
-    public static Ueberspannungsabrechnung berechne(final List<Ueberspannungsadresse> ueberspannungsadressen) {
-
-        final List<Ueberspannungsadressabrechnung> adressen = ueberspannungsadressen.stream()
-                .map(Ueberspannungsadressabrechnung::berechne)
-                .toList();
-
-        return new Ueberspannungsabrechnung(adressen, summe(adressen));
-    }
-
-    private static BigDecimal summe(final List<Ueberspannungsadressabrechnung> adressen) {
-        return adressen.stream()
-                .map(Ueberspannungsadressabrechnung::gebuehrUeberspannungen)
-                .reduce(BigDecimal.ZERO, BigDecimal::add);
-    }
 }
