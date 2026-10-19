@@ -19,26 +19,26 @@
             :key="position.id"
           >
             <td>
-              <v-text-field
+              <date-field
                 :id="`${idPrefix}-beginn-${index}`"
                 v-model="position.beginn"
                 :aria-label="`Beginn der Position ${index + 1}`"
                 density="compact"
+                persistent-placeholder
+                :readonly="readonly || undefined"
                 :rules="[requiredRule]"
-                type="date"
               />
             </td>
             <td>
-              <v-text-field
+              <date-field
                 :id="`${idPrefix}-ende-${index}`"
                 v-model="position.ende"
                 :aria-label="`Ende der Position ${index + 1}`"
                 density="compact"
-                :rules="[
-                  requiredRule,
-                  (ende: string) => endeNotBeforeBeginn(position.beginn, ende),
-                ]"
-                type="date"
+                persistent-placeholder
+                :readonly="readonly || undefined"
+                :rules="[requiredRule]"
+                :zeitraum-beginn="position.beginn"
               />
             </td>
             <td>
@@ -125,6 +125,7 @@ import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositi
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
 
+import DateField from "@/components/common/DateField.vue";
 import {
   createAbrechnungPosition,
   hasLaengeUndBreite,
@@ -135,11 +136,7 @@ import {
   breiteRule,
   laengeRule,
 } from "@/util/abrechnung/abrechnungPositionRules";
-import {
-  endeNotBeforeBeginn,
-  greaterThanZeroRule,
-  requiredRule,
-} from "@/util/validationRules";
+import { greaterThanZeroRule, requiredRule } from "@/util/validationRules";
 
 const positionen = defineModel<AbrechnungPositionForm[]>({ required: true });
 

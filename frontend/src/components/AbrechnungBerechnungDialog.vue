@@ -18,12 +18,11 @@
         @submit.prevent="createBerechnung"
       >
         <v-card-text>
-          <v-text-field
+          <date-field
             id="berechnung-abrechnungsdatum"
             v-model="abrechnungsdatum"
             label="Abrechnungsdatum"
             :rules="[requiredRule]"
-            type="date"
           />
         </v-card-text>
         <v-card-actions>
@@ -50,6 +49,8 @@
 import { mdiCalculator } from "@mdi/js";
 import { ref, useTemplateRef } from "vue";
 
+import DateField from "@/components/common/DateField.vue";
+import { toIsoDate } from "@/util/common/isoDate";
 import { requiredRule } from "@/util/validationRules";
 
 defineProps<{
@@ -60,17 +61,10 @@ defineProps<{
 
 const form = useTemplateRef("form");
 const berechnungDialog = ref(false);
-const abrechnungsdatum = ref(today());
-
-function today(): string {
-  const now = new Date();
-  const month = String(now.getMonth() + 1).padStart(2, "0");
-  const day = String(now.getDate()).padStart(2, "0");
-  return `${now.getFullYear()}-${month}-${day}`;
-}
+const abrechnungsdatum = ref(toIsoDate(new Date()));
 
 function openDialog(): void {
-  abrechnungsdatum.value = today();
+  abrechnungsdatum.value = toIsoDate(new Date());
   berechnungDialog.value = true;
 }
 

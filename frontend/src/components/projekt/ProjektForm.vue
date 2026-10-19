@@ -20,10 +20,9 @@
         cols="12"
         md="4"
       >
-        <v-text-field
+        <date-field
           v-model="projekt.abrechnungBeginn"
           label="Abrechnung Beginn"
-          type="date"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -31,11 +30,11 @@
         cols="12"
         md="4"
       >
-        <v-text-field
+        <date-field
           v-model="projekt.abrechnungEnde"
           label="Abrechnung Ende"
-          type="date"
-          :rules="[requiredRule, abrechnungEndeRule(projekt.abrechnungBeginn)]"
+          :rules="[requiredRule]"
+          :zeitraum-beginn="projekt.abrechnungBeginn"
         />
       </v-col>
     </v-row>
@@ -85,10 +84,10 @@ import type { ProjektRequestDTO } from "@/api/generated/sonar-backend";
 import { mdiPlus } from "@mdi/js";
 import { useTemplateRef } from "vue";
 
+import DateField from "@/components/common/DateField.vue";
 import ProjektFormAdresseCard from "@/components/projekt/ProjektFormAdresseCard.vue";
 import { useProjektForm } from "@/composables/projektForm";
 import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
-import { abrechnungEndeRule } from "@/util/projekt/projektRules";
 import { requiredRule } from "@/util/validationRules";
 
 defineProps<{ saving: boolean }>();

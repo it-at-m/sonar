@@ -4,27 +4,25 @@
       cols="12"
       md="4"
     >
-      <v-text-field
+      <date-field
         id="berechnung-zeitraum-von"
         v-model="abrechnung.zeitraumVon"
         label="Zeitraum von"
+        :readonly="readonly || undefined"
         :rules="[requiredRule]"
-        type="date"
       />
     </v-col>
     <v-col
       cols="12"
       md="4"
     >
-      <v-text-field
+      <date-field
         id="berechnung-zeitraum-bis"
         v-model="abrechnung.zeitraumBis"
         label="Zeitraum bis"
-        :rules="[
-          requiredRule,
-          (bis: string) => endeNotBeforeBeginn(abrechnung.zeitraumVon, bis),
-        ]"
-        type="date"
+        :readonly="readonly || undefined"
+        :rules="[requiredRule]"
+        :zeitraum-beginn="abrechnung.zeitraumVon"
       />
     </v-col>
     <v-col
@@ -107,6 +105,7 @@ import { mdiAlertCircle, mdiPlus } from "@mdi/js";
 import { computed, ref } from "vue";
 
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
+import DateField from "@/components/common/DateField.vue";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 import { ABRECHNUNGS_ART_OPTIONS } from "@/util/abrechnung/abrechnungsArt";
 import {
@@ -114,7 +113,7 @@ import {
   nutzungsobjektOfError,
 } from "@/util/abrechnung/abrechnungTabs";
 import { adresseLabel } from "@/util/common/adresseLabel";
-import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
+import { requiredRule } from "@/util/validationRules";
 
 const abrechnung = defineModel<AbrechnungForm>({ required: true });
 

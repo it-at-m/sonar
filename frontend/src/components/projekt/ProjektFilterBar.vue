@@ -17,10 +17,9 @@
       cols="12"
       md="4"
     >
-      <v-text-field
+      <date-field
         v-model="filter.abrechnungBeginn"
         label="Abrechnung Beginn"
-        type="date"
         clearable
         hide-details
       />
@@ -29,12 +28,12 @@
       cols="12"
       md="4"
     >
-      <v-text-field
+      <date-field
         v-model="filter.abrechnungEnde"
         label="Abrechnung Ende"
-        type="date"
         clearable
         hide-details
+        :zeitraum-beginn="filter.abrechnungBeginn"
       />
     </v-col>
     <v-col
@@ -58,6 +57,8 @@ import type { ProjektFilter } from "@/types/projekt/ProjektFilter";
 
 import { mdiFilterRemove, mdiMagnify } from "@mdi/js";
 import { computed } from "vue";
+
+import DateField from "@/components/common/DateField.vue";
 
 const filter = defineModel<ProjektFilter>({ required: true });
 

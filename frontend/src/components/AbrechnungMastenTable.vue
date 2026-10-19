@@ -15,26 +15,26 @@
             :key="mast.id"
           >
             <td>
-              <v-text-field
+              <date-field
                 :id="`${idPrefix}-beginn-${index}`"
                 v-model="mast.beginn"
                 :aria-label="`Beginn von Mast ${index + 1}`"
                 density="compact"
+                persistent-placeholder
+                :readonly="readonly || undefined"
                 :rules="[requiredRule]"
-                type="date"
               />
             </td>
             <td>
-              <v-text-field
+              <date-field
                 :id="`${idPrefix}-ende-${index}`"
                 v-model="mast.ende"
                 :aria-label="`Ende von Mast ${index + 1}`"
                 density="compact"
-                :rules="[
-                  requiredRule,
-                  (ende: string) => endeNotBeforeBeginn(mast.beginn, ende),
-                ]"
-                type="date"
+                persistent-placeholder
+                :readonly="readonly || undefined"
+                :rules="[requiredRule]"
+                :zeitraum-beginn="mast.beginn"
               />
             </td>
             <td v-if="!readonly">
@@ -69,8 +69,9 @@ import type { AbrechnungMastForm } from "@/types/abrechnung/AbrechnungMastForm";
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
 
+import DateField from "@/components/common/DateField.vue";
 import { createAbrechnungMast } from "@/util/abrechnung/abrechnungMastForm";
-import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
+import { requiredRule } from "@/util/validationRules";
 
 const masten = defineModel<AbrechnungMastForm[]>({ required: true });
 
