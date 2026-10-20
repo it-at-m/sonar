@@ -2,7 +2,7 @@
   "_comment": "TEMPORARY TRANSITIVE DEPENDENCY OVERRIDES FOR SECURITY FIXES",
   "overrides": {
     "get-uri": {
-      "basic-ftp": "6.2.2"
+      "basic-ftp": "6.2.3"
     },
     "vite": {
       "postcss": {
