@@ -1,11 +1,9 @@
-const LOCALE = "de-DE";
-
 export function toFirstLetterUppercase(text: string): string {
   return text ? text[0]?.toUpperCase() + text.slice(1).toLowerCase() : "";
 }
 
 export function toDateString(date: Date): string {
-  return date ? date.toLocaleDateString(LOCALE) : "";
+  return date ? date.toLocaleDateString() : "";
 }
 
 export function toIsoDateString(date: Date | undefined): string {
@@ -13,9 +11,9 @@ export function toIsoDateString(date: Date | undefined): string {
 }
 
 export function toTimeString(date: Date): string {
-  return date ? date.toLocaleTimeString(LOCALE) : "";
+  return date ? date.toLocaleTimeString() : "";
 }
 
 export function toDateAndTimeString(date: Date): string {
-  return date ? date.toLocaleString(LOCALE) : "";
+  return date ? date.toLocaleString() : "";
 }
