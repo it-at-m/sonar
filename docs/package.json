@@ -42,7 +42,7 @@
     },
     "mermaid": {
       "katex": "0.18.2",
-      "dompurify": "3.4.16"
+      "dompurify": "3.4.17"
     },
     "markdownlint-cli": {
       "js-yaml": "5.4.1",
