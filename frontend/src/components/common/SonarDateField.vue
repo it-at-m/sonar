@@ -20,9 +20,9 @@ import { computed, watch } from "vue";
 
 import { toIsoDate } from "@/util/common/isoDate";
 import {
-  nearestZeitraumEnde,
-  zeitraumEnde,
-  zeitraumPerioden,
+  countWholePeriods,
+  lastDayOfPeriods,
+  snapToLastDayOfPeriod,
 } from "@/util/common/zeitraum";
 import { zeitraumEndeRule } from "@/util/common/zeitraumRules";
 
@@ -32,7 +32,7 @@ const {
   readonly,
   rules = [],
   zeitraumBeginn = "",
-  zeitraumEinheit = "woche",
+  zeitraumEinheit = "tag",
 } = defineProps<{
   readonly?: boolean;
   rules?: ValidationRule[];
@@ -44,6 +44,8 @@ const beginn = computed(() => zeitraumBeginn ?? "");
 
 const isZeitraumEnde = computed(() => beginn.value !== "");
 
+const pickerProps = computed(() => (readonly ? { disabled: true } : undefined));
+
 const dateRules = computed(() => {
   const given = isZeitraumEnde.value
     ? [...rules, zeitraumEndeRule(beginn.value, zeitraumEinheit)]
@@ -54,24 +56,22 @@ const dateRules = computed(() => {
 const zeitraumEnden = computed(() =>
   isZeitraumEnde.value
     ? (value: unknown) =>
-        zeitraumPerioden(beginn.value, toIsoDate(value), zeitraumEinheit) !==
+        countWholePeriods(beginn.value, toIsoDate(value), zeitraumEinheit) !==
         undefined
     : undefined
 );
 
 const fruehestesEnde = computed(() =>
   isZeitraumEnde.value
-    ? zeitraumEnde(beginn.value, 1, zeitraumEinheit)
+    ? lastDayOfPeriods(beginn.value, 1, zeitraumEinheit)
     : undefined
 );
-
-const pickerProps = computed(() => (readonly ? { disabled: true } : undefined));
 
 function pick(value: unknown): void {
   const gewaehlt = toIsoDate(value);
   date.value =
     gewaehlt && isZeitraumEnde.value
-      ? nearestZeitraumEnde(beginn.value, gewaehlt, zeitraumEinheit)
+      ? snapToLastDayOfPeriod(beginn.value, gewaehlt, zeitraumEinheit)
       : gewaehlt;
 }
 
@@ -79,10 +79,10 @@ watch(beginn, (next, previous) => {
   if (!next || !date.value) {
     return;
   }
-  const perioden = zeitraumPerioden(previous, date.value, zeitraumEinheit);
+  const periods = countWholePeriods(previous, date.value, zeitraumEinheit);
   date.value =
-    perioden === undefined
-      ? nearestZeitraumEnde(next, date.value, zeitraumEinheit)
-      : zeitraumEnde(next, perioden, zeitraumEinheit);
+    periods === undefined || zeitraumEinheit === "tag"
+      ? snapToLastDayOfPeriod(next, date.value, zeitraumEinheit)
+      : lastDayOfPeriods(next, periods, zeitraumEinheit);
 });
 </script>

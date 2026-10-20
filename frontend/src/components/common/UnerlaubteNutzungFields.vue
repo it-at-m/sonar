@@ -6,7 +6,7 @@
       cols="12"
       md="3"
     >
-      <date-field
+      <sonar-date-field
         :id="`${idPrefix}-unerlaubt-von`"
         v-model="unerlaubteNutzung.unerlaubteNutzungVon"
         label="Unerlaubte Nutzung von"
@@ -18,13 +18,14 @@
       cols="12"
       md="3"
     >
-      <date-field
+      <sonar-date-field
         :id="`${idPrefix}-unerlaubt-bis`"
         v-model="unerlaubteNutzung.unerlaubteNutzungBis"
         label="Unerlaubte Nutzung bis"
         :readonly="readonly || undefined"
         :rules="[unerlaubteNutzungBisRule(unerlaubteNutzung)]"
         :zeitraum-beginn="unerlaubteNutzung.unerlaubteNutzungVon"
+        zeitraum-einheit="woche"
       />
     </v-col>
     <v-col
@@ -51,7 +52,7 @@ import type { UnerlaubteNutzung } from "@/types/common/UnerlaubteNutzung";
 
 import { computed } from "vue";
 
-import DateField from "@/components/common/DateField.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import {
   hasZeitraum,
   tageUnerlaubteNutzung,

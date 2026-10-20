@@ -15,26 +15,25 @@
             :key="mast.id"
           >
             <td>
-              <date-field
+              <sonar-date-field
                 :id="`${idPrefix}-beginn-${index}`"
                 v-model="mast.beginn"
                 :aria-label="`Beginn von Mast ${index + 1}`"
                 density="compact"
-                persistent-placeholder
                 :readonly="readonly || undefined"
                 :rules="[requiredRule]"
               />
             </td>
             <td>
-              <date-field
+              <sonar-date-field
                 :id="`${idPrefix}-ende-${index}`"
                 v-model="mast.ende"
                 :aria-label="`Ende von Mast ${index + 1}`"
                 density="compact"
-                persistent-placeholder
                 :readonly="readonly || undefined"
                 :rules="[requiredRule]"
                 :zeitraum-beginn="mast.beginn"
+                zeitraum-einheit="monat"
               />
             </td>
             <td v-if="!readonly">
@@ -69,7 +68,7 @@ import type { AbrechnungMastForm } from "@/types/abrechnung/AbrechnungMastForm";
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
 
-import DateField from "@/components/common/DateField.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import { createAbrechnungMast } from "@/util/abrechnung/abrechnungMastForm";
 import { requiredRule } from "@/util/validationRules";
 

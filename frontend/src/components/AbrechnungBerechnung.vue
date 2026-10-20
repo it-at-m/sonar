@@ -4,7 +4,7 @@
       cols="12"
       md="4"
     >
-      <date-field
+      <sonar-date-field
         id="berechnung-zeitraum-von"
         v-model="abrechnung.zeitraumVon"
         label="Zeitraum von"
@@ -16,13 +16,14 @@
       cols="12"
       md="4"
     >
-      <date-field
+      <sonar-date-field
         id="berechnung-zeitraum-bis"
         v-model="abrechnung.zeitraumBis"
         label="Zeitraum bis"
         :readonly="readonly || undefined"
         :rules="[requiredRule]"
         :zeitraum-beginn="abrechnung.zeitraumVon"
+        zeitraum-einheit="woche"
       />
     </v-col>
     <v-col
@@ -105,7 +106,7 @@ import { mdiAlertCircle, mdiPlus } from "@mdi/js";
 import { computed, ref } from "vue";
 
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
-import DateField from "@/components/common/DateField.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 import { ABRECHNUNGS_ART_OPTIONS } from "@/util/abrechnung/abrechnungsArt";
 import {

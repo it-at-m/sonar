@@ -4,6 +4,7 @@ import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
 
 import AbrechnungMastenTable from "@/components/AbrechnungMastenTable.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 
 function mountTable(
   masten: AbrechnungMastForm[],
@@ -35,6 +36,14 @@ function removeButton(wrapper: ReturnType<typeof mountTable>, nummer: number) {
     );
 }
 
+function endeField(wrapper: ReturnType<typeof mountTable>, nummer: number) {
+  return wrapper
+    .findAllComponents(SonarDateField)
+    .find(
+      (field) => field.attributes("aria-label") === `Ende von Mast ${nummer}`
+    );
+}
+
 describe("AbrechnungMastenTable.vue", () => {
   it("givenClickedHinzufuegenOnAnEmptyTable_thenAppendTwoMastenWithAnEmptyZeitraum", async () => {
     const masten: AbrechnungMastForm[] = [];
@@ -60,6 +69,15 @@ describe("AbrechnungMastenTable.vue", () => {
     expect(masten).toHaveLength(2);
     expect(masten[1]?.beginn).toBe("");
     expect(masten[1]?.ende).toBe("");
+  });
+
+  it("givenAMast_thenRunItsZeitraumInWholeMonate", () => {
+    const wrapper = mountTable([
+      { id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
+    ]);
+
+    expect(endeField(wrapper, 1)?.props("zeitraumBeginn")).toBe("2026-01-01");
+    expect(endeField(wrapper, 1)?.props("zeitraumEinheit")).toBe("monat");
   });
 
   it("givenClickedEntfernen_thenDropThatMast", async () => {

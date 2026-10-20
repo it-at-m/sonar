@@ -19,26 +19,25 @@
             :key="position.id"
           >
             <td>
-              <date-field
+              <sonar-date-field
                 :id="`${idPrefix}-beginn-${index}`"
                 v-model="position.beginn"
                 :aria-label="`Beginn der Position ${index + 1}`"
                 density="compact"
-                persistent-placeholder
                 :readonly="readonly || undefined"
                 :rules="[requiredRule]"
               />
             </td>
             <td>
-              <date-field
+              <sonar-date-field
                 :id="`${idPrefix}-ende-${index}`"
                 v-model="position.ende"
                 :aria-label="`Ende der Position ${index + 1}`"
                 density="compact"
-                persistent-placeholder
                 :readonly="readonly || undefined"
                 :rules="[requiredRule]"
                 :zeitraum-beginn="position.beginn"
+                zeitraum-einheit="woche"
               />
             </td>
             <td>
@@ -125,7 +124,7 @@ import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositi
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
 
-import DateField from "@/components/common/DateField.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import {
   createAbrechnungPosition,
   hasLaengeUndBreite,

@@ -1,26 +1,47 @@
-export type ZeitraumEinheit = "woche" | "monat";
+import { toIsoDateString } from "@/util/formatter";
 
-const TAGE_PRO_WOCHE = 7;
+export type ZeitraumEinheit = "tag" | "woche" | "monat";
+
+const DAYS_PER_WOCHE = 7;
 const MONATE_PRO_JAHR = 12;
 const MILLIS_PER_DAY = 24 * 60 * 60 * 1000;
 
-export function zeitraumEnde(
+export function lastDayOfPeriods(
   beginn: string,
-  perioden: number,
+  periods: number,
   einheit: ZeitraumEinheit
 ): string {
   const start = parseIsoDate(beginn);
-  if (start === undefined || perioden < 1) {
+  if (start === undefined || periods < 1) {
     return "";
   }
-  return toIsoDate(
-    einheit === "woche"
-      ? wochenEnde(start, perioden)
-      : monatsEnde(start, perioden)
-  );
+  switch (einheit) {
+    case "tag":
+      return toIsoDateString(
+        new Date(
+          Date.UTC(
+            start.getUTCFullYear(),
+            start.getUTCMonth(),
+            start.getUTCDate() + periods - 1
+          )
+        )
+      );
+    case "woche":
+      return toIsoDateString(
+        new Date(
+          Date.UTC(
+            start.getUTCFullYear(),
+            start.getUTCMonth(),
+            start.getUTCDate() + periods * DAYS_PER_WOCHE - 1
+          )
+        )
+      );
+    case "monat":
+      return toIsoDateString(lastDayOfMonatsPeriods(start, periods));
+  }
 }
 
-export function zeitraumPerioden(
+export function countWholePeriods(
   beginn: string,
   ende: string,
   einheit: ZeitraumEinheit
@@ -30,12 +51,17 @@ export function zeitraumPerioden(
   if (start === undefined || schluss === undefined) {
     return undefined;
   }
-  return einheit === "woche"
-    ? wochenPerioden(start, schluss)
-    : monatsPerioden(start, schluss);
+  switch (einheit) {
+    case "tag":
+      return countWholeTagePeriods(start, schluss);
+    case "woche":
+      return countWholeWochenPeriods(start, schluss);
+    case "monat":
+      return countWholeMonatsPeriods(start, schluss);
+  }
 }
 
-export function nearestZeitraumEnde(
+export function snapToLastDayOfPeriod(
   beginn: string,
   ende: string,
   einheit: ZeitraumEinheit
@@ -45,44 +71,64 @@ export function nearestZeitraumEnde(
   if (start === undefined || gewaehlt === undefined) {
     return ende;
   }
-  return zeitraumEnde(
-    beginn,
-    nearestPerioden(start, gewaehlt, einheit),
-    einheit
-  );
+  switch (einheit) {
+    case "tag": {
+      const tage = daysBetween(start, gewaehlt) + 1;
+      return lastDayOfPeriods(beginn, Math.max(1, tage), einheit);
+    }
+    case "woche": {
+      const tage = daysBetween(start, gewaehlt) + 1;
+      return lastDayOfPeriods(
+        beginn,
+        Math.max(1, Math.ceil(tage / DAYS_PER_WOCHE)),
+        einheit
+      );
+    }
+    case "monat": {
+      const next =
+        monatsCandidates(start, gewaehlt).find(
+          (monate) =>
+            lastDayOfMonatsPeriods(start, monate).getTime() >=
+            gewaehlt.getTime()
+        ) ?? 1;
+      return lastDayOfPeriods(beginn, next, einheit);
+    }
+  }
 }
 
-export function zeitraumEndeMessage(einheit: ZeitraumEinheit): string {
-  return einheit === "woche"
-    ? "Der Zeitraum muss volle Wochen umfassen."
-    : "Der Zeitraum muss volle Monate umfassen.";
-}
-
-function wochenEnde(start: Date, wochen: number): Date {
-  return addDays(start, wochen * TAGE_PRO_WOCHE - 1);
-}
-
-function wochenPerioden(start: Date, schluss: Date): number | undefined {
+function countWholeTagePeriods(start: Date, schluss: Date): number | undefined {
   const tage = daysBetween(start, schluss) + 1;
-  return tage >= TAGE_PRO_WOCHE && tage % TAGE_PRO_WOCHE === 0
-    ? tage / TAGE_PRO_WOCHE
+  return tage >= 1 ? tage : undefined;
+}
+
+function countWholeWochenPeriods(
+  start: Date,
+  schluss: Date
+): number | undefined {
+  const tage = daysBetween(start, schluss) + 1;
+  return tage >= DAYS_PER_WOCHE && tage % DAYS_PER_WOCHE === 0
+    ? tage / DAYS_PER_WOCHE
     : undefined;
 }
 
-function monatsEnde(start: Date, monate: number): Date {
+function countWholeMonatsPeriods(
+  start: Date,
+  schluss: Date
+): number | undefined {
+  return monatsCandidates(start, schluss).find(
+    (monate) =>
+      lastDayOfMonatsPeriods(start, monate).getTime() === schluss.getTime()
+  );
+}
+
+function lastDayOfMonatsPeriods(start: Date, monate: number): Date {
   const jahr = start.getUTCFullYear();
   const monat = start.getUTCMonth();
   const tag = start.getUTCDate();
-  const letzterTag = daysInMonth(jahr, monat + monate);
-  return tag > letzterTag
-    ? new Date(Date.UTC(jahr, monat + monate, letzterTag))
-    : addDays(new Date(Date.UTC(jahr, monat + monate, tag)), -1);
-}
-
-function monatsPerioden(start: Date, schluss: Date): number | undefined {
-  return monatsCandidates(start, schluss).find(
-    (monate) => monatsEnde(start, monate).getTime() === schluss.getTime()
-  );
+  const lastDay = lastDayOfMonth(jahr, monat + monate);
+  return tag > lastDay
+    ? new Date(Date.UTC(jahr, monat + monate, lastDay))
+    : new Date(Date.UTC(jahr, monat + monate, tag - 1));
 }
 
 function monatsCandidates(start: Date, schluss: Date): number[] {
@@ -94,36 +140,12 @@ function monatsCandidates(start: Date, schluss: Date): number[] {
   return [guess - 1, guess, guess + 1];
 }
 
-function nearestPerioden(
-  start: Date,
-  gewaehlt: Date,
-  einheit: ZeitraumEinheit
-): number {
-  if (einheit === "woche") {
-    const tage = daysBetween(start, gewaehlt) + 1;
-    return Math.max(1, Math.round(tage / TAGE_PRO_WOCHE));
-  }
-  return monatsCandidates(start, gewaehlt).reduce((nearest, monate) =>
-    abstand(start, gewaehlt, monate) < abstand(start, gewaehlt, nearest)
-      ? monate
-      : nearest
-  );
-}
-
-function abstand(start: Date, gewaehlt: Date, monate: number): number {
-  return Math.abs(monatsEnde(start, monate).getTime() - gewaehlt.getTime());
-}
-
-function daysInMonth(jahr: number, monat: number): number {
+function lastDayOfMonth(jahr: number, monat: number): number {
   return new Date(Date.UTC(jahr, monat + 1, 0)).getUTCDate();
 }
 
 function daysBetween(from: Date, to: Date): number {
   return Math.round((to.getTime() - from.getTime()) / MILLIS_PER_DAY);
-}
-
-function addDays(date: Date, tage: number): Date {
-  return new Date(date.getTime() + tage * MILLIS_PER_DAY);
 }
 
 function parseIsoDate(value: string): Date | undefined {
@@ -132,8 +154,4 @@ function parseIsoDate(value: string): Date | undefined {
   }
   const date = new Date(`${value}T00:00:00.000Z`);
   return Number.isNaN(date.getTime()) ? undefined : date;
-}
-
-function toIsoDate(date: Date): string {
-  return date.toISOString().slice(0, 10);
 }

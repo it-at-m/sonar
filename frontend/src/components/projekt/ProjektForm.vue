@@ -20,7 +20,7 @@
         cols="12"
         md="4"
       >
-        <date-field
+        <sonar-date-field
           v-model="projekt.abrechnungBeginn"
           label="Abrechnung Beginn"
           :rules="[requiredRule]"
@@ -30,7 +30,7 @@
         cols="12"
         md="4"
       >
-        <date-field
+        <sonar-date-field
           v-model="projekt.abrechnungEnde"
           label="Abrechnung Ende"
           :rules="[requiredRule]"
@@ -84,7 +84,7 @@ import type { ProjektRequestDTO } from "@/api/generated/sonar-backend";
 import { mdiPlus } from "@mdi/js";
 import { useTemplateRef } from "vue";
 
-import DateField from "@/components/common/DateField.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import ProjektFormAdresseCard from "@/components/projekt/ProjektFormAdresseCard.vue";
 import { useProjektForm } from "@/composables/projektForm";
 import { toProjektRequestDTO } from "@/util/projekt/projektMapper";

@@ -18,7 +18,7 @@
         @submit.prevent="createBerechnung"
       >
         <v-card-text>
-          <date-field
+          <sonar-date-field
             id="berechnung-abrechnungsdatum"
             v-model="abrechnungsdatum"
             label="Abrechnungsdatum"
@@ -49,7 +49,7 @@
 import { mdiCalculator } from "@mdi/js";
 import { ref, useTemplateRef } from "vue";
 
-import DateField from "@/components/common/DateField.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import { toIsoDate } from "@/util/common/isoDate";
 import { requiredRule } from "@/util/validationRules";
 
