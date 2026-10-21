@@ -32,7 +32,7 @@ const {
   readonly,
   rules = [],
   zeitraumBeginn = "",
-  zeitraumEinheit = "tag",
+  zeitraumEinheit = "day",
 } = defineProps<{
   readonly?: boolean;
   rules?: ValidationRule[];
@@ -81,7 +81,7 @@ watch(beginn, (next, previous) => {
   }
   const periods = countWholePeriods(previous, date.value, zeitraumEinheit);
   date.value =
-    periods === undefined || zeitraumEinheit === "tag"
+    periods === undefined || zeitraumEinheit === "day"
       ? snapToLastDayOfPeriod(next, date.value, zeitraumEinheit)
       : lastDayOfPeriods(next, periods, zeitraumEinheit);
 });

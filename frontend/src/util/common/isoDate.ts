@@ -5,7 +5,7 @@ export function toIsoDate(value: unknown): string {
   if (!(value instanceof Date) || Number.isNaN(value.getTime())) {
     return "";
   }
-  const monat = String(value.getMonth() + 1).padStart(2, "0");
-  const tag = String(value.getDate()).padStart(2, "0");
-  return `${value.getFullYear()}-${monat}-${tag}`;
+  const month = String(value.getMonth() + 1).padStart(2, "0");
+  const day = String(value.getDate()).padStart(2, "0");
+  return `${value.getFullYear()}-${month}-${day}`;
 }

@@ -71,13 +71,13 @@ describe("AbrechnungMastenTable.vue", () => {
     expect(masten[1]?.ende).toBe("");
   });
 
-  it("givenAMast_thenRunItsZeitraumInWholeMonate", () => {
+  it("givenAMast_thenRunItsZeitraumInWholeMonths", () => {
     const wrapper = mountTable([
       { id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
     ]);
 
     expect(endeField(wrapper, 1)?.props("zeitraumBeginn")).toBe("2026-01-01");
-    expect(endeField(wrapper, 1)?.props("zeitraumEinheit")).toBe("monat");
+    expect(endeField(wrapper, 1)?.props("zeitraumEinheit")).toBe("month");
   });
 
   it("givenClickedEntfernen_thenDropThatMast", async () => {

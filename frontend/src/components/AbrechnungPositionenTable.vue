@@ -37,7 +37,7 @@
                 :readonly="readonly || undefined"
                 :rules="[requiredRule]"
                 :zeitraum-beginn="position.beginn"
-                zeitraum-einheit="woche"
+                zeitraum-einheit="week"
               />
             </td>
             <td>

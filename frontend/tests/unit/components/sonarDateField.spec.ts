@@ -44,11 +44,11 @@ describe("SonarDateField.vue", () => {
     expect(pickedDate(wrapper)).toBe("2026-01-15");
   });
 
-  it("givenADateWithinAWoche_thenSnapToTheEndeOfThatWoche", async () => {
+  it("givenADateWithinAWeek_thenSnapToTheEndeOfThatWeek", async () => {
     const wrapper = mountField({
       modelValue: "",
       zeitraumBeginn: "2026-01-05",
-      zeitraumEinheit: "woche",
+      zeitraumEinheit: "week",
     });
 
     await pick(wrapper, new Date(2026, 0, 15));
@@ -78,11 +78,11 @@ describe("SonarDateField.vue", () => {
     expect(pickedDate(wrapper)).toBe("2026-01-05");
   });
 
-  it("givenTheEinheitMonat_thenSnapToTheEndeOfThatMonat", async () => {
+  it("givenTheEinheitMonth_thenSnapToTheEndeOfThatMonth", async () => {
     const wrapper = mountField({
       modelValue: "",
       zeitraumBeginn: "2026-01-15",
-      zeitraumEinheit: "monat",
+      zeitraumEinheit: "month",
     });
 
     await pick(wrapper, new Date(2026, 1, 20));
@@ -102,7 +102,7 @@ describe("SonarDateField.vue", () => {
     const wrapper = mountField({
       modelValue: "2026-01-18",
       zeitraumBeginn: "2026-01-05",
-      zeitraumEinheit: "woche",
+      zeitraumEinheit: "week",
     });
 
     await wrapper.setProps({ zeitraumBeginn: "2026-01-06" });
@@ -136,7 +136,7 @@ describe("SonarDateField.vue", () => {
     const wrapper = mountField({
       modelValue: "2026-01-15",
       zeitraumBeginn: "",
-      zeitraumEinheit: "woche",
+      zeitraumEinheit: "week",
     });
 
     await wrapper.setProps({ zeitraumBeginn: "2026-01-05" });
@@ -144,11 +144,11 @@ describe("SonarDateField.vue", () => {
     expect(pickedDate(wrapper)).toBe("2026-01-18");
   });
 
-  it("givenZeitraumBeginn_thenOfferOnlyTheEndenOfWholeWochenToTheCalendar", () => {
+  it("givenZeitraumBeginn_thenOfferOnlyTheEndenOfWholeWeeksToTheCalendar", () => {
     const wrapper = mountField({
       modelValue: "",
       zeitraumBeginn: "2026-01-05",
-      zeitraumEinheit: "woche",
+      zeitraumEinheit: "week",
     });
 
     expect(allowedDates(wrapper)(new Date(2026, 0, 18))).toBe(true);
@@ -165,11 +165,11 @@ describe("SonarDateField.vue", () => {
     expect(allowedDates(wrapper)(new Date(2026, 0, 4))).toBe(false);
   });
 
-  it("givenTheEinheitMonat_thenOfferOnlyTheEndenOfWholeMonateToTheCalendar", () => {
+  it("givenTheEinheitMonth_thenOfferOnlyTheEndenOfWholeMonthsToTheCalendar", () => {
     const wrapper = mountField({
       modelValue: "",
       zeitraumBeginn: "2026-01-15",
-      zeitraumEinheit: "monat",
+      zeitraumEinheit: "month",
     });
 
     expect(allowedDates(wrapper)(new Date(2026, 1, 14))).toBe(true);
@@ -181,21 +181,21 @@ describe("SonarDateField.vue", () => {
   });
 
   it("givenZeitraumBeginn_thenOfferTheEarliestEndeToThePicker", () => {
-    const tage = mountField({ modelValue: "", zeitraumBeginn: "2026-01-05" });
-    const wochen = mountField({
+    const days = mountField({ modelValue: "", zeitraumBeginn: "2026-01-05" });
+    const weeks = mountField({
       modelValue: "",
       zeitraumBeginn: "2026-01-05",
-      zeitraumEinheit: "woche",
+      zeitraumEinheit: "week",
     });
-    const monate = mountField({
+    const months = mountField({
       modelValue: "",
       zeitraumBeginn: "2026-01-15",
-      zeitraumEinheit: "monat",
+      zeitraumEinheit: "month",
     });
 
-    expect(dateInput(tage).props("min")).toBe("2026-01-05");
-    expect(dateInput(wochen).props("min")).toBe("2026-01-11");
-    expect(dateInput(monate).props("min")).toBe("2026-02-14");
+    expect(dateInput(days).props("min")).toBe("2026-01-05");
+    expect(dateInput(weeks).props("min")).toBe("2026-01-11");
+    expect(dateInput(months).props("min")).toBe("2026-02-14");
   });
 
   it("givenNoZeitraumBeginn_thenLeaveTheEarliestEndeOpen", () => {
@@ -209,7 +209,7 @@ describe("SonarDateField.vue", () => {
       modelValue: "",
       rules: [() => "Pflichtfeld"],
       zeitraumBeginn: "2026-01-05",
-      zeitraumEinheit: "woche",
+      zeitraumEinheit: "week",
     });
 
     expect(dateInput(wrapper).props("rules")).toHaveLength(2);
@@ -223,7 +223,7 @@ describe("SonarDateField.vue", () => {
     const wrapper = mountField({
       modelValue: "",
       zeitraumBeginn: "2026-01-05",
-      zeitraumEinheit: "woche",
+      zeitraumEinheit: "week",
     });
 
     expect(appendedRule(wrapper)(new Date(2026, 0, 18))).toBe(true);

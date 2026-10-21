@@ -23,7 +23,7 @@
         :readonly="readonly || undefined"
         :rules="[requiredRule]"
         :zeitraum-beginn="abrechnung.zeitraumVon"
-        zeitraum-einheit="woche"
+        zeitraum-einheit="week"
       />
     </v-col>
     <v-col

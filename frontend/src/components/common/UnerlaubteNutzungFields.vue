@@ -25,7 +25,7 @@
         :readonly="readonly || undefined"
         :rules="[unerlaubteNutzungBisRule(unerlaubteNutzung)]"
         :zeitraum-beginn="unerlaubteNutzung.unerlaubteNutzungVon"
-        zeitraum-einheit="woche"
+        zeitraum-einheit="week"
       />
     </v-col>
     <v-col

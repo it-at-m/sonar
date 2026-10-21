@@ -33,7 +33,7 @@
                 :readonly="readonly || undefined"
                 :rules="[requiredRule]"
                 :zeitraum-beginn="mast.beginn"
-                zeitraum-einheit="monat"
+                zeitraum-einheit="month"
               />
             </td>
             <td v-if="!readonly">
