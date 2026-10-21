@@ -1,7 +1,7 @@
 package de.muenchen.oss.sonar.backend.geschaeftspartner.dto;
 
 /**
- * The master data of a Geschäftspartner, read from a third party system owning it.
+ * The master data of a Geschaeftspartner, read from a third party system owning it.
  *
  * @param anrede Title text
  * @param name1 Name 1 of organization
