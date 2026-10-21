@@ -2,6 +2,7 @@ import { createTestingPinia } from "@pinia/testing";
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import vuetify from "@/plugins/vuetify";
 import { useSnackbarStore } from "@/stores/snackbar";
 import WiderspruchAnlegenView from "@/views/WiderspruchAnlegenView.vue";
@@ -56,9 +57,15 @@ function mountView() {
 
 async function fillDatumEingang(
   wrapper: ReturnType<typeof mountView>,
-  value: string
+  value: Date
 ): Promise<void> {
-  await wrapper.find("#widerspruch-datum-eingang").setValue(value);
+  const field = wrapper
+    .findAllComponents(SonarDateField)
+    .find((candidate) => candidate.find("#widerspruch-datum-eingang").exists());
+  await field
+    ?.findComponent({ name: "VDateInput" })
+    .vm.$emit("update:modelValue", value);
+  await flushPromises();
 }
 
 async function submit(wrapper: ReturnType<typeof mountView>): Promise<void> {
@@ -81,6 +88,7 @@ describe("WiderspruchAnlegenView.vue", () => {
 
   afterEach(() => {
     vi.unstubAllGlobals();
+    document.body.innerHTML = "";
   });
 
   it("givenMount_thenShowEveryFieldOfTheWiderspruch", () => {
@@ -108,7 +116,7 @@ describe("WiderspruchAnlegenView.vue", () => {
     const fetchSpy = stubFetch();
     const wrapper = mountView();
 
-    await fillDatumEingang(wrapper, "2026-04-01");
+    await fillDatumEingang(wrapper, new Date(2026, 3, 1));
     await submit(wrapper);
 
     expect(requestedUrl(fetchSpy)).toContain(
@@ -125,7 +133,7 @@ describe("WiderspruchAnlegenView.vue", () => {
     stubFetch();
     const wrapper = mountView();
 
-    await fillDatumEingang(wrapper, "2026-04-01");
+    await fillDatumEingang(wrapper, new Date(2026, 3, 1));
     await submit(wrapper);
 
     expect(push).toHaveBeenCalledWith(`/projekte/${PROJEKT_ID}/abrechnungen`);
@@ -144,7 +152,7 @@ describe("WiderspruchAnlegenView.vue", () => {
     stubFetch(409);
     const wrapper = mountView();
 
-    await fillDatumEingang(wrapper, "2026-04-01");
+    await fillDatumEingang(wrapper, new Date(2026, 3, 1));
     await submit(wrapper);
 
     expect(useSnackbarStore().queue[0]?.text).toBe(
@@ -157,7 +165,7 @@ describe("WiderspruchAnlegenView.vue", () => {
     stubFetch(404);
     const wrapper = mountView();
 
-    await fillDatumEingang(wrapper, "2026-04-01");
+    await fillDatumEingang(wrapper, new Date(2026, 3, 1));
     await submit(wrapper);
 
     expect(useSnackbarStore().queue[0]?.text).toBe(

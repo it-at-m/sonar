@@ -17,10 +17,9 @@
       cols="12"
       md="4"
     >
-      <v-text-field
+      <sonar-date-field
         v-model="filter.abrechnungBeginn"
         label="Abrechnung Beginn"
-        type="date"
         clearable
         hide-details
       />
@@ -29,10 +28,9 @@
       cols="12"
       md="4"
     >
-      <v-text-field
+      <sonar-date-field
         v-model="filter.abrechnungEnde"
         label="Abrechnung Ende"
-        type="date"
         clearable
         hide-details
       />
@@ -58,6 +56,8 @@ import type { ProjektFilter } from "@/types/projekt/ProjektFilter";
 
 import { mdiFilterRemove, mdiMagnify } from "@mdi/js";
 import { computed } from "vue";
+
+import SonarDateField from "@/components/common/SonarDateField.vue";
 
 const filter = defineModel<ProjektFilter>({ required: true });
 

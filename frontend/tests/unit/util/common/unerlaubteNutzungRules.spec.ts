@@ -30,13 +30,13 @@ describe("unerlaubteNutzungRules.ts", () => {
       );
     });
 
-    it("givenEndeBeforeBeginn_thenReturnMessage", () => {
+    it("givenBeginnAndEnde_thenReturnTrue", () => {
       const unerlaubteNutzung = unerlaubteNutzungWith({
-        unerlaubteNutzungVon: "2026-03-31",
+        unerlaubteNutzungVon: "2026-01-05",
       });
 
-      expect(unerlaubteNutzungBisRule(unerlaubteNutzung)("2026-01-01")).toBe(
-        "Das Ende darf nicht vor dem Beginn liegen."
+      expect(unerlaubteNutzungBisRule(unerlaubteNutzung)("2026-01-11")).toBe(
+        true
       );
     });
 

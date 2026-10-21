@@ -22,45 +22,41 @@
           cols="12"
           md="3"
         >
-          <v-text-field
+          <sonar-date-field
             id="widerspruch-datum-eingang"
             v-model="widerspruch.datumEingang"
             label="Datum Eingang"
             :rules="[requiredRule]"
-            type="date"
           />
         </v-col>
         <v-col
           cols="12"
           md="3"
         >
-          <v-text-field
+          <sonar-date-field
             id="widerspruch-datum-ruecknahme"
             v-model="widerspruch.datumRuecknahme"
             label="Datum Rücknahme"
-            type="date"
           />
         </v-col>
         <v-col
           cols="12"
           md="3"
         >
-          <v-text-field
+          <sonar-date-field
             id="widerspruch-datum-vorlage-regierung"
             v-model="widerspruch.datumVorlageRegierung"
             label="Datum Vorlage Regierung"
-            type="date"
           />
         </v-col>
         <v-col
           cols="12"
           md="3"
         >
-          <v-text-field
+          <sonar-date-field
             id="widerspruch-datum-ablehnung-regierung"
             v-model="widerspruch.datumAblehnungRegierung"
             label="Datum Ablehnung Regierung"
-            type="date"
           />
         </v-col>
       </v-row>
@@ -170,6 +166,7 @@ import {
   ResponseError,
   WiderspruchControllerApi,
 } from "@/api/generated/sonar-backend";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import { useSaveLeave } from "@/composables/saveLeave";
 import { useWiderspruchForm } from "@/composables/widerspruchForm";

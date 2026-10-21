@@ -39,9 +39,13 @@ function abrechnungsdatumInput(): HTMLInputElement {
   ) as HTMLInputElement;
 }
 
-async function fillAbrechnungsdatum(datum: string): Promise<void> {
-  abrechnungsdatumInput().value = datum;
-  abrechnungsdatumInput().dispatchEvent(new Event("input"));
+async function fillAbrechnungsdatum(
+  wrapper: ReturnType<typeof mountDialog>,
+  datum: Date | null
+): Promise<void> {
+  await wrapper
+    .findComponent({ name: "VDateInput" })
+    .vm.$emit("update:modelValue", datum);
   await flushPromises();
 }
 
@@ -59,7 +63,6 @@ async function cancel(): Promise<void> {
 
 describe("AbrechnungBerechnungDialog.vue", () => {
   beforeEach(() => {
-    // jsdom has none, and the overlay observes its content to position itself.
     vi.stubGlobal(
       "ResizeObserver",
       class {
@@ -68,7 +71,6 @@ describe("AbrechnungBerechnungDialog.vue", () => {
         disconnect = vi.fn();
       }
     );
-    // The overlay of the dialog positions itself against the visual viewport, which jsdom has none of.
     vi.stubGlobal("visualViewport", {
       width: 1024,
       height: 768,
@@ -79,7 +81,6 @@ describe("AbrechnungBerechnungDialog.vue", () => {
       removeEventListener: vi.fn(),
     });
     vi.useFakeTimers({ toFake: ["Date"] });
-    // Before 02:00 in Munich, where the UTC date is still the day before.
     vi.setSystemTime(new Date(2026, 8, 30, 1, 30));
   });
 
@@ -116,14 +117,25 @@ describe("AbrechnungBerechnungDialog.vue", () => {
 
     await openDialog(wrapper);
 
-    expect(abrechnungsdatumInput().value).toBe("2026-09-30");
+    expect(abrechnungsdatumInput().value).toBe("30.09.2026");
+  });
+
+  it("givenAPickedAbrechnungsdatum_thenKeepItAnIsoDate", async () => {
+    const wrapper = mountDialog();
+
+    await openDialog(wrapper);
+    await fillAbrechnungsdatum(wrapper, new Date(2026, 2, 31));
+
+    expect(
+      wrapper.findComponent({ name: "VDateInput" }).props("modelValue")
+    ).toBe("2026-03-31");
   });
 
   it("givenEnteredAbrechnungsdatum_thenCloseTheDialog", async () => {
     const wrapper = mountDialog();
 
     await openDialog(wrapper);
-    await fillAbrechnungsdatum("2026-03-31");
+    await fillAbrechnungsdatum(wrapper, new Date(2026, 2, 31));
     await submit();
 
     expect(isOpen(wrapper)).toBe(false);
@@ -133,7 +145,7 @@ describe("AbrechnungBerechnungDialog.vue", () => {
     const wrapper = mountDialog();
 
     await openDialog(wrapper);
-    await fillAbrechnungsdatum("");
+    await fillAbrechnungsdatum(wrapper, null);
     await submit();
 
     expect(isOpen(wrapper)).toBe(true);
@@ -153,10 +165,10 @@ describe("AbrechnungBerechnungDialog.vue", () => {
     const wrapper = mountDialog();
 
     await openDialog(wrapper);
-    await fillAbrechnungsdatum("2026-03-31");
+    await fillAbrechnungsdatum(wrapper, new Date(2026, 2, 31));
     await cancel();
     await openDialog(wrapper);
 
-    expect(abrechnungsdatumInput().value).toBe("2026-09-30");
+    expect(abrechnungsdatumInput().value).toBe("30.09.2026");
   });
 });
