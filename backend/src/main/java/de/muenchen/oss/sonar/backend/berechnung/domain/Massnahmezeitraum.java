@@ -17,13 +17,13 @@ public record Massnahmezeitraum(LocalDate beginn, LocalDate ende, int anzahlWoch
 
         final LocalDate beginn = Stream.concat(
                 flaechenadressen.stream().flatMap(adresse -> adresse.beginn().stream()),
-                ueberspannungsadressen.stream().flatMap(adresse -> adresse.earliestStart().stream()))
+                ueberspannungsadressen.stream().flatMap(adresse -> adresse.beginn().stream()))
                 .min(Comparator.naturalOrder())
                 .orElse(KEIN_BEGINN);
 
         final LocalDate ende = Stream.concat(
                 flaechenadressen.stream().flatMap(adresse -> adresse.ende().stream()),
-                ueberspannungsadressen.stream().flatMap(adresse -> adresse.latestEnd().stream()))
+                ueberspannungsadressen.stream().flatMap(adresse -> adresse.ende().stream()))
                 .max(Comparator.naturalOrder())
                 .orElse(KEIN_ENDE);
 

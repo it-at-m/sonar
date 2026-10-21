@@ -131,7 +131,7 @@ class BerechnungslaufTest {
                     .run();
 
             assertThat(ergebnis.abrechnungenUeberspannungen())
-                    .extracting(Ueberspannungsadressabrechnung::adresse)
+                    .extracting(Ueberspannungsadressabrechnung::adressbezeichnung)
                     .containsExactly("Marienplatz 8");
         }
 

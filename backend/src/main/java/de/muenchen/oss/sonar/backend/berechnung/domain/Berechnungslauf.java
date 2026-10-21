@@ -4,9 +4,13 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaechenabrechnung;
+import de.muenchen.oss.sonar.backend.berechnung.flaechen.FlaechenabrechnungService;
 import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaechenadresse;
+import de.muenchen.oss.sonar.backend.berechnung.flaechen.FlaechenadresseService;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Ueberspannungsabrechnung;
+import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.UeberspannungsabrechnungService;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Ueberspannungsadresse;
+import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.UeberspannungsadresseService;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import java.time.LocalDate;
 import java.util.Comparator;
@@ -31,11 +35,11 @@ public record Berechnungslauf(
         final LocalDate beginnWochenlauf = startOfWochenlauf(abrechnung.nutzungsobjekte());
 
         final List<Flaechenadresse> flaechenadressen = abrechnung.nutzungsobjekte().stream()
-                .map(nutzungsobjekt -> Flaechenadresse.from(nutzungsobjekt, berechnungsdatum, beginnWochenlauf))
+                .map(nutzungsobjekt -> FlaechenadresseService.berechne(nutzungsobjekt, berechnungsdatum, beginnWochenlauf))
                 .toList();
 
         final List<Ueberspannungsadresse> ueberspannungsadressen = abrechnung.nutzungsobjekte().stream()
-                .map(Ueberspannungsadresse::from)
+                .map(UeberspannungsadresseService::berechne)
                 .filter(adresse -> !adresse.masten().isEmpty())
                 .toList();
 
@@ -45,8 +49,8 @@ public record Berechnungslauf(
 
     public Berechnungsergebnis run() {
 
-        final Flaechenabrechnung flaechen = Flaechenabrechnung.berechne(flaechenadressen, zeitraum.anzahlWochen());
-        final Ueberspannungsabrechnung ueberspannungen = Ueberspannungsabrechnung.berechne(ueberspannungsadressen);
+        final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(flaechenadressen, zeitraum.anzahlWochen());
+        final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(ueberspannungsadressen);
 
         final Gebuehren gebuehren = Gebuehren.berechne(flaechen.gebuehr(), ueberspannungen.gebuehr(),
                 projekt.verwaltungsgebuehr(), vorabrechnung);

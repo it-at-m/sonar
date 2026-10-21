@@ -86,7 +86,7 @@ public class ProjektController {
      * Create a new Projekt.
      * Creates a new Projekt together with its Adressen in one call.
      * Abrechnungsende must not be before Abrechnungsbeginn.
-     * An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
+     * An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
      * Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
      * Either that period or tageUnerlaubteNutzung is given, never both.
      *

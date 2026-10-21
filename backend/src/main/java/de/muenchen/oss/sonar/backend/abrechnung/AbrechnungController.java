@@ -98,7 +98,7 @@ public class AbrechnungController {
     /**
      * Retrieve the Nutzungsobjekte of a Projekt.
      * Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
-     * The order is by Adresse and Flurstück.
+     * The order is by Adresse and Flurstueck.
      *
      * @param projektId the UUID of the Projekt the Nutzungsobjekte belong to
      * @return the Nutzungsobjekte of the Projekt represented as DTOs
@@ -152,7 +152,7 @@ public class AbrechnungController {
     /**
      * Create a new Abrechnung for a Projekt.
      * Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
-     * An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
+     * An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungRequestDTO the details of the Abrechnung to create
@@ -171,7 +171,7 @@ public class AbrechnungController {
     /**
      * Create the next version of an Abrechnung.
      * The given Abrechnung stays as it is and the details of the request become a version of its own.
-     * They may differ from the ones of the Vorgänger in every field.
+     * They may differ from the ones of the Vorgaenger in every field.
      * Only the latest version can be carried forward, so an Abrechnung that already has a newer
      * version is refused.
      *

@@ -2,7 +2,7 @@ openapi: 3.0.1
 info:
   title: sonar-backend
   description: New Backend for the old Application SonAbr
-  version: 0.1.1-SNAPSHOT
+  version: 0.3.0-SNAPSHOT
 servers:
 - url: http://localhost:8086
   description: Generated server url
@@ -244,7 +244,7 @@ paths:
         Create a new Projekt.
          Creates a new Projekt together with its Adressen in one call.
          Abrechnungsende must not be before Abrechnungsbeginn.
-         An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
+         An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
          Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
          Either that period or tageUnerlaubteNutzung is given, never both.
       operationId: saveProjekt
@@ -360,7 +360,7 @@ paths:
       description: |-
         Create a new Abrechnung for a Projekt.
          Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
-         An Adresse with a Hausnummer or a Flurstück with a Gemarkung is allowed, never both.
+         An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
       operationId: saveAbrechnung
       parameters:
       - name: projektId
@@ -438,7 +438,7 @@ paths:
       description: |-
         Create the next version of an Abrechnung.
          The given Abrechnung stays as it is and the details of the request become a version of its own.
-         They may differ from the ones of the Vorgänger in every field.
+         They may differ from the ones of the Vorgaenger in every field.
          Only the latest version can be carried forward, so an Abrechnung that already has a newer
          version is refused.
       operationId: saveAbrechnungVersion
@@ -589,7 +589,7 @@ paths:
       description: |-
         Retrieve the Nutzungsobjekte of a Projekt.
          Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
-         The order is by Adresse and Flurstück.
+         The order is by Adresse and Flurstueck.
       operationId: getNutzungsobjekte
       parameters:
       - name: projektId
@@ -616,15 +616,15 @@ paths:
     get:
       tags:
       - geschaeftspartner-controller
-      summary: Retrieve the master data of a Geschäftspartner.
+      summary: Retrieve the master data of a Geschaeftspartner.
       description: |-
-        Retrieve the master data of a Geschäftspartner.
+        Retrieve the master data of a Geschaeftspartner.
          Retrieved data come from a third party system owning them.
       operationId: getGeschaeftspartner
       parameters:
       - name: geschaeftspartnerId
         in: path
-        description: the id of the requested Geschäftspartner
+        description: the id of the requested Geschaeftspartner
         required: true
         schema:
           maxLength: 10
@@ -638,7 +638,7 @@ paths:
         "502":
           description: the owning system could not be reached
         "200":
-          description: the master data of the Geschäftspartner as a DTO
+          description: the master data of the Geschaeftspartner as a DTO
           content:
             application/json:
               schema:
@@ -1537,7 +1537,7 @@ components:
         adressnotiz:
           type: string
           description: Address notes
-      description: "The master data of a Geschäftspartner, read from a third party\
+      description: "The master data of a Geschaeftspartner, read from a third party\
         \ system owning it."
     Link:
       type: object

@@ -20,8 +20,8 @@ class MassnahmezeitraumTest {
         @Test
         void givenFlaecheBeginningBeforeTheMasten_thenStartOnTheFlaeche() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 7),
-                    1, 1, new BigDecimal("20"), new BigDecimal("20"));
-            final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1, 3);
+                    1, new BigDecimal("20"), new BigDecimal("20"));
+            final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
             final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)),
@@ -33,8 +33,8 @@ class MassnahmezeitraumTest {
         @Test
         void givenMastenEndingAfterTheFlaechen_thenEndOnTheMasten() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 7),
-                    1, 1, new BigDecimal("20"), new BigDecimal("20"));
-            final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1, 3);
+                    1, new BigDecimal("20"), new BigDecimal("20"));
+            final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
             final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)),
@@ -46,9 +46,9 @@ class MassnahmezeitraumTest {
         @Test
         void givenSeveralFlaechenadressen_thenRunAsManyWochenAsTheLongestOfThem() {
             final Flaeche kurz = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 7),
-                    1, 1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"));
             final Flaeche lang = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 4),
-                    1, 5, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"));
 
             final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(kurz), 1),
@@ -60,7 +60,7 @@ class MassnahmezeitraumTest {
 
         @Test
         void givenOnlyUeberspannungen_thenRunNoWocheButKeepTheirZeitraum() {
-            final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1, 3);
+            final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
             final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
                     List.of(), List.of(new Ueberspannungsadresse("Marienplatz 8", List.of(mast), 3)));

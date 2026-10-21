@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
+import org.springframework.util.StringUtils;
 
 public record AbrechnungNutzungsobjekt(
         UUID id,
@@ -58,17 +59,13 @@ public record AbrechnungNutzungsobjekt(
         if (art == Adressart.FLURSTUECK) {
             return "Flurstück " + joinNonBlank(", ", flurstueck, gemarkung);
         }
-        final String hausnummer = isNotBlank(hausnummerBis)
+        final String hausnummer = StringUtils.hasText(hausnummerBis)
                 ? hausnummerVon + "–" + hausnummerBis
                 : hausnummerVon;
         return joinNonBlank(" ", adresse, hausnummer);
     }
 
     private static String joinNonBlank(final String separator, final String... teile) {
-        return Arrays.stream(teile).filter(AbrechnungNutzungsobjekt::isNotBlank).collect(Collectors.joining(separator));
-    }
-
-    private static boolean isNotBlank(final String text) {
-        return text != null && !text.isBlank();
+        return Arrays.stream(teile).filter(StringUtils::hasText).collect(Collectors.joining(separator));
     }
 }

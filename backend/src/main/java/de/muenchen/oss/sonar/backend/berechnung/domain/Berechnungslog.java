@@ -30,7 +30,7 @@ public final class Berechnungslog {
                 .append("======================").append(System.lineSeparator());
 
         for (final Ueberspannungsadressabrechnung adresse : ueberspannungen.adressen()) {
-            log.append(adresse.adresse()).append(System.lineSeparator())
+            log.append(adresse.adressbezeichnung()).append(System.lineSeparator())
                     .append("----------------------").append(System.lineSeparator())
                     .append(adresse.berechnungslog());
         }

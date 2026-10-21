@@ -4,9 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaeche;
 import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaechenabrechnung;
+import de.muenchen.oss.sonar.backend.berechnung.flaechen.FlaechenabrechnungService;
 import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaechenadresse;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Mast;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Ueberspannungsabrechnung;
+import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.UeberspannungsabrechnungService;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Ueberspannungsadresse;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -24,11 +26,11 @@ class BerechnungslogTest {
         @Test
         void givenAbrechnung_thenReportEveryGebuehrInItsOwnLine() {
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
-                    1, 1, new BigDecimal("20"), new BigDecimal("20"));
-            final Flaechenabrechnung flaechen = Flaechenabrechnung.berechne(
+                    1, new BigDecimal("20"), new BigDecimal("20"));
+            final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), 1);
-            final Ueberspannungsabrechnung ueberspannungen = Ueberspannungsabrechnung.berechne(List.of(
-                    new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1, 3)), 3)));
+            final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of(
+                    new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1)), 3)));
             final Gebuehren gebuehren = Gebuehren.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), null);
 
@@ -43,9 +45,9 @@ class BerechnungslogTest {
 
         @Test
         void givenAdresseWithMasten_thenGiveItItsOwnBlock() {
-            final Flaechenabrechnung flaechen = Flaechenabrechnung.berechne(List.of(), 0);
-            final Ueberspannungsabrechnung ueberspannungen = Ueberspannungsabrechnung.berechne(List.of(
-                    new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1, 3)), 3)));
+            final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(List.of(), 0);
+            final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of(
+                    new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1)), 3)));
             final Gebuehren gebuehren = Gebuehren.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), null);
 
@@ -57,8 +59,8 @@ class BerechnungslogTest {
 
         @Test
         void givenNoVorabrechnung_thenReportNoZahlbetrag() {
-            final Flaechenabrechnung flaechen = Flaechenabrechnung.berechne(List.of(), 0);
-            final Ueberspannungsabrechnung ueberspannungen = Ueberspannungsabrechnung.berechne(List.of());
+            final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(List.of(), 0);
+            final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of());
             final Gebuehren gebuehren = Gebuehren.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), null);
 
@@ -70,9 +72,9 @@ class BerechnungslogTest {
         @Test
         void givenVorabrechnung_thenReportWhatItLeftOver() {
             final Vorabrechnung vorabrechnung = new Vorabrechnung(1, LocalDate.of(2025, 12, 31), new BigDecimal("100.00"));
-            final Flaechenabrechnung flaechen = Flaechenabrechnung.berechne(List.of(), 0);
-            final Ueberspannungsabrechnung ueberspannungen = Ueberspannungsabrechnung.berechne(List.of(
-                    new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1, 3)), 3)));
+            final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(List.of(), 0);
+            final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of(
+                    new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1)), 3)));
             final Gebuehren gebuehren = Gebuehren.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), vorabrechnung);
 

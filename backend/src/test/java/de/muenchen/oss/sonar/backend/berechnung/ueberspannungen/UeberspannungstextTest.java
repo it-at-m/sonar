@@ -17,7 +17,7 @@ class UeberspannungstextTest {
 
         @Test
         void givenMast_thenWriteItsZeitraumAndItsGueltigkeit() {
-            final Mast mast = new Mast(2, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3, 6);
+            final Mast mast = new Mast(2, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
 
             assertThat(Ueberspannungstext.zusammenfassung(mast)).isEqualTo(
                     "   - Mast 2" + NL
@@ -27,8 +27,8 @@ class UeberspannungstextTest {
 
         @Test
         void givenAdresse_thenWriteTheAnzahlMonateAndABlockPerMast() {
-            final Mast erster = new Mast(1, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30), 1, 6);
-            final Mast zweiter = new Mast(2, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3, 6);
+            final Mast erster = new Mast(1, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30), 1);
+            final Mast zweiter = new Mast(2, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
             final Ueberspannungsadresse adresse = new Ueberspannungsadresse("Marienplatz 8", List.of(erster, zweiter), 6);
 
             assertThat(Ueberspannungstext.zusammenfassung(adresse)).isEqualTo(
@@ -49,7 +49,7 @@ class UeberspannungstextTest {
 
         @Test
         void givenMonate_thenWriteEveryMastAndCloseWithTheGebuehrOfTheAdresse() {
-            final Mast mast = new Mast(1, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 28), 1, 2);
+            final Mast mast = new Mast(1, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 28), 1);
             final Ueberspannungsadresse adresse = new Ueberspannungsadresse("Marienplatz 8", List.of(mast), 2);
             final List<Ueberspannungsmonat> monate = List.of(
                     new Ueberspannungsmonat(1, List.of(new Mastposten(1, mast, 1)), ""),
@@ -76,8 +76,8 @@ class UeberspannungstextTest {
 
         @Test
         void givenAbschnitt_thenWriteTheDauerTheSatzAndTheAnzahlMasten() {
-            final Mast erster = new Mast(1, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30), 1, 6);
-            final Mast zweiter = new Mast(2, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3, 6);
+            final Mast erster = new Mast(1, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30), 1);
+            final Mast zweiter = new Mast(2, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);
             final Ueberspannungsmonat monat = new Ueberspannungsmonat(
                     6, List.of(new Mastposten(1, erster, 6), new Mastposten(2, zweiter, 4)), "");
 

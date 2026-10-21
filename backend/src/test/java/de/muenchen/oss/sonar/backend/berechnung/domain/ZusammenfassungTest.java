@@ -25,7 +25,7 @@ class ZusammenfassungTest {
         void givenAbrechnung_thenHeadItWithTheProjektnummerAndTheErsteller() {
             final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
-                    1, 1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"));
 
             final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 1,
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), List.of());
@@ -41,8 +41,8 @@ class ZusammenfassungTest {
         void givenAdressenOfBothKinds_thenGiveEachKindItsOwnBlock() {
             final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
-                    1, 1, new BigDecimal("20"), new BigDecimal("20"));
-            final Mast mast = new Mast(1, BEGINN, ENDE, 1, 3);
+                    1, new BigDecimal("20"), new BigDecimal("20"));
+            final Mast mast = new Mast(1, BEGINN, ENDE, 1);
 
             final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 1,
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)),
@@ -58,7 +58,7 @@ class ZusammenfassungTest {
         void givenNoAdresseWithMasten_thenLeaveTheUeberspannungenBlockOut() {
             final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
-                    1, 1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"));
 
             final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 1,
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), List.of());
