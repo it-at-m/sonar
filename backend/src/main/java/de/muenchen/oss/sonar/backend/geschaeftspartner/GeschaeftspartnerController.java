@@ -26,11 +26,11 @@ public class GeschaeftspartnerController {
     private final GeschaeftspartnerService geschaeftspartnerService;
 
     /**
-     * Retrieve the master data of a Geschäftspartner.
+     * Retrieve the master data of a Geschaeftspartner.
      * Retrieved data come from a third party system owning them.
      *
-     * @param geschaeftspartnerId the id of the requested Geschäftspartner
-     * @return the master data of the Geschäftspartner as a DTO
+     * @param geschaeftspartnerId the id of the requested Geschaeftspartner
+     * @return the master data of the Geschaeftspartner as a DTO
      */
     @GetMapping("{geschaeftspartnerId}")
     @ResponseStatus(HttpStatus.OK)

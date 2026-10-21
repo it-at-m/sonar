@@ -23,7 +23,7 @@ class FlaechentextTest {
 
             @Test
             void givenAdresseWithOneFlaeche_thenWriteTheWholeBlock() {
-                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1, 3,
+                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1,
                         new BigDecimal("100"), new BigDecimal("100"));
                 final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 3);
 
@@ -42,7 +42,7 @@ class FlaechentextTest {
 
             @Test
             void givenAdresseWithAufschlag_thenSaySo() {
-                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1, 3,
+                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1,
                         new BigDecimal("100"), new BigDecimal("100"));
                 final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", true, List.of(flaeche), 3);
 
@@ -51,7 +51,7 @@ class FlaechentextTest {
 
             @Test
             void givenAdresseWhoseFlaecheIsOutsideTheAbrechnungszeitraum_thenSaySoInsteadOfTheBlock() {
-                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5, 2,
+                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5,
                         new BigDecimal("100"), new BigDecimal("100"));
                 final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 2);
 
@@ -77,7 +77,7 @@ class FlaechentextTest {
 
             @Test
             void givenFlaechenreduzierung_thenWriteItWithoutAPlusSign() {
-                final Flaeche flaeche = new Flaeche("Position 2", LocalDate.of(2026, 1, 29), LocalDate.of(2026, 3, 31), 5, 13,
+                final Flaeche flaeche = new Flaeche("Position 2", LocalDate.of(2026, 1, 29), LocalDate.of(2026, 3, 31), 5,
                         new BigDecimal("60"), new BigDecimal("-40"));
 
                 assertThat(Flaechentext.zusammenfassung(flaeche)).isEqualTo(
@@ -90,7 +90,7 @@ class FlaechentextTest {
 
             @Test
             void givenFlaecheOutsideTheAbrechnungszeitraum_thenWriteOnlyThat() {
-                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5, 2,
+                final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5,
                         new BigDecimal("100"), new BigDecimal("100"));
 
                 assertThat(Flaechentext.zusammenfassung(flaeche)).isEqualTo(

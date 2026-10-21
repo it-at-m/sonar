@@ -9,16 +9,17 @@ import lombok.NoArgsConstructor;
 public final class Abschnittsbildung {
 
     private static final String KEINE_ZWISCHENABRECHNUNG = "";
+    private static final int ERSTE_PERIODE = 1;
 
     public static List<Abschnitt> abschnitte(final List<String> gruende, final boolean grundBeimEinzigenAbschnitt) {
 
         final List<Abschnitt> abschnitte = new ArrayList<>();
 
-        int von = 1;
+        int von = ERSTE_PERIODE;
         int anzahlZwischenabrechnungen = 0;
         String offenerGrund = KEINE_ZWISCHENABRECHNUNG;
 
-        for (int periode = 1; periode <= gruende.size(); periode++) {
+        for (int periode = ERSTE_PERIODE; periode <= gruende.size(); periode++) {
 
             final String grund = gruende.get(periode - 1);
             if (KEINE_ZWISCHENABRECHNUNG.equals(grund)) {

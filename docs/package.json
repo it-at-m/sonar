@@ -41,12 +41,12 @@
       }
     },
     "mermaid": {
-      "katex": "0.18.2",
-      "dompurify": "3.4.16"
+      "katex": "0.18.10",
+      "dompurify": "3.4.17"
     },
     "markdownlint-cli": {
-      "js-yaml": "5.4.1",
-      "smol-toml": "1.9.0",
+      "js-yaml": "5.4.2",
+      "smol-toml": "1.9.1",
       "markdownlint": {
         "micromark-extension-math": {
           "katex": "0.18.2"
