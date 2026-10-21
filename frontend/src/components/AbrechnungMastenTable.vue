@@ -15,26 +15,25 @@
             :key="mast.id"
           >
             <td>
-              <v-text-field
+              <sonar-date-field
                 :id="`${idPrefix}-beginn-${index}`"
                 v-model="mast.beginn"
                 :aria-label="`Beginn von Mast ${index + 1}`"
                 density="compact"
+                :readonly="readonly || undefined"
                 :rules="[requiredRule]"
-                type="date"
               />
             </td>
             <td>
-              <v-text-field
+              <sonar-date-field
                 :id="`${idPrefix}-ende-${index}`"
                 v-model="mast.ende"
                 :aria-label="`Ende von Mast ${index + 1}`"
                 density="compact"
-                :rules="[
-                  requiredRule,
-                  (ende: string) => endeNotBeforeBeginn(mast.beginn, ende),
-                ]"
-                type="date"
+                :readonly="readonly || undefined"
+                :rules="[requiredRule]"
+                :zeitraum-beginn="mast.beginn"
+                zeitraum-einheit="month"
               />
             </td>
             <td v-if="!readonly">
@@ -69,8 +68,9 @@ import type { AbrechnungMastForm } from "@/types/abrechnung/AbrechnungMastForm";
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
 
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import { createAbrechnungMast } from "@/util/abrechnung/abrechnungMastForm";
-import { endeNotBeforeBeginn, requiredRule } from "@/util/validationRules";
+import { requiredRule } from "@/util/validationRules";
 
 const masten = defineModel<AbrechnungMastForm[]>({ required: true });
 

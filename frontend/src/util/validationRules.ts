@@ -8,18 +8,6 @@ export function requiredRule(value: unknown): boolean | string {
   return filled || "Pflichtfeld";
 }
 
-export function endeNotBeforeBeginn(
-  beginn: string,
-  ende: string
-): boolean | string {
-  return (
-    !beginn ||
-    !ende ||
-    ende >= beginn ||
-    "Das Ende darf nicht vor dem Beginn liegen."
-  );
-}
-
 export function greaterThanZeroRule(value: unknown): boolean | string {
   return (
     isEmpty(value) || Number(value) > 0 || "Der Wert muss größer als 0 sein."
