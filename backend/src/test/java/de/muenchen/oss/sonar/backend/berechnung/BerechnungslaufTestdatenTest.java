@@ -59,7 +59,7 @@ class BerechnungslaufTestdatenTest {
 
     private static Berechnungslauf toBerechnungslauf(final AbrechnungTestfall testfall) {
         final JsonNode input = testfall.input();
-        return Berechnungslauf.from(toProjekt(input), toAbrechnung(input), abrechnungsdatum(input),
+        return Berechnungslauf.create(toProjekt(input), toAbrechnung(input), abrechnungsdatum(input),
                 toVorabrechnung(testfall.letzteAbrechnung()), input.get("username").asString());
     }
 

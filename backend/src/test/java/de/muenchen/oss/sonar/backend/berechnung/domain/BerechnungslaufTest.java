@@ -38,7 +38,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
                     .run();
 
             assertThat(ergebnis.lfdNr()).isEqualTo(1);
@@ -62,7 +62,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
                     .run();
 
             assertThat(ergebnis.abrechnungszeitraumVon()).isEqualTo(VON);
@@ -82,7 +82,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann")
                     .run();
 
             assertThat(ergebnis.lfdNr()).isEqualTo(2);
@@ -103,7 +103,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann")
                     .run();
 
             assertThat(ergebnis.abrechnungszeitraumVon()).isEqualTo(LocalDate.of(2026, 1, 4));
@@ -127,7 +127,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(ueberspannt, nurFlaeche));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
                     .run();
 
             assertThat(ergebnis.abrechnungenUeberspannungen())
@@ -152,7 +152,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(frueh, spaet));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, LocalDate.of(2026, 1, 14), null, "mustermann")
+                    .create(projekt, abrechnung, LocalDate.of(2026, 1, 14), null, "mustermann")
                     .run();
 
             // The later Adresse lands in Woche 2, so both are charged once at 20 m² x 1,50 €.
@@ -172,7 +172,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
                     .run();
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("30.00");
@@ -189,7 +189,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
                     .run();
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("0");
@@ -210,7 +210,7 @@ class BerechnungslaufTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .from(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
                     .run();
 
             assertThat(ergebnis.zusammenfassung()).startsWith("Abrechnung 1 von Bauprojekt 2026-0001");

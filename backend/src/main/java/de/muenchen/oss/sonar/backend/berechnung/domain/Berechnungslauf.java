@@ -29,7 +29,7 @@ public record Berechnungslauf(
         ueberspannungsadressen = List.copyOf(ueberspannungsadressen);
     }
 
-    public static Berechnungslauf from(final Projekt projekt, final Abrechnung abrechnung,
+    public static Berechnungslauf create(final Projekt projekt, final Abrechnung abrechnung,
             final LocalDate berechnungsdatum, final Vorabrechnung vorabrechnung, final String username) {
 
         final LocalDate beginnWochenlauf = startOfWochenlauf(abrechnung.nutzungsobjekte());
