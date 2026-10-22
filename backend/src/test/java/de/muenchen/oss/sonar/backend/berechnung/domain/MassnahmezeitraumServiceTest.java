@@ -12,10 +12,10 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class MassnahmezeitraumTest {
+class MassnahmezeitraumServiceTest {
 
     @Nested
-    class From {
+    class Berechne {
 
         @Test
         void givenFlaecheBeginningBeforeTheMasten_thenStartOnTheFlaeche() {
@@ -23,7 +23,7 @@ class MassnahmezeitraumTest {
                     1, new BigDecimal("20"), new BigDecimal("20"));
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
-            final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
+            final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)),
                     List.of(new Ueberspannungsadresse("Marienplatz 8", List.of(mast), 3)));
 
@@ -36,7 +36,7 @@ class MassnahmezeitraumTest {
                     1, new BigDecimal("20"), new BigDecimal("20"));
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
-            final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
+            final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)),
                     List.of(new Ueberspannungsadresse("Marienplatz 8", List.of(mast), 3)));
 
@@ -50,7 +50,7 @@ class MassnahmezeitraumTest {
             final Flaeche lang = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 4),
                     1, new BigDecimal("20"), new BigDecimal("20"));
 
-            final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
+            final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(kurz), 1),
                             new Flaechenadresse("Sendlinger Straße 1", false, List.of(lang), 5)),
                     List.of());
@@ -62,7 +62,7 @@ class MassnahmezeitraumTest {
         void givenOnlyUeberspannungen_thenRunNoWocheButKeepTheirZeitraum() {
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
-            final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(
+            final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(
                     List.of(), List.of(new Ueberspannungsadresse("Marienplatz 8", List.of(mast), 3)));
 
             assertThat(zeitraum.anzahlWochen()).isZero();
@@ -72,9 +72,9 @@ class MassnahmezeitraumTest {
 
         @Test
         void givenNoAdresse_thenFallBackToDatesNoRealZeitraumCanBeat() {
-            final Massnahmezeitraum zeitraum = Massnahmezeitraum.from(List.of(), List.of());
+            final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(List.of(), List.of());
 
-            assertThat(zeitraum.beginn()).isEqualTo(Massnahmezeitraum.KEIN_BEGINN);
+            assertThat(zeitraum.beginn()).isEqualTo(MassnahmezeitraumService.KEIN_BEGINN);
             assertThat(zeitraum.ende()).isBefore(zeitraum.beginn());
             assertThat(zeitraum.anzahlWochen()).isZero();
         }

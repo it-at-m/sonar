@@ -31,7 +31,7 @@ class BerechnungslogTest {
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), 1);
             final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of(
                     new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1)), 3)));
-            final Gebuehren gebuehren = Gebuehren.berechne(
+            final Gebuehren gebuehren = GebuehrenService.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), null);
 
             final String log = Berechnungslog.schreibe(1, flaechen, ueberspannungen, gebuehren, null);
@@ -48,7 +48,7 @@ class BerechnungslogTest {
             final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(List.of(), 0);
             final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of(
                     new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1)), 3)));
-            final Gebuehren gebuehren = Gebuehren.berechne(
+            final Gebuehren gebuehren = GebuehrenService.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), null);
 
             final String log = Berechnungslog.schreibe(1, flaechen, ueberspannungen, gebuehren, null);
@@ -61,7 +61,7 @@ class BerechnungslogTest {
         void givenNoVorabrechnung_thenReportNoZahlbetrag() {
             final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(List.of(), 0);
             final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of());
-            final Gebuehren gebuehren = Gebuehren.berechne(
+            final Gebuehren gebuehren = GebuehrenService.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), null);
 
             final String log = Berechnungslog.schreibe(1, flaechen, ueberspannungen, gebuehren, null);
@@ -75,7 +75,7 @@ class BerechnungslogTest {
             final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(List.of(), 0);
             final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(List.of(
                     new Ueberspannungsadresse("Marienplatz 8", List.of(new Mast(1, BEGINN, LocalDate.of(2026, 3, 31), 1)), 3)));
-            final Gebuehren gebuehren = Gebuehren.berechne(
+            final Gebuehren gebuehren = GebuehrenService.berechne(
                     flaechen.gebuehr(), ueberspannungen.gebuehr(), new BigDecimal("42"), vorabrechnung);
 
             final String log = Berechnungslog.schreibe(2, flaechen, ueberspannungen, gebuehren, vorabrechnung);

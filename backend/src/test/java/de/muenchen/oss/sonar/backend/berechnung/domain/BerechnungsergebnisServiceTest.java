@@ -16,7 +16,7 @@ import java.util.List;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
-class BerechnungslaufTest {
+class BerechnungsergebnisServiceTest {
 
     private static final LocalDate VON = LocalDate.of(2026, 1, 1);
     private static final LocalDate BIS = LocalDate.of(2026, 3, 31);
@@ -24,7 +24,7 @@ class BerechnungslaufTest {
     private static final LocalDate BERECHNUNGSDATUM = LocalDate.of(2026, 1, 7);
 
     @Nested
-    class Run {
+    class Berechne {
 
         @Test
         void givenNoVorabrechnung_thenStartAtLfdNrOneAndChargeTheWholeBetrag() {
@@ -37,9 +37,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.lfdNr()).isEqualTo(1);
             // Gebührenstufe 1 (20 m²) and Zeitindex 1 charge 1,50 € per m² for the single Woche.
@@ -61,9 +60,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.abrechnungszeitraumVon()).isEqualTo(VON);
             assertThat(ergebnis.abrechnungszeitraumBis()).isEqualTo(LocalDate.of(2026, 1, 7));
@@ -81,9 +79,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann"));
 
             assertThat(ergebnis.lfdNr()).isEqualTo(2);
             assertThat(ergebnis.gebuehrGesamt()).isEqualByComparingTo("72.00");
@@ -102,9 +99,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann"));
 
             assertThat(ergebnis.abrechnungszeitraumVon()).isEqualTo(LocalDate.of(2026, 1, 4));
         }
@@ -126,9 +122,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(ueberspannt, nurFlaeche));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.abrechnungenUeberspannungen())
                     .extracting(Ueberspannungsadressabrechnung::adressbezeichnung)
@@ -151,9 +146,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(frueh, spaet));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, LocalDate.of(2026, 1, 14), null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, LocalDate.of(2026, 1, 14), null, "mustermann"));
 
             // The later Adresse lands in Woche 2, so both are charged once at 20 m² x 1,50 €.
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("60.00");
@@ -171,9 +165,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("30.00");
             assertThat(ergebnis.abrechnungszeitraumBis()).isEqualTo(BERECHNUNGSDATUM);
@@ -191,9 +184,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
 
             // Only Monat 1 has begun by the Berechnungsdatum, and the erste Mast costs 50,00 € per Monat.
             assertThat(ergebnis.gebuehrUeberspannungen()).isEqualByComparingTo("50.00");
@@ -209,9 +201,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("0");
             assertThat(ergebnis.gebuehrGesamt()).isEqualByComparingTo(Projekt.VERWALTUNGSGEBUEHR);
@@ -230,9 +221,8 @@ class BerechnungslaufTest {
             final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            final Berechnungsergebnis ergebnis = Berechnungslauf
-                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
-                    .run();
+            final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
+                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.zusammenfassung()).startsWith("Abrechnung 1 von Bauprojekt 2026-0001");
             assertThat(ergebnis.zusammenfassung()).contains("mustermann");

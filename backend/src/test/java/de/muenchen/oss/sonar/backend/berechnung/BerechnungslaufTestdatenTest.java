@@ -8,7 +8,9 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.berechnung.domain.Berechnungsergebnis;
+import de.muenchen.oss.sonar.backend.berechnung.domain.BerechnungsergebnisService;
 import de.muenchen.oss.sonar.backend.berechnung.domain.Berechnungslauf;
+import de.muenchen.oss.sonar.backend.berechnung.domain.BerechnungslaufService;
 import de.muenchen.oss.sonar.backend.berechnung.domain.Vorabrechnung;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
@@ -39,7 +41,7 @@ class BerechnungslaufTestdatenTest {
     @ParameterizedTest(name = "{0}")
     @MethodSource("testfaelle")
     void givenTestfall_thenErgebnisMatchesTheRecordedValues(final AbrechnungTestfall testfall) {
-        final Berechnungsergebnis ergebnis = toBerechnungslauf(testfall).run();
+        final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(toBerechnungslauf(testfall));
 
         final String ergebnisJson = AbrechnungErgebnisJson.toJson(ergebnis);
 
@@ -51,15 +53,15 @@ class BerechnungslaufTestdatenTest {
     void givenTheSameAbrechnungTwice_thenTheZweiterLaufChargesTheSame(final AbrechnungTestfall testfall) {
         final Berechnungslauf berechnungslauf = toBerechnungslauf(testfall);
 
-        final String ersterLauf = AbrechnungErgebnisJson.toJson(berechnungslauf.run());
-        final String zweiterLauf = AbrechnungErgebnisJson.toJson(berechnungslauf.run());
+        final String ersterLauf = AbrechnungErgebnisJson.toJson(BerechnungsergebnisService.berechne(berechnungslauf));
+        final String zweiterLauf = AbrechnungErgebnisJson.toJson(BerechnungsergebnisService.berechne(berechnungslauf));
 
         assertThat(zweiterLauf).isEqualTo(ersterLauf);
     }
 
     private static Berechnungslauf toBerechnungslauf(final AbrechnungTestfall testfall) {
         final JsonNode input = testfall.input();
-        return Berechnungslauf.create(toProjekt(input), toAbrechnung(input), abrechnungsdatum(input),
+        return BerechnungslaufService.berechne(toProjekt(input), toAbrechnung(input), abrechnungsdatum(input),
                 toVorabrechnung(testfall.letzteAbrechnung()), input.get("username").asString());
     }
 
