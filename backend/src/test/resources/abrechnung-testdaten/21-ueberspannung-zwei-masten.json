@@ -1,0 +1,75 @@
+{
+  "name": "Ueberspannung: der zweite Mast ist frei",
+  "description": "Zwei Masten ueber zwei Monate. Der zweite Mast kostet nichts, die Monatsgebuehr bleibt deshalb bei 50 Euro.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Ueberspannung zwei Masten",
+    "projektNummer": "P-0021",
+    "projektDbId": "11111111-1111-1111-1111-111111111131",
+    "abrechnungsdatum": "2025-12-31",
+    "adressen": [],
+    "adressenUeberspannung": [
+      {
+        "adressId": 0,
+        "adresse": "Mastweg 2",
+        "masten": [
+          {
+            "mastNummer": 1,
+            "beginn": "2025-01-01",
+            "ende": "2025-02-28"
+          },
+          {
+            "mastNummer": 2,
+            "beginn": "2025-01-01",
+            "ende": "2025-02-28"
+          }
+        ]
+      }
+    ],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-01-01",
+    "$.abrechnungszeitraumBis": "2025-02-28",
+    "$.gebuehrFlaechen": 0,
+    "$.gebuehrUeberspannungen": 100,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 100,
+    "$.gebuehrZahlung": 100,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 0,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 0,
+    "$.bescheiddatenFlaechen[0].gebuehr": 0,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "0m² --> ",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 1,
+    "$.bescheiddatenUeberspannungen[0].adresse": "Mastweg 2",
+    "$.bescheiddatenUeberspannungen[0].gebuehrUeberspannungen": 100,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen.length()": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatBeginn": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatEnde": 2,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatDauer": 2,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].gebuehr": 100,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].berechnung": [
+      "    2 Monate x 50,00€ (2 Masten)",
+      ""
+    ]
+  }
+}

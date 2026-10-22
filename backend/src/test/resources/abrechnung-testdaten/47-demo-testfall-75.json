@@ -1,0 +1,126 @@
+{
+  "name": "Demo Testfall 75",
+  "description": "Flaechenreduzierung von 60 auf 30 m2 an der ersten Adresse, waehrend die zweite Adresse unveraendert weiterlaeuft.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Demo Testfall 75",
+    "projektNummer": "P-0047",
+    "projektDbId": "123e4567-e89b-12d3-a456-426614174006",
+    "abrechnungsdatum": "2026-06-28",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Anton-Muster-Str. 12",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-02-09",
+            "gueltigBis": "2026-05-24",
+            "flaecheQm": 60,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2026-05-25",
+            "gueltigBis": "2026-06-28",
+            "flaecheQm": 30,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      },
+      {
+        "adressId": 1,
+        "adresse": "Nordstraße",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-02-09",
+            "gueltigBis": "2026-06-28",
+            "flaecheQm": 100,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2026-02-09",
+    "$.abrechnungszeitraumBis": "2026-06-28",
+    "$.gebuehrFlaechen": 6105,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 6105,
+    "$.gebuehrZahlung": 6105,
+    "$.bescheiddatenFlaechen.length()": 3,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 13,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 13,
+    "$.bescheiddatenFlaechen[0].gebuehr": 3705,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Anton-Muster-Str. 12: 60m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      "    Nordstraße: 100m² / Zeitindex 1 (Fläche: Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "160m² --> Gebührenstufe 3",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    13 Wochen x 100m² (100m²) x 1,50€ (Gebührenstufe 3 / Zeitindex 1) = 1.950,00€",
+      "    13 Wochen x 60m² (60m²) x 2,25€ (Gebührenstufe 3 / Zeitindex 1) = 1.755,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].wocheBeginn": 14,
+    "$.bescheiddatenFlaechen[1].wocheEnde": 15,
+    "$.bescheiddatenFlaechen[1].wocheDauer": 2,
+    "$.bescheiddatenFlaechen[1].gebuehr": 950,
+    "$.bescheiddatenFlaechen[1].grund": [
+      "    Anton-Muster-Str. 12: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1) (50%-Aufschlag)",
+      "    Nordstraße: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].flaechenVerteilung": [
+      "    Anton-Muster-Str. 12: 60m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      "    Nordstraße: 100m² / Zeitindex 2 (Fläche: Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].gebuehrenstufe": [
+      "160m² --> Gebührenstufe 3",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].berechnung": [
+      "    2 Wochen x 100m² (100m²) x 2,50€ (Gebührenstufe 3 / Zeitindex 2) = 500,00€",
+      "    2 Wochen x 60m² (60m²) x 3,75€ (Gebührenstufe 3 / Zeitindex 2) = 450,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].wocheBeginn": 16,
+    "$.bescheiddatenFlaechen[2].wocheEnde": 20,
+    "$.bescheiddatenFlaechen[2].wocheDauer": 5,
+    "$.bescheiddatenFlaechen[2].gebuehr": 1450,
+    "$.bescheiddatenFlaechen[2].grund": [
+      "    Anton-Muster-Str. 12: Flächenreduzierung -30m² (Fläche Position 2) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].flaechenVerteilung": [
+      "    Anton-Muster-Str. 12: 30m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      "    Nordstraße: 100m² / Zeitindex 2 (Fläche: Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].gebuehrenstufe": [
+      "130m² --> Gebührenstufe 2",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].berechnung": [
+      "    5 Wochen x 100m² (100m²) x 2,00€ (Gebührenstufe 2 / Zeitindex 2) = 1.000,00€",
+      "    5 Wochen x 30m² (30m²) x 3,00€ (Gebührenstufe 2 / Zeitindex 2) = 450,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

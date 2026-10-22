@@ -1,0 +1,128 @@
+{
+  "name": "Demo Testfall 74",
+  "description": "Eine Adresse mit zwei aufeinanderfolgenden Flaechen, die zweite hebt die Gesamtflaeche um 20 m2 an.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Demo Testfall 74",
+    "projektNummer": "P-0046",
+    "projektDbId": "123e4567-e89b-12d3-a456-426614174005",
+    "abrechnungsdatum": "2026-05-24",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Nordstraße",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-02-09",
+            "gueltigBis": "2026-05-24",
+            "flaecheQm": 80,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      },
+      {
+        "adressId": 1,
+        "adresse": "Anton-Muster-Str. 12",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-02-09",
+            "gueltigBis": "2026-04-12",
+            "flaecheQm": 60,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2026-04-13",
+            "gueltigBis": "2026-05-24",
+            "flaecheQm": 80,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2026-02-09",
+    "$.abrechnungszeitraumBis": "2026-05-24",
+    "$.gebuehrFlaechen": 4435,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 4435,
+    "$.gebuehrZahlung": 4435,
+    "$.bescheiddatenFlaechen.length()": 3,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 9,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 9,
+    "$.bescheiddatenFlaechen[0].gebuehr": 2295,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Nordstraße: 80m² / Zeitindex 1 (Fläche: Position 1)",
+      "    Anton-Muster-Str. 12: 60m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "140m² --> Gebührenstufe 2",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    9 Wochen x 80m² (80m²) x 1,50€ (Gebührenstufe 2 / Zeitindex 1) = 1.080,00€",
+      "    9 Wochen x 60m² (60m²) x 2,25€ (Gebührenstufe 2 / Zeitindex 1) = 1.215,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].wocheBeginn": 10,
+    "$.bescheiddatenFlaechen[1].wocheEnde": 13,
+    "$.bescheiddatenFlaechen[1].wocheDauer": 4,
+    "$.bescheiddatenFlaechen[1].gebuehr": 1200,
+    "$.bescheiddatenFlaechen[1].grund": [
+      "    Anton-Muster-Str. 12: Flächenerweiterung +20m² (Fläche Position 2) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].flaechenVerteilung": [
+      "    Nordstraße: 80m² / Zeitindex 1 (Fläche: Position 1)",
+      "    Anton-Muster-Str. 12: 80m² / Zeitindex 1 (Fläche: Position 1, Position 2) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].gebuehrenstufe": [
+      "160m² --> Gebührenstufe 3",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].berechnung": [
+      "    4 Wochen x 80m² (80m²) x 1,50€ (Gebührenstufe 3 / Zeitindex 1) = 480,00€",
+      "    4 Wochen x 80m² (80m²) x 2,25€ (Gebührenstufe 3 / Zeitindex 1) = 720,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].wocheBeginn": 14,
+    "$.bescheiddatenFlaechen[2].wocheEnde": 15,
+    "$.bescheiddatenFlaechen[2].wocheDauer": 2,
+    "$.bescheiddatenFlaechen[2].gebuehr": 940,
+    "$.bescheiddatenFlaechen[2].grund": [
+      "    Nordstraße: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1)",
+      "    Anton-Muster-Str. 12: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].flaechenVerteilung": [
+      "    Nordstraße: 80m² / Zeitindex 2 (Fläche: Position 1)",
+      "    Anton-Muster-Str. 12: 20m² / Zeitindex 1 (Fläche: Position 2) (50% Aufschlag)",
+      "    Anton-Muster-Str. 12: 60m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].gebuehrenstufe": [
+      "160m² --> Gebührenstufe 3",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].berechnung": [
+      "    2 Wochen x 80m² (80m²) x 2,50€ (Gebührenstufe 3 / Zeitindex 2) = 400,00€",
+      "    2 Wochen x 20m² (20m²) x 2,25€ (Gebührenstufe 3 / Zeitindex 1) = 90,00€ (50%-Aufschlag)",
+      "    2 Wochen x 60m² (60m²) x 3,75€ (Gebührenstufe 3 / Zeitindex 2) = 450,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

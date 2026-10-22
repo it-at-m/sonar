@@ -1,0 +1,80 @@
+{
+  "name": "Ueberspannung: ab dem dritten Mast gilt Mastzahl Stufe 2",
+  "description": "Drei Masten ueber zwei Monate. Der erste kostet 50 Euro, der zweite nichts, der dritte 15 Euro aus Mastzahl Stufe 2.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Ueberspannung drei Masten",
+    "projektNummer": "P-0022",
+    "projektDbId": "11111111-1111-1111-1111-111111111132",
+    "abrechnungsdatum": "2025-12-31",
+    "adressen": [],
+    "adressenUeberspannung": [
+      {
+        "adressId": 0,
+        "adresse": "Mastweg 3",
+        "masten": [
+          {
+            "mastNummer": 1,
+            "beginn": "2025-01-01",
+            "ende": "2025-02-28"
+          },
+          {
+            "mastNummer": 2,
+            "beginn": "2025-01-01",
+            "ende": "2025-02-28"
+          },
+          {
+            "mastNummer": 3,
+            "beginn": "2025-01-01",
+            "ende": "2025-02-28"
+          }
+        ]
+      }
+    ],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-01-01",
+    "$.abrechnungszeitraumBis": "2025-02-28",
+    "$.gebuehrFlaechen": 0,
+    "$.gebuehrUeberspannungen": 130,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 130,
+    "$.gebuehrZahlung": 130,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 0,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 0,
+    "$.bescheiddatenFlaechen[0].gebuehr": 0,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "0m² --> ",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 1,
+    "$.bescheiddatenUeberspannungen[0].adresse": "Mastweg 3",
+    "$.bescheiddatenUeberspannungen[0].gebuehrUeberspannungen": 130,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen.length()": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatBeginn": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatEnde": 2,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatDauer": 2,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].gebuehr": 130,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].berechnung": [
+      "    2 Monate x 65,00€ (3 Masten)",
+      ""
+    ]
+  }
+}

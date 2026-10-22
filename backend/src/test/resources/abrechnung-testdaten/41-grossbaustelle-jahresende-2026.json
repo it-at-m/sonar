@@ -1,0 +1,279 @@
+{
+  "name": "Grossbaustelle, erstes Jahr vollstaendig",
+  "description": "Dasselbe Projekt zum Jahresende 2026. Alle drei Adressen sind aktiv geworden, der Zeitindex wechselt von 1 auf 2.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Grossbaustelle",
+    "projektNummer": "P-0040",
+    "projektDbId": "123e4567-e89b-12d3-a456-426614174000",
+    "abrechnungsdatum": "2026-12-31",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Beispielplatz 1",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-01-01",
+            "gueltigBis": "2026-08-31",
+            "flaecheQm": 20.1,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2026-09-01",
+            "gueltigBis": "2026-12-31",
+            "flaecheQm": 40.1,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2027-01-01",
+            "gueltigBis": "2027-08-31",
+            "flaecheQm": 80,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2027-09-01",
+            "gueltigBis": "2027-12-31",
+            "flaecheQm": 45,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      },
+      {
+        "adressId": 1,
+        "adresse": "Beispielstraße 20",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-09-01",
+            "gueltigBis": "2026-10-31",
+            "flaecheQm": 4.1,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2026-11-01",
+            "gueltigBis": "2027-03-31",
+            "flaecheQm": 40,
+            "flaecheQmUnerlaubt": 15
+          },
+          {
+            "gueltigVon": "2027-04-01",
+            "gueltigBis": "2027-10-31",
+            "flaecheQm": 49,
+            "flaecheQmUnerlaubt": 30
+          }
+        ]
+      },
+      {
+        "adressId": 2,
+        "adresse": "Musterplatz 2a",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-06-01",
+            "gueltigBis": "2026-10-31",
+            "flaecheQm": 4.1,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2026-11-01",
+            "gueltigBis": "2027-03-31",
+            "flaecheQm": 10,
+            "flaecheQmUnerlaubt": 3
+          },
+          {
+            "gueltigVon": "2027-04-01",
+            "gueltigBis": "2027-12-31",
+            "flaecheQm": 49,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2026-01-01",
+    "$.abrechnungszeitraumBis": "2026-12-31",
+    "$.gebuehrFlaechen": 4654.25,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 4654.25,
+    "$.gebuehrZahlung": 4654.25,
+    "$.bescheiddatenFlaechen.length()": 7,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 13,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 13,
+    "$.bescheiddatenFlaechen[0].gebuehr": 614.25,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Beispielplatz 1: 20.1m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "20.1m² --> Gebührenstufe 1",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    13 Wochen x 21m² (20.1m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 1) = 614,25€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].wocheBeginn": 14,
+    "$.bescheiddatenFlaechen[1].wocheEnde": 21,
+    "$.bescheiddatenFlaechen[1].wocheDauer": 8,
+    "$.bescheiddatenFlaechen[1].gebuehr": 378,
+    "$.bescheiddatenFlaechen[1].grund": [
+      "    Beispielplatz 1: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].flaechenVerteilung": [
+      "    Beispielplatz 1: 20.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].gebuehrenstufe": [
+      "20.1m² --> Gebührenstufe 1",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].berechnung": [
+      "    8 Wochen x 21m² (20.1m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 2) = 378,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].wocheBeginn": 22,
+    "$.bescheiddatenFlaechen[2].wocheEnde": 34,
+    "$.bescheiddatenFlaechen[2].wocheDauer": 13,
+    "$.bescheiddatenFlaechen[2].gebuehr": 760.5,
+    "$.bescheiddatenFlaechen[2].grund": [
+      "    Musterplatz 2a: Flächenerweiterung +4.1m² (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].flaechenVerteilung": [
+      "    Beispielplatz 1: 20.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      "    Musterplatz 2a: 4.1m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].gebuehrenstufe": [
+      "24.2m² --> Gebührenstufe 1",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[2].berechnung": [
+      "    13 Wochen x 5m² (4.1m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 1) = 146,25€ (50%-Aufschlag)",
+      "    13 Wochen x 21m² (20.1m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 2) = 614,25€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[3].wocheBeginn": 35,
+    "$.bescheiddatenFlaechen[3].wocheEnde": 43,
+    "$.bescheiddatenFlaechen[3].wocheDauer": 9,
+    "$.bescheiddatenFlaechen[3].gebuehr": 978.75,
+    "$.bescheiddatenFlaechen[3].grund": [
+      "    Beispielplatz 1: Flächenerweiterung +20.0m² (Fläche Position 2) (50%-Aufschlag)",
+      "    Beispielstraße 20: Flächenerweiterung +4.1m² (Fläche Position 1)",
+      "    Musterplatz 2a: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[3].flaechenVerteilung": [
+      "    Beispielplatz 1: 20.0m² / Zeitindex 1 (Fläche: Position 2) (50% Aufschlag)",
+      "    Beispielplatz 1: 20.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      "    Beispielstraße 20: 4.1m² / Zeitindex 1 (Fläche: Position 1)",
+      "    Musterplatz 2a: 4.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[3].gebuehrenstufe": [
+      "48.3m² --> Gebührenstufe 1",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[3].berechnung": [
+      "    9 Wochen x 5m² (4.1m²) x 1,50€ (Gebührenstufe 1 / Zeitindex 1) = 67,50€",
+      "    9 Wochen x 20m² (20.0m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 1) = 405,00€ (50%-Aufschlag)",
+      "    9 Wochen x 25m² (24.2m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 2) = 506,25€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[4].wocheBeginn": 44,
+    "$.bescheiddatenFlaechen[4].wocheEnde": 47,
+    "$.bescheiddatenFlaechen[4].wocheDauer": 4,
+    "$.bescheiddatenFlaechen[4].gebuehr": 774,
+    "$.bescheiddatenFlaechen[4].grund": [
+      "    Beispielstraße 20: Flächenerweiterung +35.9m² (Fläche Position 2)",
+      "    Musterplatz 2a: Flächenerweiterung +5.9m² (Fläche Position 2) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[4].flaechenVerteilung": [
+      "    Beispielplatz 1: 20.0m² / Zeitindex 1 (Fläche: Position 2) (50% Aufschlag)",
+      "    Beispielplatz 1: 20.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      "    Beispielstraße 20: 40.0m² / Zeitindex 1 (Fläche: Position 1, Position 2)",
+      "    Musterplatz 2a: 5.9m² / Zeitindex 1 (Fläche: Position 2) (50% Aufschlag)",
+      "    Musterplatz 2a: 4.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[4].gebuehrenstufe": [
+      "90.1m² --> Gebührenstufe 2",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[4].berechnung": [
+      "    4 Wochen x 40m² (40.0m²) x 1,50€ (Gebührenstufe 2 / Zeitindex 1) = 240,00€",
+      "    4 Wochen x 26m² (25.9m²) x 2,25€ (Gebührenstufe 2 / Zeitindex 1) = 234,00€ (50%-Aufschlag)",
+      "    4 Wochen x 25m² (24.2m²) x 3,00€ (Gebührenstufe 2 / Zeitindex 2) = 300,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[5].wocheBeginn": 48,
+    "$.bescheiddatenFlaechen[5].wocheEnde": 52,
+    "$.bescheiddatenFlaechen[5].wocheDauer": 5,
+    "$.bescheiddatenFlaechen[5].gebuehr": 1062.5,
+    "$.bescheiddatenFlaechen[5].grund": [
+      "    Beispielplatz 1: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 2) (50%-Aufschlag)",
+      "    Beispielstraße 20: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[5].flaechenVerteilung": [
+      "    Beispielplatz 1: 40.1m² / Zeitindex 2 (Fläche: Position 1, Position 2) (50% Aufschlag)",
+      "    Beispielstraße 20: 35.9m² / Zeitindex 1 (Fläche: Position 2)",
+      "    Beispielstraße 20: 4.1m² / Zeitindex 2 (Fläche: Position 1)",
+      "    Musterplatz 2a: 5.9m² / Zeitindex 1 (Fläche: Position 2) (50% Aufschlag)",
+      "    Musterplatz 2a: 4.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[5].gebuehrenstufe": [
+      "90.1m² --> Gebührenstufe 2",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[5].berechnung": [
+      "    5 Wochen x 36m² (35.9m²) x 1,50€ (Gebührenstufe 2 / Zeitindex 1) = 270,00€",
+      "    5 Wochen x 5m² (4.1m²) x 2,00€ (Gebührenstufe 2 / Zeitindex 2) = 50,00€",
+      "    5 Wochen x 6m² (5.9m²) x 2,25€ (Gebührenstufe 2 / Zeitindex 1) = 67,50€ (50%-Aufschlag)",
+      "    5 Wochen x 45m² (44.2m²) x 3,00€ (Gebührenstufe 2 / Zeitindex 2) = 675,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[6].wocheBeginn": 53,
+    "$.bescheiddatenFlaechen[6].wocheEnde": 53,
+    "$.bescheiddatenFlaechen[6].wocheDauer": 1,
+    "$.bescheiddatenFlaechen[6].gebuehr": 86.25,
+    "$.bescheiddatenFlaechen[6].grund": [
+      "    Beispielplatz 1: Fläche nicht mehr aktiv (Fläche Position 1) (50%-Aufschlag)",
+      "    Beispielplatz 1: Fläche nicht mehr aktiv (Fläche Position 2) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[6].flaechenVerteilung": [
+      "    Beispielstraße 20: 35.9m² / Zeitindex 1 (Fläche: Position 2)",
+      "    Beispielstraße 20: 4.1m² / Zeitindex 2 (Fläche: Position 1)",
+      "    Musterplatz 2a: 5.9m² / Zeitindex 1 (Fläche: Position 2) (50% Aufschlag)",
+      "    Musterplatz 2a: 4.1m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[6].gebuehrenstufe": [
+      "50.0m² --> Gebührenstufe 1",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[6].berechnung": [
+      "    1 Wochen x 36m² (35.9m²) x 1,50€ (Gebührenstufe 1 / Zeitindex 1) = 54,00€",
+      "    1 Wochen x 5m² (4.1m²) x 1,50€ (Gebührenstufe 1 / Zeitindex 2) = 7,50€",
+      "    1 Wochen x 6m² (5.9m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 1) = 13,50€ (50%-Aufschlag)",
+      "    1 Wochen x 5m² (4.1m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 2) = 11,25€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

@@ -31,7 +31,7 @@ public record AbrechnungTestfall(
 
     public static final String BASE_PATH = "abrechnung-testdaten";
 
-    private static final String FAELLE_RESOURCES = "classpath:" + BASE_PATH + "/faelle/*.json";
+    private static final String FAELLE_RESOURCES = "classpath:" + BASE_PATH + "/*.json";
 
     private static final ObjectMapper MAPPER = new ObjectMapper();
 

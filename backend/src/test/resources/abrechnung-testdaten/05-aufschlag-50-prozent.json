@@ -1,0 +1,61 @@
+{
+  "name": "Adresse mit 50 Prozent Aufschlag",
+  "description": "Gleiche Flaeche wie im Grundfall, aber die Adresse traegt den Aufschlag. Der Gebuehrensatz steigt von 1,50 auf 2,25 Euro.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Aufschlag",
+    "projektNummer": "P-0005",
+    "projektDbId": "11111111-1111-1111-1111-111111111115",
+    "abrechnungsdatum": "2025-12-31",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Musterstrasse 5",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "id": 1,
+            "gueltigVon": "2025-01-06",
+            "gueltigBis": "2025-01-26",
+            "flaecheQm": 50
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-01-06",
+    "$.abrechnungszeitraumBis": "2025-01-26",
+    "$.gebuehrFlaechen": 337.5,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 337.5,
+    "$.gebuehrZahlung": 337.5,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 3,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 3,
+    "$.bescheiddatenFlaechen[0].gebuehr": 337.5,
+    "$.bescheiddatenFlaechen[0].grund": [
+      "    Musterstrasse 5: Flächenerweiterung +50m² (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Musterstrasse 5: 50m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "50m² --> Gebührenstufe 1",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    3 Wochen x 50m² (50m²) x 2,25€ (Gebührenstufe 1 / Zeitindex 1) = 337,50€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

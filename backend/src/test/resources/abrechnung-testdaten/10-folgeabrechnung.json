@@ -1,0 +1,84 @@
+{
+  "name": "Folgeabrechnung nach einer bestehenden Abrechnung",
+  "description": "Gleiche Eingabe wie beim Zeitindexwechsel, aber es gibt schon Abrechnung 1. Gerechnet wird weiterhin ueber den ganzen Zeitraum, nur der Zahlbetrag wird um die Gesamtgebuehr der Vorabrechnung gekuerzt. Der Abrechnungszeitraum beginnt am Tag nach der Vorabrechnung.",
+  "letzteAbrechnung": {
+    "lfdNr": 1,
+    "abrechnungszeitraumBis": "2025-04-06",
+    "gebuehrGesamt": 2340
+  },
+  "input": {
+    "projektName": "Testprojekt Folgeabrechnung",
+    "projektNummer": "P-0010",
+    "projektDbId": "11111111-1111-1111-1111-111111111120",
+    "abrechnungsdatum": "2025-12-31",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Musterstrasse 11",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "id": 1,
+            "gueltigVon": "2025-01-06",
+            "gueltigBis": "2025-06-29",
+            "flaecheQm": 120
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 2,
+    "$.abrechnungszeitraumVon": "2025-04-07",
+    "$.abrechnungszeitraumBis": "2025-06-29",
+    "$.gebuehrFlaechen": 5220,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 5220,
+    "$.gebuehrZahlung": 2880,
+    "$.bescheiddatenFlaechen.length()": 2,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 13,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 13,
+    "$.bescheiddatenFlaechen[0].gebuehr": 2340,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Musterstrasse 11: 120m² / Zeitindex 1 (Fläche: Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "120m² --> Gebührenstufe 2",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    13 Wochen x 120m² (120m²) x 1,50€ (Gebührenstufe 2 / Zeitindex 1) = 2.340,00€",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].wocheBeginn": 14,
+    "$.bescheiddatenFlaechen[1].wocheEnde": 25,
+    "$.bescheiddatenFlaechen[1].wocheDauer": 12,
+    "$.bescheiddatenFlaechen[1].gebuehr": 2880,
+    "$.bescheiddatenFlaechen[1].grund": [
+      "    Musterstrasse 11: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].flaechenVerteilung": [
+      "    Musterstrasse 11: 120m² / Zeitindex 2 (Fläche: Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].gebuehrenstufe": [
+      "120m² --> Gebührenstufe 2",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].berechnung": [
+      "    12 Wochen x 120m² (120m²) x 2,00€ (Gebührenstufe 2 / Zeitindex 2) = 2.880,00€",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

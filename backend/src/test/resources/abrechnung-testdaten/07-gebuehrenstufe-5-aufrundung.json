@@ -1,0 +1,61 @@
+{
+  "name": "Aufrundung auf volle m2 und Gebuehrenstufe 5",
+  "description": "500,01 m2 werden auf 501 m2 aufgerundet und kippen damit ueber die Grenze von 500 m2 in Gebuehrenstufe 5. Der Zeitraum ist genau eine Woche lang.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Aufrundung",
+    "projektNummer": "P-0007",
+    "projektDbId": "11111111-1111-1111-1111-111111111117",
+    "abrechnungsdatum": "2025-12-31",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Musterstrasse 8",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "id": 1,
+            "gueltigVon": "2025-01-06",
+            "gueltigBis": "2025-01-12",
+            "flaecheQm": 500.01
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-01-06",
+    "$.abrechnungszeitraumBis": "2025-01-12",
+    "$.gebuehrFlaechen": 751.5,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 751.5,
+    "$.gebuehrZahlung": 751.5,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 1,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 1,
+    "$.bescheiddatenFlaechen[0].gebuehr": 751.5,
+    "$.bescheiddatenFlaechen[0].grund": [
+      "    Musterstrasse 8: Flächenerweiterung +500.01m² (Fläche Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Musterstrasse 8: 500.01m² / Zeitindex 1 (Fläche: Position 1)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "500.01m² --> Gebührenstufe 5",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    1 Wochen x 501m² (500.01m²) x 1,50€ (Gebührenstufe 5 / Zeitindex 1) = 751,50€",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}
