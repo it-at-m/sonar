@@ -2,6 +2,7 @@ package de.muenchen.oss.sonar.backend.berechnung.ueberspannungen;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Mastzeitindex;
+import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.util.Optional;
@@ -11,8 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class MastService {
 
-    public static Mast berechne(final AbrechnungMast mast, final int nummer, final LocalDate beginnMonatslauf) {
-        return new Mast(nummer, mast.beginn(), mast.ende(), firstMonth(mast.beginn(), beginnMonatslauf));
+    public static Mast berechne(final AbrechnungMast mast, final int nummer, final LocalDate beginnMonatslauf,
+            final LocalDate berechnungsdatum) {
+        return new Mast(nummer, mast.beginn(), Zeitraum.notAfter(mast.ende(), berechnungsdatum),
+                firstMonth(mast.beginn(), beginnMonatslauf));
     }
 
     private static int firstMonth(final LocalDate beginn, final LocalDate beginnMonatslauf) {

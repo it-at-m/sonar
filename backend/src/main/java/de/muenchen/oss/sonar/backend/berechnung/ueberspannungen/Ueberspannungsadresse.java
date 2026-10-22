@@ -23,6 +23,6 @@ public record Ueberspannungsadresse(
     }
 
     public Optional<LocalDate> ende() {
-        return masten.stream().map(Mast::ende).max(Comparator.naturalOrder());
+        return masten.stream().map(Mast::berechnungsEnde).max(Comparator.naturalOrder());
     }
 }

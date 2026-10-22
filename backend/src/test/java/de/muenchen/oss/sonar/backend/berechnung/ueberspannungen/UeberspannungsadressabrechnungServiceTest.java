@@ -36,6 +36,18 @@ class UeberspannungsadressabrechnungServiceTest {
         }
 
         @Test
+        void givenAdresseWhoseMastHasNotStarted_thenChargeNothingAndReportAnAbschnittOhneMonat() {
+            final Mast kuenftig = new Mast(1, LocalDate.of(2026, 5, 1), LocalDate.of(2026, 3, 31), 1);
+            final Ueberspannungsadresse adresse = new Ueberspannungsadresse("Marienplatz 8", List.of(kuenftig), 0);
+
+            final Ueberspannungsadressabrechnung abrechnung = UeberspannungsadressabrechnungService.berechne(adresse);
+
+            assertThat(abrechnung.gebuehr()).isEqualByComparingTo(BigDecimal.ZERO);
+            assertThat(abrechnung.abschnitte()).containsExactly(
+                    new BescheiddatenUeberspannung(1, 0, 0, "", "", BigDecimal.ZERO));
+        }
+
+        @Test
         void givenMastJoiningLater_thenCutAnAbschnittAtThatMonat() {
             final Mast laufend = new Mast(1, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30), 1);
             final Mast neu = new Mast(2, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30), 3);

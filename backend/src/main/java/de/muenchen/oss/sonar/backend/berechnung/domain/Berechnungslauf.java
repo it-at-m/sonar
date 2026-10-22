@@ -39,7 +39,7 @@ public record Berechnungslauf(
                 .toList();
 
         final List<Ueberspannungsadresse> ueberspannungsadressen = abrechnung.nutzungsobjekte().stream()
-                .map(UeberspannungsadresseService::berechne)
+                .map(nutzungsobjekt -> UeberspannungsadresseService.berechne(nutzungsobjekt, berechnungsdatum))
                 .filter(adresse -> !adresse.masten().isEmpty())
                 .toList();
 

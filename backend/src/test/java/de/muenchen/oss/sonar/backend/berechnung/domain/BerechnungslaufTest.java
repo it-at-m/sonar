@@ -180,6 +180,27 @@ class BerechnungslaufTest {
         }
 
         @Test
+        void givenMastReachingBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, null, null, null, false, List.of(position),
+                    List.of(new AbrechnungMast(null, VON, LocalDate.of(2026, 12, 31))));
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
+
+            final Berechnungsergebnis ergebnis = Berechnungslauf
+                    .create(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann")
+                    .run();
+
+            // Only Monat 1 has begun by the Berechnungsdatum, and the erste Mast costs 50,00 € per Monat.
+            assertThat(ergebnis.gebuehrUeberspannungen()).isEqualByComparingTo("50.00");
+            assertThat(ergebnis.abrechnungszeitraumBis()).isEqualTo(BERECHNUNGSDATUM);
+        }
+
+        @Test
         void givenNutzungsobjektWithoutPosition_thenChargeNoFlaeche() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
