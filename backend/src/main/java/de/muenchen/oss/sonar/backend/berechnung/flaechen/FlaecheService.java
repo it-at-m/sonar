@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.berechnung.flaechen;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
+import de.muenchen.oss.sonar.backend.common.Zeitraum;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
@@ -18,17 +19,10 @@ public final class FlaecheService {
         return new Flaeche(
                 "Position " + flaechenNummer,
                 position.beginn(),
-                notAfter(position.ende(), berechnungsdatum),
+                Zeitraum.notAfter(position.ende(), berechnungsdatum),
                 firstWeek(position.beginn(), beginnWochenlauf),
                 gesamtflaecheAdresse,
                 gesamtflaecheAdresse.subtract(gesamtflaecheVorher));
-    }
-
-    private static LocalDate notAfter(final LocalDate datum, final LocalDate obergrenze) {
-        if (datum == null || obergrenze == null) {
-            return datum;
-        }
-        return datum.isAfter(obergrenze) ? obergrenze : datum;
     }
 
     private static BigDecimal withoutTrailingZeros(final BigDecimal flaeche) {

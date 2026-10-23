@@ -1,0 +1,94 @@
+{
+  "name": "Ueberspannung: Altersstufenwechsel im 13. Monat",
+  "description": "Drei Masten ueber 14 Monate. Ab dem 13. Monat gilt Altersstufe 2, der dritte Mast steigt dadurch von 15 auf 22,50 Euro. Der Wechsel loest eine Zwischenabrechnung ueber die Monate 1 bis 12 aus.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Altersstufe",
+    "projektNummer": "P-0023",
+    "projektDbId": "11111111-1111-1111-1111-111111111133",
+    "abrechnungsdatum": "2026-12-31",
+    "adressen": [],
+    "adressenUeberspannung": [
+      {
+        "adressId": 0,
+        "adresse": "Mastweg 4",
+        "masten": [
+          {
+            "mastNummer": 1,
+            "beginn": "2025-01-01",
+            "ende": "2026-02-28"
+          },
+          {
+            "mastNummer": 2,
+            "beginn": "2025-01-01",
+            "ende": "2026-02-28"
+          },
+          {
+            "mastNummer": 3,
+            "beginn": "2025-01-01",
+            "ende": "2026-02-28"
+          }
+        ]
+      }
+    ],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-01-01",
+    "$.abrechnungszeitraumBis": "2026-02-28",
+    "$.gebuehrFlaechen": 0,
+    "$.gebuehrUeberspannungen": 925,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 925,
+    "$.gebuehrZahlung": 925,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 0,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 0,
+    "$.bescheiddatenFlaechen[0].gebuehr": 0,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "0m² --> ",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 1,
+    "$.bescheiddatenUeberspannungen[0].adresse": "Mastweg 4",
+    "$.bescheiddatenUeberspannungen[0].gebuehrUeberspannungen": 925,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen.length()": 2,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatBeginn": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatEnde": 12,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatDauer": 12,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].gebuehr": 780,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].berechnung": [
+      "    12 Monate x 65,00€ (3 Masten)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[1].monatBeginn": 13,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[1].monatEnde": 14,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[1].monatDauer": 2,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[1].gebuehr": 145,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[1].grund": [
+      "    Mast 1 wechselt in Altersstufe 2",
+      "    Mast 2 wechselt in Altersstufe 2",
+      "    Mast 3 wechselt in Altersstufe 2",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[1].berechnung": [
+      "    2 Monate x 72,50€ (3 Masten)",
+      ""
+    ]
+  }
+}

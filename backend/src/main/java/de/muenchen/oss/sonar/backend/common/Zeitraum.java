@@ -12,6 +12,13 @@ public final class Zeitraum {
         return von == null || bis == null || !bis.isBefore(von);
     }
 
+    public static LocalDate notAfter(final LocalDate datum, final LocalDate obergrenze) {
+        if (datum == null || obergrenze == null) {
+            return datum;
+        }
+        return datum.isAfter(obergrenze) ? obergrenze : datum;
+    }
+
     /**
      * A given period wins, because then the days follow from it. Otherwise the directly entered value
      * is kept. Both boundaries count, so a period from the 1st to the 3rd is three days.

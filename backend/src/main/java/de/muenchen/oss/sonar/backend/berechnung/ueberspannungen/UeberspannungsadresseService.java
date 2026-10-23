@@ -12,7 +12,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class UeberspannungsadresseService {
 
-    public static Ueberspannungsadresse berechne(final AbrechnungNutzungsobjekt nutzungsobjekt) {
+    public static Ueberspannungsadresse berechne(final AbrechnungNutzungsobjekt nutzungsobjekt, final LocalDate berechnungsdatum) {
 
         final List<AbrechnungMast> erfasst = nutzungsobjekt.masten();
 
@@ -20,10 +20,13 @@ public final class UeberspannungsadresseService {
 
         final List<Mast> masten = new ArrayList<>();
         for (final AbrechnungMast mast : erfasst) {
-            masten.add(MastService.berechne(mast, masten.size() + 1, beginnMonatslauf));
+            masten.add(MastService.berechne(mast, masten.size() + 1, beginnMonatslauf, berechnungsdatum));
         }
 
-        final int letzterMonat = masten.stream().mapToInt(Mast::letzterMonat).max().orElse(0);
+        final int letzterMonat = masten.stream()
+                .filter(Mast::isInAbrechnungszeitraum)
+                .mapToInt(Mast::letzterMonat)
+                .max().orElse(0);
 
         return new Ueberspannungsadresse(nutzungsobjekt.adressbezeichnung(), masten, letzterMonat);
     }

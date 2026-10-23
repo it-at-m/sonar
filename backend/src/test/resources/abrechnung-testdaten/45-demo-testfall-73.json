@@ -1,0 +1,77 @@
+{
+  "name": "Demo Testfall 73",
+  "description": "Zwei Adressen mit gleichem Zeitraum, eine davon mit Aufschlag.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Demo Testfall 73",
+    "projektNummer": "P-0045",
+    "projektDbId": "123e4567-e89b-12d3-a456-426614174004",
+    "abrechnungsdatum": "2026-04-19",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Nordstraße",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-02-09",
+            "gueltigBis": "2026-04-19",
+            "flaecheQm": 100,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      },
+      {
+        "adressId": 1,
+        "adresse": "Anton-Muster-Str. 12",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-02-09",
+            "gueltigBis": "2026-04-19",
+            "flaecheQm": 60,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2026-02-09",
+    "$.abrechnungszeitraumBis": "2026-04-19",
+    "$.gebuehrFlaechen": 2850,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 2850,
+    "$.gebuehrZahlung": 2850,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 10,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 10,
+    "$.bescheiddatenFlaechen[0].gebuehr": 2850,
+    "$.bescheiddatenFlaechen[0].grund": [
+      "    Nordstraße: Flächenerweiterung +100m² (Fläche Position 1)",
+      "    Anton-Muster-Str. 12: Flächenerweiterung +60m² (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Nordstraße: 100m² / Zeitindex 1 (Fläche: Position 1)",
+      "    Anton-Muster-Str. 12: 60m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "160m² --> Gebührenstufe 3",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    10 Wochen x 100m² (100m²) x 1,50€ (Gebührenstufe 3 / Zeitindex 1) = 1.500,00€",
+      "    10 Wochen x 60m² (60m²) x 2,25€ (Gebührenstufe 3 / Zeitindex 1) = 1.350,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

@@ -11,6 +11,8 @@ class MastServiceTest {
 
     private static final LocalDate BEGINN_ADRESSE = LocalDate.of(2026, 1, 1);
 
+    private static final LocalDate BERECHNUNGSDATUM = LocalDate.of(2026, 12, 31);
+
     @Nested
     class Berechne {
 
@@ -18,7 +20,7 @@ class MastServiceTest {
         void givenMastStartingWithTheAdresse_thenBeginItInTheFirstMonat() {
             final AbrechnungMast erfasst = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31));
 
-            final Mast mast = MastService.berechne(erfasst, 1, BEGINN_ADRESSE);
+            final Mast mast = MastService.berechne(erfasst, 1, BEGINN_ADRESSE, BERECHNUNGSDATUM);
 
             assertThat(mast.ersterMonat()).isEqualTo(1);
             assertThat(mast.letzterMonat()).isEqualTo(3);
@@ -28,7 +30,7 @@ class MastServiceTest {
         void givenMastStartingLater_thenCountItsErsterMonatFromTheBeginnOfTheAdresse() {
             final AbrechnungMast erfasst = new AbrechnungMast(null, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30));
 
-            final Mast mast = MastService.berechne(erfasst, 2, BEGINN_ADRESSE);
+            final Mast mast = MastService.berechne(erfasst, 2, BEGINN_ADRESSE, BERECHNUNGSDATUM);
 
             assertThat(mast.ersterMonat()).isEqualTo(3);
             assertThat(mast.letzterMonat()).isEqualTo(6);
@@ -38,7 +40,7 @@ class MastServiceTest {
         void givenMastEndingWithinItsFirstMonat_thenStillChargeThatMonat() {
             final AbrechnungMast erfasst = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15));
 
-            final Mast mast = MastService.berechne(erfasst, 1, BEGINN_ADRESSE);
+            final Mast mast = MastService.berechne(erfasst, 1, BEGINN_ADRESSE, BERECHNUNGSDATUM);
 
             assertThat(mast.ersterMonat()).isEqualTo(1);
             assertThat(mast.letzterMonat()).isEqualTo(1);
@@ -48,11 +50,30 @@ class MastServiceTest {
         void givenMast_thenKeepItsNummerAndItsDates() {
             final AbrechnungMast erfasst = new AbrechnungMast(null, LocalDate.of(2026, 2, 1), LocalDate.of(2026, 4, 30));
 
-            final Mast mast = MastService.berechne(erfasst, 7, BEGINN_ADRESSE);
+            final Mast mast = MastService.berechne(erfasst, 7, BEGINN_ADRESSE, BERECHNUNGSDATUM);
 
             assertThat(mast.nummer()).isEqualTo(7);
             assertThat(mast.beginn()).isEqualTo(LocalDate.of(2026, 2, 1));
-            assertThat(mast.ende()).isEqualTo(LocalDate.of(2026, 4, 30));
+            assertThat(mast.berechnungsEnde()).isEqualTo(LocalDate.of(2026, 4, 30));
+        }
+
+        @Test
+        void givenMastReachingBeyondTheBerechnungsdatum_thenCutItBackToIt() {
+            final AbrechnungMast erfasst = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2027, 6, 30));
+
+            final Mast mast = MastService.berechne(erfasst, 1, BEGINN_ADRESSE, LocalDate.of(2026, 3, 31));
+
+            assertThat(mast.berechnungsEnde()).isEqualTo(LocalDate.of(2026, 3, 31));
+            assertThat(mast.letzterMonat()).isEqualTo(3);
+        }
+
+        @Test
+        void givenMastStartingAfterTheBerechnungsdatum_thenLeaveItOutOfTheAbrechnungszeitraum() {
+            final AbrechnungMast erfasst = new AbrechnungMast(null, LocalDate.of(2026, 5, 1), LocalDate.of(2026, 9, 30));
+
+            final Mast mast = MastService.berechne(erfasst, 1, BEGINN_ADRESSE, LocalDate.of(2026, 3, 31));
+
+            assertThat(mast.isInAbrechnungszeitraum()).isFalse();
         }
     }
 

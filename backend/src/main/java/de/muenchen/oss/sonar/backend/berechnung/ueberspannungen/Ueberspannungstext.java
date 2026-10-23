@@ -22,7 +22,7 @@ public final class Ueberspannungstext {
 
     /* default */ static String zusammenfassung(final Mast mast) {
         return "   - Mast " + mast.nummer() + System.lineSeparator()
-                + "        Beginn: " + mast.beginn() + "  Ende: " + mast.ende()
+                + "        Beginn: " + mast.beginn() + "  Ende: " + mast.berechnungsEnde()
                 + " (--> " + mast.dauerMonate() + " Monate)" + System.lineSeparator()
                 + "        Gültigkeit: Monat " + mast.ersterMonat() + "-" + mast.letzterMonat() + System.lineSeparator();
     }

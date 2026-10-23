@@ -1,0 +1,77 @@
+{
+  "name": "Zwei Adressen, nur eine mit Aufschlag",
+  "description": "Die Gebuehrenstufe richtet sich nach der Summe beider Adressen (200 m2, Stufe 3), der Gebuehrensatz aber je Adresse nach ihrem Aufschlag.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Zwei Adressen",
+    "projektNummer": "P-0006",
+    "projektDbId": "11111111-1111-1111-1111-111111111116",
+    "abrechnungsdatum": "2025-12-31",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Musterstrasse 6",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "id": 1,
+            "gueltigVon": "2025-01-06",
+            "gueltigBis": "2025-01-26",
+            "flaecheQm": 80
+          }
+        ]
+      },
+      {
+        "adressId": 1,
+        "adresse": "Musterstrasse 7",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "id": 2,
+            "gueltigVon": "2025-01-06",
+            "gueltigBis": "2025-01-26",
+            "flaecheQm": 120
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-01-06",
+    "$.abrechnungszeitraumBis": "2025-01-26",
+    "$.gebuehrFlaechen": 1170,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 1170,
+    "$.gebuehrZahlung": 1170,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 3,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 3,
+    "$.bescheiddatenFlaechen[0].gebuehr": 1170,
+    "$.bescheiddatenFlaechen[0].grund": [
+      "    Musterstrasse 6: Flächenerweiterung +80m² (Fläche Position 1)",
+      "    Musterstrasse 7: Flächenerweiterung +120m² (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Musterstrasse 6: 80m² / Zeitindex 1 (Fläche: Position 1)",
+      "    Musterstrasse 7: 120m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "200m² --> Gebührenstufe 3",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    3 Wochen x 80m² (80m²) x 1,50€ (Gebührenstufe 3 / Zeitindex 1) = 360,00€",
+      "    3 Wochen x 120m² (120m²) x 2,25€ (Gebührenstufe 3 / Zeitindex 1) = 810,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

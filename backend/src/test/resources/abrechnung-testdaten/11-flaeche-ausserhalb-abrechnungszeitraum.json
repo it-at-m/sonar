@@ -1,0 +1,58 @@
+{
+  "name": "Randfall: Flaeche beginnt nach dem Abrechnungsdatum",
+  "description": "Die Flaeche wird erst ab Mai gueltig, abgerechnet wird zum 2025-04-01. Nach dem Kappen liegt das Ende vor dem Beginn. Der Fall haelt fest, wie der PoC damit umgeht: null Wochen, null Euro, und ein Abrechnungszeitraum, dessen Von nach dem Bis liegt. Wenn das Zielprojekt hier bewusst anders arbeitet, den Tag randfall abschalten.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Randfall",
+    "projektNummer": "P-0011",
+    "projektDbId": "11111111-1111-1111-1111-111111111121",
+    "abrechnungsdatum": "2025-04-01",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Musterstrasse 12",
+        "aufschlag50prozent": false,
+        "flaechen": [
+          {
+            "id": 1,
+            "gueltigVon": "2025-05-01",
+            "gueltigBis": "2025-06-01",
+            "flaecheQm": 80
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-05-01",
+    "$.abrechnungszeitraumBis": "2025-04-01",
+    "$.gebuehrFlaechen": 0,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 0,
+    "$.gebuehrZahlung": 0,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 0,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 0,
+    "$.bescheiddatenFlaechen[0].gebuehr": 0,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "0m² --> ",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

@@ -1,0 +1,104 @@
+{
+  "name": "Demo Testfall 28",
+  "description": "Zwei Adressen, beide mit 50 Prozent Aufschlag. Die erste waechst von 200 auf 300 m2, die zweite kommt zum selben Zeitpunkt dazu.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Demo Testfall 28",
+    "projektNummer": "P-0044",
+    "projektDbId": "123e4567-e89b-12d3-a456-426614174003",
+    "abrechnungsdatum": "2026-07-26",
+    "adressen": [
+      {
+        "adressId": 0,
+        "adresse": "Beispielplatz-Mitte 25",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-02-02",
+            "gueltigBis": "2026-05-03",
+            "flaecheQm": 200,
+            "flaecheQmUnerlaubt": 0
+          },
+          {
+            "gueltigVon": "2026-05-04",
+            "gueltigBis": "2026-07-26",
+            "flaecheQm": 300,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      },
+      {
+        "adressId": 1,
+        "adresse": "Teststr. 4",
+        "aufschlag50prozent": true,
+        "flaechen": [
+          {
+            "gueltigVon": "2026-05-04",
+            "gueltigBis": "2026-07-26",
+            "flaecheQm": 100,
+            "flaecheQmUnerlaubt": 0
+          }
+        ]
+      }
+    ],
+    "adressenUeberspannung": [],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2026-02-02",
+    "$.abrechnungszeitraumBis": "2026-07-26",
+    "$.gebuehrFlaechen": 22050,
+    "$.gebuehrUeberspannungen": 0,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 22050,
+    "$.gebuehrZahlung": 22050,
+    "$.bescheiddatenFlaechen.length()": 2,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 13,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 13,
+    "$.bescheiddatenFlaechen[0].gebuehr": 5850,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      "    Beispielplatz-Mitte 25: 200m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "200m² --> Gebührenstufe 3",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      "    13 Wochen x 200m² (200m²) x 2,25€ (Gebührenstufe 3 / Zeitindex 1) = 5.850,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].wocheBeginn": 14,
+    "$.bescheiddatenFlaechen[1].wocheEnde": 25,
+    "$.bescheiddatenFlaechen[1].wocheDauer": 12,
+    "$.bescheiddatenFlaechen[1].gebuehr": 16200,
+    "$.bescheiddatenFlaechen[1].grund": [
+      "    Beispielplatz-Mitte 25: Wechsel von Zeitindex 1 zu Zeitindex 2 (Fläche Position 1) (50%-Aufschlag)",
+      "    Beispielplatz-Mitte 25: Flächenerweiterung +100m² (Fläche Position 2) (50%-Aufschlag)",
+      "    Teststr. 4: Flächenerweiterung +100m² (Fläche Position 1) (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].flaechenVerteilung": [
+      "    Beispielplatz-Mitte 25: 100m² / Zeitindex 1 (Fläche: Position 2) (50% Aufschlag)",
+      "    Beispielplatz-Mitte 25: 200m² / Zeitindex 2 (Fläche: Position 1) (50% Aufschlag)",
+      "    Teststr. 4: 100m² / Zeitindex 1 (Fläche: Position 1) (50% Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].gebuehrenstufe": [
+      "400m² --> Gebührenstufe 4",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[1].berechnung": [
+      "    12 Wochen x 200m² (200m²) x 2,25€ (Gebührenstufe 4 / Zeitindex 1) = 5.400,00€ (50%-Aufschlag)",
+      "    12 Wochen x 200m² (200m²) x 4,50€ (Gebührenstufe 4 / Zeitindex 2) = 10.800,00€ (50%-Aufschlag)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 0
+  }
+}

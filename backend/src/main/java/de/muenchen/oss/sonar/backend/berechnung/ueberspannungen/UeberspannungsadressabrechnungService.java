@@ -15,6 +15,12 @@ public final class UeberspannungsadressabrechnungService {
 
     public static Ueberspannungsadressabrechnung berechne(final Ueberspannungsadresse adresse) {
 
+        if (adresse.letzterMonat() == 0) {
+            return new Ueberspannungsadressabrechnung(adresse.adressbezeichnung(),
+                    Ueberspannungstext.protokoll(adresse, List.of(), BigDecimal.ZERO), BigDecimal.ZERO,
+                    List.of(abschnittOhneMonat()));
+        }
+
         final List<Ueberspannungsmonat> monate = IntStream.rangeClosed(1, adresse.letzterMonat())
                 .mapToObj(monat -> UeberspannungsmonatService.berechne(adresse, monat))
                 .toList();
@@ -42,6 +48,10 @@ public final class UeberspannungsadressabrechnungService {
                 abschnitt.grund(),
                 Ueberspannungstext.bescheidzeile(letzterMonat, abschnitt.dauer()),
                 summe(monate.subList(abschnitt.von() - 1, abschnitt.bis())));
+    }
+
+    private static BescheiddatenUeberspannung abschnittOhneMonat() {
+        return new BescheiddatenUeberspannung(1, 0, 0, "", "", BigDecimal.ZERO);
     }
 
     private static BigDecimal summe(final List<Ueberspannungsmonat> monate) {

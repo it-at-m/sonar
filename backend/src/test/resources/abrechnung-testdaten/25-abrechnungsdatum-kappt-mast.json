@@ -1,0 +1,80 @@
+{
+  "name": "Abrechnungsdatum kappt die Mastlaufzeit",
+  "description": "Gegenstueck zu Fall 08 auf der Seite der Ueberspannungen. Der Mast laeuft bis 2025-12-31, abgerechnet wird aber zum 2025-02-02. Gekuerzt wird wie bei einer Flaeche, also ein Monat statt zwoelf, und das Bis des Zeitraums ist das Abrechnungsdatum.",
+  "letzteAbrechnung": null,
+  "input": {
+    "projektName": "Testprojekt Stichtag Ueberspannung",
+    "projektNummer": "P-0025",
+    "projektDbId": "11111111-1111-1111-1111-111111111135",
+    "abrechnungsdatum": "2025-02-02",
+    "adressen": [],
+    "adressenUeberspannung": [
+      {
+        "adressId": 0,
+        "adresse": "Mastweg 1",
+        "masten": [
+          {
+            "mastNummer": 1,
+            "beginn": "2025-01-06",
+            "ende": "2025-12-31"
+          }
+        ]
+      }
+    ],
+    "verwaltungsgebuehren": 0,
+    "username": "testuser"
+  },
+  "expected": {
+    "$.abrechnungLfdNr": 1,
+    "$.abrechnungszeitraumVon": "2025-01-06",
+    "$.abrechnungszeitraumBis": "2025-02-02",
+    "$.gebuehrFlaechen": 0,
+    "$.gebuehrUeberspannungen": 50,
+    "$.gebuehrVerwaltung": 0,
+    "$.gebuehrGesamt": 50,
+    "$.gebuehrZahlung": 50,
+    "$.bescheiddatenFlaechen.length()": 1,
+    "$.bescheiddatenFlaechen[0].wocheBeginn": 1,
+    "$.bescheiddatenFlaechen[0].wocheEnde": 0,
+    "$.bescheiddatenFlaechen[0].wocheDauer": 0,
+    "$.bescheiddatenFlaechen[0].gebuehr": 0,
+    "$.bescheiddatenFlaechen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].flaechenVerteilung": [
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].gebuehrenstufe": [
+      "0m² --> ",
+      ""
+    ],
+    "$.bescheiddatenFlaechen[0].berechnung": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen.length()": 1,
+    "$.bescheiddatenUeberspannungen[0].adresse": "Mastweg 1",
+    "$.bescheiddatenUeberspannungen[0].gebuehrUeberspannungen": 50,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen.length()": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatBeginn": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatEnde": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].monatDauer": 1,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].gebuehr": 50,
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].grund": [
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen[0].bescheiddatenUeberspannungen[0].berechnung": [
+      "    1 Monate x 50,00€ (1 Masten)",
+      ""
+    ],
+    "$.bescheiddatenUeberspannungen[0].berechnungslog": [
+      "Monat 1",
+      "    Anzahl Masten: 1",
+      "    Mast 1: 1. Monat  --> Gebührensatz: 50,00€",
+      "    ==> Die Gebühr für Monat 1 beträgt 50,00€",
+      "",
+      "===> Die Gebühr für Adresse Mastweg 1 beträgt 50,00€",
+      "",
+      ""
+    ]
+  }
+}

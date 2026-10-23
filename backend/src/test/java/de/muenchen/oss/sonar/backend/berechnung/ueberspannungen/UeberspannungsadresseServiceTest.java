@@ -13,6 +13,8 @@ import org.junit.jupiter.api.Test;
 
 class UeberspannungsadresseServiceTest {
 
+    private static final LocalDate BERECHNUNGSDATUM = LocalDate.of(2026, 12, 31);
+
     @Nested
     class Berechne {
 
@@ -24,7 +26,7 @@ class UeberspannungsadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(erster, zweiter));
 
-            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt);
+            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
 
             assertThat(adresse.masten()).extracting(Mast::nummer).containsExactly(1, 2);
         }
@@ -37,7 +39,7 @@ class UeberspannungsadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(spaeter, frueher));
 
-            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt);
+            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
 
             assertThat(adresse.masten()).extracting(Mast::ersterMonat).containsExactly(3, 1);
             assertThat(adresse.masten()).extracting(Mast::letzterMonat).containsExactly(6, 4);
@@ -51,7 +53,7 @@ class UeberspannungsadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(kurz, lang));
 
-            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt);
+            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
 
             assertThat(adresse.letzterMonat()).isEqualTo(6);
         }
@@ -62,7 +64,7 @@ class UeberspannungsadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, null, null);
 
-            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt);
+            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
 
             assertThat(adresse.masten()).isEmpty();
             assertThat(adresse.letzterMonat()).isZero();
@@ -75,9 +77,35 @@ class UeberspannungsadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(erfasst));
 
-            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt);
+            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
 
             assertThat(adresse.adressbezeichnung()).isEqualTo("Marienplatz 8");
+        }
+
+        @Test
+        void givenMastStartingAfterTheBerechnungsdatum_thenCarryNoMonatForIt() {
+            final AbrechnungMast kuenftig = new AbrechnungMast(null, LocalDate.of(2026, 5, 1), LocalDate.of(2026, 9, 30));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, null, null, null, false, null, List.of(kuenftig));
+
+            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 3, 31));
+
+            assertThat(adresse.letzterMonat()).isZero();
+        }
+
+        @Test
+        void givenOneMastStartedAndOneNotYet_thenEndTheAdresseWithTheStartedOne() {
+            final AbrechnungMast laufend = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 28));
+            final AbrechnungMast kuenftig = new AbrechnungMast(null, LocalDate.of(2026, 5, 1), LocalDate.of(2026, 9, 30));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, null, null, null, false, null, List.of(laufend, kuenftig));
+
+            final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 3, 31));
+
+            assertThat(adresse.letzterMonat()).isEqualTo(2);
+            assertThat(adresse.masten()).extracting(Mast::nummer).containsExactly(1, 2);
         }
     }
 
