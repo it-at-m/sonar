@@ -21,6 +21,7 @@ const vitepressConfig = defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Designentscheidungen", link: "/architecture/decisions/" },
+      { text: "Berechnung", link: "/architecture/berechnung/" },
       { text: "Naming Conventions", link: "/architecture/naming_conventions/" },
     ],
     sidebar: [
@@ -54,6 +55,10 @@ const vitepressConfig = defineConfig({
             link: "/architecture/decisions/0004-offset-pagination",
           },
         ],
+      },
+      {
+        text: "Berechnung",
+        link: "/architecture/berechnung/",
       },
     ],
     socialLinks: [
