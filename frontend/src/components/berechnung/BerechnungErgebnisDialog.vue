@@ -11,7 +11,10 @@
     width="1200"
   >
     <v-card>
-      <v-card-title>Ergebnis der Berechnung (temporär zum Abgleich mit Prototyp)</v-card-title>
+      <v-card-title
+        >Ergebnis der Berechnung (temporär zum Abgleich mit
+        Prototyp)</v-card-title
+      >
       <v-card-subtitle>{{ ueberschrift }}</v-card-subtitle>
       <v-card-text>
         <v-tabs v-model="tab">
