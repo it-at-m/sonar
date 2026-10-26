@@ -71,6 +71,11 @@ public class AbrechnungService {
     }
 
     @Transactional(readOnly = true)
+    public boolean existsAbrechnung(final UUID projektId, final UUID abrechnungId) {
+        return abrechnungRepository.existsByIdAndProjektId(abrechnungId, projektId);
+    }
+
+    @Transactional(readOnly = true)
     public List<AbrechnungVersion> getVersionenOfAbrechnung(final UUID projektId, final UUID abrechnungId) {
         log.info("Get the versions of Abrechnung {} of Projekt {}", abrechnungId, projektId);
         final List<AbrechnungVersion> versionenOfProjekt = abrechnungRepository.findByProjektId(projektId);

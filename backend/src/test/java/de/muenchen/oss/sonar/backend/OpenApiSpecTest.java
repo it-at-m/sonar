@@ -6,6 +6,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
+import de.muenchen.oss.sonar.backend.berechnung.BerechnungRepository;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
 import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchRepository;
@@ -73,6 +74,9 @@ class OpenApiSpecTest {
 
     @MockitoBean
     private AbrechnungRepository abrechnungRepository;
+
+    @MockitoBean
+    private BerechnungRepository berechnungRepository;
 
     @MockitoBean
     private ProjektRepository projektRepository;

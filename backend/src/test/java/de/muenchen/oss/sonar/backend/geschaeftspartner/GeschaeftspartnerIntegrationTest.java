@@ -7,6 +7,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
+import de.muenchen.oss.sonar.backend.berechnung.BerechnungRepository;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.client.MockGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
@@ -42,6 +43,9 @@ class GeschaeftspartnerIntegrationTest {
 
     @MockitoBean
     private AbrechnungRepository abrechnungRepository;
+
+    @MockitoBean
+    private BerechnungRepository berechnungRepository;
 
     @MockitoBean
     private ProjektRepository projektRepository;
