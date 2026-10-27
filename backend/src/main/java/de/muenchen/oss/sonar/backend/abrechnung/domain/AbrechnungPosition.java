@@ -11,8 +11,7 @@ public record AbrechnungPosition(
         LocalDate ende,
         BigDecimal laenge,
         BigDecimal breite,
-        BigDecimal flaeche,
-        BigDecimal anteilAnFlaeche) {
+        BigDecimal flaeche) {
 
     public AbrechnungPosition {
         if (!Zeitraum.isOrdered(beginn, ende)) {
