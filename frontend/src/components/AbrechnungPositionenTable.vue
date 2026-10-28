@@ -43,25 +43,27 @@
             <td>
               <v-number-input
                 :id="`${idPrefix}-laenge-${index}`"
+                ref="laengeInputs"
                 :aria-label="`Länge der Position ${index + 1}`"
                 control-variant="hidden"
                 density="compact"
                 :model-value="position.laenge"
                 :precision="2"
                 :rules="[laengeRule(position), greaterThanZeroRule]"
-                @update:model-value="setLaenge(position, $event)"
+                @update:model-value="updateLaenge(position, index, $event)"
               />
             </td>
             <td>
               <v-number-input
                 :id="`${idPrefix}-breite-${index}`"
+                ref="breiteInputs"
                 :aria-label="`Breite der Position ${index + 1}`"
                 control-variant="hidden"
                 density="compact"
                 :model-value="position.breite"
                 :precision="2"
                 :rules="[breiteRule(position), greaterThanZeroRule]"
-                @update:model-value="setBreite(position, $event)"
+                @update:model-value="updateBreite(position, index, $event)"
               />
             </td>
             <td>
@@ -121,8 +123,10 @@
 
 <script setup lang="ts">
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
+import type { VNumberInput } from "vuetify/components";
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
+import { useTemplateRef } from "vue";
 
 import SonarDateField from "@/components/common/SonarDateField.vue";
 import {
@@ -145,12 +149,39 @@ const { readonly = false, removable } = defineProps<{
   readonly?: boolean;
 }>();
 
+const laengeInputs = useTemplateRef<VNumberInput[]>("laengeInputs");
+const breiteInputs = useTemplateRef<VNumberInput[]>("breiteInputs");
+
 function addPosition(): void {
   positionen.value.push(createAbrechnungPosition());
 }
 
 function removePosition(index: number): void {
   positionen.value.splice(index, 1);
+}
+
+function updateLaenge(
+  position: AbrechnungPositionForm,
+  index: number,
+  laenge: number | null
+): void {
+  setLaenge(position, laenge);
+  revalidate(breiteInputs.value?.[index]);
+}
+
+function updateBreite(
+  position: AbrechnungPositionForm,
+  index: number,
+  breite: number | null
+): void {
+  setBreite(position, breite);
+  revalidate(laengeInputs.value?.[index]);
+}
+
+function revalidate(input?: VNumberInput): void {
+  if (input?.isValid === false) {
+    void input.validate();
+  }
 }
 </script>
 
