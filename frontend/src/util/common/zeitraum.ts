@@ -41,6 +41,10 @@ export function lastDayOfPeriods(
   }
 }
 
+export function dayAfter(date: string): string {
+  return lastDayOfPeriods(date, 2, "day");
+}
+
 export function countWholePeriods(
   beginn: string,
   ende: string,

@@ -24,7 +24,7 @@
                 v-model="position.beginn"
                 :aria-label="`Beginn der Position ${index + 1}`"
                 density="compact"
-                :readonly="readonly || undefined"
+                readonly
                 :rules="[requiredRule]"
               />
             </td>
@@ -34,7 +34,7 @@
                 v-model="position.ende"
                 :aria-label="`Ende der Position ${index + 1}`"
                 density="compact"
-                :readonly="readonly || undefined"
+                :readonly="readonly || isLetzte(index) || undefined"
                 :rules="[requiredRule]"
                 :zeitraum-beginn="position.beginn"
                 zeitraum-einheit="week"
@@ -144,6 +144,10 @@ const { readonly = false, removable } = defineProps<{
   removable: boolean;
   readonly?: boolean;
 }>();
+
+function isLetzte(index: number): boolean {
+  return index === positionen.value.length - 1;
+}
 
 function addPosition(): void {
   positionen.value.push(createAbrechnungPosition());

@@ -1,5 +1,7 @@
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
 
+import { dayAfter } from "@/util/common/zeitraum";
+
 const HUNDREDTHS_PER_UNIT = 100;
 
 export function createAbrechnungPosition(): AbrechnungPositionForm {
@@ -25,6 +27,22 @@ export function isAbrechnungPositionDirty(
     position.flaeche !== null ||
     position.anteilAnFlaeche !== null
   );
+}
+
+export function alignPositionenToZeitraum(
+  positionen: AbrechnungPositionForm[],
+  zeitraumVon: string,
+  zeitraumBis: string
+): void {
+  positionen.forEach((position, index) => {
+    const vorgaenger = positionen[index - 1];
+    position.beginn =
+      vorgaenger === undefined ? zeitraumVon : dayAfter(vorgaenger.ende);
+  });
+  const letzte = positionen.at(-1);
+  if (letzte !== undefined && letzte.ende !== zeitraumBis) {
+    letzte.ende = zeitraumBis;
+  }
 }
 
 export function hasLaengeUndBreite(position: AbrechnungPositionForm): boolean {

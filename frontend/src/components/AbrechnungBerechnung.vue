@@ -103,11 +103,12 @@ import type { NutzungsobjektSuggestion } from "@/types/abrechnung/Nutzungsobjekt
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiAlertCircle, mdiPlus } from "@mdi/js";
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import SonarDateField from "@/components/common/SonarDateField.vue";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
+import { alignPositionenToZeitraum } from "@/util/abrechnung/abrechnungPositionForm";
 import { ABRECHNUNGS_ART_OPTIONS } from "@/util/abrechnung/abrechnungsArt";
 import {
   nutzungsobjektIdPrefix,
@@ -128,6 +129,20 @@ const {
   nutzungsobjektSuggestions?: NutzungsobjektSuggestion[];
   readonly?: boolean;
 }>();
+
+watchEffect(() => {
+  if (readonly) {
+    return;
+  }
+  const { nutzungsobjekte, zeitraumBis, zeitraumVon } = abrechnung.value;
+  for (const nutzungsobjekt of nutzungsobjekte) {
+    alignPositionenToZeitraum(
+      nutzungsobjekt.positionen,
+      zeitraumVon,
+      zeitraumBis
+    );
+  }
+});
 
 const activeNutzungsobjekt = ref(abrechnung.value.nutzungsobjekte[0]?.id ?? "");
 
