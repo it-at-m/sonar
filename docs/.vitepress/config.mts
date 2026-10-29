@@ -1,5 +1,4 @@
 import { defineConfig } from "vitepress";
-import { withMermaid } from "vitepress-plugin-mermaid";
 
 // https://vitepress.dev/reference/site-config
 const vitepressConfig = defineConfig({
@@ -86,4 +85,4 @@ const vitepressConfig = defineConfig({
   },
 });
 
-export default withMermaid(vitepressConfig);
+export default vitepressConfig;
