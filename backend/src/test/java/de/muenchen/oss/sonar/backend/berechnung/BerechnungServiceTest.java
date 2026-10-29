@@ -118,6 +118,31 @@ class BerechnungServiceTest {
         }
 
         @Test
+        void givenAPositionRunningBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
+            final LocalDate berechnungsdatumWaehrendDerPosition = LocalDate.of(2025, 1, 26);
+            final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, LocalDate.of(2025, 3, 30),
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"), new BigDecimal("50.00"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
+                    "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
+            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
+                    BEGINN, LocalDate.of(2025, 3, 30), AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
+            when(projektService.getProjekt(PROJEKT_ID)).thenReturn(
+                    new Projekt(PROJEKT_ID, "P-0001", BEGINN, LocalDate.of(2025, 3, 30), BigDecimal.ZERO, List.of()));
+            when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
+
+            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID,
+                    berechnungsdatumWaehrendDerPosition);
+
+            assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("225");
+            assertThat(ergebnis.gebuehrGesamt()).isEqualByComparingTo("225");
+            assertThat(ergebnis.abrechnungszeitraumBis()).isEqualTo(berechnungsdatumWaehrendDerPosition);
+            assertThat(ergebnis.bescheiddatenFlaechen()).singleElement().satisfies(bescheiddaten -> {
+                assertThat(bescheiddaten.wocheEnde()).isEqualTo(3);
+                assertThat(bescheiddaten.wocheDauer()).isEqualTo(3);
+            });
+        }
+
+        @Test
         void givenAnAbrechnung_thenTheZusammenfassungNamesTheProjektAndTheUser() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, ENDE,
                     new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"), new BigDecimal("50.00"));
