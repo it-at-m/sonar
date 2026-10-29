@@ -4,9 +4,9 @@ import { mdiChatAlert, mdiChatPlus, mdiFileDocumentPlus } from "@mdi/js";
 import { mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
-import AbrechnungBerechnungDialog from "@/components/AbrechnungBerechnungDialog.vue";
 import AbrechnungTable from "@/components/AbrechnungTable.vue";
 import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
+import BerechnungDurchfuehrenDialog from "@/components/berechnung/BerechnungDurchfuehrenDialog.vue";
 import vuetify from "@/plugins/vuetify";
 
 const PROJEKT_ID = "123e4567-e89b-12d3-a456-426614174000";
@@ -22,7 +22,10 @@ function mountTable(rows: AbrechnungTableRow[] = []) {
       totalAbrechnungen: rows.length,
       loading: false,
     },
-    global: { plugins: [vuetify] },
+    global: {
+      plugins: [vuetify],
+      stubs: { BerechnungDurchfuehrenDialog: true },
+    },
   });
 }
 
@@ -53,7 +56,7 @@ function neueVersionIconPath(wrapper: ReturnType<typeof mountTable>) {
 }
 
 function berechnungDialog(wrapper: ReturnType<typeof mountTable>) {
-  return wrapper.findComponent(AbrechnungBerechnungDialog);
+  return wrapper.findComponent(BerechnungDurchfuehrenDialog);
 }
 
 describe("AbrechnungTable.vue", () => {
