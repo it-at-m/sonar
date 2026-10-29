@@ -1,5 +1,4 @@
 import { defineConfig } from "vitepress";
-import { withMermaid } from "vitepress-plugin-mermaid";
 
 // https://vitepress.dev/reference/site-config
 const vitepressConfig = defineConfig({
@@ -21,6 +20,7 @@ const vitepressConfig = defineConfig({
     nav: [
       { text: "Home", link: "/" },
       { text: "Designentscheidungen", link: "/architecture/decisions/" },
+      { text: "Berechnung", link: "/architecture/berechnung/" },
       { text: "Naming Conventions", link: "/architecture/naming_conventions/" },
     ],
     sidebar: [
@@ -55,6 +55,10 @@ const vitepressConfig = defineConfig({
           },
         ],
       },
+      {
+        text: "Berechnung",
+        link: "/architecture/berechnung/",
+      },
     ],
     socialLinks: [
       { icon: "github", link: "https://github.com/it-at-m/refarch-templates" },
@@ -81,4 +85,4 @@ const vitepressConfig = defineConfig({
   },
 });
 
-export default withMermaid(vitepressConfig);
+export default vitepressConfig;
