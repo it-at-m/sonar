@@ -7,6 +7,7 @@
 <template>
   <v-dialog
     v-model="open"
+    class="berechnung-print"
     scrollable
     width="1200"
   >
@@ -48,19 +49,35 @@
           v-model="tab"
           class="mt-4"
         >
-          <v-tabs-window-item :value="TABS.KONTROLLE">
+          <v-tabs-window-item
+            eager
+            :value="TABS.KONTROLLE"
+          >
+            <h2 class="print-heading">Kontrolle UI-Daten</h2>
             <pre class="ergebnis-text">{{ kontrolldaten }}</pre>
           </v-tabs-window-item>
 
-          <v-tabs-window-item :value="TABS.ZUSAMMENFASSUNG">
+          <v-tabs-window-item
+            eager
+            :value="TABS.ZUSAMMENFASSUNG"
+          >
+            <h2 class="print-heading">Zusammenfassung</h2>
             <pre class="ergebnis-text">{{ ergebnis.zusammenfassung }}</pre>
           </v-tabs-window-item>
 
-          <v-tabs-window-item :value="TABS.BERECHNUNGSLOG">
+          <v-tabs-window-item
+            eager
+            :value="TABS.BERECHNUNGSLOG"
+          >
+            <h2 class="print-heading">Berechnungslog</h2>
             <pre class="ergebnis-text">{{ ergebnis.berechnungslog }}</pre>
           </v-tabs-window-item>
 
-          <v-tabs-window-item :value="TABS.BESCHEIDDATEN">
+          <v-tabs-window-item
+            eager
+            :value="TABS.BESCHEIDDATEN"
+          >
+            <h2 class="print-heading">Bescheiddaten</h2>
             <template
               v-for="(bescheiddaten, index) in ergebnis.bescheiddatenFlaechen"
               :key="`flaeche-${index}`"
@@ -157,6 +174,12 @@
         <v-spacer />
         <v-btn
           variant="text"
+          @click="printErgebnis"
+        >
+          Drucken
+        </v-btn>
+        <v-btn
+          variant="text"
           @click="open = false"
         >
           Schließen
@@ -241,6 +264,10 @@ function ueberspannungAbschnitte(
     { label: "Berechnung", text: bescheiddaten.berechnung ?? "" },
   ].filter((abschnitt) => abschnitt.text.trim());
 }
+
+function printErgebnis(): void {
+  window.print();
+}
 </script>
 
 <style scoped>
@@ -249,5 +276,40 @@ function ueberspannungAbschnitte(
   font-size: 0.8rem;
   white-space: pre-wrap;
   word-break: break-word;
+}
+</style>
+
+<style>
+.print-heading {
+  display: none;
+}
+
+@media print {
+  body:has(.berechnung-print.v-overlay--active) > *:not(.v-overlay-container) {
+    display: none;
+  }
+
+  body:has(.berechnung-print.v-overlay--active)
+    .v-overlay:not(.berechnung-print) {
+    display: none;
+  }
+
+  .berechnung-print,
+  .berechnung-print .v-overlay__content,
+  .berechnung-print .v-card {
+    position: static;
+    max-height: none;
+  }
+
+  .berechnung-print .v-overlay__scrim,
+  .berechnung-print .v-tabs,
+  .berechnung-print .v-card-actions {
+    display: none;
+  }
+
+  .print-heading,
+  .berechnung-print .v-window-item {
+    display: block !important;
+  }
 }
 </style>
