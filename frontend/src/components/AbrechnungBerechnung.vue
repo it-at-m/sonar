@@ -6,10 +6,11 @@
     >
       <sonar-date-field
         id="berechnung-zeitraum-von"
-        v-model="abrechnung.zeitraumVon"
         label="Zeitraum von"
+        :model-value="abrechnung.zeitraumVon"
         :readonly="readonly || undefined"
         :rules="[requiredRule]"
+        @update:model-value="setZeitraumVon"
       />
     </v-col>
     <v-col
@@ -103,11 +104,15 @@ import type { NutzungsobjektSuggestion } from "@/types/abrechnung/Nutzungsobjekt
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { mdiAlertCircle, mdiPlus } from "@mdi/js";
-import { computed, ref } from "vue";
+import { computed, ref, watchEffect } from "vue";
 
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import SonarDateField from "@/components/common/SonarDateField.vue";
 import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
+import {
+  alignPositionenToZeitraum,
+  moveBeginneWithZeitraumVon,
+} from "@/util/abrechnung/abrechnungPositionForm";
 import { ABRECHNUNGS_ART_OPTIONS } from "@/util/abrechnung/abrechnungsArt";
 import {
   nutzungsobjektIdPrefix,
@@ -128,6 +133,20 @@ const {
   nutzungsobjektSuggestions?: NutzungsobjektSuggestion[];
   readonly?: boolean;
 }>();
+
+watchEffect(() => {
+  if (readonly) {
+    return;
+  }
+  const { nutzungsobjekte, zeitraumBis, zeitraumVon } = abrechnung.value;
+  for (const nutzungsobjekt of nutzungsobjekte) {
+    alignPositionenToZeitraum(
+      nutzungsobjekt.positionen,
+      zeitraumVon,
+      zeitraumBis
+    );
+  }
+});
 
 const activeNutzungsobjekt = ref(abrechnung.value.nutzungsobjekte[0]?.id ?? "");
 
@@ -151,6 +170,18 @@ function selectableNutzungsobjekte(index: number): NutzungsobjektSuggestion[] {
   return nutzungsobjektSuggestions.filter(
     (suggestion) => !selectedByOtherEntries.has(suggestion.id)
   );
+}
+
+function setZeitraumVon(zeitraumVon: string | null | undefined): void {
+  const next = zeitraumVon ?? "";
+  for (const nutzungsobjekt of abrechnung.value.nutzungsobjekte) {
+    moveBeginneWithZeitraumVon(
+      nutzungsobjekt.positionen,
+      abrechnung.value.zeitraumVon,
+      next
+    );
+  }
+  abrechnung.value.zeitraumVon = next;
 }
 
 function addNutzungsobjekt(): void {
