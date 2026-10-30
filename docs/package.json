@@ -46,7 +46,7 @@
       "dompurify": "3.4.17"
     },
     "markdownlint-cli": {
-      "js-yaml": "5.4.2",
+      "js-yaml": "5.4.3",
       "smol-toml": "1.9.1",
       "markdownlint": {
         "micromark-extension-math": {
