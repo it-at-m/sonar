@@ -141,9 +141,10 @@ describe("nutzungsobjektSuggestion.ts", () => {
 
       applyNutzungsobjektSuggestion(nutzungsobjekt, suggestion());
 
-      expect(nutzungsobjekt.uebernommenesNutzungsobjektId).toBe(
-        NUTZUNGSOBJEKT_ID
-      );
+      expect(nutzungsobjekt.uebernahme).toEqual({
+        quelle: "NUTZUNGSOBJEKT",
+        nutzungsobjektId: NUTZUNGSOBJEKT_ID,
+      });
     });
 
     it("givenSuggestion_thenKeepTheEntryAndItsPositionen", () => {

@@ -143,6 +143,48 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     expect(nutzungsobjekt.positionen).toBe(positionen);
   });
 
+  it("givenTakenOverProjektAdresse_thenLockEveryFieldButThePositionen", async () => {
+    const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+    const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION]);
+
+    await suggestionEntries(wrapper)[0]?.vm.$emit("click");
+
+    expect(wrapper.findComponent(AdresseFields).props("readonly")).toBe(true);
+    expect(
+      wrapper.findComponent(UnerlaubteNutzungFields).props("readonly")
+    ).toBe(true);
+    expect(
+      wrapper.findComponent(AbrechnungPositionenTable).props("readonly")
+    ).toBe(false);
+  });
+
+  it("givenTakenOverProjektAdresse_thenOfferNoTakeOverButARelease", () => {
+    const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+    nutzungsobjekt.uebernahme = { quelle: "PROJEKT" };
+
+    const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION], false, [
+      NUTZUNGSOBJEKT_SUGGESTION,
+    ]);
+
+    expect(suggestionEntries(wrapper)).toHaveLength(0);
+    expect(nutzungsobjektEntries(wrapper)).toHaveLength(0);
+    expect(aufhebenButton(wrapper).exists()).toBe(true);
+  });
+
+  it("givenReleasedProjektAdresse_thenEditTheAdresseAgain", async () => {
+    const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+    nutzungsobjekt.uebernahme = { quelle: "PROJEKT" };
+    nutzungsobjekt.adresse = "Marienplatz";
+    const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION]);
+
+    await aufhebenButton(wrapper).trigger("click");
+
+    expect(nutzungsobjekt.uebernahme).toBeNull();
+    expect(nutzungsobjekt.adresse).toBe("Marienplatz");
+    expect(wrapper.findComponent(AdresseFields).props("readonly")).toBe(false);
+    expect(suggestionEntries(wrapper)).toHaveLength(1);
+  });
+
   it("givenReadonly_thenOfferNeitherToRemoveTheEntryNorToTakeOverAnAdresse", () => {
     const wrapper = mountPanel(
       createAbrechnungNutzungsobjekt(),
@@ -239,9 +281,10 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
 
     await nutzungsobjektEntries(wrapper)[0]?.vm.$emit("click");
 
-    expect(nutzungsobjekt.uebernommenesNutzungsobjektId).toBe(
-      NUTZUNGSOBJEKT_ID
-    );
+    expect(nutzungsobjekt.uebernahme).toEqual({
+      quelle: "NUTZUNGSOBJEKT",
+      nutzungsobjektId: NUTZUNGSOBJEKT_ID,
+    });
     expect(nutzungsobjekt.adresse).toBe("Sendlinger Straße");
     expect(nutzungsobjekt.bemerkung).toBe("Aus der Erstabrechnung");
     expect(nutzungsobjekt.aufschlag50prozent).toBe(true);
@@ -261,21 +304,27 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
 
   it("givenReleasedNutzungsobjekt_thenEnterANewOneAgain", async () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
-    nutzungsobjekt.uebernommenesNutzungsobjektId = NUTZUNGSOBJEKT_ID;
+    nutzungsobjekt.uebernahme = {
+      quelle: "NUTZUNGSOBJEKT",
+      nutzungsobjektId: NUTZUNGSOBJEKT_ID,
+    };
     const wrapper = mountPanel(nutzungsobjekt, [], false, [
       NUTZUNGSOBJEKT_SUGGESTION,
     ]);
 
     await aufhebenButton(wrapper).trigger("click");
 
-    expect(nutzungsobjekt.uebernommenesNutzungsobjektId).toBeNull();
+    expect(nutzungsobjekt.uebernahme).toBeNull();
     expect(wrapper.findComponent(AdresseFields).props("readonly")).toBe(false);
     expect(nutzungsobjektEntries(wrapper)).toHaveLength(1);
   });
 
   it("givenChosenNutzungsobjekt_thenLockEveryFieldButThePositionen", () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
-    nutzungsobjekt.uebernommenesNutzungsobjektId = NUTZUNGSOBJEKT_ID;
+    nutzungsobjekt.uebernahme = {
+      quelle: "NUTZUNGSOBJEKT",
+      nutzungsobjektId: NUTZUNGSOBJEKT_ID,
+    };
 
     const wrapper = mountPanel(nutzungsobjekt, [], false, [
       NUTZUNGSOBJEKT_SUGGESTION,
@@ -292,7 +341,10 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
 
   it("givenChosenNutzungsobjekt_thenOfferNoTakeOverButARelease", () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
-    nutzungsobjekt.uebernommenesNutzungsobjektId = NUTZUNGSOBJEKT_ID;
+    nutzungsobjekt.uebernahme = {
+      quelle: "NUTZUNGSOBJEKT",
+      nutzungsobjektId: NUTZUNGSOBJEKT_ID,
+    };
 
     const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION], false, [
       NUTZUNGSOBJEKT_SUGGESTION,
@@ -305,7 +357,10 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
 
   it("givenReadonly_thenOfferNeitherTheTakeOverNorTheRelease", () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
-    nutzungsobjekt.uebernommenesNutzungsobjektId = NUTZUNGSOBJEKT_ID;
+    nutzungsobjekt.uebernahme = {
+      quelle: "NUTZUNGSOBJEKT",
+      nutzungsobjektId: NUTZUNGSOBJEKT_ID,
+    };
 
     const wrapper = mountPanel(nutzungsobjekt, [], true, [
       NUTZUNGSOBJEKT_SUGGESTION,

@@ -185,7 +185,10 @@ describe("AbrechnungBerechnung.vue", () => {
     if (ersterEintrag === undefined) {
       throw new Error("Die Abrechnung hat kein Nutzungsobjekt.");
     }
-    ersterEintrag.uebernommenesNutzungsobjektId = erstes.id;
+    ersterEintrag.uebernahme = {
+      quelle: "NUTZUNGSOBJEKT",
+      nutzungsobjektId: erstes.id,
+    };
     await wrapper.vm.$nextTick();
 
     const panels = wrapper.findAllComponents(AbrechnungNutzungsobjektPanel);
