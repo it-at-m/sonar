@@ -6,7 +6,9 @@ import { describe, expect, it } from "vitest";
 import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
 import AbrechnungBerechnung from "@/components/AbrechnungBerechnung.vue";
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
+import SonarDateField from "@/components/common/SonarDateField.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
+import { createAbrechnungPosition } from "@/util/abrechnung/abrechnungPositionForm";
 
 function mountBerechnung(
   invalidNutzungsobjekte: number[] = [],
@@ -194,5 +196,65 @@ describe("AbrechnungBerechnung.vue", () => {
       zweites,
     ]);
     expect(panels[1]?.props("nutzungsobjektSuggestions")).toEqual([zweites]);
+  });
+
+  it("givenZeitraum_thenAlignThePositionen", async () => {
+    const { abrechnung, wrapper } = mountBerechnung();
+    const nutzungsobjekt = abrechnung.value.nutzungsobjekte[0];
+    if (nutzungsobjekt === undefined) {
+      throw new Error("Die Abrechnung hat kein Nutzungsobjekt.");
+    }
+    nutzungsobjekt.positionen.push(createAbrechnungPosition());
+    const [erste, zweite] = nutzungsobjekt.positionen;
+    if (erste === undefined || zweite === undefined) {
+      throw new Error("Das Nutzungsobjekt hat keine zwei Positionen.");
+    }
+    zweite.beginn = "2026-01-12";
+
+    abrechnung.value.zeitraumVon = "2026-01-05";
+    abrechnung.value.zeitraumBis = "2026-02-01";
+    await wrapper.vm.$nextTick();
+
+    expect(erste.beginn).toBe("2026-01-05");
+    expect(erste.ende).toBe("2026-01-11");
+    expect(zweite.ende).toBe("2026-02-01");
+  });
+
+  it("givenReadonly_thenKeepThePositionenAsTheyAre", async () => {
+    const { abrechnung, wrapper } = mountBerechnung([], true);
+    const position = abrechnung.value.nutzungsobjekte[0]?.positionen[0];
+    if (position === undefined) {
+      throw new Error("Das Nutzungsobjekt hat keine Position.");
+    }
+    position.beginn = "2026-01-12";
+
+    abrechnung.value.zeitraumVon = "2026-01-05";
+    await wrapper.vm.$nextTick();
+
+    expect(position.beginn).toBe("2026-01-12");
+  });
+
+  it("givenMovedZeitraumVon_thenMoveTheChosenBeginne", async () => {
+    const { abrechnung, wrapper } = mountBerechnung();
+    abrechnung.value.zeitraumVon = "2026-01-05";
+    await wrapper.vm.$nextTick();
+    const nutzungsobjekt = abrechnung.value.nutzungsobjekte[0];
+    if (nutzungsobjekt === undefined) {
+      throw new Error("Die Abrechnung hat kein Nutzungsobjekt.");
+    }
+    nutzungsobjekt.positionen.push(createAbrechnungPosition());
+    const zweite = nutzungsobjekt.positionen[1];
+    if (zweite === undefined) {
+      throw new Error("Das Nutzungsobjekt hat keine zweite Position.");
+    }
+    zweite.beginn = "2026-01-19";
+
+    await wrapper
+      .findAllComponents(SonarDateField)
+      .find((field) => field.attributes("id") === "berechnung-zeitraum-von")
+      ?.vm.$emit("update:modelValue", "2026-01-08");
+    await wrapper.vm.$nextTick();
+
+    expect(zweite.beginn).toBe("2026-01-22");
   });
 });

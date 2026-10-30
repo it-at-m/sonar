@@ -3,9 +3,12 @@ import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositi
 import { describe, expect, it } from "vitest";
 
 import {
+  alignPositionenToZeitraum,
   createAbrechnungPosition,
   hasLaengeUndBreite,
   isAbrechnungPositionDirty,
+  isPossibleBeginn,
+  moveBeginneWithZeitraumVon,
   setBreite,
   setLaenge,
 } from "@/util/abrechnung/abrechnungPositionForm";
@@ -32,6 +35,134 @@ describe("abrechnungPositionForm.ts", () => {
       const position = positionWith({ anteilAnFlaeche: 0 });
 
       expect(isAbrechnungPositionDirty(position)).toBe(true);
+    });
+  });
+
+  describe("alignPositionenToZeitraum", () => {
+    it("givenOnePosition_thenSpanTheWholeZeitraum", () => {
+      const position = createAbrechnungPosition();
+
+      alignPositionenToZeitraum([position], "2026-01-05", "2026-02-01");
+
+      expect(position.beginn).toBe("2026-01-05");
+      expect(position.ende).toBe("2026-02-01");
+    });
+
+    it("givenSeveralPositionen_thenEndEachTheDayBeforeTheNextBegins", () => {
+      const erste = createAbrechnungPosition();
+      const zweite = createAbrechnungPosition();
+      zweite.beginn = "2026-01-12";
+      const dritte = createAbrechnungPosition();
+      dritte.beginn = "2026-01-26";
+
+      alignPositionenToZeitraum(
+        [erste, zweite, dritte],
+        "2026-01-05",
+        "2026-02-01"
+      );
+
+      expect(erste.beginn).toBe("2026-01-05");
+      expect(erste.ende).toBe("2026-01-11");
+      expect(zweite.beginn).toBe("2026-01-12");
+      expect(zweite.ende).toBe("2026-01-25");
+      expect(dritte.beginn).toBe("2026-01-26");
+      expect(dritte.ende).toBe("2026-02-01");
+    });
+
+    it("givenSuccessorWithoutBeginn_thenLeaveTheEndeEmpty", () => {
+      const erste = createAbrechnungPosition();
+      erste.ende = "2026-01-11";
+      const zweite = createAbrechnungPosition();
+
+      alignPositionenToZeitraum([erste, zweite], "2026-01-05", "2026-02-01");
+
+      expect(erste.ende).toBe("");
+    });
+
+    it("givenNoPositionen_thenDoNothing", () => {
+      expect(() =>
+        alignPositionenToZeitraum([], "2026-01-05", "2026-02-01")
+      ).not.toThrow();
+    });
+  });
+
+  describe("moveBeginneWithZeitraumVon", () => {
+    it("givenMovedZeitraumVon_thenKeepTheWeeksOfEachBeginn", () => {
+      const erste = createAbrechnungPosition();
+      erste.beginn = "2026-01-05";
+      const zweite = createAbrechnungPosition();
+      zweite.beginn = "2026-01-19";
+
+      moveBeginneWithZeitraumVon([erste, zweite], "2026-01-05", "2026-01-08");
+
+      expect(erste.beginn).toBe("2026-01-05");
+      expect(zweite.beginn).toBe("2026-01-22");
+    });
+
+    it("givenBeginnOffTheWeeks_thenLeaveIt", () => {
+      const erste = createAbrechnungPosition();
+      const zweite = createAbrechnungPosition();
+      zweite.beginn = "2026-01-15";
+
+      moveBeginneWithZeitraumVon([erste, zweite], "2026-01-05", "2026-01-08");
+
+      expect(zweite.beginn).toBe("2026-01-15");
+    });
+
+    it("givenNoPreviousZeitraumVon_thenLeaveTheBeginn", () => {
+      const erste = createAbrechnungPosition();
+      const zweite = createAbrechnungPosition();
+      zweite.beginn = "2026-01-19";
+
+      moveBeginneWithZeitraumVon([erste, zweite], "", "2026-01-08");
+
+      expect(zweite.beginn).toBe("2026-01-19");
+    });
+  });
+
+  describe("isPossibleBeginn", () => {
+    it("givenWholeWeeksOnBothSides_thenReturnTrue", () => {
+      const vorgaenger = createAbrechnungPosition();
+      vorgaenger.beginn = "2026-01-05";
+      const position = createAbrechnungPosition();
+      position.ende = "2026-02-01";
+
+      expect(isPossibleBeginn(vorgaenger, position, "2026-01-19")).toBe(true);
+    });
+
+    it("givenPartialWeekForTheVorgaenger_thenReturnFalse", () => {
+      const vorgaenger = createAbrechnungPosition();
+      vorgaenger.beginn = "2026-01-05";
+      const position = createAbrechnungPosition();
+      position.ende = "2026-02-01";
+
+      expect(isPossibleBeginn(vorgaenger, position, "2026-01-15")).toBe(false);
+    });
+
+    it("givenBeginnOfTheVorgaenger_thenReturnFalse", () => {
+      const vorgaenger = createAbrechnungPosition();
+      vorgaenger.beginn = "2026-01-05";
+      const position = createAbrechnungPosition();
+      position.ende = "2026-02-01";
+
+      expect(isPossibleBeginn(vorgaenger, position, "2026-01-05")).toBe(false);
+    });
+
+    it("givenNoWeekLeftUntilTheEnde_thenReturnFalse", () => {
+      const vorgaenger = createAbrechnungPosition();
+      vorgaenger.beginn = "2026-01-05";
+      const position = createAbrechnungPosition();
+      position.ende = "2026-02-01";
+
+      expect(isPossibleBeginn(vorgaenger, position, "2026-02-02")).toBe(false);
+    });
+
+    it("givenNoEnde_thenOnlyCheckTheVorgaenger", () => {
+      const vorgaenger = createAbrechnungPosition();
+      vorgaenger.beginn = "2026-01-05";
+      const position = createAbrechnungPosition();
+
+      expect(isPossibleBeginn(vorgaenger, position, "2026-03-02")).toBe(true);
     });
   });
 
