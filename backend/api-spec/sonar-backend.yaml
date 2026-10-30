@@ -1110,7 +1110,6 @@ components:
             $ref: "#/components/schemas/AbrechnungMastRequestDTO"
     AbrechnungPositionRequestDTO:
       required:
-      - anteilAnFlaeche
       - beginn
       - ende
       - flaeche
@@ -1131,10 +1130,6 @@ components:
           exclusiveMinimum: true
           type: number
         flaeche:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-        anteilAnFlaeche:
           minimum: 0
           exclusiveMinimum: true
           type: number
@@ -1295,8 +1290,6 @@ components:
         breite:
           type: number
         flaeche:
-          type: number
-        anteilAnFlaeche:
           type: number
     AbrechnungResponseDTO:
       type: object

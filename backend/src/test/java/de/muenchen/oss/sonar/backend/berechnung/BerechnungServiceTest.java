@@ -51,7 +51,7 @@ class BerechnungServiceTest {
         @Test
         void givenOneFlaecheOverThreeWochen_thenChargeTheRecordedGebuehr() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, ENDE,
-                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"), new BigDecimal("50.00"));
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
@@ -80,7 +80,7 @@ class BerechnungServiceTest {
         @Test
         void givenNoVorabrechnung_thenStartAtLfdNrOneAndChargeTheWholeBetrag() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, ENDE,
-                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"), new BigDecimal("50.00"));
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
@@ -101,7 +101,7 @@ class BerechnungServiceTest {
         void givenAPositionBeginningAfterTheBerechnungsdatum_thenChargeNothing() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(),
                     LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 22),
-                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"), new BigDecimal("50.00"));
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
@@ -121,7 +121,7 @@ class BerechnungServiceTest {
         void givenAPositionRunningBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
             final LocalDate berechnungsdatumWaehrendDerPosition = LocalDate.of(2025, 1, 26);
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, LocalDate.of(2025, 3, 30),
-                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"), new BigDecimal("50.00"));
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
@@ -145,7 +145,7 @@ class BerechnungServiceTest {
         @Test
         void givenAnAbrechnung_thenTheZusammenfassungNamesTheProjektAndTheUser() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, ENDE,
-                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"), new BigDecimal("50.00"));
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
