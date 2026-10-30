@@ -20,9 +20,9 @@ class FlaechenadresseServiceTest {
         @Test
         void givenPositionenOutOfOrder_thenNumberTheFlaechenByTheirBeginn() {
             final AbrechnungPosition spaetere = new AbrechnungPosition(null, LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 31),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"));
             final AbrechnungPosition fruehere = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(spaetere, fruehere), List.of());
@@ -38,9 +38,9 @@ class FlaechenadresseServiceTest {
         @Test
         void givenSeveralPositionen_thenReadEveryFlaecheAsTheGesamtflaecheOfTheAdresse() {
             final AbrechnungPosition erste = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
             final AbrechnungPosition zweite = new AbrechnungPosition(null, LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 31),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(erste, zweite), List.of());
@@ -54,9 +54,9 @@ class FlaechenadresseServiceTest {
         @Test
         void givenPositionen_thenEndInTheLatestWocheOfAllFlaechen() {
             final AbrechnungPosition kuerzere = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
             final AbrechnungPosition laengere = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 31),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(kuerzere, laengere), List.of());
@@ -69,7 +69,7 @@ class FlaechenadresseServiceTest {
         @Test
         void givenNutzungsobjekt_thenTakeItsBezeichnungAndItsAufschlag() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true, List.of(position), List.of());

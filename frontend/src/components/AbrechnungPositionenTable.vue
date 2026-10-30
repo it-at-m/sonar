@@ -9,7 +9,6 @@
             <th>Länge (m)</th>
             <th>Breite (m)</th>
             <th>Fläche (m²)</th>
-            <th>Anteil Fläche (m²)</th>
             <th v-if="!readonly" />
           </tr>
         </thead>
@@ -81,18 +80,10 @@
                 "
               />
             </td>
-            <td>
-              <v-number-input
-                :id="`${idPrefix}-anteil-${index}`"
-                v-model="position.anteilAnFlaeche"
-                :aria-label="`Anteil Fläche der Position ${index + 1}`"
-                control-variant="hidden"
-                density="compact"
-                :precision="2"
-                :rules="[requiredRule, greaterThanZeroRule]"
-              />
-            </td>
-            <td v-if="!readonly">
+            <td
+              v-if="!readonly"
+              class="text-end"
+            >
               <v-btn
                 :aria-label="`Position ${index + 1} entfernen`"
                 :disabled="!removable"

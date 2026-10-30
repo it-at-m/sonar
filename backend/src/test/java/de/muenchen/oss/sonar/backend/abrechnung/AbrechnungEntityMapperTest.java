@@ -30,7 +30,7 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenAbrechnung_thenDropTheIdAndLeaveTheChildrenToTheService() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
@@ -52,7 +52,7 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenAbrechnung_thenLeaveThePlaceInTheChainOfVersionsUnset() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
@@ -68,7 +68,7 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenNutzungsobjekt_thenDropTheIdAndMoveTheAdressdatenIntoTheEmbeddable() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
@@ -89,7 +89,7 @@ class AbrechnungEntityMapperTest {
         @Test
         void givenPosition_thenDropTheIdAndLeaveTheNutzungsobjektToTheService() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
 
             final AbrechnungPositionEntity result = abrechnungEntityMapper.toEntity(position);
 
@@ -100,7 +100,6 @@ class AbrechnungEntityMapperTest {
             assertThat(result.getLaenge()).isEqualByComparingTo("12.00");
             assertThat(result.getBreite()).isEqualByComparingTo("3.00");
             assertThat(result.getFlaeche()).isEqualByComparingTo("36.00");
-            assertThat(result.getAnteilAnFlaeche()).isEqualByComparingTo("30.00");
         }
 
         @Test
@@ -153,7 +152,7 @@ class AbrechnungEntityMapperTest {
             adressdaten.setTageUnerlaubteNutzung(90);
 
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
 
             final AbrechnungNutzungsobjekt result = abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjektEntity, List.of(position), List.of());
 
@@ -201,7 +200,7 @@ class AbrechnungEntityMapperTest {
             entity.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
 
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());

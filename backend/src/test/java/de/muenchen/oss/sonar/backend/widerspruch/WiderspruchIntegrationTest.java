@@ -104,7 +104,6 @@ class WiderspruchIntegrationTest {
         position.setLaenge(new BigDecimal("12.00"));
         position.setBreite(new BigDecimal("3.00"));
         position.setFlaeche(new BigDecimal("36.00"));
-        position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
         final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
         nutzungsobjekt.setAufschlag50prozent(true);

@@ -146,7 +146,6 @@ class BerechnungslaufTestdatenTest {
                     LocalDate.parse(flaeche.get("gueltigBis").asString()),
                     flaecheQm,
                     BigDecimal.ONE.setScale(NACHKOMMASTELLEN_FLAECHE),
-                    flaecheQm,
                     flaecheQm));
         }
         return positionen;

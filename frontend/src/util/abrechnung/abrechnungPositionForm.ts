@@ -17,7 +17,6 @@ export function createAbrechnungPosition(): AbrechnungPositionForm {
     laenge: null,
     breite: null,
     flaeche: null,
-    anteilAnFlaeche: null,
   };
 }
 
@@ -29,8 +28,7 @@ export function isAbrechnungPositionDirty(
     position.ende !== "" ||
     position.laenge !== null ||
     position.breite !== null ||
-    position.flaeche !== null ||
-    position.anteilAnFlaeche !== null
+    position.flaeche !== null
   );
 }
 

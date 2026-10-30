@@ -31,8 +31,8 @@ describe("abrechnungPositionForm.ts", () => {
       expect(isAbrechnungPositionDirty(position)).toBe(true);
     });
 
-    it("givenAnteilAnFlaecheOfZero_thenReturnTrue", () => {
-      const position = positionWith({ anteilAnFlaeche: 0 });
+    it("givenFlaecheOfZero_thenReturnTrue", () => {
+      const position = positionWith({ flaeche: 0 });
 
       expect(isAbrechnungPositionDirty(position)).toBe(true);
     });
