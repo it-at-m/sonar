@@ -23,7 +23,6 @@
                 v-model="position.beginn"
                 :aria-label="`Beginn der Position ${index + 1}`"
                 density="compact"
-                :readonly="readonly || undefined"
                 :rules="[requiredRule]"
               />
             </td>
@@ -33,7 +32,6 @@
                 v-model="position.ende"
                 :aria-label="`Ende der Position ${index + 1}`"
                 density="compact"
-                :readonly="readonly || undefined"
                 :rules="[requiredRule]"
                 :zeitraum-beginn="position.beginn"
                 zeitraum-einheit="week"
@@ -70,7 +68,7 @@
                 :aria-label="`Fläche der Position ${index + 1}`"
                 control-variant="hidden"
                 density="compact"
-                :disabled="hasLaengeUndBreite(position)"
+                :disabled="hasLaengeUndBreite(position) || undefined"
                 :precision="2"
                 :rules="[requiredRule, greaterThanZeroRule]"
                 :title="

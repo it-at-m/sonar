@@ -3,10 +3,8 @@
     :allowed-dates="zeitraumEnden"
     :min="fruehestesEnde"
     :model-value="date ?? ''"
-    :picker-props="pickerProps"
     prepend-icon=""
     prepend-inner-icon="$calendar"
-    :readonly="readonly"
     :rules="dateRules"
     @update:model-value="pick"
   />
@@ -29,12 +27,10 @@ import { zeitraumEndeRule } from "@/util/common/zeitraumRules";
 const date = defineModel<string | null | undefined>();
 
 const {
-  readonly,
   rules = [],
   zeitraumBeginn = "",
   zeitraumEinheit = "day",
 } = defineProps<{
-  readonly?: boolean;
   rules?: ValidationRule[];
   zeitraumBeginn?: string | null;
   zeitraumEinheit?: ZeitraumEinheit;
@@ -43,8 +39,6 @@ const {
 const beginn = computed(() => zeitraumBeginn ?? "");
 
 const isZeitraumEnde = computed(() => beginn.value !== "");
-
-const pickerProps = computed(() => (readonly ? { disabled: true } : undefined));
 
 const dateRules = computed(() => {
   const given = isZeitraumEnde.value

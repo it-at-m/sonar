@@ -269,7 +269,12 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     await aufhebenButton(wrapper).trigger("click");
 
     expect(nutzungsobjekt.uebernommenesNutzungsobjektId).toBeNull();
-    expect(wrapper.findComponent(AdresseFields).props("readonly")).toBe(false);
+    expect(wrapper.findComponent(AdresseFields).props("disabled")).toBe(false);
+    expect(
+      wrapper
+        .findComponent("#berechnung-nutzungsobjekt-0-bemerkung")
+        .props("disabled")
+    ).toBeNull();
     expect(nutzungsobjektEntries(wrapper)).toHaveLength(1);
   });
 
@@ -281,9 +286,14 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
       NUTZUNGSOBJEKT_SUGGESTION,
     ]);
 
-    expect(wrapper.findComponent(AdresseFields).props("readonly")).toBe(true);
+    expect(wrapper.findComponent(AdresseFields).props("disabled")).toBe(true);
     expect(
-      wrapper.findComponent(UnerlaubteNutzungFields).props("readonly")
+      wrapper.findComponent(UnerlaubteNutzungFields).props("disabled")
+    ).toBe(true);
+    expect(
+      wrapper
+        .findComponent("#berechnung-nutzungsobjekt-0-bemerkung")
+        .props("disabled")
     ).toBe(true);
     expect(
       wrapper.findComponent(AbrechnungPositionenTable).props("readonly")

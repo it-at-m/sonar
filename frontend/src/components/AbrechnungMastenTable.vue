@@ -20,7 +20,6 @@
                 v-model="mast.beginn"
                 :aria-label="`Beginn von Mast ${index + 1}`"
                 density="compact"
-                :readonly="readonly || undefined"
                 :rules="[requiredRule]"
               />
             </td>
@@ -30,7 +29,6 @@
                 v-model="mast.ende"
                 :aria-label="`Ende von Mast ${index + 1}`"
                 density="compact"
-                :readonly="readonly || undefined"
                 :rules="[requiredRule]"
                 :zeitraum-beginn="mast.beginn"
                 zeitraum-einheit="month"
