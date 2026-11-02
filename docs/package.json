@@ -25,6 +25,7 @@
   "overrides": {
     "markdown-it": "14.3.3",
     "esbuild": "0.25.12",
+    "minimatch": "11.0.1",
     "vite": "6.4.5",
     "vitepress": {
       "postcss": {
