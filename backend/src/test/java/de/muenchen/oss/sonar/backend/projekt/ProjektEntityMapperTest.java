@@ -8,6 +8,7 @@ import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -45,6 +46,7 @@ class ProjektEntityMapperTest {
             final ProjektEntity projektEntity = new ProjektEntity();
             projektEntity.setId(UUID.randomUUID());
             projektEntity.setProjektnummer("2026-0001");
+            projektEntity.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projektEntity.setAbrechnungBeginn(BEGINN);
             projektEntity.setAbrechnungEnde(ENDE);
             projektEntity.addAdresse(adresseEntity);
@@ -54,6 +56,7 @@ class ProjektEntityMapperTest {
             assertNotNull(result);
             assertThat(result.id()).isEqualTo(projektEntity.getId());
             assertThat(result.projektnummer()).isEqualTo(projektEntity.getProjektnummer());
+            assertThat(result.stadtbezirk()).isEqualTo(projektEntity.getStadtbezirk());
             assertThat(result.abrechnungBeginn()).isEqualTo(projektEntity.getAbrechnungBeginn());
             assertThat(result.abrechnungEnde()).isEqualTo(projektEntity.getAbrechnungEnde());
             assertThat(result.verwaltungsgebuehr()).isEqualByComparingTo(Projekt.VERWALTUNGSGEBUEHR);
@@ -83,12 +86,13 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, false);
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 
             assertNotNull(result);
             assertThat(result.getProjektnummer()).isEqualTo(projekt.projektnummer());
+            assertThat(result.getStadtbezirk()).isEqualTo(projekt.stadtbezirk());
             assertThat(result.getAbrechnungBeginn()).isEqualTo(projekt.abrechnungBeginn());
             assertThat(result.getAbrechnungEnde()).isEqualTo(projekt.abrechnungEnde());
             assertThat(result.getAdressen()).hasSize(1);
@@ -114,7 +118,8 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, 12, 0, false);
-            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
+                    List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 

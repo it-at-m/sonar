@@ -42,6 +42,7 @@ public class ProjektController {
     /**
      * Retrieve Projekte with pagination.
      * Fetches a paginated list of Projekte based on the provided page number and size.
+     * Only Projekte in a Stadtbezirk assigned to one of the roles of the user are part of the result.
      * The optional search criteria are combined with AND and apply to the whole result, not just to
      * the requested page. The same holds for the order, which is applied by the database.
      *
@@ -71,13 +72,14 @@ public class ProjektController {
     /**
      * Retrieve a single Projekt.
      * Fetches the Projekt together with its Adressen.
+     * A Projekt in a Stadtbezirk assigned to none of the roles of the user is answered as missing.
      *
      * @param projektId the id of the requested Projekt
      * @return the Projekt represented as a DTO
      */
     @GetMapping("{projektId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = "404", description = "the Projekt does not exist", content = @Content)
+    @ApiResponse(responseCode = "404", description = "the Projekt does not exist or lies outside the Stadtbezirke of the user", content = @Content)
     public ProjektResponseDTO getProjekt(@PathVariable("projektId") final UUID projektId) {
         return projektDTOMapper.toDTO(projektService.getProjekt(projektId));
     }

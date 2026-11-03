@@ -13,6 +13,9 @@ import de.muenchen.oss.sonar.backend.projekt.dto.ProjektAdresseRequestDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektAdresseResponseDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektRequestDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektResponseDTO;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
+import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleEntity;
+import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -58,6 +61,9 @@ class ProjektIntegrationTest {
     private ProjektRepository projektRepository;
 
     @Autowired
+    private StadtbezirkRolleRepository stadtbezirkRolleRepository;
+
+    @Autowired
     private TransactionTemplate transactionTemplate;
 
     private UUID projektId;
@@ -65,6 +71,12 @@ class ProjektIntegrationTest {
     @BeforeEach
     public void setUp() {
         projektRepository.deleteAll();
+        stadtbezirkRolleRepository.deleteAll();
+
+        final StadtbezirkRolleEntity altstadtLehelMitte = new StadtbezirkRolleEntity();
+        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+        altstadtLehelMitte.setRolle("SB_Mitte");
+        stadtbezirkRolleRepository.save(altstadtLehelMitte);
 
         final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
         adresse.setAnzahlMahnungen(0);
@@ -80,6 +92,7 @@ class ProjektIntegrationTest {
 
         final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer("2026-0001");
+        projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
         projekt.setAbrechnungBeginn(BEGINN);
         projekt.setAbrechnungEnde(ENDE);
         projekt.addAdresse(adresse);
@@ -97,7 +110,7 @@ class ProjektIntegrationTest {
                             .queryParam("pageNumber", "0")
                             .queryParam("pageSize", "10")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -105,6 +118,114 @@ class ProjektIntegrationTest {
                     .jsonPath("$.content")
                     .value(new ParameterizedTypeReference<List<ProjektResponseDTO>>() {
                     }, content -> assertThat(content.size()).isEqualTo(1));
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenLeaveItOut() {
+            final ProjektAdresseEntity adresseMoosach = new ProjektAdresseEntity();
+            adresseMoosach.setAnzahlMahnungen(0);
+            adresseMoosach.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdatenMoosach = adresseMoosach.getAdressdaten();
+            adressdatenMoosach.setArt(Adressart.ADRESSE);
+            adressdatenMoosach.setAdresse("Dachauer Straße");
+            adressdatenMoosach.setHausnummerVon("300");
+            adresseMoosach.addNutzung(Nutzung.BAUZAUN);
+            adressdatenMoosach.setUnerlaubteNutzungVon(BEGINN);
+            adressdatenMoosach.setUnerlaubteNutzungBis(ENDE);
+
+            final ProjektEntity projektMoosach = new ProjektEntity();
+            projektMoosach.setProjektnummer("2026-0002");
+            projektMoosach.setStadtbezirk(Stadtbezirk.MOOSACH);
+            projektMoosach.setAbrechnungBeginn(BEGINN);
+            projektMoosach.setAbrechnungEnde(ENDE);
+            projektMoosach.addAdresse(adresseMoosach);
+            projektRepository.save(projektMoosach);
+
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            restTestClient.get()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.content..projektnummer")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, projektnummern -> assertThat(projektnummern).containsExactly("2026-0001"))
+                    .jsonPath("$.page.totalElements").isEqualTo(1);
+        }
+
+        @Test
+        void givenSeveralRoles_thenReturnTheProjekteOfEveryRole() {
+            final ProjektAdresseEntity adresseSendling = new ProjektAdresseEntity();
+            adresseSendling.setAnzahlMahnungen(0);
+            adresseSendling.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdatenSendling = adresseSendling.getAdressdaten();
+            adressdatenSendling.setArt(Adressart.ADRESSE);
+            adressdatenSendling.setAdresse("Lindwurmstraße");
+            adressdatenSendling.setHausnummerVon("100");
+            adresseSendling.addNutzung(Nutzung.BAUZAUN);
+            adressdatenSendling.setUnerlaubteNutzungVon(BEGINN);
+            adressdatenSendling.setUnerlaubteNutzungBis(ENDE);
+
+            final ProjektEntity projektSendling = new ProjektEntity();
+            projektSendling.setProjektnummer("2026-0002");
+            projektSendling.setStadtbezirk(Stadtbezirk.SENDLING);
+            projektSendling.setAbrechnungBeginn(BEGINN);
+            projektSendling.setAbrechnungEnde(ENDE);
+            projektSendling.addAdresse(adresseSendling);
+            projektRepository.save(projektSendling);
+
+            final ProjektAdresseEntity adresseMoosach = new ProjektAdresseEntity();
+            adresseMoosach.setAnzahlMahnungen(0);
+            adresseMoosach.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdatenMoosach = adresseMoosach.getAdressdaten();
+            adressdatenMoosach.setArt(Adressart.ADRESSE);
+            adressdatenMoosach.setAdresse("Dachauer Straße");
+            adressdatenMoosach.setHausnummerVon("300");
+            adresseMoosach.addNutzung(Nutzung.BAUZAUN);
+            adressdatenMoosach.setUnerlaubteNutzungVon(BEGINN);
+            adressdatenMoosach.setUnerlaubteNutzungBis(ENDE);
+
+            final ProjektEntity projektMoosach = new ProjektEntity();
+            projektMoosach.setProjektnummer("2026-0003");
+            projektMoosach.setStadtbezirk(Stadtbezirk.MOOSACH);
+            projektMoosach.setAbrechnungBeginn(BEGINN);
+            projektMoosach.setAbrechnungEnde(ENDE);
+            projektMoosach.addAdresse(adresseMoosach);
+            projektRepository.save(projektMoosach);
+
+            final StadtbezirkRolleEntity sendlingSued = new StadtbezirkRolleEntity();
+            sendlingSued.setStadtbezirk(Stadtbezirk.SENDLING);
+            sendlingSued.setRolle("SB_Sued");
+            stadtbezirkRolleRepository.save(sendlingSued);
+
+            restTestClient.get()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte+SB_Sued")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.content..projektnummer")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, projektnummern -> assertThat(projektnummern).containsExactly("2026-0002", "2026-0001"));
+        }
+
+        @Test
+        void givenNoSachbearbeiterRole_thenReturnNoProjekte() {
+            restTestClient.get()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.page.totalElements").isEqualTo(0);
         }
 
         @Test
@@ -123,6 +244,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
+            projekt0003.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt0003.setAbrechnungBeginn(BEGINN);
             projekt0003.setAbrechnungEnde(ENDE);
             projekt0003.addAdresse(adresse0003);
@@ -142,6 +264,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
+            projekt0002.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt0002.setAbrechnungBeginn(BEGINN);
             projekt0002.setAbrechnungEnde(ENDE);
             projekt0002.addAdresse(adresse0002);
@@ -153,7 +276,7 @@ class ProjektIntegrationTest {
                             .queryParam("pageNumber", "0")
                             .queryParam("pageSize", "2")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -167,7 +290,7 @@ class ProjektIntegrationTest {
                             .queryParam("pageNumber", "1")
                             .queryParam("pageSize", "2")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -192,6 +315,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
+            projekt0003.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt0003.setAbrechnungBeginn(BEGINN);
             projekt0003.setAbrechnungEnde(ENDE);
             projekt0003.addAdresse(adresse0003);
@@ -211,6 +335,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
+            projekt0002.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt0002.setAbrechnungBeginn(BEGINN);
             projekt0002.setAbrechnungEnde(ENDE);
             projekt0002.addAdresse(adresse0002);
@@ -222,7 +347,7 @@ class ProjektIntegrationTest {
                             .queryParam("sortBy", "PROJEKTNUMMER")
                             .queryParam("sortDirection", "ASC")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -247,6 +372,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
+            projekt0002.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt0002.setAbrechnungBeginn(LocalDate.of(2025, 1, 1));
             projekt0002.setAbrechnungEnde(ENDE);
             projekt0002.addAdresse(adresse0002);
@@ -266,6 +392,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
+            projekt0003.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt0003.setAbrechnungBeginn(LocalDate.of(2024, 1, 1));
             projekt0003.setAbrechnungEnde(ENDE);
             projekt0003.addAdresse(adresse0003);
@@ -278,7 +405,7 @@ class ProjektIntegrationTest {
                             .queryParam("sortDirection", "ASC")
                             .queryParam("pageSize", "2")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -294,7 +421,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("sortBy", "GEHEIMES_FELD")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -315,6 +442,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
+            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(BEGINN);
             projekt.setAbrechnungEnde(ENDE);
             projekt.addAdresse(adresse);
@@ -325,7 +453,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("projektnummer", "27-47")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -350,6 +478,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
+            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(BEGINN);
             projekt.setAbrechnungEnde(ENDE);
             projekt.addAdresse(adresse);
@@ -360,7 +489,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("projektnummer", " ")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -385,6 +514,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
+            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -395,7 +525,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("abrechnungBeginn", "2027-01-01")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -420,6 +550,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
+            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -430,7 +561,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("abrechnungEnde", "2026-03-31")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -446,7 +577,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("abrechnungBeginn", "2026-01-02")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -471,6 +602,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
+            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -482,7 +614,7 @@ class ProjektIntegrationTest {
                             .queryParam("projektnummer", "2027")
                             .queryParam("abrechnungBeginn", "2026-01-01")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -507,6 +639,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
+            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -517,7 +650,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("projektnummer", "2027")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -531,7 +664,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("pageSize", "0")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -543,7 +676,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("pageSize", "101")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -555,7 +688,7 @@ class ProjektIntegrationTest {
                             .path("/projekt")
                             .queryParam("pageNumber", "-1")
                             .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -567,7 +700,7 @@ class ProjektIntegrationTest {
         void givenKnownId_thenReturnProjektWithItsAdressen() {
             restTestClient.get()
                     .uri("/projekt/{projektId}", projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -576,6 +709,7 @@ class ProjektIntegrationTest {
                         assertNotNull(projektResponseDTO);
                         assertThat(projektResponseDTO.id()).isEqualTo(projektId);
                         assertThat(projektResponseDTO.projektnummer()).isEqualTo("2026-0001");
+                        assertThat(projektResponseDTO.stadtbezirk()).isEqualTo(Stadtbezirk.ALTSTADT_LEHEL);
                         assertThat(projektResponseDTO.adressen()).hasSize(1);
 
                         final ProjektAdresseResponseDTO adresse = projektResponseDTO.adressen().getFirst();
@@ -587,10 +721,33 @@ class ProjektIntegrationTest {
         }
 
         @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            restTestClient.get()
+                    .uri("/projekt/{projektId}", projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenNoSachbearbeiterRole_thenReturnNotFound() {
+            restTestClient.get()
+                    .uri("/projekt/{projektId}", projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
         void givenUnknownId_thenReturnNotFound() {
             restTestClient.get()
                     .uri("/projekt/{projektId}", UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
         }
@@ -599,7 +756,7 @@ class ProjektIntegrationTest {
         void givenIdThatIsNoUuid_thenReturnBadRequest() {
             restTestClient.get()
                     .uri("/projekt/{projektId}", "2026-0001")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -612,7 +769,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 3, true);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", Stadtbezirk.SENDLING, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -626,6 +783,7 @@ class ProjektIntegrationTest {
                     .value(projektResponseDTO -> {
                         assertNotNull(projektResponseDTO);
                         assertThat(projektResponseDTO.projektnummer()).isEqualTo(requestDTO.projektnummer());
+                        assertThat(projektResponseDTO.stadtbezirk()).isEqualTo(Stadtbezirk.SENDLING);
                         assertThat(projektResponseDTO.adressen()).hasSize(1);
                     })
                     .returnResult()
@@ -635,6 +793,7 @@ class ProjektIntegrationTest {
             transactionTemplate.executeWithoutResult(status -> {
                 final ProjektEntity projekt = projektRepository.findById(responseDTO.id()).orElseThrow();
                 assertThat(projekt.getProjektnummer()).isEqualTo("2026-0002");
+                assertThat(projekt.getStadtbezirk()).isEqualTo(Stadtbezirk.SENDLING);
                 assertThat(projekt.getAdressen()).hasSize(1);
 
                 final ProjektAdresseEntity adresse = projekt.getAdressen().getFirst();
@@ -656,7 +815,7 @@ class ProjektIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null,
                     List.of(Nutzung.SONSTIGES, Nutzung.BAUZAUN, Nutzung.CONTAINER), "Gerüst über dem Gehweg",
                     null, null, null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -684,7 +843,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), "Gerüst über dem Gehweg",
                     null, null, null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0004", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0004", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -702,7 +861,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     null, null, null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", ENDE, BEGINN, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", Stadtbezirk.ALTSTADT_LEHEL, ENDE, BEGINN, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -720,7 +879,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     null, null, 12, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -749,7 +908,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -776,7 +935,25 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, 12, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+
+            restTestClient.post()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+
+            assertThat(projektRepository.count()).isEqualTo(1);
+        }
+
+        @Test
+        void givenProjektWithoutStadtbezirk_thenReturnBadRequest() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0009", null, BEGINN, ENDE, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -791,7 +968,7 @@ class ProjektIntegrationTest {
 
         @Test
         void givenProjektWithoutAdressen_thenReturnBadRequest() {
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", BEGINN, ENDE, List.of());
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of());
 
             restTestClient.post()
                     .uri("/projekt")

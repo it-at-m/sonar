@@ -7,6 +7,7 @@ import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaechenadresse;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Mast;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Ueberspannungsadresse;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -23,7 +24,7 @@ class ZusammenfassungTest {
 
         @Test
         void givenAbrechnung_thenHeadItWithTheProjektnummerAndTheErsteller() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
                     1, new BigDecimal("20"), new BigDecimal("20"));
 
@@ -39,7 +40,7 @@ class ZusammenfassungTest {
 
         @Test
         void givenAdressenOfBothKinds_thenGiveEachKindItsOwnBlock() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
                     1, new BigDecimal("20"), new BigDecimal("20"));
             final Mast mast = new Mast(1, BEGINN, ENDE, 1);
@@ -56,7 +57,7 @@ class ZusammenfassungTest {
 
         @Test
         void givenNoAdresseWithMasten_thenLeaveTheUeberspannungenBlockOut() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
                     1, new BigDecimal("20"), new BigDecimal("20"));
 
@@ -68,7 +69,7 @@ class ZusammenfassungTest {
 
         @Test
         void givenNoAdresseAtAll_thenLeaveBothBlocksOut() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
 
             final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 0,
                     List.of(), List.of());

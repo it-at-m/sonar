@@ -16,6 +16,9 @@ import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektAdresseEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
+import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleEntity;
+import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleRepository;
 import de.muenchen.oss.sonar.backend.widerspruch.dto.WiderspruchRequestDTO;
 import de.muenchen.oss.sonar.backend.widerspruch.dto.WiderspruchResponseDTO;
 import java.math.BigDecimal;
@@ -71,6 +74,9 @@ class WiderspruchIntegrationTest {
     @Autowired
     private ProjektRepository projektRepository;
 
+    @Autowired
+    private StadtbezirkRolleRepository stadtbezirkRolleRepository;
+
     private UUID projektId;
 
     private UUID abrechnungId;
@@ -80,6 +86,12 @@ class WiderspruchIntegrationTest {
         abrechnungRepository.deleteAll();
         widerspruchRepository.deleteAll();
         projektRepository.deleteAll();
+        stadtbezirkRolleRepository.deleteAll();
+
+        final StadtbezirkRolleEntity altstadtLehelMitte = new StadtbezirkRolleEntity();
+        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+        altstadtLehelMitte.setRolle("SB_Mitte");
+        stadtbezirkRolleRepository.save(altstadtLehelMitte);
 
         final ProjektAdresseEntity projektAdresse = new ProjektAdresseEntity();
         projektAdresse.setAnzahlMahnungen(0);
@@ -92,6 +104,7 @@ class WiderspruchIntegrationTest {
 
         final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer("2026-0001");
+        projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
         projekt.setAbrechnungBeginn(VON);
         projekt.setAbrechnungEnde(BIS);
         projekt.addAdresse(projektAdresse);
@@ -254,7 +267,7 @@ class WiderspruchIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -278,7 +291,7 @@ class WiderspruchIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()

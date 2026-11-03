@@ -14,6 +14,7 @@ import de.muenchen.oss.sonar.backend.berechnung.domain.BerechnungslaufService;
 import de.muenchen.oss.sonar.backend.berechnung.domain.Vorabrechnung;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -68,6 +69,7 @@ class BerechnungslaufTestdatenTest {
     private static Projekt toProjekt(final JsonNode input) {
         return new Projekt(PROJEKT_ID,
                 input.get("projektNummer").asString(),
+                Stadtbezirk.ALTSTADT_LEHEL,
                 zeitraumVon(input),
                 abrechnungsdatum(input),
                 input.get("verwaltungsgebuehren").decimalValue(),

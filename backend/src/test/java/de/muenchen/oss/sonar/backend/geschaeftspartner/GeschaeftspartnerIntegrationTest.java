@@ -9,6 +9,7 @@ import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.geschaeftspartner.client.MockGeschaeftspartnerClient;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
+import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
 import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchRepository;
 import org.junit.jupiter.api.Nested;
@@ -45,6 +46,9 @@ class GeschaeftspartnerIntegrationTest {
 
     @MockitoBean
     private ProjektRepository projektRepository;
+
+    @MockitoBean
+    private StadtbezirkRolleRepository stadtbezirkRolleRepository;
 
     @MockitoBean
     private TheEntityRepository theEntityRepository;

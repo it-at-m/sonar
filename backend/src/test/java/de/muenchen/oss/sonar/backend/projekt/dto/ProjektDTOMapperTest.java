@@ -7,6 +7,7 @@ import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -31,13 +32,14 @@ class ProjektDTOMapperTest {
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     BEGINN, ENDE, 90, 2, true);
             final Projekt projekt = new Projekt(
-                    UUID.randomUUID(), "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+                    UUID.randomUUID(), "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
 
             final ProjektResponseDTO result = projektDTOMapper.toDTO(projekt);
 
             assertNotNull(result);
             assertThat(result.id()).isEqualTo(projekt.id());
             assertThat(result.projektnummer()).isEqualTo(projekt.projektnummer());
+            assertThat(result.stadtbezirk()).isEqualTo(projekt.stadtbezirk());
             assertThat(result.abrechnungBeginn()).isEqualTo(projekt.abrechnungBeginn());
             assertThat(result.abrechnungEnde()).isEqualTo(projekt.abrechnungEnde());
             assertThat(result.adressen()).hasSize(1);
@@ -66,13 +68,14 @@ class ProjektDTOMapperTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final Projekt result = projektDTOMapper.toProjekt(requestDTO);
 
             assertNotNull(result);
             assertThat(result.id()).isNull();
             assertThat(result.projektnummer()).isEqualTo(requestDTO.projektnummer());
+            assertThat(result.stadtbezirk()).isEqualTo(requestDTO.stadtbezirk());
             assertThat(result.abrechnungBeginn()).isEqualTo(requestDTO.abrechnungBeginn());
             assertThat(result.abrechnungEnde()).isEqualTo(requestDTO.abrechnungEnde());
             assertThat(result.verwaltungsgebuehr()).isEqualByComparingTo(Projekt.VERWALTUNGSGEBUEHR);
