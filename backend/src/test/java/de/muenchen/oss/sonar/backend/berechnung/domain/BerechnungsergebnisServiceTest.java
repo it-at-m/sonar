@@ -30,7 +30,7 @@ class BerechnungsergebnisServiceTest {
         void givenNoVorabrechnung_thenStartAtLfdNrOneAndChargeTheWholeBetrag() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
@@ -53,7 +53,7 @@ class BerechnungsergebnisServiceTest {
         void givenNoVorabrechnung_thenStartTheZeitraumOnTheBeginnOfTheMassnahme() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
@@ -72,7 +72,7 @@ class BerechnungsergebnisServiceTest {
             final Vorabrechnung vorabrechnung = new Vorabrechnung(1, LocalDate.of(2025, 12, 31), new BigDecimal("50.00"));
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
@@ -92,7 +92,7 @@ class BerechnungsergebnisServiceTest {
             final Vorabrechnung vorabrechnung = new Vorabrechnung(1, LocalDate.of(2026, 1, 3), new BigDecimal("50.00"));
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
@@ -109,9 +109,9 @@ class BerechnungsergebnisServiceTest {
         void givenNutzungsobjektWithoutMasten_thenLeaveItOutOfTheUeberspannungen() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition mitMast = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungPosition ohneMast = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt ueberspannt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(mitMast),
@@ -134,9 +134,9 @@ class BerechnungsergebnisServiceTest {
         void givenAdresseBeginningLater_thenCountItsWochenFromTheEarliestBeginnOfAll() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition ersteWoche = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungPosition zweiteWoche = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 14),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt frueh = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(ersteWoche), List.of());
@@ -158,7 +158,7 @@ class BerechnungsergebnisServiceTest {
         void givenPositionReachingBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 12, 31),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
@@ -176,7 +176,7 @@ class BerechnungsergebnisServiceTest {
         void givenMastReachingBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position),
@@ -214,7 +214,7 @@ class BerechnungsergebnisServiceTest {
         void givenAbrechnung_thenWriteTheZusammenfassungAndTheBerechnungslog() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
-                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"), new BigDecimal("20.00"));
+                    new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());

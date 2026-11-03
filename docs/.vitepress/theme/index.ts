@@ -1,5 +1,6 @@
 import type { Theme } from "vitepress";
 
+import { createMermaidRenderer } from "vitepress-mermaid-renderer";
 import DefaultTheme from "vitepress/theme";
 
 import LhmThemeExtension from "./LhmThemeExtension.vue";
@@ -7,6 +8,9 @@ import LhmThemeExtension from "./LhmThemeExtension.vue";
 import "./style.css";
 
 export default <Theme>{
-  ...DefaultTheme,
+  extends: DefaultTheme,
   Layout: LhmThemeExtension,
+  enhanceApp() {
+    createMermaidRenderer();
+  },
 };

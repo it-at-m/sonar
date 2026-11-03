@@ -102,7 +102,7 @@ class NutzungsobjektServiceTest {
             anderesNutzungsobjekt.getAdressdaten().setAdresse("Sendlinger Straße");
 
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     nutzungsobjektId, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position), List.of());
@@ -121,7 +121,7 @@ class NutzungsobjektServiceTest {
         void givenNutzungsobjektOfAnotherProjekt_thenThrowNotFound() {
             final UUID nutzungsobjektId = UUID.randomUUID();
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     nutzungsobjektId, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position), List.of());
@@ -138,7 +138,7 @@ class NutzungsobjektServiceTest {
         @Test
         void givenOnlyNewNutzungsobjekte_thenLookUpNothing() {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position), List.of());

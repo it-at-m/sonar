@@ -59,7 +59,7 @@
     </template>
 
     <template #[`item.berechnung`]="{ item }">
-      <abrechnung-berechnung-dialog
+      <berechnung-durchfuehren-dialog
         v-if="item.id"
         :abrechnung-id="item.id"
         :geschaeftspartner-id="item.geschaeftspartnerId"
@@ -80,8 +80,8 @@ import {
   mdiFileDocumentPlus,
 } from "@mdi/js";
 
-import AbrechnungBerechnungDialog from "@/components/AbrechnungBerechnungDialog.vue";
 import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
+import BerechnungDurchfuehrenDialog from "@/components/berechnung/BerechnungDurchfuehrenDialog.vue";
 
 const HEADERS = [
   { title: "Geschäftspartner:in", key: "geschaeftspartnerId" },

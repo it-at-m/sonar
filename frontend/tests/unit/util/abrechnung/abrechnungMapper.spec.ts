@@ -43,7 +43,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const requestDTO = toAbrechnungRequestDTO(abrechnung.value);
 
@@ -79,7 +78,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const positionRequestDTO = itemAt(
         itemAt(toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte)
@@ -89,7 +87,6 @@ describe("abrechnungMapper.ts", () => {
       expect(positionRequestDTO.laenge).toBe(12);
       expect(positionRequestDTO.breite).toBe(3);
       expect(positionRequestDTO.flaeche).toBe(36);
-      expect(positionRequestDTO.anteilAnFlaeche).toBe(30);
     });
 
     it("givenMasten_thenSendTheirZeitraeume", () => {
@@ -139,7 +136,6 @@ describe("abrechnungMapper.ts", () => {
       position.beginn = "2026-01-01";
       position.ende = "2026-03-31";
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const positionRequestDTO = itemAt(
         itemAt(toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte)
@@ -174,7 +170,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const nutzungsobjektRequestDTO = itemAt(
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
@@ -209,7 +204,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const nutzungsobjektRequestDTO = itemAt(
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
@@ -242,7 +236,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const nutzungsobjektRequestDTO = itemAt(
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
@@ -275,7 +268,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const nutzungsobjektRequestDTO = itemAt(
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
@@ -309,7 +301,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const nutzungsobjektRequestDTO = itemAt(
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
@@ -343,7 +334,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const requestDTO = toAbrechnungRequestDTO(abrechnung.value);
 
@@ -377,7 +367,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const requestDTO = toAbrechnungRequestDTO(abrechnung.value);
 
@@ -407,7 +396,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       expect(() => toAbrechnungRequestDTO(abrechnung.value)).toThrow();
     });
@@ -430,7 +418,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const nutzungsobjektRequestDTO = itemAt(
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
@@ -459,7 +446,6 @@ describe("abrechnungMapper.ts", () => {
       position.laenge = 12;
       position.breite = 3;
       position.flaeche = 36;
-      position.anteilAnFlaeche = 30;
 
       const nutzungsobjektRequestDTO = itemAt(
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
@@ -504,7 +490,6 @@ describe("abrechnungMapper.ts", () => {
                 laenge: 12,
                 breite: 3,
                 flaeche: 36,
-                anteilAnFlaeche: 30,
               },
             ],
           },
@@ -540,7 +525,7 @@ describe("abrechnungMapper.ts", () => {
       expect(position.beginn).toBe("2026-01-01");
       expect(position.ende).toBe("2026-03-31");
       expect(position.laenge).toBe(12);
-      expect(position.anteilAnFlaeche).toBe(30);
+      expect(position.flaeche).toBe(36);
     });
 
     it("givenFormOfAnAbrechnung_thenSendTheSameValuesBack", () => {
@@ -562,7 +547,6 @@ describe("abrechnungMapper.ts", () => {
                 laenge: 12,
                 breite: 3,
                 flaeche: 36,
-                anteilAnFlaeche: 36,
               },
             ],
           },

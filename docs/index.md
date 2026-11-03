@@ -13,6 +13,9 @@ hero:
     - theme: brand
       text: Naming Conventions
       link: /architecture/naming_conventions/
+    - theme: brand
+      text: Berechnung
+      link: /architecture/berechnung/
 features:
   - icon: 🧭
     title: ADRs
@@ -20,4 +23,7 @@ features:
   - icon: 🧩
     title: Conventions
     details: Benennungsregeln und Vorgaben
+  - icon: 📐
+    title: Berechnung
+    details: UML-Diagramm zum Berechnungslauf
 ---

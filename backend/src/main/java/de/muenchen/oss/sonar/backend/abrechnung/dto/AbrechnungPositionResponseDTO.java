@@ -10,6 +10,5 @@ public record AbrechnungPositionResponseDTO(
         LocalDate ende,
         BigDecimal laenge,
         BigDecimal breite,
-        BigDecimal flaeche,
-        BigDecimal anteilAnFlaeche) {
+        BigDecimal flaeche) {
 }

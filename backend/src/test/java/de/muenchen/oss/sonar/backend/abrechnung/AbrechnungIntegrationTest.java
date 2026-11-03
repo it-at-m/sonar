@@ -119,7 +119,6 @@ class AbrechnungIntegrationTest {
             eigenePosition.setLaenge(new BigDecimal("12.00"));
             eigenePosition.setBreite(new BigDecimal("3.00"));
             eigenePosition.setFlaeche(new BigDecimal("36.00"));
-            eigenePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity eigenesNutzungsobjekt = new NutzungsobjektEntity();
             eigenesNutzungsobjekt.setAufschlag50prozent(true);
@@ -171,7 +170,6 @@ class AbrechnungIntegrationTest {
             fremdePosition.setLaenge(new BigDecimal("12.00"));
             fremdePosition.setBreite(new BigDecimal("3.00"));
             fremdePosition.setFlaeche(new BigDecimal("36.00"));
-            fremdePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity fremdesNutzungsobjekt = new NutzungsobjektEntity();
             fremdesNutzungsobjekt.setAufschlag50prozent(true);
@@ -209,7 +207,6 @@ class AbrechnungIntegrationTest {
             position0001.setLaenge(new BigDecimal("12.00"));
             position0001.setBreite(new BigDecimal("3.00"));
             position0001.setFlaeche(new BigDecimal("36.00"));
-            position0001.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0001 = new NutzungsobjektEntity();
             nutzungsobjekt0001.setAufschlag50prozent(true);
@@ -238,7 +235,6 @@ class AbrechnungIntegrationTest {
             position0002.setLaenge(new BigDecimal("12.00"));
             position0002.setBreite(new BigDecimal("3.00"));
             position0002.setFlaeche(new BigDecimal("36.00"));
-            position0002.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0002 = new NutzungsobjektEntity();
             nutzungsobjekt0002.setAufschlag50prozent(true);
@@ -267,7 +263,6 @@ class AbrechnungIntegrationTest {
             position0003.setLaenge(new BigDecimal("12.00"));
             position0003.setBreite(new BigDecimal("3.00"));
             position0003.setFlaeche(new BigDecimal("36.00"));
-            position0003.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0003 = new NutzungsobjektEntity();
             nutzungsobjekt0003.setAufschlag50prozent(true);
@@ -327,7 +322,6 @@ class AbrechnungIntegrationTest {
             position0001.setLaenge(new BigDecimal("12.00"));
             position0001.setBreite(new BigDecimal("3.00"));
             position0001.setFlaeche(new BigDecimal("36.00"));
-            position0001.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0001 = new NutzungsobjektEntity();
             nutzungsobjekt0001.setAufschlag50prozent(true);
@@ -356,7 +350,6 @@ class AbrechnungIntegrationTest {
             position0002.setLaenge(new BigDecimal("12.00"));
             position0002.setBreite(new BigDecimal("3.00"));
             position0002.setFlaeche(new BigDecimal("36.00"));
-            position0002.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0002 = new NutzungsobjektEntity();
             nutzungsobjekt0002.setAufschlag50prozent(true);
@@ -402,7 +395,6 @@ class AbrechnungIntegrationTest {
             position0001.setLaenge(new BigDecimal("12.00"));
             position0001.setBreite(new BigDecimal("3.00"));
             position0001.setFlaeche(new BigDecimal("36.00"));
-            position0001.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0001 = new NutzungsobjektEntity();
             nutzungsobjekt0001.setAufschlag50prozent(true);
@@ -431,7 +423,6 @@ class AbrechnungIntegrationTest {
             position0002.setLaenge(new BigDecimal("12.00"));
             position0002.setBreite(new BigDecimal("3.00"));
             position0002.setFlaeche(new BigDecimal("36.00"));
-            position0002.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0002 = new NutzungsobjektEntity();
             nutzungsobjekt0002.setAufschlag50prozent(true);
@@ -460,7 +451,6 @@ class AbrechnungIntegrationTest {
             position0003.setLaenge(new BigDecimal("12.00"));
             position0003.setBreite(new BigDecimal("3.00"));
             position0003.setFlaeche(new BigDecimal("36.00"));
-            position0003.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt0003 = new NutzungsobjektEntity();
             nutzungsobjekt0003.setAufschlag50prozent(true);
@@ -519,7 +509,6 @@ class AbrechnungIntegrationTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -625,7 +614,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -679,7 +668,7 @@ class AbrechnungIntegrationTest {
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", null, null,
                     null, null, 12, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -707,7 +696,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, null, null,
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -745,13 +734,13 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungNutzungsobjektRequestDTO zweite = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(erste, zweite));
@@ -780,7 +769,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -802,7 +791,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, "Sendling", null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -824,7 +813,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, BIS, VON,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -930,7 +919,6 @@ class AbrechnungIntegrationTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -1031,7 +1019,6 @@ class AbrechnungIntegrationTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -1097,7 +1084,6 @@ class AbrechnungIntegrationTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
             erstesNutzungsobjekt.setAufschlag50prozent(true);
@@ -1124,7 +1110,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Sendlinger Straße", "1", "3", null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, 5, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(geaendertesNutzungsobjekt));
@@ -1163,7 +1149,6 @@ class AbrechnungIntegrationTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
             erstesNutzungsobjekt.setAufschlag50prozent(true);
@@ -1191,7 +1176,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(geaendertesNutzungsobjekt));
@@ -1228,7 +1213,6 @@ class AbrechnungIntegrationTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
             erstesNutzungsobjekt.setAufschlag50prozent(true);
@@ -1255,7 +1239,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(geaendertesNutzungsobjekt));
@@ -1294,7 +1278,6 @@ class AbrechnungIntegrationTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
             erstesNutzungsobjekt.setAufschlag50prozent(true);
@@ -1321,7 +1304,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Zweite Fassung", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(nutzungsobjekt));
@@ -1351,7 +1334,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
@@ -1379,7 +1362,6 @@ class AbrechnungIntegrationTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -1406,7 +1388,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
@@ -1455,7 +1437,6 @@ class AbrechnungIntegrationTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -1482,7 +1463,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
@@ -1516,7 +1497,6 @@ class AbrechnungIntegrationTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -1558,7 +1538,6 @@ class AbrechnungIntegrationTest {
             eigenePosition.setLaenge(new BigDecimal("12.00"));
             eigenePosition.setBreite(new BigDecimal("3.00"));
             eigenePosition.setFlaeche(new BigDecimal("36.00"));
-            eigenePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity eigenesNutzungsobjekt = new NutzungsobjektEntity();
             eigenesNutzungsobjekt.setAufschlag50prozent(true);
@@ -1587,7 +1566,6 @@ class AbrechnungIntegrationTest {
             fremdePosition.setLaenge(new BigDecimal("15.00"));
             fremdePosition.setBreite(new BigDecimal("3.00"));
             fremdePosition.setFlaeche(new BigDecimal("45.00"));
-            fremdePosition.setAnteilAnFlaeche(new BigDecimal("45.00"));
 
             final NutzungsobjektEntity fremdesNutzungsobjekt = new NutzungsobjektEntity();
             fremdesNutzungsobjekt.setAufschlag50prozent(false);
@@ -1614,7 +1592,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO neueVersionDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjektDTO));
@@ -1646,7 +1624,6 @@ class AbrechnungIntegrationTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -1722,7 +1699,6 @@ class AbrechnungIntegrationTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity gemeinsamesNutzungsobjekt = new NutzungsobjektEntity();
             gemeinsamesNutzungsobjekt.setAufschlag50prozent(true);
@@ -1756,7 +1732,6 @@ class AbrechnungIntegrationTest {
                 zweitePosition.setLaenge(new BigDecimal("15.00"));
                 zweitePosition.setBreite(new BigDecimal("3.00"));
                 zweitePosition.setFlaeche(new BigDecimal("45.00"));
-                zweitePosition.setAnteilAnFlaeche(new BigDecimal("45.00"));
 
                 final AbrechnungEntity zweiteAbrechnung = new AbrechnungEntity();
                 zweiteAbrechnung.setProjektId(projektId);
@@ -1796,7 +1771,6 @@ class AbrechnungIntegrationTest {
             eigenePosition.setLaenge(new BigDecimal("12.00"));
             eigenePosition.setBreite(new BigDecimal("3.00"));
             eigenePosition.setFlaeche(new BigDecimal("36.00"));
-            eigenePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity eigenesNutzungsobjekt = new NutzungsobjektEntity();
             eigenesNutzungsobjekt.setAufschlag50prozent(true);
@@ -1839,7 +1813,6 @@ class AbrechnungIntegrationTest {
             fremdePosition.setLaenge(new BigDecimal("15.00"));
             fremdePosition.setBreite(new BigDecimal("3.00"));
             fremdePosition.setFlaeche(new BigDecimal("45.00"));
-            fremdePosition.setAnteilAnFlaeche(new BigDecimal("45.00"));
 
             final NutzungsobjektEntity fremdesNutzungsobjekt = new NutzungsobjektEntity();
             fremdesNutzungsobjekt.setAufschlag50prozent(false);
@@ -1898,7 +1871,6 @@ class AbrechnungIntegrationTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setAufschlag50prozent(true);
@@ -1932,7 +1904,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Wird ignoriert", false,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(nutzungsobjekt));
@@ -1981,7 +1953,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(nutzungsobjekt));
@@ -2027,7 +1999,7 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(nutzungsobjekt));
@@ -2047,13 +2019,13 @@ class AbrechnungIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
-                            new BigDecimal("45.00"), new BigDecimal("45.00"))),
+                            new BigDecimal("45.00"))),
                     List.of());
             final AbrechnungNutzungsobjektRequestDTO zweitesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true,
                     List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
-                            new BigDecimal("36.00"), new BigDecimal("30.00"))),
+                            new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
                     AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(erstesNutzungsobjekt, zweitesNutzungsobjekt));

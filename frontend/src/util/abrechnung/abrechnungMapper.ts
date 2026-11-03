@@ -117,7 +117,6 @@ function toPositionForm(
     laenge: position.laenge ?? null,
     breite: position.breite ?? null,
     flaeche: position.flaeche ?? null,
-    anteilAnFlaeche: position.anteilAnFlaeche ?? null,
   };
 }
 
@@ -137,10 +136,9 @@ function toPositionRequestDTO(
     ende: new Date(position.ende),
     laenge: position.laenge ?? undefined,
     breite: position.breite ?? undefined,
-    // The 0 fallbacks are used to ensure the type, but the backend will reject them.
-    // The values are validated so these fallbacks should never actually be used.
+    // The 0 fallback is used to ensure the type, but the backend will reject it.
+    // The value is validated so this fallback should never actually be used.
     flaeche: position.flaeche ?? 0,
-    anteilAnFlaeche: position.anteilAnFlaeche ?? 0,
   };
 }
 

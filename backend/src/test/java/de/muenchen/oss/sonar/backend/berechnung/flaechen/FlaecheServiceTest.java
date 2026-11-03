@@ -16,7 +16,7 @@ class FlaecheServiceTest {
         @Test
         void givenPosition_thenNameItAfterItsPlaceInTheAdresse() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 2, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -26,7 +26,7 @@ class FlaecheServiceTest {
         @Test
         void givenEndeAfterBerechnungsdatum_thenStopAtBerechnungsdatum() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 2, 15), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -36,7 +36,7 @@ class FlaecheServiceTest {
         @Test
         void givenEndeBeforeBerechnungsdatum_thenKeepIt() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 20),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 2, 15), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -46,7 +46,7 @@ class FlaecheServiceTest {
         @Test
         void givenNoBerechnungsdatum_thenKeepTheEnde() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 20),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, null, LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -56,7 +56,7 @@ class FlaecheServiceTest {
         @Test
         void givenFlaecheWithNachkommanullen_thenPrintItWithoutThem() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("50.00"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("50.00"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -66,7 +66,7 @@ class FlaecheServiceTest {
         @Test
         void givenFlaecheWithNachkommastellen_thenKeepThem() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("50.50"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("50.50"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -76,7 +76,7 @@ class FlaecheServiceTest {
         @Test
         void givenBeginnOnTheFirstTagOfTheWochenlauf_thenStartInWocheOne() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -86,7 +86,7 @@ class FlaecheServiceTest {
         @Test
         void givenBeginnOnTheLastTagOfTheFirstWoche_thenStartInWocheOne() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 7), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -96,7 +96,7 @@ class FlaecheServiceTest {
         @Test
         void givenBeginnInALaterWoche_thenStartInThatWoche() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -106,7 +106,7 @@ class FlaecheServiceTest {
         @Test
         void givenAngefangeneWoche_thenEndInThatWoche() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
@@ -116,7 +116,7 @@ class FlaecheServiceTest {
         @Test
         void givenGroessereFlaecheThanBefore_thenReportTheFlaechenaenderungAsAGain() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
                     new BigDecimal("100"));
@@ -127,7 +127,7 @@ class FlaecheServiceTest {
         @Test
         void givenKleinereFlaecheThanBefore_thenReportTheFlaechenaenderungAsALoss() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
-                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("60"), BigDecimal.ZERO);
+                    BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("60"));
 
             final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
                     new BigDecimal("100"));

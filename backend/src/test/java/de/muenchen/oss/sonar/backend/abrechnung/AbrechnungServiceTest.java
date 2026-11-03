@@ -90,7 +90,6 @@ class AbrechnungServiceTest {
             erstePosition.setLaenge(new BigDecimal("12.00"));
             erstePosition.setBreite(new BigDecimal("3.00"));
             erstePosition.setFlaeche(new BigDecimal("36.00"));
-            erstePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
             erstesNutzungsobjekt.setId(UUID.randomUUID());
@@ -119,7 +118,6 @@ class AbrechnungServiceTest {
             zweitePosition.setLaenge(new BigDecimal("12.00"));
             zweitePosition.setBreite(new BigDecimal("3.00"));
             zweitePosition.setFlaeche(new BigDecimal("36.00"));
-            zweitePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity zweitesNutzungsobjekt = new NutzungsobjektEntity();
             zweitesNutzungsobjekt.setId(UUID.randomUUID());
@@ -165,7 +163,6 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setId(UUID.randomUUID());
@@ -199,7 +196,6 @@ class AbrechnungServiceTest {
             anderePosition.setLaenge(new BigDecimal("12.00"));
             anderePosition.setBreite(new BigDecimal("3.00"));
             anderePosition.setFlaeche(new BigDecimal("36.00"));
-            anderePosition.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity anderesNutzungsobjekt = new NutzungsobjektEntity();
             anderesNutzungsobjekt.setId(UUID.randomUUID());
@@ -242,7 +238,6 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setId(UUID.randomUUID());
@@ -409,7 +404,7 @@ class AbrechnungServiceTest {
         @Test
         void givenAbrechnung_thenReturnSavedAbrechnung() {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
@@ -446,7 +441,7 @@ class AbrechnungServiceTest {
         @Test
         void givenAbrechnung_thenSaveItAsTheFirstVersion() {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true, List.of(position), List.of());
@@ -485,7 +480,7 @@ class AbrechnungServiceTest {
             gespeicherteAdressdaten.setHausnummerVon("8");
 
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     nutzungsobjektId, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, "Wird ignoriert", false, List.of(position), List.of());
@@ -516,13 +511,13 @@ class AbrechnungServiceTest {
         @Test
         void givenSeveralNeueNutzungsobjekte_thenLinkEachPositionToItsOwnNutzungsobjekt() {
             final AbrechnungPosition positionAmMarienplatz = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt marienplatz = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true, List.of(positionAmMarienplatz), List.of());
 
             final AbrechnungPosition positionInDerSendlingerStrasse = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
-                    new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
+                    new BigDecimal("3.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt sendlingerStrasse = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
                     null, null, null, null, false, List.of(positionInDerSendlingerStrasse), List.of());
@@ -575,7 +570,6 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setId(UUID.randomUUID());
@@ -620,7 +614,6 @@ class AbrechnungServiceTest {
             position.setLaenge(new BigDecimal("12.00"));
             position.setBreite(new BigDecimal("3.00"));
             position.setFlaeche(new BigDecimal("36.00"));
-            position.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
             nutzungsobjekt.setId(UUID.randomUUID());
@@ -672,7 +665,6 @@ class AbrechnungServiceTest {
             positionAmMarienplatz.setLaenge(new BigDecimal("12.00"));
             positionAmMarienplatz.setBreite(new BigDecimal("3.00"));
             positionAmMarienplatz.setFlaeche(new BigDecimal("36.00"));
-            positionAmMarienplatz.setAnteilAnFlaeche(new BigDecimal("30.00"));
 
             final AbrechnungPositionEntity positionInDerSendlingerStrasse = new AbrechnungPositionEntity();
             positionInDerSendlingerStrasse.setNutzungsobjekt(zweitesNutzungsobjekt);
@@ -681,7 +673,6 @@ class AbrechnungServiceTest {
             positionInDerSendlingerStrasse.setLaenge(new BigDecimal("15.00"));
             positionInDerSendlingerStrasse.setBreite(new BigDecimal("3.00"));
             positionInDerSendlingerStrasse.setFlaeche(new BigDecimal("45.00"));
-            positionInDerSendlingerStrasse.setAnteilAnFlaeche(new BigDecimal("45.00"));
 
             final UUID abrechnungId = UUID.randomUUID();
             final AbrechnungEntity abrechnung = new AbrechnungEntity();
@@ -857,7 +848,7 @@ class AbrechnungServiceTest {
             vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
 
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
-                    new BigDecimal("3.00"), new BigDecimal("45.00"), new BigDecimal("45.00"));
+                    new BigDecimal("3.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position), List.of());

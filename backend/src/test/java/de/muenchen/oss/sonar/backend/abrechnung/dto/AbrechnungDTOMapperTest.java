@@ -32,7 +32,7 @@ class AbrechnungDTOMapperTest {
         @Test
         void givenAbrechnung_thenReturnsCorrectDTO() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
-                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"), new BigDecimal("30.00"));
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungMast mast = new AbrechnungMast(UUID.randomUUID(), VON, BIS);
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
@@ -75,7 +75,6 @@ class AbrechnungDTOMapperTest {
             assertThat(positionDTO.laenge()).isEqualByComparingTo("12.00");
             assertThat(positionDTO.breite()).isEqualByComparingTo("3.00");
             assertThat(positionDTO.flaeche()).isEqualByComparingTo("36.00");
-            assertThat(positionDTO.anteilAnFlaeche()).isEqualByComparingTo("30.00");
 
             assertThat(nutzungsobjektDTO.masten()).hasSize(1);
             final AbrechnungMastResponseDTO mastDTO = nutzungsobjektDTO.masten().getFirst();
@@ -101,8 +100,7 @@ class AbrechnungDTOMapperTest {
         void givenRequestDTO_thenTakeTheProjektFromThePath() {
             final UUID projektId = UUID.randomUUID();
             final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
-                    VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"),
-                    new BigDecimal("30.00"));
+                    VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, 12, null, false, List.of(positionDTO), List.of());
@@ -149,8 +147,7 @@ class AbrechnungDTOMapperTest {
         @Test
         void givenPosition_thenKeepTheFlaecheAsGiven() {
             final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
-                    VON, BIS, new BigDecimal("1.15"), new BigDecimal("0.10"), new BigDecimal("5.00"),
-                    BigDecimal.ZERO);
+                    VON, BIS, new BigDecimal("1.15"), new BigDecimal("0.10"), new BigDecimal("5.00"));
 
             final AbrechnungPosition result = abrechnungDTOMapper.toAbrechnungPosition(positionDTO);
 
@@ -160,7 +157,7 @@ class AbrechnungDTOMapperTest {
         @Test
         void givenOnlyFlaeche_thenKeepItAsGiven() {
             final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
-                    VON, BIS, null, null, new BigDecimal("5.00"), BigDecimal.ZERO);
+                    VON, BIS, null, null, new BigDecimal("5.00"));
 
             final AbrechnungPosition result = abrechnungDTOMapper.toAbrechnungPosition(positionDTO);
 
