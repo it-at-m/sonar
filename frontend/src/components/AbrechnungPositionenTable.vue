@@ -21,10 +21,12 @@
               <sonar-date-field
                 :id="`${idPrefix}-beginn-${index}`"
                 v-model="position.beginn"
+                :allowed-dates="possibleBeginn(index)"
                 :aria-label="`Beginn der Position ${index + 1}`"
                 density="compact"
+                :disabled="(!readonly && index === 0) || undefined"
                 :readonly="readonly || undefined"
-                :rules="[requiredRule]"
+                :rules="beginnRules(index)"
               />
             </td>
             <td>
@@ -33,10 +35,8 @@
                 v-model="position.ende"
                 :aria-label="`Ende der Position ${index + 1}`"
                 density="compact"
+                :disabled="!readonly || undefined"
                 :readonly="readonly || undefined"
-                :rules="[requiredRule]"
-                :zeitraum-beginn="position.beginn"
-                zeitraum-einheit="week"
               />
             </td>
             <td>
@@ -114,6 +114,7 @@
 
 <script setup lang="ts">
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
+import type { ValidationRule } from "@/util/validationRules";
 import type { VNumberInput } from "vuetify/components";
 
 import { mdiDelete, mdiPlus } from "@mdi/js";
@@ -123,13 +124,16 @@ import SonarDateField from "@/components/common/SonarDateField.vue";
 import {
   createAbrechnungPosition,
   hasLaengeUndBreite,
+  isPossibleBeginn,
   setBreite,
   setLaenge,
 } from "@/util/abrechnung/abrechnungPositionForm";
 import {
+  beginnRule,
   breiteRule,
   laengeRule,
 } from "@/util/abrechnung/abrechnungPositionRules";
+import { toIsoDate } from "@/util/common/isoDate";
 import { greaterThanZeroRule, requiredRule } from "@/util/validationRules";
 
 const positionen = defineModel<AbrechnungPositionForm[]>({ required: true });
@@ -142,6 +146,25 @@ const { readonly = false, removable } = defineProps<{
 
 const laengeInputs = useTemplateRef<VNumberInput[]>("laengeInputs");
 const breiteInputs = useTemplateRef<VNumberInput[]>("breiteInputs");
+
+function beginnRules(index: number): ValidationRule[] {
+  const vorgaenger = positionen.value[index - 1];
+  const position = positionen.value[index];
+  return vorgaenger === undefined || position === undefined
+    ? [requiredRule]
+    : [requiredRule, beginnRule(vorgaenger, position)];
+}
+
+function possibleBeginn(
+  index: number
+): ((value: unknown) => boolean) | undefined {
+  const vorgaenger = positionen.value[index - 1];
+  const position = positionen.value[index];
+  if (vorgaenger === undefined || position === undefined) {
+    return undefined;
+  }
+  return (value) => isPossibleBeginn(vorgaenger, position, toIsoDate(value));
+}
 
 function addPosition(): void {
   positionen.value.push(createAbrechnungPosition());

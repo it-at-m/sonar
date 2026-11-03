@@ -250,4 +250,12 @@ describe("SonarDateField.vue", () => {
     expect(dateInput(wrapper).props("prependIcon")).toBe("");
     expect(dateInput(wrapper).props("prependInnerIcon")).toBe("$calendar");
   });
+
+  it("givenAllowedDatesAndNoZeitraumBeginn_thenPassThemOn", () => {
+    const onlyMondays = (date: unknown) =>
+      date instanceof Date && date.getDay() === 1;
+    const wrapper = mountField({ modelValue: "", allowedDates: onlyMondays });
+
+    expect(allowedDates(wrapper)).toBe(onlyMondays);
+  });
 });

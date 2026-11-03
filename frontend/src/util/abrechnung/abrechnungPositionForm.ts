@@ -1,5 +1,12 @@
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
 
+import {
+  countWholePeriods,
+  dayAfter,
+  dayBefore,
+  lastDayOfPeriods,
+} from "@/util/common/zeitraum";
+
 const HUNDREDTHS_PER_UNIT = 100;
 
 export function createAbrechnungPosition(): AbrechnungPositionForm {
@@ -23,6 +30,53 @@ export function isAbrechnungPositionDirty(
     position.breite !== null ||
     position.flaeche !== null
   );
+}
+
+export function alignPositionenToZeitraum(
+  positionen: AbrechnungPositionForm[],
+  zeitraumVon: string,
+  zeitraumBis: string
+): void {
+  positionen.forEach((position, index) => {
+    if (index === 0) {
+      position.beginn = zeitraumVon;
+    }
+    const nachfolger = positionen[index + 1];
+    position.ende =
+      nachfolger === undefined ? zeitraumBis : dayBefore(nachfolger.beginn);
+  });
+}
+
+export function moveBeginneWithZeitraumVon(
+  positionen: AbrechnungPositionForm[],
+  previousZeitraumVon: string,
+  zeitraumVon: string
+): void {
+  for (const position of positionen.slice(1)) {
+    const weeks = countWholePeriods(
+      previousZeitraumVon,
+      dayBefore(position.beginn),
+      "week"
+    );
+    if (weeks !== undefined && zeitraumVon) {
+      position.beginn = dayAfter(lastDayOfPeriods(zeitraumVon, weeks, "week"));
+    }
+  }
+}
+
+export function isPossibleBeginn(
+  vorgaenger: AbrechnungPositionForm,
+  position: AbrechnungPositionForm,
+  beginn: string
+): boolean {
+  const vorgaengerInWholeWeeks =
+    !vorgaenger.beginn ||
+    countWholePeriods(vorgaenger.beginn, dayBefore(beginn), "week") !==
+      undefined;
+  const positionInWholeWeeks =
+    !position.ende ||
+    countWholePeriods(beginn, position.ende, "week") !== undefined;
+  return vorgaengerInWholeWeeks && positionInWholeWeeks;
 }
 
 export function hasLaengeUndBreite(position: AbrechnungPositionForm): boolean {
