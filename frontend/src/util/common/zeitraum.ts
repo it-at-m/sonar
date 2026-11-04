@@ -41,6 +41,14 @@ export function lastDayOfPeriods(
   }
 }
 
+export function dayAfter(date: string): string {
+  return addDays(date, 1);
+}
+
+export function dayBefore(date: string): string {
+  return addDays(date, -1);
+}
+
 export function countWholePeriods(
   beginn: string,
   ende: string,
@@ -93,6 +101,22 @@ export function snapToLastDayOfPeriod(
       return lastDayOfPeriods(beginn, next, einheit);
     }
   }
+}
+
+function addDays(date: string, days: number): string {
+  const start = parseIsoDate(date);
+  if (start === undefined) {
+    return "";
+  }
+  return toIsoDateString(
+    new Date(
+      Date.UTC(
+        start.getUTCFullYear(),
+        start.getUTCMonth(),
+        start.getUTCDate() + days
+      )
+    )
+  );
 }
 
 function countWholeDayPeriods(start: Date, schluss: Date): number | undefined {

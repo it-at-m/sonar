@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest";
 
 import {
   countWholePeriods,
+  dayAfter,
   lastDayOfPeriods,
   snapToLastDayOfPeriod,
 } from "@/util/common/zeitraum";
@@ -50,6 +51,15 @@ describe("zeitraum.ts", () => {
 
     it("givenNoBeginn_thenReturnEmpty", () => {
       expect(lastDayOfPeriods("", 1, "week")).toBe("");
+    });
+  });
+  describe("dayAfter", () => {
+    it("givenTheLastOfAMonth_thenReturnTheFirstOfTheNext", () => {
+      expect(dayAfter("2026-01-31")).toBe("2026-02-01");
+    });
+
+    it("givenNoDate_thenReturnEmpty", () => {
+      expect(dayAfter("")).toBe("");
     });
   });
 
