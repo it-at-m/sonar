@@ -32,7 +32,7 @@ describe("projektForm.ts", () => {
 
     it("givenSelectedStadtbezirk_thenReturnTrue", () => {
       const { isDirty, projekt } = useProjektForm();
-      projekt.stadtbezirk = ProjektRequestDTOStadtbezirkEnum.MOOSACH;
+      projekt.stadtbezirk = ProjektRequestDTOStadtbezirkEnum.BEZIRK_10_MOOSACH;
 
       expect(isDirty()).toBe(true);
     });

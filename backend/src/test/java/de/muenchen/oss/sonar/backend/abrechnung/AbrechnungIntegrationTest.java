@@ -98,7 +98,7 @@ class AbrechnungIntegrationTest {
         stadtbezirkRolleRepository.deleteAll();
 
         final StadtbezirkRolleEntity altstadtLehelMitte = new StadtbezirkRolleEntity();
-        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
         altstadtLehelMitte.setRolle("SB_Mitte");
         stadtbezirkRolleRepository.save(altstadtLehelMitte);
 
@@ -113,7 +113,7 @@ class AbrechnungIntegrationTest {
 
         final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer("2026-0001");
-        projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+        projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
         projekt.setAbrechnungBeginn(VON);
         projekt.setAbrechnungEnde(BIS);
         projekt.addAdresse(adresse);
@@ -156,7 +156,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
-            anderesProjekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -586,7 +586,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.MOOSACH);
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
             stadtbezirkRolleRepository.save(moosachNord);
 
@@ -829,7 +829,7 @@ class AbrechnungIntegrationTest {
         @Test
         void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.MOOSACH);
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
             stadtbezirkRolleRepository.save(moosachNord);
 
@@ -1111,7 +1111,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
-            anderesProjekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -1717,7 +1717,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
-            anderesProjekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -1864,7 +1864,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
-            anderesProjekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -2053,7 +2053,7 @@ class AbrechnungIntegrationTest {
         void givenNutzungsobjektOfAnotherProjekt_thenReturnNotFound() {
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
-            anderesProjekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 

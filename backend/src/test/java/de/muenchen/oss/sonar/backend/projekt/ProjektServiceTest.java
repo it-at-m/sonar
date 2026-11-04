@@ -209,19 +209,19 @@ class ProjektServiceTest {
             final ProjektEntity projektEntity = new ProjektEntity();
             projektEntity.setId(projektId);
             projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
-            projektEntity.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projektEntity.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projektEntity.setAbrechnungBeginn(BEGINN);
             projektEntity.setAbrechnungEnde(ENDE);
             projektEntity.addAdresse(adresseEntity);
 
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.ALTSTADT_LEHEL));
-            when(projektRepository.findByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.ALTSTADT_LEHEL))).thenReturn(Optional.of(projektEntity));
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
+            when(projektRepository.findByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL))).thenReturn(Optional.of(projektEntity));
 
             final Projekt result = unitUnderTest.getProjekt(projektId);
 
             assertThat(result.id()).isEqualTo(projektId);
             assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
-            assertThat(result.stadtbezirk()).isEqualTo(Stadtbezirk.ALTSTADT_LEHEL);
+            assertThat(result.stadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             assertThat(result.adressen()).hasSize(1);
             assertThat(result.adressen().getFirst().adresse()).isEqualTo("Marienplatz");
         }
@@ -229,8 +229,8 @@ class ProjektServiceTest {
         @Test
         void givenNoProjektInTheStadtbezirkeOfTheUser_thenThrowNotFound() {
             final UUID projektId = UUID.randomUUID();
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.ALTSTADT_LEHEL, Stadtbezirk.SENDLING));
-            when(projektRepository.findByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.ALTSTADT_LEHEL, Stadtbezirk.SENDLING)))
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING));
+            when(projektRepository.findByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING)))
                     .thenReturn(Optional.empty());
 
             assertThatExceptionOfType(NotFoundException.class)
@@ -244,8 +244,9 @@ class ProjektServiceTest {
         @Test
         void givenProjektInAStadtbezirkOfTheUser_thenReturnTrue() {
             final UUID projektId = UUID.randomUUID();
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.ALTSTADT_LEHEL, Stadtbezirk.SENDLING));
-            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.ALTSTADT_LEHEL, Stadtbezirk.SENDLING))).thenReturn(true);
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING));
+            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING)))
+                    .thenReturn(true);
 
             assertThat(unitUnderTest.existsProjekt(projektId)).isTrue();
         }
@@ -253,8 +254,8 @@ class ProjektServiceTest {
         @Test
         void givenNoProjektInTheStadtbezirkeOfTheUser_thenReturnFalse() {
             final UUID projektId = UUID.randomUUID();
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.ALTSTADT_LEHEL));
-            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.ALTSTADT_LEHEL))).thenReturn(false);
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
+            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL))).thenReturn(false);
 
             assertThat(unitUnderTest.existsProjekt(projektId)).isFalse();
         }
@@ -267,7 +268,7 @@ class ProjektServiceTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, true);
-            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
+            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
                     List.of(adresse));
 
             final UUID savedId = UUID.randomUUID();
@@ -282,7 +283,7 @@ class ProjektServiceTest {
             verify(projektRepository).save(any(ProjektEntity.class));
             assertThat(result.id()).isEqualTo(savedId);
             assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
-            assertThat(result.stadtbezirk()).isEqualTo(Stadtbezirk.ALTSTADT_LEHEL);
+            assertThat(result.stadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             assertThat(result.adressen()).hasSize(1);
             assertThat(result.adressen().getFirst().flurstueck()).isEqualTo("1234/5");
             assertThat(result.adressen().getFirst().sondernutzungErlaubt()).isTrue();

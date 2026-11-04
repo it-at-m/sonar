@@ -5,4 +5,6 @@ includes:
   - path: 04_add-users.yml
   - path: 05_assign-roles.yml
   - path: 06_local-audience.yml
+  - path: 07_add-sachbearbeiter-roles-and-users.yml
+  - path: 08_assign-sachbearbeiter-roles-to-reader-and-writer.yml
   #- path: permissions/P01_init_permissions.yml

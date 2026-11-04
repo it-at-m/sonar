@@ -29,7 +29,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenNoVorabrechnung_thenStartAtLfdNrOneAndChargeTheWholeBetrag() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -52,7 +52,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenNoVorabrechnung_thenStartTheZeitraumOnTheBeginnOfTheMassnahme() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -71,7 +71,7 @@ class BerechnungsergebnisServiceTest {
         @Test
         void givenVorabrechnung_thenContinueItsLfdNrAndChargeOnlyWhatItLeftOver() {
             final Vorabrechnung vorabrechnung = new Vorabrechnung(1, LocalDate.of(2025, 12, 31), new BigDecimal("50.00"));
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -91,7 +91,7 @@ class BerechnungsergebnisServiceTest {
         @Test
         void givenVorabrechnung_thenStartTheZeitraumOnTheDayAfterIt() {
             final Vorabrechnung vorabrechnung = new Vorabrechnung(1, LocalDate.of(2026, 1, 3), new BigDecimal("50.00"));
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -108,7 +108,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenNutzungsobjektWithoutMasten_thenLeaveItOutOfTheUeberspannungen() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition mitMast = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungPosition ohneMast = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
@@ -133,7 +133,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenAdresseBeginningLater_thenCountItsWochenFromTheEarliestBeginnOfAll() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition ersteWoche = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungPosition zweiteWoche = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 14),
@@ -157,7 +157,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenPositionReachingBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 12, 31),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -175,7 +175,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenMastReachingBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -195,7 +195,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenNutzungsobjektWithoutPosition_thenChargeNoFlaeche() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(), List.of());
@@ -213,7 +213,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenAbrechnung_thenWriteTheZusammenfassungAndTheBerechnungslog() {
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(

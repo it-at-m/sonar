@@ -19,7 +19,7 @@ describe("projektTableRowMapper.ts", () => {
     it("givenStadtbezirk_thenShowItsNummerAndName", () => {
       const row = toProjektTableRow({
         stadtbezirk:
-          ProjektResponseDTOStadtbezirkEnum.THALKIRCHEN_OBERSENDLING_FORSTENRIED_FUERSTENRIED_SOLLN,
+          ProjektResponseDTOStadtbezirkEnum.BEZIRK_19_THALKIRCHEN_OBERSENDLING_FORSTENRIED_FUERSTENRIED_SOLLN,
       });
 
       expect(row.stadtbezirk).toBe(

@@ -74,7 +74,7 @@ class ProjektIntegrationTest {
         stadtbezirkRolleRepository.deleteAll();
 
         final StadtbezirkRolleEntity altstadtLehelMitte = new StadtbezirkRolleEntity();
-        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
         altstadtLehelMitte.setRolle("SB_Mitte");
         stadtbezirkRolleRepository.save(altstadtLehelMitte);
 
@@ -92,7 +92,7 @@ class ProjektIntegrationTest {
 
         final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer("2026-0001");
-        projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+        projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
         projekt.setAbrechnungBeginn(BEGINN);
         projekt.setAbrechnungEnde(ENDE);
         projekt.addAdresse(adresse);
@@ -136,14 +136,14 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projektMoosach = new ProjektEntity();
             projektMoosach.setProjektnummer("2026-0002");
-            projektMoosach.setStadtbezirk(Stadtbezirk.MOOSACH);
+            projektMoosach.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             projektMoosach.setAbrechnungBeginn(BEGINN);
             projektMoosach.setAbrechnungEnde(ENDE);
             projektMoosach.addAdresse(adresseMoosach);
             projektRepository.save(projektMoosach);
 
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.MOOSACH);
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
             stadtbezirkRolleRepository.save(moosachNord);
 
@@ -175,7 +175,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projektSendling = new ProjektEntity();
             projektSendling.setProjektnummer("2026-0002");
-            projektSendling.setStadtbezirk(Stadtbezirk.SENDLING);
+            projektSendling.setStadtbezirk(Stadtbezirk.BEZIRK_06_SENDLING);
             projektSendling.setAbrechnungBeginn(BEGINN);
             projektSendling.setAbrechnungEnde(ENDE);
             projektSendling.addAdresse(adresseSendling);
@@ -195,14 +195,14 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projektMoosach = new ProjektEntity();
             projektMoosach.setProjektnummer("2026-0003");
-            projektMoosach.setStadtbezirk(Stadtbezirk.MOOSACH);
+            projektMoosach.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             projektMoosach.setAbrechnungBeginn(BEGINN);
             projektMoosach.setAbrechnungEnde(ENDE);
             projektMoosach.addAdresse(adresseMoosach);
             projektRepository.save(projektMoosach);
 
             final StadtbezirkRolleEntity sendlingSued = new StadtbezirkRolleEntity();
-            sendlingSued.setStadtbezirk(Stadtbezirk.SENDLING);
+            sendlingSued.setStadtbezirk(Stadtbezirk.BEZIRK_06_SENDLING);
             sendlingSued.setRolle("SB_Sued");
             stadtbezirkRolleRepository.save(sendlingSued);
 
@@ -244,7 +244,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
-            projekt0003.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt0003.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt0003.setAbrechnungBeginn(BEGINN);
             projekt0003.setAbrechnungEnde(ENDE);
             projekt0003.addAdresse(adresse0003);
@@ -264,7 +264,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
-            projekt0002.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt0002.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt0002.setAbrechnungBeginn(BEGINN);
             projekt0002.setAbrechnungEnde(ENDE);
             projekt0002.addAdresse(adresse0002);
@@ -315,7 +315,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
-            projekt0003.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt0003.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt0003.setAbrechnungBeginn(BEGINN);
             projekt0003.setAbrechnungEnde(ENDE);
             projekt0003.addAdresse(adresse0003);
@@ -335,7 +335,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
-            projekt0002.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt0002.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt0002.setAbrechnungBeginn(BEGINN);
             projekt0002.setAbrechnungEnde(ENDE);
             projekt0002.addAdresse(adresse0002);
@@ -372,7 +372,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
-            projekt0002.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt0002.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt0002.setAbrechnungBeginn(LocalDate.of(2025, 1, 1));
             projekt0002.setAbrechnungEnde(ENDE);
             projekt0002.addAdresse(adresse0002);
@@ -392,7 +392,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
-            projekt0003.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt0003.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt0003.setAbrechnungBeginn(LocalDate.of(2024, 1, 1));
             projekt0003.setAbrechnungEnde(ENDE);
             projekt0003.addAdresse(adresse0003);
@@ -412,6 +412,73 @@ class ProjektIntegrationTest {
                     .jsonPath("$.content..projektnummer")
                     .value(new ParameterizedTypeReference<List<String>>() {
                     }, projektnummern -> assertThat(projektnummern).containsExactly("2026-0003", "2026-0002"));
+        }
+
+        @Test
+        void givenStadtbezirkAscending_thenOrderByItsNummer() {
+            final StadtbezirkRolleEntity allachUntermenzingMitte = new StadtbezirkRolleEntity();
+            allachUntermenzingMitte.setStadtbezirk(Stadtbezirk.BEZIRK_23_ALLACH_UNTERMENZING);
+            allachUntermenzingMitte.setRolle("SB_Mitte");
+            stadtbezirkRolleRepository.save(allachUntermenzingMitte);
+
+            final StadtbezirkRolleEntity auHaidhausenMitte = new StadtbezirkRolleEntity();
+            auHaidhausenMitte.setStadtbezirk(Stadtbezirk.BEZIRK_05_AU_HAIDHAUSEN);
+            auHaidhausenMitte.setRolle("SB_Mitte");
+            stadtbezirkRolleRepository.save(auHaidhausenMitte);
+
+            final ProjektAdresseEntity adresse0002 = new ProjektAdresseEntity();
+            adresse0002.setAnzahlMahnungen(0);
+            adresse0002.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0002 = adresse0002.getAdressdaten();
+            adressdaten0002.setArt(Adressart.ADRESSE);
+            adressdaten0002.setAdresse("Marienplatz");
+            adressdaten0002.setHausnummerVon("8");
+            adresse0002.addNutzung(Nutzung.BAUZAUN);
+            adressdaten0002.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten0002.setUnerlaubteNutzungBis(ENDE);
+
+            final ProjektEntity projekt0002 = new ProjektEntity();
+            projekt0002.setProjektnummer("2026-0002");
+            projekt0002.setStadtbezirk(Stadtbezirk.BEZIRK_23_ALLACH_UNTERMENZING);
+            projekt0002.setAbrechnungBeginn(BEGINN);
+            projekt0002.setAbrechnungEnde(ENDE);
+            projekt0002.addAdresse(adresse0002);
+            projektRepository.save(projekt0002);
+
+            final ProjektAdresseEntity adresse0003 = new ProjektAdresseEntity();
+            adresse0003.setAnzahlMahnungen(0);
+            adresse0003.setSondernutzungErlaubt(false);
+
+            final AdressdatenEmbeddable adressdaten0003 = adresse0003.getAdressdaten();
+            adressdaten0003.setArt(Adressart.ADRESSE);
+            adressdaten0003.setAdresse("Marienplatz");
+            adressdaten0003.setHausnummerVon("8");
+            adresse0003.addNutzung(Nutzung.BAUZAUN);
+            adressdaten0003.setUnerlaubteNutzungVon(BEGINN);
+            adressdaten0003.setUnerlaubteNutzungBis(ENDE);
+
+            final ProjektEntity projekt0003 = new ProjektEntity();
+            projekt0003.setProjektnummer("2026-0003");
+            projekt0003.setStadtbezirk(Stadtbezirk.BEZIRK_05_AU_HAIDHAUSEN);
+            projekt0003.setAbrechnungBeginn(BEGINN);
+            projekt0003.setAbrechnungEnde(ENDE);
+            projekt0003.addAdresse(adresse0003);
+            projektRepository.save(projekt0003);
+
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path("/projekt")
+                            .queryParam("sortBy", "STADTBEZIRK")
+                            .queryParam("sortDirection", "ASC")
+                            .build())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody()
+                    .jsonPath("$.content..projektnummer")
+                    .value(new ParameterizedTypeReference<List<String>>() {
+                    }, projektnummern -> assertThat(projektnummern).containsExactly("2026-0001", "2026-0003", "2026-0002"));
         }
 
         @Test
@@ -442,7 +509,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
-            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(BEGINN);
             projekt.setAbrechnungEnde(ENDE);
             projekt.addAdresse(adresse);
@@ -478,7 +545,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
-            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(BEGINN);
             projekt.setAbrechnungEnde(ENDE);
             projekt.addAdresse(adresse);
@@ -514,7 +581,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
-            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -550,7 +617,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
-            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -602,7 +669,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
-            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -639,7 +706,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt = new ProjektEntity();
             projekt.setProjektnummer("2027-4711");
-            projekt.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projekt.setAbrechnungBeginn(LocalDate.of(2027, 1, 1));
             projekt.setAbrechnungEnde(LocalDate.of(2027, 3, 31));
             projekt.addAdresse(adresse);
@@ -709,7 +776,7 @@ class ProjektIntegrationTest {
                         assertNotNull(projektResponseDTO);
                         assertThat(projektResponseDTO.id()).isEqualTo(projektId);
                         assertThat(projektResponseDTO.projektnummer()).isEqualTo("2026-0001");
-                        assertThat(projektResponseDTO.stadtbezirk()).isEqualTo(Stadtbezirk.ALTSTADT_LEHEL);
+                        assertThat(projektResponseDTO.stadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
                         assertThat(projektResponseDTO.adressen()).hasSize(1);
 
                         final ProjektAdresseResponseDTO adresse = projektResponseDTO.adressen().getFirst();
@@ -723,7 +790,7 @@ class ProjektIntegrationTest {
         @Test
         void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.MOOSACH);
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
             stadtbezirkRolleRepository.save(moosachNord);
 
@@ -769,7 +836,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 3, true);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", Stadtbezirk.SENDLING, BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0002", Stadtbezirk.BEZIRK_06_SENDLING, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -783,7 +850,7 @@ class ProjektIntegrationTest {
                     .value(projektResponseDTO -> {
                         assertNotNull(projektResponseDTO);
                         assertThat(projektResponseDTO.projektnummer()).isEqualTo(requestDTO.projektnummer());
-                        assertThat(projektResponseDTO.stadtbezirk()).isEqualTo(Stadtbezirk.SENDLING);
+                        assertThat(projektResponseDTO.stadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_06_SENDLING);
                         assertThat(projektResponseDTO.adressen()).hasSize(1);
                     })
                     .returnResult()
@@ -793,7 +860,7 @@ class ProjektIntegrationTest {
             transactionTemplate.executeWithoutResult(status -> {
                 final ProjektEntity projekt = projektRepository.findById(responseDTO.id()).orElseThrow();
                 assertThat(projekt.getProjektnummer()).isEqualTo("2026-0002");
-                assertThat(projekt.getStadtbezirk()).isEqualTo(Stadtbezirk.SENDLING);
+                assertThat(projekt.getStadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_06_SENDLING);
                 assertThat(projekt.getAdressen()).hasSize(1);
 
                 final ProjektAdresseEntity adresse = projekt.getAdressen().getFirst();
@@ -815,7 +882,7 @@ class ProjektIntegrationTest {
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null,
                     List.of(Nutzung.SONSTIGES, Nutzung.BAUZAUN, Nutzung.CONTAINER), "Gerüst über dem Gehweg",
                     null, null, null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -843,7 +910,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), "Gerüst über dem Gehweg",
                     null, null, null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0004", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0004", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -861,7 +928,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     null, null, null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", Stadtbezirk.ALTSTADT_LEHEL, ENDE, BEGINN, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0005", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, ENDE, BEGINN, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -879,7 +946,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     null, null, 12, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0006", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -908,7 +975,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), null, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0007", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
@@ -935,7 +1002,7 @@ class ProjektIntegrationTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, 12, 0, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0008", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             restTestClient.post()
                     .uri("/projekt")
@@ -968,7 +1035,7 @@ class ProjektIntegrationTest {
 
         @Test
         void givenProjektWithoutAdressen_thenReturnBadRequest() {
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of());
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0003", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of());
 
             restTestClient.post()
                     .uri("/projekt")

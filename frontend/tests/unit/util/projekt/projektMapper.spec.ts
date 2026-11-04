@@ -20,7 +20,7 @@ function adresseWith(
 function projektWith(overrides: Partial<ProjektForm>): ProjektForm {
   return {
     projektnummer: "2026-0001",
-    stadtbezirk: ProjektRequestDTOStadtbezirkEnum.ALTSTADT_LEHEL,
+    stadtbezirk: ProjektRequestDTOStadtbezirkEnum.BEZIRK_01_ALTSTADT_LEHEL,
     abrechnungBeginn: "2026-01-01",
     abrechnungEnde: "2026-03-31",
     adressen: [adresseWith({ adresse: "Marienplatz", hausnummerVon: "8" })],
@@ -81,12 +81,14 @@ describe("projektMapper.ts", () => {
 
     it("givenStadtbezirk_thenSendIt", () => {
       const projekt = projektWith({
-        stadtbezirk: ProjektRequestDTOStadtbezirkEnum.SENDLING,
+        stadtbezirk: ProjektRequestDTOStadtbezirkEnum.BEZIRK_06_SENDLING,
       });
 
       const dto = toProjektRequestDTO(projekt);
 
-      expect(dto.stadtbezirk).toBe(ProjektRequestDTOStadtbezirkEnum.SENDLING);
+      expect(dto.stadtbezirk).toBe(
+        ProjektRequestDTOStadtbezirkEnum.BEZIRK_06_SENDLING
+      );
     });
 
     it("givenNoStadtbezirk_thenThrow", () => {

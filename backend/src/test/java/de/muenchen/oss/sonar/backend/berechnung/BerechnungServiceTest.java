@@ -58,7 +58,7 @@ class BerechnungServiceTest {
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
                     BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID))
-                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
+                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
             final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
@@ -87,7 +87,7 @@ class BerechnungServiceTest {
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
                     BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID))
-                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, new BigDecimal("42"), List.of()));
+                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, new BigDecimal("42"), List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
             final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
@@ -109,7 +109,8 @@ class BerechnungServiceTest {
                     LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 22), AbrechnungsArt.ENDABRECHNUNG, null, false,
                     List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID)).thenReturn(
-                    new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.ALTSTADT_LEHEL, LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 22), BigDecimal.ZERO,
+                    new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 22),
+                            BigDecimal.ZERO,
                             List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
@@ -129,7 +130,7 @@ class BerechnungServiceTest {
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
                     BEGINN, LocalDate.of(2025, 3, 30), AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID)).thenReturn(
-                    new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, LocalDate.of(2025, 3, 30), BigDecimal.ZERO, List.of()));
+                    new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, LocalDate.of(2025, 3, 30), BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
             final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID,
@@ -153,7 +154,7 @@ class BerechnungServiceTest {
             final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
                     BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID))
-                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
+                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
             final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
@@ -168,7 +169,7 @@ class BerechnungServiceTest {
         @Test
         void givenAnUnknownAbrechnung_thenThrowNotFound() {
             when(projektService.getProjekt(PROJEKT_ID))
-                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
+                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenThrow(new NotFoundException("not found"));
 
             assertThatThrownBy(() -> unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM))

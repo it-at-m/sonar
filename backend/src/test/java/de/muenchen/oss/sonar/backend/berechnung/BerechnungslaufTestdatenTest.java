@@ -69,7 +69,7 @@ class BerechnungslaufTestdatenTest {
     private static Projekt toProjekt(final JsonNode input) {
         return new Projekt(PROJEKT_ID,
                 input.get("projektNummer").asString(),
-                Stadtbezirk.ALTSTADT_LEHEL,
+                Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL,
                 zeitraumVon(input),
                 abrechnungsdatum(input),
                 input.get("verwaltungsgebuehren").decimalValue(),

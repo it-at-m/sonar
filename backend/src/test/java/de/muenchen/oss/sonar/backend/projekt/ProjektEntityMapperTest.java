@@ -46,7 +46,7 @@ class ProjektEntityMapperTest {
             final ProjektEntity projektEntity = new ProjektEntity();
             projektEntity.setId(UUID.randomUUID());
             projektEntity.setProjektnummer("2026-0001");
-            projektEntity.setStadtbezirk(Stadtbezirk.ALTSTADT_LEHEL);
+            projektEntity.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projektEntity.setAbrechnungBeginn(BEGINN);
             projektEntity.setAbrechnungEnde(ENDE);
             projektEntity.addAdresse(adresseEntity);
@@ -86,7 +86,8 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, false);
-            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+            final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
+                    List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 
@@ -118,7 +119,7 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, 12, 0, false);
-            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
+            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
                     List.of(adresse));
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);

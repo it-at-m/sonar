@@ -64,10 +64,10 @@ class ProjektSpecificationsTest {
             final Path<Object> stadtbezirk = mock();
             final Predicate inSendlingOrLaim = mock();
             when(root.get("stadtbezirk")).thenReturn(stadtbezirk);
-            when(stadtbezirk.in(Set.of(Stadtbezirk.SENDLING, Stadtbezirk.LAIM))).thenReturn(inSendlingOrLaim);
+            when(stadtbezirk.in(Set.of(Stadtbezirk.BEZIRK_06_SENDLING, Stadtbezirk.BEZIRK_25_LAIM))).thenReturn(inSendlingOrLaim);
 
             final Specification<ProjektEntity> result = ProjektSpecifications.matching(
-                    new ProjektFilter(null, null, null, Set.of(Stadtbezirk.SENDLING, Stadtbezirk.LAIM)));
+                    new ProjektFilter(null, null, null, Set.of(Stadtbezirk.BEZIRK_06_SENDLING, Stadtbezirk.BEZIRK_25_LAIM)));
 
             assertThat(result.toPredicate(root, query, builder)).isSameAs(inSendlingOrLaim);
         }
@@ -75,7 +75,7 @@ class ProjektSpecificationsTest {
         @Test
         void givenFilledFilter_thenReturnSpecification() {
             final ProjektFilter filter = new ProjektFilter(
-                    "2026-", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), Set.of(Stadtbezirk.ALTSTADT_LEHEL));
+                    "2026-", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
 
             final Specification<ProjektEntity> result = ProjektSpecifications.matching(filter);
 

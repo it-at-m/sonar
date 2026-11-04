@@ -15,13 +15,13 @@ class ProjektTest {
     @Test
     void givenInvertedAbrechnungszeitraum_thenThrow() {
         assertThatIllegalArgumentException()
-                .isThrownBy(() -> new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, ENDE, BEGINN, Projekt.VERWALTUNGSGEBUEHR, null))
+                .isThrownBy(() -> new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, ENDE, BEGINN, Projekt.VERWALTUNGSGEBUEHR, null))
                 .withMessageContaining("abrechnungEnde");
     }
 
     @Test
     void givenNullAdressen_thenEmptyList() {
-        final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, null);
+        final Projekt projekt = new Projekt(null, "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, null);
 
         assertThat(projekt.adressen()).isEmpty();
     }

@@ -32,7 +32,7 @@ class ProjektDTOMapperTest {
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     BEGINN, ENDE, 90, 2, true);
             final Projekt projekt = new Projekt(
-                    UUID.randomUUID(), "2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+                    UUID.randomUUID(), "2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
 
             final ProjektResponseDTO result = projektDTOMapper.toDTO(projekt);
 
@@ -68,7 +68,7 @@ class ProjektDTOMapperTest {
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, false);
-            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", Stadtbezirk.ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
 
             final Projekt result = projektDTOMapper.toProjekt(requestDTO);
 

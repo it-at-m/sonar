@@ -53,12 +53,12 @@ class ProjektFilterTest {
 
         @Test
         void givenPermittedStadtbezirkeChangedAfterwards_thenKeepTheOriginalOnes() {
-            final Set<Stadtbezirk> permittedStadtbezirke = new HashSet<>(Set.of(Stadtbezirk.SENDLING));
+            final Set<Stadtbezirk> permittedStadtbezirke = new HashSet<>(Set.of(Stadtbezirk.BEZIRK_06_SENDLING));
 
             final ProjektFilter result = new ProjektFilter(null, null, null, permittedStadtbezirke);
-            permittedStadtbezirke.add(Stadtbezirk.LAIM);
+            permittedStadtbezirke.add(Stadtbezirk.BEZIRK_25_LAIM);
 
-            assertThat(result.permittedStadtbezirke()).containsExactly(Stadtbezirk.SENDLING);
+            assertThat(result.permittedStadtbezirke()).containsExactly(Stadtbezirk.BEZIRK_06_SENDLING);
         }
     }
 }
