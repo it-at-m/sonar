@@ -54,8 +54,6 @@ const props = defineProps<{
 }>();
 
 const noDataText = computed(() =>
-  props.filtered
-    ? "Keine Projekte gefunden."
-    : "Keine Projekte sichtbar."
+  props.filtered ? "Keine Projekte gefunden." : "Keine Projekte sichtbar."
 );
 </script>
