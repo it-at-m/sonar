@@ -5,7 +5,7 @@ import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
-import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.projekt.ProjektZugriffService;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -22,14 +22,12 @@ import org.springframework.transaction.annotation.Transactional;
 public class NutzungsobjektService {
 
     private final AbrechnungRepository abrechnungRepository;
-    private final ProjektService projektService;
+    private final ProjektZugriffService projektZugriffService;
     private final AbrechnungEntityMapper abrechnungEntityMapper;
 
     @Transactional(readOnly = true)
     public List<AbrechnungNutzungsobjekt> getNutzungsobjekteOfProjekt(final UUID projektId) {
-        if (!projektService.existsProjekt(projektId)) {
-            throw new NotFoundException(String.format(MSG_NOT_FOUND, projektId));
-        }
+        projektZugriffService.checkZugriffOnProjekt(projektId);
         log.info("Get the Nutzungsobjekte of Projekt {}", projektId);
         return abrechnungRepository.findNutzungsobjekteByProjektId(projektId).stream()
                 .map(nutzungsobjekt -> abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjekt, List.of(), List.of()))

@@ -788,7 +788,7 @@ class ProjektIntegrationTest {
         }
 
         @Test
-        void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
             moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
@@ -798,16 +798,16 @@ class ProjektIntegrationTest {
                     .uri("/projekt/{projektId}", projektId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
                     .exchange()
-                    .expectStatus().isNotFound();
+                    .expectStatus().isForbidden();
         }
 
         @Test
-        void givenNoSachbearbeiterRole_thenReturnNotFound() {
+        void givenNoSachbearbeiterRole_thenReturnForbidden() {
             restTestClient.get()
                     .uri("/projekt/{projektId}", projektId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
                     .exchange()
-                    .expectStatus().isNotFound();
+                    .expectStatus().isForbidden();
         }
 
         @Test
@@ -833,6 +833,11 @@ class ProjektIntegrationTest {
     class SaveProjekt {
         @Test
         void givenProjekt_thenProjektIsSaved() {
+            final StadtbezirkRolleEntity sendlingSued = new StadtbezirkRolleEntity();
+            sendlingSued.setStadtbezirk(Stadtbezirk.BEZIRK_06_SENDLING);
+            sendlingSued.setRolle("SB_Sued");
+            stadtbezirkRolleRepository.save(sendlingSued);
+
             final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 3, true);
@@ -840,7 +845,7 @@ class ProjektIntegrationTest {
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte+SB_Sued")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -886,7 +891,7 @@ class ProjektIntegrationTest {
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -914,7 +919,7 @@ class ProjektIntegrationTest {
 
             restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -932,7 +937,7 @@ class ProjektIntegrationTest {
 
             restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -950,7 +955,7 @@ class ProjektIntegrationTest {
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -979,7 +984,7 @@ class ProjektIntegrationTest {
 
             final ProjektResponseDTO responseDTO = restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1006,7 +1011,7 @@ class ProjektIntegrationTest {
 
             restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1024,7 +1029,7 @@ class ProjektIntegrationTest {
 
             restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1039,11 +1044,52 @@ class ProjektIntegrationTest {
 
             restTestClient.post()
                     .uri("/projekt")
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isBadRequest();
+
+            assertThat(projektRepository.count()).isEqualTo(1);
+        }
+
+        @Test
+        void givenStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Dachauer Straße", "1", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0010", Stadtbezirk.BEZIRK_10_MOOSACH, BEGINN, ENDE, List.of(adresseDTO));
+
+            restTestClient.post()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isForbidden();
+
+            assertThat(projektRepository.count()).isEqualTo(1);
+        }
+
+        @Test
+        void givenNoSachbearbeiterRole_thenReturnForbidden() {
+            final ProjektAdresseRequestDTO adresseDTO = new ProjektAdresseRequestDTO(
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, 0, false);
+            final ProjektRequestDTO requestDTO = new ProjektRequestDTO("2026-0011", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, List.of(adresseDTO));
+
+            restTestClient.post()
+                    .uri("/projekt")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isForbidden();
 
             assertThat(projektRepository.count()).isEqualTo(1);
         }

@@ -7,6 +7,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungEntity;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
+import de.muenchen.oss.sonar.backend.projekt.ProjektZugriffService;
 import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -22,11 +23,13 @@ public class WiderspruchService {
     private final WiderspruchRepository widerspruchRepository;
     private final AbrechnungRepository abrechnungRepository;
     private final WiderspruchEntityMapper widerspruchEntityMapper;
+    private final ProjektZugriffService projektZugriffService;
 
     @Transactional
     public Widerspruch createWiderspruch(final UUID abrechnungId, final Widerspruch widerspruch) {
         final AbrechnungEntity abrechnung = abrechnungRepository.findById(abrechnungId)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, abrechnungId)));
+        projektZugriffService.checkZugriffOnProjekt(abrechnung.getProjektId());
         if (abrechnung.getWiderspruch() != null) {
             throw new ConflictException(String.format(MSG_WIDERSPRUCH_ALREADY_EXISTS, abrechnungId));
         }

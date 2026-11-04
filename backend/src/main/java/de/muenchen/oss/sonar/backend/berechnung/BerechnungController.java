@@ -43,6 +43,7 @@ public class BerechnungController {
     @PostMapping("/preview")
     @ResponseStatus(HttpStatus.OK)
     @ApiResponse(responseCode = "400", description = "the berechnungsdatum is missing or is not a date", content = @Content)
+    @ApiResponse(responseCode = "403", description = "the Projekt lies outside the Stadtbezirke of the user", content = @Content)
     @ApiResponse(responseCode = "404", description = "the Projekt has no Abrechnung with that UUID", content = @Content)
     public BerechnungResponseDTO previewBerechnung(@PathVariable("projektId") final UUID projektId,
             @PathVariable("abrechnungId") final UUID abrechnungId,
