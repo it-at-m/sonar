@@ -307,6 +307,22 @@ describe("BerechnungDurchfuehrenDialog.vue", () => {
     );
   });
 
+  it("givenAProjektOutsideTheStadtbezirkeOfTheUser_thenReportTheMissingZustaendigkeit", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("", { status: 403 }))
+    );
+    const wrapper = mountDialog();
+
+    await openDialog(wrapper);
+    await fillAbrechnungsdatum(wrapper, new Date(2026, 2, 31));
+    await submit();
+
+    expect(useSnackbarStore().queue[0]?.text).toBe(
+      "Sie sind für den Stadtbezirk dieses Projekts nicht zuständig."
+    );
+  });
+
   it("givenMissingAbrechnungsdatum_thenKeepTheDialogOpen", async () => {
     const fetchSpy = stubFetch();
     const wrapper = mountDialog();

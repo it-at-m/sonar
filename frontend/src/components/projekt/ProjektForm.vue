@@ -44,7 +44,7 @@
         <v-autocomplete
           v-model="projekt.stadtbezirk"
           label="Stadtbezirk"
-          :items="STADTBEZIRK_OPTIONS"
+          :items="stadtbezirkOptions"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -91,6 +91,7 @@
 
 <script setup lang="ts">
 import type { ProjektRequestDTO } from "@/api/generated/sonar-backend";
+import type { StadtbezirkOption } from "@/types/projekt/StadtbezirkOption";
 
 import { mdiPlus } from "@mdi/js";
 import { useTemplateRef } from "vue";
@@ -99,10 +100,9 @@ import SonarDateField from "@/components/common/SonarDateField.vue";
 import ProjektFormAdresseCard from "@/components/projekt/ProjektFormAdresseCard.vue";
 import { useProjektForm } from "@/composables/projektForm";
 import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
-import { STADTBEZIRK_OPTIONS } from "@/util/projekt/stadtbezirk";
 import { requiredRule } from "@/util/validationRules";
 
-defineProps<{ saving: boolean }>();
+defineProps<{ saving: boolean; stadtbezirkOptions: StadtbezirkOption[] }>();
 
 const emit = defineEmits<{
   save: [projekt: ProjektRequestDTO];
