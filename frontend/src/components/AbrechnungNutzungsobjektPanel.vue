@@ -85,17 +85,17 @@
       />
 
       <adresse-fields
+        :disabled="uebernommen"
         :id-prefix="idPrefix"
         :model-value="nutzungsobjekt"
-        :readonly="uebernommen"
       >
         <template #after-nutzung>
           <v-checkbox
             :id="`${idPrefix}-aufschlag50prozent`"
             v-model="nutzungsobjekt.aufschlag50prozent"
+            :disabled="uebernommen || undefined"
             hide-details
             label="Aufschlag 50 %"
-            :readonly="uebernommen"
           />
         </template>
       </adresse-fields>
@@ -119,9 +119,9 @@
       />
 
       <unerlaubte-nutzung-fields
+        :disabled="uebernommen"
         :id-prefix="idPrefix"
         :model-value="nutzungsobjekt"
-        :readonly="uebernommen"
       />
 
       <v-row>
@@ -131,9 +131,9 @@
             v-model="nutzungsobjekt.bemerkung"
             auto-grow
             counter
+            :disabled="uebernommen || undefined"
             label="Bemerkung"
             maxlength="10000"
-            :readonly="uebernommen"
             rows="2"
           />
         </v-col>

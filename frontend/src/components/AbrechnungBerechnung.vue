@@ -8,7 +8,6 @@
         id="berechnung-zeitraum-von"
         label="Zeitraum von"
         :model-value="abrechnung.zeitraumVon"
-        :readonly="readonly || undefined"
         :rules="[requiredRule]"
         @update:model-value="setZeitraumVon"
       />
@@ -21,7 +20,6 @@
         id="berechnung-zeitraum-bis"
         v-model="abrechnung.zeitraumBis"
         label="Zeitraum bis"
-        :readonly="readonly || undefined"
         :rules="[requiredRule]"
         :zeitraum-beginn="abrechnung.zeitraumVon"
         zeitraum-einheit="week"
