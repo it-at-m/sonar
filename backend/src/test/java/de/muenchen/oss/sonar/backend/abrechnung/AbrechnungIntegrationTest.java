@@ -584,7 +584,7 @@ class AbrechnungIntegrationTest {
         }
 
         @Test
-        void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
             moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
@@ -596,18 +596,18 @@ class AbrechnungIntegrationTest {
                             .build(projektId))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
                     .exchange()
-                    .expectStatus().isNotFound();
+                    .expectStatus().isForbidden();
         }
 
         @Test
-        void givenNoSachbearbeiterRole_thenReturnNotFound() {
+        void givenNoSachbearbeiterRole_thenReturnForbidden() {
             restTestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
                     .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
                     .exchange()
-                    .expectStatus().isNotFound();
+                    .expectStatus().isForbidden();
         }
 
         @Test
@@ -827,7 +827,7 @@ class AbrechnungIntegrationTest {
         }
 
         @Test
-        void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
             moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
@@ -848,7 +848,7 @@ class AbrechnungIntegrationTest {
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
-                    .expectStatus().isNotFound();
+                    .expectStatus().isForbidden();
 
             assertThat(abrechnungRepository.count()).isZero();
         }
@@ -1140,6 +1140,48 @@ class AbrechnungIntegrationTest {
                     .exchange()
                     .expectStatus().isNotFound();
         }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setAufschlag50prozent(true);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(projektId);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
+            final UUID abrechnungId = abrechnungRepository.save(abrechnung).getId();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_BY_ID_PATH, projektId, abrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isForbidden();
+        }
     }
 
     @Nested
@@ -1417,6 +1459,61 @@ class AbrechnungIntegrationTest {
                     .expectStatus().isNotFound();
 
             assertThat(abrechnungRepository.count()).isZero();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            final AbrechnungPositionEntity vorgaengerPosition = new AbrechnungPositionEntity();
+            vorgaengerPosition.setBeginn(VON);
+            vorgaengerPosition.setEnde(BIS);
+            vorgaengerPosition.setLaenge(new BigDecimal("12.00"));
+            vorgaengerPosition.setBreite(new BigDecimal("3.00"));
+            vorgaengerPosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity vorgaengerNutzungsobjekt = new NutzungsobjektEntity();
+            vorgaengerNutzungsobjekt.setAufschlag50prozent(true);
+
+            final AdressdatenEmbeddable vorgaengerAdressdaten = vorgaengerNutzungsobjekt.getAdressdaten();
+            vorgaengerAdressdaten.setArt(Adressart.ADRESSE);
+            vorgaengerAdressdaten.setAdresse("Marienplatz");
+            vorgaengerAdressdaten.setHausnummerVon("8");
+            vorgaengerNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity vorgaenger = new AbrechnungEntity();
+            vorgaenger.setProjektId(projektId);
+            vorgaenger.setVersionsnummer(1);
+            vorgaenger.setGeschaeftspartnerId("1000000001");
+            vorgaenger.setZeitraumVon(VON);
+            vorgaenger.setZeitraumBis(BIS);
+            vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            vorgaengerPosition.setNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaenger.addNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaenger.addPosition(vorgaengerPosition);
+            final UUID vorgaengerId = abrechnungRepository.save(vorgaenger).getId();
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, null, null, null, true,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                            new BigDecimal("36.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, vorgaengerId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isForbidden();
+
+            assertThat(abrechnungRepository.count()).isEqualTo(1);
         }
     }
 
@@ -1756,6 +1853,48 @@ class AbrechnungIntegrationTest {
                     .expectStatus().isNotFound();
         }
 
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setAufschlag50prozent(true);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(projektId);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
+            final UUID abrechnungId = abrechnungRepository.save(abrechnung).getId();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, abrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isForbidden();
+        }
+
     }
 
     @Nested
@@ -1924,6 +2063,20 @@ class AbrechnungIntegrationTest {
                     .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            restTestClient.get()
+                    .uri(NUTZUNGSOBJEKT_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isForbidden();
         }
 
     }

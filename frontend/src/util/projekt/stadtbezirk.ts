@@ -1,8 +1,13 @@
 import type { ProjektResponseDTOStadtbezirkEnum } from "@/api/generated/sonar-backend";
+import type { StadtbezirkOption } from "@/types/projekt/StadtbezirkOption";
 
-import { ProjektRequestDTOStadtbezirkEnum } from "@/api/generated/sonar-backend";
+import { ApiFactory } from "@/api/ApiFactory";
+import {
+  ProjektRequestDTOStadtbezirkEnum,
+  StadtbezirkControllerApi,
+} from "@/api/generated/sonar-backend";
 
-export const STADTBEZIRK_OPTIONS = [
+export const STADTBEZIRK_OPTIONS: StadtbezirkOption[] = [
   {
     title: "01 Altstadt-Lehel",
     value: ProjektRequestDTOStadtbezirkEnum.BEZIRK_01_ALTSTADT_LEHEL,
@@ -111,5 +116,16 @@ export function stadtbezirkLabel(
   return (
     STADTBEZIRK_OPTIONS.find((option) => option.value === stadtbezirk)?.title ??
     ""
+  );
+}
+
+export async function fetchStadtbezirkOptionsOfCurrentUser(): Promise<
+  StadtbezirkOption[]
+> {
+  const stadtbezirkeOfCurrentUser = await ApiFactory.getInstance(
+    StadtbezirkControllerApi
+  ).getStadtbezirkeOfCurrentUser();
+  return STADTBEZIRK_OPTIONS.filter((option) =>
+    stadtbezirkeOfCurrentUser.includes(option.value)
   );
 }

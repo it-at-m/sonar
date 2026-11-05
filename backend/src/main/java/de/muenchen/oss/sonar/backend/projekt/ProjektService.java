@@ -30,6 +30,7 @@ public class ProjektService {
     private final ProjektRepository projektRepository;
     private final ProjektEntityMapper projektEntityMapper;
     private final StadtbezirkService stadtbezirkService;
+    private final ProjektZugriffService projektZugriffService;
 
     @Transactional(readOnly = true)
     public Page<Projekt> getAllProjekte(final int pageNumber, final int pageSize, final String projektnummer,
@@ -48,18 +49,16 @@ public class ProjektService {
     @Transactional(readOnly = true)
     public Projekt getProjekt(final UUID projektId) {
         log.info("Get Projekt {}", projektId);
+        projektZugriffService.checkZugriffOnProjekt(projektId);
         return projektRepository
-                .findByIdAndStadtbezirkIn(projektId, stadtbezirkService.getStadtbezirkeOfCurrentUser())
+                .findById(projektId)
                 .map(projektEntityMapper::toProjekt)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, projektId)));
     }
 
-    public boolean existsProjekt(final UUID projektId) {
-        return projektRepository.existsByIdAndStadtbezirkIn(projektId, stadtbezirkService.getStadtbezirkeOfCurrentUser());
-    }
-
     @Transactional
     public Projekt createProjekt(final Projekt projekt) {
+        projektZugriffService.checkZugriffOnStadtbezirk(projekt.stadtbezirk());
         final ProjektEntity projektEntity = projektEntityMapper.toEntity(projekt);
         log.debug("Create Projekt {}", projektEntity);
         return projektEntityMapper.toProjekt(projektRepository.save(projektEntity));

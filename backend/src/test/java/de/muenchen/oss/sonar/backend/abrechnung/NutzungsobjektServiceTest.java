@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.abrechnung;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -12,9 +13,10 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
+import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
-import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.projekt.ProjektZugriffService;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -40,7 +42,7 @@ class NutzungsobjektServiceTest {
     private AbrechnungRepository abrechnungRepository;
 
     @Mock
-    private ProjektService projektService;
+    private ProjektZugriffService projektZugriffService;
 
     @Spy
     private final AbrechnungEntityMapper abrechnungEntityMapper = Mappers.getMapper(AbrechnungEntityMapper.class);
@@ -63,7 +65,6 @@ class NutzungsobjektServiceTest {
             adressdaten.setAdresse("Marienplatz");
             adressdaten.setHausnummerVon("8");
 
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNutzungsobjekteByProjektId(PROJEKT_ID)).thenReturn(List.of(nutzungsobjekt));
 
             final List<AbrechnungNutzungsobjekt> result = unitUnderTest.getNutzungsobjekteOfProjekt(PROJEKT_ID);
@@ -77,12 +78,12 @@ class NutzungsobjektServiceTest {
         }
 
         @Test
-        void givenUnknownProjekt_thenThrowNotFound() {
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(false);
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutLoadingNutzungsobjekte() {
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(PROJEKT_ID);
 
             assertThatThrownBy(() -> unitUnderTest.getNutzungsobjekteOfProjekt(PROJEKT_ID))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(PROJEKT_ID.toString());
+                    .isInstanceOf(ForbiddenException.class);
+            verify(abrechnungRepository, never()).findNutzungsobjekteByProjektId(any(UUID.class));
         }
     }
 

@@ -5,6 +5,7 @@
     <projekt-form
       ref="projektForm"
       :saving="saving"
+      :stadtbezirk-options="stadtbezirkOptions"
       @cancel="abbrechen"
       @save="save"
     />
@@ -21,8 +22,9 @@
 
 <script setup lang="ts">
 import type { ProjektRequestDTO } from "@/api/generated/sonar-backend";
+import type { StadtbezirkOption } from "@/types/projekt/StadtbezirkOption";
 
-import { ref, useTemplateRef } from "vue";
+import { onMounted, ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 
 import { ApiFactory } from "@/api/ApiFactory.ts";
@@ -35,6 +37,7 @@ import ProjektForm from "@/components/projekt/ProjektForm.vue";
 import { useSaveLeave } from "@/composables/saveLeave.ts";
 import { STATUS_INDICATORS } from "@/constants.ts";
 import { useSnackbarStore } from "@/stores/snackbar.ts";
+import { fetchStadtbezirkOptionsOfCurrentUser } from "@/util/projekt/stadtbezirk";
 
 const router = useRouter();
 const snackbarStore = useSnackbarStore();
@@ -42,6 +45,7 @@ const snackbarStore = useSnackbarStore();
 const projektForm =
   useTemplateRef<InstanceType<typeof ProjektForm>>("projektForm");
 const saving = ref(false);
+const stadtbezirkOptions = ref<StadtbezirkOption[]>([]);
 
 const {
   cancel,
@@ -57,8 +61,22 @@ function errorText(error: unknown): string {
     if (error.response.status === 400) {
       return "Das Projekt konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben.";
     }
+    if (error.response.status === 403) {
+      return "Sie sind für den gewählten Stadtbezirk nicht zuständig.";
+    }
   }
   return "Das Projekt konnte nicht gespeichert werden.";
+}
+
+async function loadStadtbezirkOptions(): Promise<void> {
+  try {
+    stadtbezirkOptions.value = await fetchStadtbezirkOptionsOfCurrentUser();
+  } catch {
+    snackbarStore.push({
+      text: "Die Stadtbezirke konnten nicht geladen werden.",
+      color: STATUS_INDICATORS.ERROR,
+    });
+  }
 }
 
 async function save(request: ProjektRequestDTO): Promise<void> {
@@ -85,4 +103,6 @@ async function save(request: ProjektRequestDTO): Promise<void> {
 function abbrechen(): void {
   void router.push("/projekte");
 }
+
+onMounted(() => void loadStadtbezirkOptions());
 </script>

@@ -151,7 +151,7 @@ class WiderspruchIntegrationTest {
 
             final WiderspruchResponseDTO responseDTO = restTestClient.post()
                     .uri(WIDERSPRUCH_PATH, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -181,7 +181,7 @@ class WiderspruchIntegrationTest {
 
             restTestClient.post()
                     .uri(WIDERSPRUCH_PATH, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -206,7 +206,7 @@ class WiderspruchIntegrationTest {
 
             restTestClient.post()
                     .uri(WIDERSPRUCH_PATH, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -222,11 +222,32 @@ class WiderspruchIntegrationTest {
 
             restTestClient.post()
                     .uri(WIDERSPRUCH_PATH, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isNotFound();
+
+            assertThat(widerspruchRepository.count()).isZero();
+        }
+
+        @Test
+        void givenAbrechnungOfAProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
+            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            moosachNord.setRolle("SB_Nord");
+            stadtbezirkRolleRepository.save(moosachNord);
+
+            final WiderspruchRequestDTO requestDTO = new WiderspruchRequestDTO(EINGANG, null, null, null, null, false,
+                    false, null);
+
+            restTestClient.post()
+                    .uri(WIDERSPRUCH_PATH, abrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isForbidden();
 
             assertThat(widerspruchRepository.count()).isZero();
         }
@@ -238,7 +259,7 @@ class WiderspruchIntegrationTest {
 
             restTestClient.post()
                     .uri(WIDERSPRUCH_PATH, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(bestehenderWiderspruch)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -249,7 +270,7 @@ class WiderspruchIntegrationTest {
 
             restTestClient.post()
                     .uri(WIDERSPRUCH_PATH, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiterWiderspruch)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -281,7 +302,7 @@ class WiderspruchIntegrationTest {
 
             restTestClient.post()
                     .uri(WIDERSPRUCH_PATH, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(widerspruch)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
