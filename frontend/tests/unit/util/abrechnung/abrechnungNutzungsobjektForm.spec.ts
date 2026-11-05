@@ -81,8 +81,10 @@ describe("abrechnungNutzungsobjektForm.ts", () => {
 
     it("givenUebernommenesNutzungsobjekt_thenReturnTrue", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
-      nutzungsobjekt.uebernommenesNutzungsobjektId =
-        "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d";
+      nutzungsobjekt.uebernahme = {
+        quelle: "NUTZUNGSOBJEKT",
+        nutzungsobjektId: "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d",
+      };
 
       expect(isAbrechnungNutzungsobjektDirty(nutzungsobjekt)).toBe(true);
     });

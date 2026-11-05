@@ -14,7 +14,10 @@ import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/Abrechnung
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
 
 import { ProjektAdresseRequestDTOArtEnum } from "@/api/generated/sonar-backend";
-import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
+import {
+  createAbrechnungNutzungsobjekt,
+  uebernommenesNutzungsobjektId,
+} from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 import { toAdresseRequestFields } from "@/util/common/adresseMapper";
 import { toUnerlaubteNutzungRequestFields } from "@/util/common/unerlaubteNutzungMapper";
 import { toIsoDateString } from "@/util/formatter";
@@ -49,7 +52,7 @@ function toNutzungsobjektRequestDTO(
   nutzungsobjekt: AbrechnungNutzungsobjektForm
 ): AbrechnungNutzungsobjektRequestDTO {
   return {
-    id: nutzungsobjekt.uebernommenesNutzungsobjektId ?? undefined,
+    id: uebernommenesNutzungsobjektId(nutzungsobjekt),
     ...toAdresseRequestFields(nutzungsobjekt),
     ...toUnerlaubteNutzungRequestFields(nutzungsobjekt),
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
@@ -88,7 +91,7 @@ function toNutzungsobjektForm(
 ): AbrechnungNutzungsobjektForm {
   return {
     id: crypto.randomUUID(),
-    uebernommenesNutzungsobjektId: null,
+    uebernahme: null,
     art: nutzungsobjekt.art ?? ProjektAdresseRequestDTOArtEnum.ADRESSE,
     adresse: nutzungsobjekt.adresse ?? "",
     hausnummerVon: nutzungsobjekt.hausnummerVon ?? "",
