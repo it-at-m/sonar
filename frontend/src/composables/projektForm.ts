@@ -10,6 +10,7 @@ import {
 export function useProjektForm() {
   const projekt = reactive<ProjektForm>({
     projektnummer: "",
+    stadtbezirk: null,
     abrechnungBeginn: "",
     abrechnungEnde: "",
     adressen: [createProjektAdresse()],
@@ -26,6 +27,7 @@ export function useProjektForm() {
   function isDirty(): boolean {
     if (
       projekt.projektnummer ||
+      projekt.stadtbezirk ||
       projekt.abrechnungBeginn ||
       projekt.abrechnungEnde
     ) {

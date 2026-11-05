@@ -1,5 +1,6 @@
 import { describe, expect, it } from "vitest";
 
+import { ProjektRequestDTOStadtbezirkEnum } from "@/api/generated/sonar-backend";
 import { useProjektForm } from "@/composables/projektForm";
 
 /**
@@ -25,6 +26,13 @@ describe("projektForm.ts", () => {
     it("givenFilledProjektnummer_thenReturnTrue", () => {
       const { isDirty, projekt } = useProjektForm();
       projekt.projektnummer = "2026-0001";
+
+      expect(isDirty()).toBe(true);
+    });
+
+    it("givenSelectedStadtbezirk_thenReturnTrue", () => {
+      const { isDirty, projekt } = useProjektForm();
+      projekt.stadtbezirk = ProjektRequestDTOStadtbezirkEnum.BEZIRK_10_MOOSACH;
 
       expect(isDirty()).toBe(true);
     });

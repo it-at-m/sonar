@@ -1,7 +1,11 @@
 package de.muenchen.oss.sonar.backend.security;
 
+import de.muenchen.oss.sonar.backend.configuration.security.KeycloakRolesAuthoritiesConverter;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 
@@ -13,6 +17,9 @@ public final class AuthUtils {
     public static final String NAME_UNAUTHENTICATED_USER = "unauthenticated";
 
     private static final String TOKEN_USER_NAME = "preferred_username";
+
+    /** Has to match the prefix {@link KeycloakRolesAuthoritiesConverter} adds to each role. */
+    private static final String ROLE_PREFIX = "ROLE_";
 
     private AuthUtils() {
     }
@@ -34,6 +41,21 @@ public final class AuthUtils {
         } else {
             return NAME_UNAUTHENTICATED_USER;
         }
+    }
+
+    /**
+     * The roles as Keycloak names them, without the prefix {@link KeycloakRolesAuthoritiesConverter}
+     * puts in front.
+     */
+    public static Set<String> getRoles() {
+        final Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null) {
+            return Set.of();
+        }
+        return AuthorityUtils.authorityListToSet(authentication.getAuthorities()).stream()
+                .filter(authority -> authority.startsWith(ROLE_PREFIX))
+                .map(authority -> authority.substring(ROLE_PREFIX.length()))
+                .collect(Collectors.toSet());
     }
 
 }
