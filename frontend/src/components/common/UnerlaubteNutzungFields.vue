@@ -9,8 +9,8 @@
       <sonar-date-field
         :id="`${idPrefix}-unerlaubt-von`"
         v-model="unerlaubteNutzung.unerlaubteNutzungVon"
+        :disabled="disabled || undefined"
         label="Unerlaubte Nutzung von"
-        :readonly="readonly || undefined"
         :rules="[unerlaubteNutzungVonRule(unerlaubteNutzung)]"
       />
     </v-col>
@@ -21,8 +21,8 @@
       <sonar-date-field
         :id="`${idPrefix}-unerlaubt-bis`"
         v-model="unerlaubteNutzung.unerlaubteNutzungBis"
+        :disabled="disabled || undefined"
         label="Unerlaubte Nutzung bis"
-        :readonly="readonly || undefined"
         :rules="[unerlaubteNutzungBisRule(unerlaubteNutzung)]"
         :zeitraum-beginn="unerlaubteNutzung.unerlaubteNutzungVon"
         zeitraum-einheit="week"
@@ -35,13 +35,12 @@
       <v-number-input
         :id="`${idPrefix}-tage`"
         v-model="tage"
-        :disabled="tageAusZeitraum"
+        :disabled="disabled || tageAusZeitraum || undefined"
         :hint="tageHint"
         label="Tage unerlaubte Nutzung"
         :min="1"
         persistent-hint
         :precision="0"
-        :readonly="readonly || undefined"
       />
     </v-col>
   </v-row>
@@ -64,9 +63,9 @@ import {
 
 const unerlaubteNutzung = defineModel<UnerlaubteNutzung>({ required: true });
 
-const { readonly = false } = defineProps<{
+const { disabled = false } = defineProps<{
   idPrefix: string;
-  readonly?: boolean;
+  disabled?: boolean;
 }>();
 
 const tageAusZeitraum = computed(() => hasZeitraum(unerlaubteNutzung.value));

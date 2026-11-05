@@ -2,9 +2,9 @@
   <v-radio-group
     v-model="adresse.art"
     class="art-group"
+    :disabled="disabled || undefined"
     inline
     label="Erfassung als"
-    :readonly="readonly"
     @update:model-value="clearFieldsOfUnselectedArt(adresse)"
   >
     <v-radio
@@ -26,9 +26,9 @@
         <v-text-field
           :id="`${idPrefix}-adresse`"
           v-model="adresse.adresse"
+          :disabled="disabled || undefined"
           label="Adresse"
           maxlength="255"
-          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -39,9 +39,9 @@
         <v-text-field
           :id="`${idPrefix}-hausnummer-von`"
           v-model="adresse.hausnummerVon"
+          :disabled="disabled || undefined"
           label="Hausnummer von"
           maxlength="20"
-          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -52,11 +52,11 @@
         <v-text-field
           :id="`${idPrefix}-hausnummer-bis`"
           v-model="adresse.hausnummerBis"
+          :disabled="disabled || undefined"
           hint="Nur bei einer Spanne von Hausnummern"
           label="Hausnummer bis"
           maxlength="20"
           persistent-hint
-          :readonly="readonly"
         />
       </v-col>
     </template>
@@ -68,9 +68,9 @@
         <v-text-field
           :id="`${idPrefix}-flurstueck`"
           v-model="adresse.flurstueck"
+          :disabled="disabled || undefined"
           label="Flurstück"
           maxlength="255"
-          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -81,9 +81,9 @@
         <v-text-field
           :id="`${idPrefix}-gemarkung`"
           v-model="adresse.gemarkung"
+          :disabled="disabled || undefined"
           label="Gemarkung"
           maxlength="255"
-          :readonly="readonly"
           :rules="[requiredRule]"
         />
       </v-col>
@@ -97,12 +97,12 @@
         :id="`${idPrefix}-nutzung`"
         v-model="adresse.nutzungen"
         chips
-        :clearable="!readonly"
-        :closable-chips="!readonly"
+        clearable
+        closable-chips
+        :disabled="disabled || undefined"
         :items="NUTZUNG_OPTIONS"
         label="Nutzung"
         multiple
-        :readonly="readonly"
         @update:model-value="clearSonstigesOfUnselectedNutzung(adresse)"
       />
     </v-col>
@@ -124,9 +124,9 @@
       <v-text-field
         :id="`${idPrefix}-nutzung-sonstiges`"
         v-model="adresse.nutzungSonstiges"
+        :disabled="disabled || undefined"
         label="Beschreibung der Nutzung"
         maxlength="255"
-        :readonly="readonly"
       />
     </v-col>
   </v-row>
@@ -150,9 +150,9 @@ import { requiredRule } from "@/util/validationRules";
 
 const adresse = defineModel<Adresse>({ required: true });
 
-const { readonly = false } = defineProps<{
+const { disabled = false } = defineProps<{
   idPrefix: string;
-  readonly?: boolean;
+  disabled?: boolean;
 }>();
 
 const isAdresse = computed(
