@@ -76,7 +76,7 @@ function pick(value: unknown): void {
 }
 
 watch(beginn, (next, previous) => {
-  if (!next || !date.value) {
+  if (readonly || !next || !date.value) {
     return;
   }
   const periods = countWholePeriods(previous, date.value, zeitraumEinheit);
