@@ -1,6 +1,7 @@
 <template>
   <v-date-input
     :allowed-dates="zeitraumEnden"
+    :disabled="disabled"
     :min="fruehestesEnde"
     :model-value="date ?? ''"
     prepend-icon=""
@@ -27,10 +28,12 @@ import { zeitraumEndeRule } from "@/util/common/zeitraumRules";
 const date = defineModel<string | null | undefined>();
 
 const {
+  disabled = false,
   rules = [],
   zeitraumBeginn = "",
   zeitraumEinheit = "day",
 } = defineProps<{
+  disabled?: boolean;
   rules?: ValidationRule[];
   zeitraumBeginn?: string | null;
   zeitraumEinheit?: ZeitraumEinheit;
@@ -70,7 +73,7 @@ function pick(value: unknown): void {
 }
 
 watch(beginn, (next, previous) => {
-  if (!next || !date.value) {
+  if (disabled || !next || !date.value) {
     return;
   }
   const periods = countWholePeriods(previous, date.value, zeitraumEinheit);

@@ -51,5 +51,8 @@ export function applyNutzungsobjektSuggestion(
 ): void {
   const { id, ...uebernommeneDaten } = suggestion;
   Object.assign(nutzungsobjekt, uebernommeneDaten);
-  nutzungsobjekt.uebernommenesNutzungsobjektId = id;
+  nutzungsobjekt.uebernahme = {
+    quelle: "NUTZUNGSOBJEKT",
+    nutzungsobjektId: id,
+  };
 }

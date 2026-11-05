@@ -1,12 +1,13 @@
 import type { AbrechnungMastForm } from "@/types/abrechnung/AbrechnungMastForm";
 import type { AbrechnungPositionForm } from "@/types/abrechnung/AbrechnungPositionForm";
+import type { Uebernahme } from "@/types/abrechnung/Uebernahme";
 import type { Adresse } from "@/types/common/Adresse";
 import type { UnerlaubteNutzung } from "@/types/common/UnerlaubteNutzung";
 
 export interface AbrechnungNutzungsobjektForm
   extends Adresse, UnerlaubteNutzung {
   id: string;
-  uebernommenesNutzungsobjektId: string | null;
+  uebernahme: Uebernahme | null;
   bemerkung: string;
   aufschlag50prozent: boolean;
   positionen: AbrechnungPositionForm[];

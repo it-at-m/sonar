@@ -69,17 +69,17 @@
           :id="`${idPrefix}-uebernahme-aufheben`"
           :prepend-icon="mdiLinkVariantOff"
           variant="text"
-          @click="nutzungsobjekt.uebernommenesNutzungsobjektId = null"
+          @click="nutzungsobjekt.uebernahme = null"
         >
           Übernahme aufheben
         </v-btn>
       </div>
 
       <v-alert
-        v-if="uebernommen && !readonly"
+        v-if="nutzungsobjekt.uebernahme && !readonly"
         class="mb-4"
         density="compact"
-        text="Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung."
+        :text="UEBERNAHME_HINWEISE[nutzungsobjekt.uebernahme.quelle]"
         type="info"
         variant="tonal"
       />
@@ -145,6 +145,7 @@
 <script setup lang="ts">
 import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/AbrechnungNutzungsobjektForm";
 import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
+import type { Uebernahme } from "@/types/abrechnung/Uebernahme";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import {
@@ -178,9 +179,14 @@ const { nutzungsobjektSuggestions = [], readonly = false } = defineProps<{
 
 const emit = defineEmits<{ remove: [] }>();
 
-const uebernommen = computed(
-  () => nutzungsobjekt.value.uebernommenesNutzungsobjektId !== null
-);
+const UEBERNAHME_HINWEISE: Record<Uebernahme["quelle"], string> = {
+  PROJEKT:
+    "Die Daten stammen aus dem Projekt und lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung.",
+  NUTZUNGSOBJEKT:
+    "Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung.",
+};
+
+const uebernommen = computed(() => nutzungsobjekt.value.uebernahme !== null);
 
 /**
  * Counted over both tables, because a Nutzungsobjekt has to keep either a Position or a Mast. The
