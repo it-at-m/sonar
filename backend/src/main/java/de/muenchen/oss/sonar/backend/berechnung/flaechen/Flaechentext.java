@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.berechnung.flaechen;
 import de.muenchen.oss.sonar.backend.berechnung.gebuehren.Betragsformat;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -76,6 +77,7 @@ public final class Flaechentext {
         final StringBuilder protokoll = new StringBuilder()
                 .append("Woche ").append(woche.woche()).append(System.lineSeparator())
                 .append(verteilung(woche))
+                .append(zeilen(woche.verbundverteilung()))
                 .append("    Baustellenfläche: ").append(gebuehrenstufe(woche));
 
         for (final Gebuehrenposten posten : woche.posten()) {
@@ -92,7 +94,11 @@ public final class Flaechentext {
     }
 
     /* default */ static String verteilung(final Flaechenwoche woche) {
-        return woche.verteilung().stream().map(Flaechentext::zeile).reduce("", String::concat);
+        return zeilen(woche.verteilung());
+    }
+
+    private static String zeilen(final List<Flaechenverteilung> verteilung) {
+        return verteilung.stream().map(Flaechentext::zeile).reduce("", String::concat);
     }
 
     private static String zeile(final Flaechenverteilung verteilung) {

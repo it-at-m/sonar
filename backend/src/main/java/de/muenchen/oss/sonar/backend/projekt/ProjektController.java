@@ -4,6 +4,7 @@ import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfigura
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektDTOMapper;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektRequestDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektResponseDTO;
+import de.muenchen.oss.sonar.backend.projekt.dto.VerbundenesProjektRequestDTO;
 import io.swagger.v3.oas.annotations.media.Content;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -20,9 +21,11 @@ import org.springframework.data.domain.Sort;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -35,6 +38,8 @@ import org.springframework.web.bind.annotation.RestController;
 @RequestMapping(value = "/projekt", produces = MediaType.APPLICATION_JSON_VALUE)
 @SecurityRequirement(name = OpenAPIDocumentationConfiguration.SECURITY_SCHEME_NAME)
 public class ProjektController {
+
+    private static final String STATUS_NOT_FOUND = "404";
 
     private final ProjektService projektService;
     private final ProjektDTOMapper projektDTOMapper;
@@ -77,7 +82,7 @@ public class ProjektController {
      */
     @GetMapping("{projektId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = "404", description = "the Projekt does not exist", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
     public ProjektResponseDTO getProjekt(@PathVariable("projektId") final UUID projektId) {
         return projektDTOMapper.toDTO(projektService.getProjekt(projektId));
     }
@@ -96,8 +101,46 @@ public class ProjektController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Projekt are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the verbundene Projekt does not exist", content = @Content)
     public ProjektResponseDTO saveProjekt(@Valid @RequestBody final ProjektRequestDTO projektRequestDTO) {
         return projektDTOMapper.toDTO(projektService.createProjekt(projektDTOMapper.toProjekt(projektRequestDTO)));
+    }
+
+    /**
+     * Connect a Projekt to another Projekt.
+     * The Berechnung treats verbundene Projekte as one Projekt. They form a group of one root Projekt
+     * and the Projekte connected to it. A Projekt that is itself connected resolves to the root of its
+     * group, so the group stays flat. A Projekt that is already connected moves to the new group, and
+     * connecting it to its own group again changes nothing.
+     * A Projekt that other Projekte are connected to cannot be connected to another Projekt.
+     *
+     * @param projektId the UUID of the Projekt to connect
+     * @param verbundenesProjektRequestDTO the Projekt to connect it to
+     * @return the Projekt with its new group as a DTO
+     */
+    @PutMapping("{projektId}/verbundenes-projekt")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = "400", description = "the verbundene Projekt is missing or is the Projekt itself", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt or the verbundene Projekt does not exist", content = @Content)
+    @ApiResponse(responseCode = "409", description = "other Projekte are connected to the Projekt", content = @Content)
+    public ProjektResponseDTO updateVerbundenesProjekt(@PathVariable("projektId") final UUID projektId,
+            @Valid @RequestBody final VerbundenesProjektRequestDTO verbundenesProjektRequestDTO) {
+        return projektDTOMapper.toDTO(projektService.connectProjekt(projektId, verbundenesProjektRequestDTO.verbundenesProjektId()));
+    }
+
+    /**
+     * Disconnect a Projekt from its group.
+     * Removes the connection of the Projekt to the root of its group. A root, or a Projekt that is not
+     * connected, stays as it is. A group is dissolved by disconnecting each Projekt connected to its
+     * root.
+     *
+     * @param projektId the UUID of the Projekt to disconnect
+     */
+    @DeleteMapping("{projektId}/verbundenes-projekt")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    public void deleteVerbundenesProjekt(@PathVariable("projektId") final UUID projektId) {
+        projektService.disconnectProjekt(projektId);
     }
 
 }

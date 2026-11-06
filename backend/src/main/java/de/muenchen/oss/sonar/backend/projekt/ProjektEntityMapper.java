@@ -2,6 +2,8 @@ package de.muenchen.oss.sonar.backend.projekt;
 
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
+import de.muenchen.oss.sonar.backend.projekt.domain.VerbundenesProjekt;
+import java.util.List;
 import org.mapstruct.CollectionMappingStrategy;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -11,7 +13,7 @@ import org.mapstruct.ReportingPolicy;
 public interface ProjektEntityMapper {
 
     @Mapping(target = "verwaltungsgebuehr", expression = "java(Projekt.VERWALTUNGSGEBUEHR)")
-    Projekt toProjekt(ProjektEntity projektEntity);
+    Projekt toProjekt(ProjektEntity projektEntity, List<VerbundenesProjekt> verbundeneProjekte);
 
     @Mapping(target = "id", ignore = true)
     ProjektEntity toEntity(Projekt projekt);

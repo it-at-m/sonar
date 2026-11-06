@@ -43,6 +43,9 @@ public final class FlaechenbeitragService {
 
     private static String flaechenaenderung(final Flaeche flaeche) {
         final BigDecimal aenderung = flaeche.flaechenaenderung();
+        if (aenderung.signum() == 0) {
+            return "Fläche unverändert (Fläche " + flaeche.bezeichnung() + ")";
+        }
         final String art = aenderung.signum() > 0 ? "Flächenerweiterung +" : "Flächenreduzierung ";
         return art + aenderung + "m² (Fläche " + flaeche.bezeichnung() + ")";
     }

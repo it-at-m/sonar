@@ -12,11 +12,13 @@ public record Flaechenwoche(
         BigDecimal baustellenflaecheQm,
         Flaechengroessenstufe flaechengroessenstufe,
         List<Flaechenverteilung> verteilung,
+        List<Flaechenverteilung> verbundverteilung,
         List<Gebuehrenposten> posten,
         String zwischenabrechnungGrund) {
 
     public Flaechenwoche {
         verteilung = List.copyOf(verteilung);
+        verbundverteilung = List.copyOf(verbundverteilung);
         posten = List.copyOf(posten);
     }
 

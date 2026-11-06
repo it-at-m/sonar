@@ -15,6 +15,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 import lombok.AccessLevel;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -40,6 +41,9 @@ public class ProjektEntity extends BaseEntity {
 
     @Column(nullable = false)
     @NotNull private LocalDate abrechnungEnde;
+
+    @Column(name = "verbundenes_projekt_id")
+    private UUID verbundenesProjektId;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "projekt_id", nullable = false)

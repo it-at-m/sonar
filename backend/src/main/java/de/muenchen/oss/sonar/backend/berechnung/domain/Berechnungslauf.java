@@ -11,10 +11,12 @@ public record Berechnungslauf(
         Vorabrechnung vorabrechnung,
         List<Flaechenadresse> flaechenadressen,
         List<Ueberspannungsadresse> ueberspannungsadressen,
+        List<Flaechenadresse> verbundflaechenadressen,
         Massnahmezeitraum zeitraum) {
 
     public Berechnungslauf {
         flaechenadressen = List.copyOf(flaechenadressen);
         ueberspannungsadressen = List.copyOf(ueberspannungsadressen);
+        verbundflaechenadressen = List.copyOf(verbundflaechenadressen);
     }
 }

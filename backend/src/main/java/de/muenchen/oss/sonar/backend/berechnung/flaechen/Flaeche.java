@@ -10,7 +10,8 @@ public record Flaeche(
         LocalDate berechnungsEnde,
         int ersteWoche,
         BigDecimal gesamtflaecheAdresse,
-        BigDecimal flaechenaenderung) {
+        BigDecimal flaechenaenderung,
+        boolean isFromOtherProjekt) {
 
     private static final int TAGE_PRO_WOCHE = 7;
 

@@ -11,18 +11,19 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FlaecheService {
 
-    public static Flaeche berechne(final AbrechnungPosition position, final int flaechenNummer, final LocalDate berechnungsdatum,
-            final LocalDate beginnWochenlauf, final BigDecimal gesamtflaecheVorher) {
+    public static Flaeche berechne(final AbrechnungPosition position, final String bezeichnung, final boolean isFromOtherProjekt,
+            final LocalDate berechnungsdatum, final LocalDate beginnWochenlauf, final BigDecimal gesamtflaecheVorher) {
 
         final BigDecimal gesamtflaecheAdresse = withoutTrailingZeros(position.flaeche());
 
         return new Flaeche(
-                "Position " + flaechenNummer,
+                bezeichnung,
                 position.beginn(),
                 Zeitraum.notAfter(position.ende(), berechnungsdatum),
                 firstWeek(position.beginn(), beginnWochenlauf),
                 gesamtflaecheAdresse,
-                gesamtflaecheAdresse.subtract(gesamtflaecheVorher));
+                gesamtflaecheAdresse.subtract(gesamtflaecheVorher),
+                isFromOtherProjekt);
     }
 
     private static BigDecimal withoutTrailingZeros(final BigDecimal flaeche) {
