@@ -137,5 +137,13 @@ services:
       test: ["CMD-SHELL", "/workspace/health-check"]
     security_opt: *security_settings
 
+  wiremock-service:
+    image: wiremock/wiremock:3.13.2
+    ports:
+      - "8085:8080"
+    volumes:
+      - "./local-wiremock:/home/wiremock:ro"
+    security_opt: *security_settings
+
 networks:
   keycloak:

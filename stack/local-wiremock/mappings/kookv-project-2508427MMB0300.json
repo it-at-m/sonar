@@ -1,0 +1,107 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/kookv/projects/2508427MMB0300"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "quitt": "000",
+      "proj_nr_bs": "2508427MMB0300",
+      "proj_nr_ds": "25084270200300",
+      "kunden_dateien": {
+        "name1": "Kieselwerk Bau GmbH",
+        "name2": "",
+        "strkl": "Wiesenbogen",
+        "hnr": "0024",
+        "bu": "",
+        "plz": "85757",
+        "ort": ""
+      },
+      "bauleitung": {
+        "bauleiter_name": "Jonas Feldmann"
+      },
+      "datum_beginn_ve": "20251216",
+      "datum_ende_ve": "20261215",
+      "datum_beginn_alte_ve": "20251216",
+      "datum_ende_alte_ve": "20261215",
+      "nutzungsart": {
+        "code": ["13", "", "", "", "", "", "", "", "", "", "", ""],
+        "sonstiges_text": ""
+      },
+      "adressenperiode": [
+        {
+          "adresse": {
+            "strassenklartext": "BIRKENWINKEL",
+            "str_nr": "99003",
+            "hnr_von": "0043",
+            "bu_von": "",
+            "hnr_bis": "0045"
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "laenge": "3.20",
+          "breite": "0.55",
+          "flaeche": "",
+          "anzahl_masten": "0"
+        },
+        {
+          "adresse": {
+            "strassenklartext": "LINDENBOGEN",
+            "str_nr": "99004",
+            "hnr_von": "0068",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "SEITE BIRKENWINKEL",
+          "laenge": "",
+          "breite": "",
+          "flaeche": "2.15",
+          "anzahl_masten": ""
+        },
+        {
+          "adresse": {
+            "strassenklartext": "",
+            "str_nr": "",
+            "hnr_von": "",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "laenge": "",
+          "breite": "",
+          "flaeche": "",
+          "anzahl_masten": ""
+        },
+        {
+          "adresse": {
+            "strassenklartext": "",
+            "str_nr": "",
+            "hnr_von": "",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "laenge": "",
+          "breite": "",
+          "flaeche": "",
+          "anzahl_masten": ""
+        }
+      ]
+    }
+  }
+}
