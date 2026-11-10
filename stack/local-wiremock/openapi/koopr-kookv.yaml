@@ -1,0 +1,115 @@
+openapi: 3.0.1
+info:
+  title: KOOPR and KOOKV mock API
+  description: Mocked subset of the sonar-rpc-client API.
+  version: 0.0.1-SNAPSHOT
+servers:
+  - url: http://localhost:8085
+paths:
+  /api/koopr/projects/{projectNumber}:
+    get:
+      operationId: getKooprProjectData
+      parameters:
+        - name: projectNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AntwortDto"
+  /api/kookv/projects/{projectNumber}:
+    get:
+      operationId: getKookvProjectData
+      parameters:
+        - name: projectNumber
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Project data
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AntwortDto"
+components:
+  schemas:
+    AdresseDto:
+      type: object
+      properties:
+        strassenklartext:
+          type: string
+        str_nr:
+          type: string
+        hnr_von:
+          type: string
+        bu_von:
+          type: string
+        hnr_bis:
+          type: string
+        bu_bis:
+          type: string
+    AdressenperiodeDto:
+      type: object
+      properties:
+        adresse:
+          $ref: "#/components/schemas/AdresseDto"
+        flurstueck:
+          $ref: "#/components/schemas/FlurstueckDto"
+        lage:
+          type: string
+        stadtbezirk:
+          type: string
+    AntwortDto:
+      type: object
+      properties:
+        quitt:
+          type: string
+        proj_nr_ds:
+          type: string
+        proj_nr_bs:
+          type: string
+        beendet:
+          type: string
+        adressenperiode:
+          type: array
+          items:
+            $ref: "#/components/schemas/AdressenperiodeDto"
+        fallstatus:
+          type: string
+        datum_baubeginn:
+          type: string
+        datum_bauende:
+          type: string
+        gebuehren:
+          $ref: "#/components/schemas/GebuehrenDto"
+    FlurstueckDto:
+      type: object
+      properties:
+        flurnr:
+          type: string
+    GebuehrenDto:
+      type: object
+      properties:
+        datum_1:
+          type: string
+        gebuehr_1:
+          type: string
+        datum_2:
+          type: string
+        gebuehr_2:
+          type: string
+        datum_3:
+          type: string
+        gebuehr_3:
+          type: string
+        datum_4:
+          type: string
+        gebuehr_4:
+          type: string
