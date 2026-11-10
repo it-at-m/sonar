@@ -92,6 +92,75 @@ paths:
           description: OK
       security:
       - bearerAuth: []
+  /projekt/{projektId}/vorgaenger:
+    put:
+      tags:
+      - projekt-controller
+      summary: Put a Projekt behind another Projekt in a Kette.
+      description: |-
+        Put a Projekt behind another Projekt in a Kette.
+         The Projekte of a Kette follow each other, and the Berechnung of a Projekt counts all its
+         Vorgaenger as if they and the Projekt were one. Only a Projekt that belongs to no Kette yet can
+         get a Vorgaenger, and only the last Projekt of a Kette can be that Vorgaenger, so a Kette stays a
+         straight line.
+      operationId: updateVorgaengerProjekt
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt that gets the Vorgaenger
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: the Projekt it follows
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/VorgaengerProjektRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the Vorgaenger is missing or is the Projekt itself
+        "404":
+          description: the Projekt or the Vorgaenger does not exist
+        "409":
+          description: "the Projekt belongs to a Kette already, or the Vorgaenger\
+            \ has a Nachfolger"
+        "200":
+          description: the Projekt with its Kette as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
+    delete:
+      tags:
+      - projekt-controller
+      summary: Release a Projekt from its Vorgaenger.
+      description: |-
+        Release a Projekt from its Vorgaenger.
+         Only the last Projekt of a Kette can be released, so a Kette shrinks from its end and never
+         breaks in two. A Projekt without Vorgaenger stays as it is.
+      operationId: deleteVorgaengerProjekt
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt to release
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "409":
+          description: the Projekt has a Nachfolger
+        "204":
+          description: No Content
+      security:
+      - bearerAuth: []
   /theEntity:
     get:
       tags:
@@ -161,6 +230,8 @@ paths:
          Fetches a paginated list of Projekte based on the provided page number and size.
          The optional search criteria are combined with AND and apply to the whole result, not just to
          the requested page. The same holds for the order, which is applied by the database.
+         Each Projekt comes with the other Projekte of its Kette, its Vorgaenger and its Nachfolger in
+         the order of the Kette.
       operationId: getProjekteByPageAndSize
       parameters:
       - name: pageNumber
@@ -247,6 +318,8 @@ paths:
          An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
          Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
          Either that period or tageUnerlaubteNutzung is given, never both.
+         The optional vorgaengerProjektId puts the new Projekt behind that Projekt in its Kette. Only
+         the last Projekt of a Kette can be that Vorgaenger.
       operationId: saveProjekt
       requestBody:
         description: the details of the Projekt to create
@@ -258,6 +331,10 @@ paths:
       responses:
         "400":
           description: the details of the Projekt are invalid
+        "404":
+          description: the Vorgaenger does not exist
+        "409":
+          description: the Vorgaenger has a Nachfolger
         "201":
           description: the created Projekt as a DTO
           content:
@@ -490,6 +567,10 @@ paths:
          given berechnungsdatum. A Position reaching beyond that date is charged only up to it, and one
          beginning after it is left out. The Zeitraum stored on the Abrechnung does not limit the
          Berechnung, so the berechnungsdatum may fall outside it.
+         The newest versions of the Abrechnungen of the Vorgaenger of the Projekt take part as well.
+         Together with this Abrechnung they decide the Flächengrößenstufe, the Wochen and the
+         Abrechnungszeitraum. Only this Abrechnung is charged. The Nachfolger of the Projekt do not take
+         part, so a later Projekt never changes the Berechnung of an earlier one.
       operationId: previewBerechnung
       parameters:
       - name: projektId
@@ -572,7 +653,8 @@ paths:
       summary: Retrieve a single Projekt.
       description: |-
         Retrieve a single Projekt.
-         Fetches the Projekt together with its Adressen.
+         Fetches the Projekt together with its Adressen and the other Projekte of its Kette, its
+         Vorgaenger and its Nachfolger in the order of the Kette.
       operationId: getProjekt
       parameters:
       - name: projektId
@@ -632,11 +714,14 @@ paths:
     get:
       tags:
       - abrechnung-controller
-      summary: Retrieve the Nutzungsobjekte of a Projekt.
+      summary: Retrieve the Nutzungsobjekte that an Abrechnung of a Projekt can take
+        over.
       description: |-
-        Retrieve the Nutzungsobjekte of a Projekt.
-         Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
-         The order is by Adresse and Flurstueck.
+        Retrieve the Nutzungsobjekte that an Abrechnung of a Projekt can take over.
+         Fetches every Nutzungsobjekt that an Abrechnung of the Projekt or of one of its Vorgaenger
+         bills, each of them once. A Nutzungsobjekt that only Vorgaenger bill names the nearest of them
+         in projektnummer. Once taken over, its Flächen keep their age in the Berechnung. The order is by
+         Adresse and Flurstueck.
       operationId: getNutzungsobjekte
       parameters:
       - name: projektId
@@ -852,6 +937,106 @@ components:
           format: uuid
         textAttribute:
           type: string
+    VorgaengerProjektRequestDTO:
+      required:
+      - vorgaengerProjektId
+      type: object
+      properties:
+        vorgaengerProjektId:
+          type: string
+          format: uuid
+    ProjektAdresseResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
+          type: string
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          type: integer
+          format: int32
+        anzahlMahnungen:
+          type: integer
+          format: int32
+        sondernutzungErlaubt:
+          type: boolean
+    ProjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektnummer:
+          type: string
+        abrechnungBeginn:
+          type: string
+          format: date
+        abrechnungEnde:
+          type: string
+          format: date
+        adressen:
+          type: array
+          items:
+            $ref: "#/components/schemas/ProjektAdresseResponseDTO"
+        vorgaengerProjektId:
+          type: string
+          format: uuid
+        vorgaengerProjekte:
+          type: array
+          items:
+            $ref: "#/components/schemas/VerbundenesProjektResponseDTO"
+        nachfolgerProjekte:
+          type: array
+          items:
+            $ref: "#/components/schemas/VerbundenesProjektResponseDTO"
+    VerbundenesProjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektnummer:
+          type: string
     ProjektAdresseRequestDTO:
       required:
       - anzahlMahnungen
@@ -944,79 +1129,9 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektAdresseRequestDTO"
-    ProjektAdresseResponseDTO:
-      type: object
-      properties:
-        id:
+        vorgaengerProjektId:
           type: string
           format: uuid
-        art:
-          type: string
-          enum:
-          - ADRESSE
-          - FLURSTUECK
-        adresse:
-          type: string
-        hausnummerVon:
-          type: string
-        hausnummerBis:
-          type: string
-        flurstueck:
-          type: string
-        gemarkung:
-          type: string
-        nutzungen:
-          type: array
-          items:
-            type: string
-            enum:
-            - AUFZUEGE
-            - AUTOKRAENE
-            - BAGGER
-            - BAUWAGEN
-            - BAUZAUN
-            - CONTAINER
-            - BAUGERUESTE
-            - HAUSKANALANSCHLUSS
-            - KRAENE
-            - MATERIALLAGERUNG
-            - UEBERSPANNUNG
-            - HEBEBUEHNEN
-            - SONSTIGES
-        nutzungSonstiges:
-          type: string
-        unerlaubteNutzungVon:
-          type: string
-          format: date
-        unerlaubteNutzungBis:
-          type: string
-          format: date
-        tageUnerlaubteNutzung:
-          type: integer
-          format: int32
-        anzahlMahnungen:
-          type: integer
-          format: int32
-        sondernutzungErlaubt:
-          type: boolean
-    ProjektResponseDTO:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        projektnummer:
-          type: string
-        abrechnungBeginn:
-          type: string
-          format: date
-        abrechnungEnde:
-          type: string
-          format: date
-        adressen:
-          type: array
-          items:
-            $ref: "#/components/schemas/ProjektAdresseResponseDTO"
     AbrechnungMastRequestDTO:
       required:
       - beginn
@@ -1604,6 +1719,8 @@ components:
           type: string
         aufschlag50prozent:
           type: boolean
+        projektnummer:
+          type: string
     GeschaeftspartnerResponseDTO:
       type: object
       properties:

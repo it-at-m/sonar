@@ -96,9 +96,11 @@ public class AbrechnungController {
     }
 
     /**
-     * Retrieve the Nutzungsobjekte of a Projekt.
-     * Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
-     * The order is by Adresse and Flurstueck.
+     * Retrieve the Nutzungsobjekte that an Abrechnung of a Projekt can take over.
+     * Fetches every Nutzungsobjekt that an Abrechnung of the Projekt or of one of its Vorgaenger
+     * bills, each of them once. A Nutzungsobjekt that only Vorgaenger bill names the nearest of them
+     * in projektnummer. Once taken over, its Flächen keep their age in the Berechnung. The order is by
+     * Adresse and Flurstueck.
      *
      * @param projektId the UUID of the Projekt the Nutzungsobjekte belong to
      * @return the Nutzungsobjekte of the Projekt represented as DTOs

@@ -34,6 +34,10 @@ public class BerechnungController {
      * given berechnungsdatum. A Position reaching beyond that date is charged only up to it, and one
      * beginning after it is left out. The Zeitraum stored on the Abrechnung does not limit the
      * Berechnung, so the berechnungsdatum may fall outside it.
+     * The newest versions of the Abrechnungen of the Vorgaenger of the Projekt take part as well.
+     * Together with this Abrechnung they decide the Flächengrößenstufe, the Wochen and the
+     * Abrechnungszeitraum. Only this Abrechnung is charged. The Nachfolger of the Projekt do not take
+     * part, so a later Projekt never changes the Berechnung of an earlier one.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungId the UUID of the Abrechnung to calculate

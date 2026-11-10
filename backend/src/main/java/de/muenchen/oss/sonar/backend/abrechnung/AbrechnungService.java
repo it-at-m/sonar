@@ -63,6 +63,15 @@ public class AbrechnungService {
     }
 
     @Transactional(readOnly = true)
+    public List<Abrechnung> getNewestAbrechnungenOfProjekt(final UUID projektId) {
+        log.info("Get the newest Abrechnungen of Projekt {}", projektId);
+        final Sort sort = Sort.by(Sort.Direction.ASC, AbrechnungSortBy.ZEITRAUM_VON.getEntityAttribute(), TIEBREAKER_ATTRIBUTE);
+        return abrechnungRepository.findNewestVersionsByProjektId(projektId, Pageable.unpaged(sort))
+                .map(abrechnungEntity -> toAbrechnung(abrechnungEntity, false))
+                .getContent();
+    }
+
+    @Transactional(readOnly = true)
     public Abrechnung getAbrechnung(final UUID projektId, final UUID abrechnungId) {
         log.info("Get Abrechnung {} of Projekt {}", abrechnungId, projektId);
         final AbrechnungEntity abrechnungEntity = abrechnungRepository.findByIdAndProjektId(abrechnungId, projektId)

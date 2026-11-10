@@ -20,7 +20,8 @@ public record NutzungsobjektResponseDTO(
         LocalDate unerlaubteNutzungBis,
         Integer tageUnerlaubteNutzung,
         String bemerkung,
-        boolean aufschlag50prozent) {
+        boolean aufschlag50prozent,
+        String projektnummer) {
 
     public NutzungsobjektResponseDTO {
         nutzungen = List.copyOf(Nutzung.distinctSorted(nutzungen));
