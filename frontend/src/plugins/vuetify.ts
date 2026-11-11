@@ -4,6 +4,8 @@ import { createVuetify } from "vuetify";
 import { aliases, mdi } from "vuetify/iconsets/mdi-svg";
 import { de } from "vuetify/locale";
 
+import { loadThemeColor } from "@/util/themeColor";
+
 export default createVuetify({
   locale: {
     locale: "de",
@@ -21,7 +23,7 @@ export default createVuetify({
     themes: {
       light: {
         colors: {
-          primary: "#333333",
+          primary: loadThemeColor(),
           secondary: "#FFCC00",
           accent: "#7BA4D9",
           success: "#69BE28",
