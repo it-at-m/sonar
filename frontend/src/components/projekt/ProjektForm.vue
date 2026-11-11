@@ -39,6 +39,15 @@
       </v-col>
     </v-row>
 
+    <v-row>
+      <v-col
+        cols="12"
+        md="8"
+      >
+        <vorgaenger-projekt-field v-model="projekt.vorgaengerProjekt" />
+      </v-col>
+    </v-row>
+
     <h2 class="text-headline-small mt-4 mb-2">Adressen/Flurstücke</h2>
 
     <projekt-form-adresse-card
@@ -86,6 +95,7 @@ import { useTemplateRef } from "vue";
 
 import SonarDateField from "@/components/common/SonarDateField.vue";
 import ProjektFormAdresseCard from "@/components/projekt/ProjektFormAdresseCard.vue";
+import VorgaengerProjektField from "@/components/projekt/VorgaengerProjektField.vue";
 import { useProjektForm } from "@/composables/projektForm";
 import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
 import { requiredRule } from "@/util/validationRules";

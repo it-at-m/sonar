@@ -12,6 +12,7 @@ export function useProjektForm() {
     projektnummer: "",
     abrechnungBeginn: "",
     abrechnungEnde: "",
+    vorgaengerProjekt: null,
     adressen: [createProjektAdresse()],
   });
 
@@ -27,7 +28,8 @@ export function useProjektForm() {
     if (
       projekt.projektnummer ||
       projekt.abrechnungBeginn ||
-      projekt.abrechnungEnde
+      projekt.abrechnungEnde ||
+      projekt.vorgaengerProjekt
     ) {
       return true;
     }

@@ -5,4 +5,5 @@ export interface NutzungsobjektSuggestion extends Adresse, UnerlaubteNutzung {
   id: string;
   bemerkung: string;
   aufschlag50prozent: boolean;
+  projektnummer?: string;
 }

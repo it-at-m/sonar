@@ -1,3 +1,7 @@
 export type Uebernahme =
   | { quelle: "PROJEKT" }
-  | { quelle: "NUTZUNGSOBJEKT"; nutzungsobjektId: string };
+  | {
+      quelle: "NUTZUNGSOBJEKT";
+      nutzungsobjektId: string;
+      projektnummer?: string;
+    };

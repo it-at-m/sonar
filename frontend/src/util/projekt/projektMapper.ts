@@ -8,6 +8,7 @@ export function toProjektRequestDTO(projekt: ProjektForm): ProjektRequestDTO {
     projektnummer: projekt.projektnummer.trim(),
     abrechnungBeginn: new Date(projekt.abrechnungBeginn),
     abrechnungEnde: new Date(projekt.abrechnungEnde),
+    vorgaengerProjektId: projekt.vorgaengerProjekt?.id,
     adressen: projekt.adressen.map(toProjektAdresseRequestDTO),
   };
 }

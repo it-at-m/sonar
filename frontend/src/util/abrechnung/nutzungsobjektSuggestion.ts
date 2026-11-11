@@ -42,6 +42,7 @@ function toNutzungsobjektSuggestion(
     tageUnerlaubteNutzung: nutzungsobjekt.tageUnerlaubteNutzung ?? null,
     bemerkung: nutzungsobjekt.bemerkung ?? "",
     aufschlag50prozent: nutzungsobjekt.aufschlag50prozent ?? false,
+    projektnummer: nutzungsobjekt.projektnummer,
   };
 }
 
@@ -49,10 +50,11 @@ export function applyNutzungsobjektSuggestion(
   nutzungsobjekt: AbrechnungNutzungsobjektForm,
   suggestion: NutzungsobjektSuggestion
 ): void {
-  const { id, ...uebernommeneDaten } = suggestion;
+  const { id, projektnummer, ...uebernommeneDaten } = suggestion;
   Object.assign(nutzungsobjekt, uebernommeneDaten);
   nutzungsobjekt.uebernahme = {
     quelle: "NUTZUNGSOBJEKT",
     nutzungsobjektId: id,
+    projektnummer,
   };
 }
