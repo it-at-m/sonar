@@ -119,7 +119,7 @@
       />
 
       <unerlaubte-nutzung-fields
-        :disabled="uebernommen"
+        :disabled="nutzungsobjektUebernommen"
         :id-prefix="idPrefix"
         :model-value="nutzungsobjekt"
       />
@@ -181,12 +181,16 @@ const emit = defineEmits<{ remove: [] }>();
 
 const UEBERNAHME_HINWEISE: Record<Uebernahme["quelle"], string> = {
   PROJEKT:
-    "Die Daten stammen aus dem Projekt und lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung.",
+    "Die Daten stammen aus dem Projekt und lassen sich hier nicht ändern, nur die unerlaubte Nutzung, die Positionen und die Masten gehören zu dieser Abrechnung.",
   NUTZUNGSOBJEKT:
     "Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung.",
 };
 
 const uebernommen = computed(() => nutzungsobjekt.value.uebernahme !== null);
+
+const nutzungsobjektUebernommen = computed(
+  () => nutzungsobjekt.value.uebernahme?.quelle === "NUTZUNGSOBJEKT"
+);
 
 /**
  * Counted over both tables, because a Nutzungsobjekt has to keep either a Position or a Mast. The
