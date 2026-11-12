@@ -143,7 +143,7 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     expect(nutzungsobjekt.positionen).toBe(positionen);
   });
 
-  it("givenTakenOverProjektAdresse_thenLockEveryFieldButThePositionen", async () => {
+  it("givenTakenOverProjektAdresse_thenLockEveryFieldButTheUnerlaubteNutzungAndThePositionen", async () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
     const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION]);
 
@@ -151,8 +151,13 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
 
     expect(wrapper.findComponent(AdresseFields).props("disabled")).toBe(true);
     expect(
-      wrapper.findComponent(UnerlaubteNutzungFields).props("disabled")
+      wrapper
+        .findComponent("#berechnung-nutzungsobjekt-0-bemerkung")
+        .props("disabled")
     ).toBe(true);
+    expect(
+      wrapper.findComponent(UnerlaubteNutzungFields).props("disabled")
+    ).toBe(false);
     expect(
       wrapper.findComponent(AbrechnungPositionenTable).props("readonly")
     ).toBe(false);

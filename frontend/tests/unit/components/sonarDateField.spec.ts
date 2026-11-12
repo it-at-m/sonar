@@ -144,6 +144,21 @@ describe("SonarDateField.vue", () => {
     expect(pickedDate(wrapper)).toBe("2026-01-18");
   });
 
+  it("givenBeginnAndEndeReplacedTogether_thenKeepTheGivenEnde", async () => {
+    const wrapper = mountField({
+      modelValue: "2026-01-28",
+      zeitraumBeginn: "2026-01-01",
+      zeitraumEinheit: "week",
+    });
+
+    await wrapper.setProps({
+      modelValue: "2026-02-04",
+      zeitraumBeginn: "2026-01-08",
+    });
+
+    expect(pickedDate(wrapper)).toBeUndefined();
+  });
+
   it("givenZeitraumBeginn_thenOfferOnlyTheEndenOfWholeWeeksToTheCalendar", () => {
     const wrapper = mountField({
       modelValue: "",
