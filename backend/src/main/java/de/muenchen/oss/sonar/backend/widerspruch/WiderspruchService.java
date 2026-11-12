@@ -1,5 +1,6 @@
 package de.muenchen.oss.sonar.backend.widerspruch;
 
+import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_DRAFT;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_WIDERSPRUCH_ALREADY_EXISTS;
 
@@ -27,6 +28,9 @@ public class WiderspruchService {
     public Widerspruch createWiderspruch(final UUID abrechnungId, final Widerspruch widerspruch) {
         final AbrechnungEntity abrechnung = abrechnungRepository.findById(abrechnungId)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, abrechnungId)));
+        if (abrechnung.isDraft()) {
+            throw new ConflictException(String.format(MSG_DRAFT, abrechnungId));
+        }
         if (abrechnung.getWiderspruch() != null) {
             throw new ConflictException(String.format(MSG_WIDERSPRUCH_ALREADY_EXISTS, abrechnungId));
         }

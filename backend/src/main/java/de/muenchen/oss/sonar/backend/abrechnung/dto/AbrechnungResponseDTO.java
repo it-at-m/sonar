@@ -11,6 +11,7 @@ public record AbrechnungResponseDTO(
         UUID projektId,
         int versionsnummer,
         UUID vorgaengerAbrechnungId,
+        boolean draft,
         String geschaeftspartnerId,
         boolean zustellungsbevollmaechtigterGenutzt,
         String zustellungsbevollmaechtigterId,

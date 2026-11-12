@@ -33,6 +33,7 @@ public class WiderspruchController {
     /**
      * Create the Widerspruch of an Abrechnung.
      * An Abrechnung carries at most one Widerspruch, so a second one is refused.
+     * A draft cannot receive a Widerspruch.
      *
      * @param abrechnungId the UUID of the Abrechnung the Widerspruch belongs to
      * @param widerspruchRequestDTO the details of the Widerspruch to create
@@ -42,7 +43,7 @@ public class WiderspruchController {
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Widerspruch are invalid", content = @Content)
     @ApiResponse(responseCode = "404", description = "the Abrechnung does not exist", content = @Content)
-    @ApiResponse(responseCode = "409", description = "the Abrechnung already has a Widerspruch", content = @Content)
+    @ApiResponse(responseCode = "409", description = "the Abrechnung is a draft or already has a Widerspruch", content = @Content)
     public WiderspruchResponseDTO saveWiderspruch(@PathVariable("abrechnungId") final UUID abrechnungId,
             @Valid @RequestBody final WiderspruchRequestDTO widerspruchRequestDTO) {
         return widerspruchDTOMapper.toDTO(

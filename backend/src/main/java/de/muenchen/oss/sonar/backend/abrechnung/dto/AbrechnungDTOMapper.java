@@ -20,6 +20,7 @@ public interface AbrechnungDTOMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "versionsnummer", ignore = true)
     @Mapping(target = "vorgaengerAbrechnungId", ignore = true)
+    @Mapping(target = "draft", ignore = true)
     @Mapping(target = "widerspruch", ignore = true)
     @Mapping(target = "neuereVersionVorhanden", ignore = true)
     Abrechnung toAbrechnung(UUID projektId, AbrechnungRequestDTO abrechnungRequestDTO);
@@ -28,10 +29,8 @@ public interface AbrechnungDTOMapper {
 
     AbrechnungNutzungsobjekt toAbrechnungNutzungsobjekt(AbrechnungNutzungsobjektRequestDTO abrechnungNutzungsobjektRequestDTO);
 
-    @Mapping(target = "id", ignore = true)
     AbrechnungPosition toAbrechnungPosition(AbrechnungPositionRequestDTO abrechnungPositionRequestDTO);
 
-    @Mapping(target = "id", ignore = true)
     AbrechnungMast toAbrechnungMast(AbrechnungMastRequestDTO abrechnungMastRequestDTO);
 
 }

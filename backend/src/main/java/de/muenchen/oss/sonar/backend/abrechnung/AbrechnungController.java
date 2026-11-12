@@ -27,6 +27,7 @@ import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -41,7 +42,11 @@ import org.springframework.web.bind.annotation.RestController;
 public class AbrechnungController {
 
     private static final String PROJEKT_ID = "projektId";
+    private static final String ABRECHNUNG_ID = "abrechnungId";
+    private static final String STATUS_BAD_REQUEST = "400";
     private static final String STATUS_NOT_FOUND = "404";
+    private static final String STATUS_CONFLICT = "409";
+    private static final String NO_ABRECHNUNG_WITH_UUID = "the Projekt has no Abrechnung with that UUID";
 
     private final AbrechnungService abrechnungService;
     private final NutzungsobjektService nutzungsobjektService;
@@ -66,7 +71,7 @@ public class AbrechnungController {
      */
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = "400", description = "the pagination or sort parameters are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = "the pagination or sort parameters are invalid", content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
     public Page<AbrechnungResponseDTO> getAbrechnungenByPageAndSize(@PathVariable(PROJEKT_ID) final UUID projektId,
             @RequestParam(defaultValue = "0") @Min(0) final int pageNumber,
@@ -122,9 +127,9 @@ public class AbrechnungController {
      */
     @GetMapping("/{abrechnungId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NO_ABRECHNUNG_WITH_UUID, content = @Content)
     public AbrechnungResponseDTO getAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
-            @PathVariable("abrechnungId") final UUID abrechnungId) {
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId) {
         return abrechnungDTOMapper.toDTO(abrechnungService.getAbrechnung(projektId, abrechnungId));
     }
 
@@ -141,9 +146,9 @@ public class AbrechnungController {
      */
     @GetMapping("/{abrechnungId}/version")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NO_ABRECHNUNG_WITH_UUID, content = @Content)
     public List<AbrechnungVersionResponseDTO> getAbrechnungVersionen(@PathVariable(PROJEKT_ID) final UUID projektId,
-            @PathVariable("abrechnungId") final UUID abrechnungId) {
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId) {
         return abrechnungService.getVersionenOfAbrechnung(projektId, abrechnungId).stream()
                 .map(abrechnungDTOMapper::toDTO)
                 .toList();
@@ -153,6 +158,7 @@ public class AbrechnungController {
      * Create a new Abrechnung for a Projekt.
      * Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
      * An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
+     * The Abrechnung starts as a draft. It can be changed until it is finalized.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungRequestDTO the details of the Abrechnung to create
@@ -160,7 +166,7 @@ public class AbrechnungController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiResponse(responseCode = "400", description = "the details of the Abrechnung are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = "the details of the Abrechnung are invalid", content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
     public AbrechnungResponseDTO saveAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
             @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
@@ -173,7 +179,8 @@ public class AbrechnungController {
      * The given Abrechnung stays as it is and the details of the request become a version of its own.
      * They may differ from the ones of the Vorgaenger in every field.
      * Only the latest version can be carried forward, so an Abrechnung that already has a newer
-     * version is refused.
+     * version is refused. A draft is changed instead of carried forward, so it is refused as well.
+     * The new version starts as a draft. It can be changed until it is finalized.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungId the UUID of the Abrechnung to create the next version of
@@ -182,14 +189,58 @@ public class AbrechnungController {
      */
     @PostMapping("/{abrechnungId}/version")
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiResponse(responseCode = "400", description = "the details of the new version are invalid", content = @Content)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
-    @ApiResponse(responseCode = "409", description = "the Abrechnung already has a newer version", content = @Content)
+    @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = "the details of the new version are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NO_ABRECHNUNG_WITH_UUID, content = @Content)
+    @ApiResponse(responseCode = STATUS_CONFLICT, description = "the Abrechnung is a draft or already has a newer version", content = @Content)
     public AbrechnungResponseDTO saveAbrechnungVersion(@PathVariable(PROJEKT_ID) final UUID projektId,
-            @PathVariable("abrechnungId") final UUID abrechnungId,
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId,
             @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
         return abrechnungDTOMapper.toDTO(abrechnungService.createNextVersion(abrechnungId,
                 abrechnungDTOMapper.toAbrechnung(projektId, abrechnungRequestDTO)));
+    }
+
+    /**
+     * Change a draft of an Abrechnung.
+     * The details of the request replace the ones of the draft as a whole. The draft keeps its
+     * UUID and its place in the chain of versions.
+     * A finalized Abrechnung is refused, because it cannot be changed any more.
+     *
+     * @param projektId the UUID of the Projekt the Abrechnung belongs to
+     * @param abrechnungId the UUID of the draft to change
+     * @param abrechnungRequestDTO the new details of the draft
+     * @return the changed draft as a DTO
+     */
+    @PutMapping("/{abrechnungId}")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_BAD_REQUEST, description = "the details of the draft are invalid", content = @Content)
+    @ApiResponse(
+            responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID, or the draft has no Position or Mast with a given id",
+            content = @Content
+    )
+    @ApiResponse(responseCode = STATUS_CONFLICT, description = "the Abrechnung is not a draft", content = @Content)
+    public AbrechnungResponseDTO updateAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId,
+            @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
+        return abrechnungDTOMapper.toDTO(abrechnungService.updateDraft(abrechnungId,
+                abrechnungDTOMapper.toAbrechnung(projektId, abrechnungRequestDTO)));
+    }
+
+    /**
+     * Finalize a draft of an Abrechnung.
+     * The draft becomes an Abrechnung with the details it has. From then on it cannot be changed
+     * any more. Instead it can be carried forward to a new version, and it can receive a Widerspruch.
+     *
+     * @param projektId the UUID of the Projekt the Abrechnung belongs to
+     * @param abrechnungId the UUID of the draft to finalize
+     * @return the finalized Abrechnung as a DTO
+     */
+    @PostMapping("/{abrechnungId}/finalize")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = NO_ABRECHNUNG_WITH_UUID, content = @Content)
+    @ApiResponse(responseCode = STATUS_CONFLICT, description = "the Abrechnung is not a draft", content = @Content)
+    public AbrechnungResponseDTO finalizeAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
+            @PathVariable(ABRECHNUNG_ID) final UUID abrechnungId) {
+        return abrechnungDTOMapper.toDTO(abrechnungService.finalizeDraft(projektId, abrechnungId));
     }
 
 }
