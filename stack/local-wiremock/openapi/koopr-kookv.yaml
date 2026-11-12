@@ -1,0 +1,215 @@
+openapi: 3.0.1
+info:
+  title: KOOPR and KOOKV mock API
+  description: Mocked subset of the sonar-rpc-client API.
+  version: 0.0.1-SNAPSHOT
+servers:
+- url: http://localhost:8086
+  description: Generated server url
+paths:
+  /api/koopr/projects/{projectNumber}:
+    get:
+      tags:
+      - koopr-controller
+      operationId: getProjectData
+      parameters:
+      - name: projectNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KooprAntwortDto"
+  /api/kookv/projects/{projectNumber}:
+    get:
+      tags:
+      - kookv-controller
+      operationId: getProjectData_1
+      parameters:
+      - name: projectNumber
+        in: path
+        required: true
+        schema:
+          type: string
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: "#/components/schemas/KookvAntwortDto"
+components:
+  schemas:
+    KooprAdresseDto:
+      type: object
+      properties:
+        strassenklartext:
+          type: string
+        str_nr:
+          type: string
+        hnr_von:
+          type: string
+        bu_von:
+          type: string
+        hnr_bis:
+          type: string
+        bu_bis:
+          type: string
+    KooprAdressenperiodeDto:
+      type: object
+      properties:
+        adresse:
+          $ref: "#/components/schemas/KooprAdresseDto"
+        flurstueck:
+          $ref: "#/components/schemas/KooprFlurstueckDto"
+        lage:
+          type: string
+        stadtbezirk:
+          type: string
+    KooprAntwortDto:
+      type: object
+      properties:
+        quitt:
+          type: string
+        proj_nr_ds:
+          type: string
+        proj_nr_bs:
+          type: string
+        beendet:
+          type: string
+        adressenperiode:
+          type: array
+          items:
+            $ref: "#/components/schemas/KooprAdressenperiodeDto"
+        fallstatus:
+          type: string
+        datum_baubeginn:
+          type: string
+        datum_bauende:
+          type: string
+        gebuehren:
+          $ref: "#/components/schemas/KooprGebuehrenDto"
+    KooprFlurstueckDto:
+      type: object
+      properties:
+        flurnr:
+          type: string
+    KooprGebuehrenDto:
+      type: object
+      properties:
+        datum_1:
+          type: string
+        gebuehr_1:
+          type: string
+        datum_2:
+          type: string
+        gebuehr_2:
+          type: string
+        datum_3:
+          type: string
+        gebuehr_3:
+          type: string
+        datum_4:
+          type: string
+        gebuehr_4:
+          type: string
+    KookvAdresseDto:
+      type: object
+      properties:
+        strassenklartext:
+          type: string
+        str_nr:
+          type: string
+        hnr_von:
+          type: string
+        bu_von:
+          type: string
+        hnr_bis:
+          type: string
+        bu_bis:
+          type: string
+    KookvAdressenperiodeDto:
+      type: object
+      properties:
+        adresse:
+          $ref: "#/components/schemas/KookvAdresseDto"
+        flurstueck:
+          $ref: "#/components/schemas/KookvFlurstueckDto"
+        lage:
+          type: string
+        laenge:
+          type: string
+        breite:
+          type: string
+        flaeche:
+          type: string
+        anzahl_masten:
+          type: string
+    KookvAntwortDto:
+      type: object
+      properties:
+        quitt:
+          type: string
+        projnr_bs:
+          type: string
+        projnr_ds:
+          type: string
+        kunden_dateien:
+          $ref: "#/components/schemas/KookvKundenDateienDto"
+        bauleitung:
+          $ref: "#/components/schemas/KookvBauleitungDto"
+        nutzungsart:
+          $ref: "#/components/schemas/KookvNutzungsartDto"
+        datum_beginn_ve:
+          type: string
+        datum_ende_ve:
+          type: string
+        datum_beginn_alte_ve:
+          type: string
+        datum_ende_alte_ve:
+          type: string
+        adressenperiode:
+          type: array
+          items:
+            $ref: "#/components/schemas/KookvAdressenperiodeDto"
+    KookvBauleitungDto:
+      type: object
+      properties:
+        bauleiter_name:
+          type: string
+    KookvFlurstueckDto:
+      type: object
+      properties:
+        flurnr:
+          type: string
+    KookvKundenDateienDto:
+      type: object
+      properties:
+        name1:
+          type: string
+        name2:
+          type: string
+        strkl:
+          type: string
+        hnr:
+          type: string
+        bu:
+          type: string
+        plz:
+          type: string
+        ort:
+          type: string
+    KookvNutzungsartDto:
+      type: object
+      properties:
+        code:
+          type: array
+          items:
+            type: string
+        sonstiges_text:
+          type: string
