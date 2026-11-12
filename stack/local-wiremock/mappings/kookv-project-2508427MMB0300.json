@@ -10,8 +10,8 @@
     },
     "jsonBody": {
       "quitt": "000",
-      "proj_nr_bs": "2508427MMB0300",
-      "proj_nr_ds": "25084270200300",
+      "projnr_bs": "2508427MMB0300",
+      "projnr_ds": "25084270200300",
       "kunden_dateien": {
         "name1": "Kieselwerk Bau GmbH",
         "name2": "",

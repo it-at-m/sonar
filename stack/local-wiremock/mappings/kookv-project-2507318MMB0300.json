@@ -10,8 +10,8 @@
     },
     "jsonBody": {
       "quitt": "000",
-      "proj_nr_ds": "25073180200300",
-      "proj_nr_bs": "2507318MMB0300",
+      "projnr_ds": "25073180200300",
+      "projnr_bs": "2507318MMB0300",
       "beendet": "",
       "kunden_dateien": {
         "name1": "Lindenwerk Bau GmbH",
