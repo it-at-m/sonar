@@ -1,7 +1,9 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
+import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_FORBIDDEN;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
 
+import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkService;
@@ -48,10 +50,12 @@ public class ProjektService {
     @Transactional(readOnly = true)
     public Projekt getProjekt(final UUID projektId) {
         log.info("Get Projekt {}", projektId);
-        return projektRepository
-                .findByIdAndStadtbezirkIn(projektId, stadtbezirkService.getStadtbezirkeOfCurrentUser())
-                .map(projektEntityMapper::toProjekt)
+        final ProjektEntity projektEntity = projektRepository.findById(projektId)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, projektId)));
+        if (!stadtbezirkService.getStadtbezirkeOfCurrentUser().contains(projektEntity.getStadtbezirk())) {
+            throw new ForbiddenException(String.format(MSG_FORBIDDEN, projektId));
+        }
+        return projektEntityMapper.toProjekt(projektEntity);
     }
 
     public boolean existsProjekt(final UUID projektId) {

@@ -788,7 +788,7 @@ class ProjektIntegrationTest {
         }
 
         @Test
-        void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
             final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
             moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
             moosachNord.setRolle("SB_Nord");
@@ -798,16 +798,16 @@ class ProjektIntegrationTest {
                     .uri("/projekt/{projektId}", projektId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
                     .exchange()
-                    .expectStatus().isNotFound();
+                    .expectStatus().isForbidden();
         }
 
         @Test
-        void givenNoSachbearbeiterRole_thenReturnNotFound() {
+        void givenNoSachbearbeiterRole_thenReturnForbidden() {
             restTestClient.get()
                     .uri("/projekt/{projektId}", projektId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
                     .exchange()
-                    .expectStatus().isNotFound();
+                    .expectStatus().isForbidden();
         }
 
         @Test

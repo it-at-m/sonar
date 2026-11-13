@@ -575,7 +575,7 @@ paths:
       description: |-
         Retrieve a single Projekt.
          Fetches the Projekt together with its Adressen.
-         A Projekt in a Stadtbezirk assigned to none of the roles of the user is answered as missing.
+         A Projekt in a Stadtbezirk assigned to none of the roles of the user is refused.
       operationId: getProjekt
       parameters:
       - name: projektId
@@ -586,9 +586,10 @@ paths:
           type: string
           format: uuid
       responses:
+        "403":
+          description: the Projekt lies outside the Stadtbezirke of the user
         "404":
-          description: the Projekt does not exist or lies outside the Stadtbezirke
-            of the user
+          description: the Projekt does not exist
         "200":
           description: the Projekt represented as a DTO
           content:

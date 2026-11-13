@@ -72,14 +72,15 @@ public class ProjektController {
     /**
      * Retrieve a single Projekt.
      * Fetches the Projekt together with its Adressen.
-     * A Projekt in a Stadtbezirk assigned to none of the roles of the user is answered as missing.
+     * A Projekt in a Stadtbezirk assigned to none of the roles of the user is refused.
      *
      * @param projektId the id of the requested Projekt
      * @return the Projekt represented as a DTO
      */
     @GetMapping("{projektId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = "404", description = "the Projekt does not exist or lies outside the Stadtbezirke of the user", content = @Content)
+    @ApiResponse(responseCode = "403", description = "the Projekt lies outside the Stadtbezirke of the user", content = @Content)
+    @ApiResponse(responseCode = "404", description = "the Projekt does not exist", content = @Content)
     public ProjektResponseDTO getProjekt(@PathVariable("projektId") final UUID projektId) {
         return projektDTOMapper.toDTO(projektService.getProjekt(projektId));
     }

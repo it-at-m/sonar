@@ -9,6 +9,7 @@ import static org.mockito.Mockito.when;
 
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
+import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
@@ -215,7 +216,7 @@ class ProjektServiceTest {
             projektEntity.addAdresse(adresseEntity);
 
             when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
-            when(projektRepository.findByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL))).thenReturn(Optional.of(projektEntity));
+            when(projektRepository.findById(projektId)).thenReturn(Optional.of(projektEntity));
 
             final Projekt result = unitUnderTest.getProjekt(projektId);
 
@@ -227,11 +228,28 @@ class ProjektServiceTest {
         }
 
         @Test
-        void givenNoProjektInTheStadtbezirkeOfTheUser_thenThrowNotFound() {
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbidden() {
             final UUID projektId = UUID.randomUUID();
+
+            final ProjektEntity projektEntity = new ProjektEntity();
+            projektEntity.setId(projektId);
+            projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
+            projektEntity.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            projektEntity.setAbrechnungBeginn(BEGINN);
+            projektEntity.setAbrechnungEnde(ENDE);
+
             when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING));
-            when(projektRepository.findByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING)))
-                    .thenReturn(Optional.empty());
+            when(projektRepository.findById(projektId)).thenReturn(Optional.of(projektEntity));
+
+            assertThatExceptionOfType(ForbiddenException.class)
+                    .isThrownBy(() -> unitUnderTest.getProjekt(projektId))
+                    .withMessageContaining(projektId.toString());
+        }
+
+        @Test
+        void givenUnknownId_thenThrowNotFound() {
+            final UUID projektId = UUID.randomUUID();
+            when(projektRepository.findById(projektId)).thenReturn(Optional.empty());
 
             assertThatExceptionOfType(NotFoundException.class)
                     .isThrownBy(() -> unitUnderTest.getProjekt(projektId))
