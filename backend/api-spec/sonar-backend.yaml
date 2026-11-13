@@ -724,7 +724,9 @@ paths:
       summary: Retrieve the Nutzungsobjekte of a Projekt.
       description: |-
         Retrieve the Nutzungsobjekte of a Projekt.
-         Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
+         Fetches every Nutzungsobjekt that a finalized Abrechnung of the Projekt bills, each of them once.
+         These are the Nutzungsobjekte that can be taken over. A draft can still change its own ones, so
+         they are left out.
          The order is by Adresse and Flurstueck.
       operationId: getNutzungsobjekte
       parameters:
@@ -956,18 +958,15 @@ components:
         ende:
           type: string
           format: date
-      description: |-
-        A Mast of the Abrechnung to store.
-         <p>
-         The id names a Mast that the draft already has, and changing the draft updates that Mast. A Mast
-         without an id is new. A new Abrechnung has no Masten yet, so an id is refused there.
-         </p>
     AbrechnungNutzungsobjektRequestDTO:
       required:
       - art
       type: object
       properties:
         id:
+          type: string
+          format: uuid
+        takenOverId:
           type: string
           format: uuid
         art:
@@ -1041,6 +1040,14 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/AbrechnungMastRequestDTO"
+      description: |-
+        A Nutzungsobjekt of the Abrechnung to store.
+         <p>
+         The id names an own Nutzungsobjekt of the draft that is changed, and the details update it. The
+         takenOverId names a Nutzungsobjekt that a finalized Abrechnung of the Projekt bills. It is taken
+         over as it is stored, and the other details are ignored. At most one of the two is given. Without
+         either, the Nutzungsobjekt is new.
+         </p>
     AbrechnungPositionRequestDTO:
       required:
       - beginn
@@ -1069,13 +1076,6 @@ components:
           minimum: 0
           exclusiveMinimum: true
           type: number
-      description: |-
-        A Position of the Abrechnung to store.
-         <p>
-         The id names a Position that the draft already has, and changing the draft updates that Position.
-         A Position without an id is new. A new Abrechnung has no Positionen yet, so an id is refused
-         there.
-         </p>
     AbrechnungRequestDTO:
       required:
       - abrechnungsArt
@@ -1160,6 +1160,8 @@ components:
         id:
           type: string
           format: uuid
+        changeable:
+          type: boolean
         art:
           type: string
           enum:

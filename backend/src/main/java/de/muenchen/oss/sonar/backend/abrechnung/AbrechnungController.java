@@ -102,7 +102,9 @@ public class AbrechnungController {
 
     /**
      * Retrieve the Nutzungsobjekte of a Projekt.
-     * Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
+     * Fetches every Nutzungsobjekt that a finalized Abrechnung of the Projekt bills, each of them once.
+     * These are the Nutzungsobjekte that can be taken over. A draft can still change its own ones, so
+     * they are left out.
      * The order is by Adresse and Flurstueck.
      *
      * @param projektId the UUID of the Projekt the Nutzungsobjekte belong to

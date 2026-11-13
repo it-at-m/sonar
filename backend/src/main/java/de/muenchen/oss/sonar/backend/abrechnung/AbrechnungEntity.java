@@ -53,6 +53,9 @@ public class AbrechnungEntity extends BaseEntity {
     @Column(name = "vorgaenger_abrechnung_id", unique = true)
     private UUID vorgaengerAbrechnungId;
 
+    @Column(nullable = false)
+    private boolean draft;
+
     @Column(nullable = false, length = 10)
     @NotNull @Size(min = 1, max = 10) private String geschaeftspartnerId;
 
@@ -121,6 +124,11 @@ public class AbrechnungEntity extends BaseEntity {
         nutzungsobjekte.add(nutzungsobjekt);
     }
 
+    public void setNutzungsobjekte(final List<NutzungsobjektEntity> entries) {
+        nutzungsobjekte.clear();
+        nutzungsobjekte.addAll(entries);
+    }
+
     public List<AbrechnungPositionEntity> getPositionen() {
         return Collections.unmodifiableList(positionen);
     }
@@ -129,12 +137,22 @@ public class AbrechnungEntity extends BaseEntity {
         positionen.add(position);
     }
 
+    public void setPositionen(final List<AbrechnungPositionEntity> entries) {
+        positionen.clear();
+        positionen.addAll(entries);
+    }
+
     public List<AbrechnungMastEntity> getMasten() {
         return Collections.unmodifiableList(masten);
     }
 
     public void addMast(final AbrechnungMastEntity mast) {
         masten.add(mast);
+    }
+
+    public void setMasten(final List<AbrechnungMastEntity> entries) {
+        masten.clear();
+        masten.addAll(entries);
     }
 
 }

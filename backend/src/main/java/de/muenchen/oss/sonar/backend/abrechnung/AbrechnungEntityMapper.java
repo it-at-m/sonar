@@ -21,7 +21,7 @@ public interface AbrechnungEntityMapper {
             List<AbrechnungNutzungsobjekt> nutzungsobjekte);
 
     @Mapping(target = ".", source = "nutzungsobjektEntity.adressdaten")
-    AbrechnungNutzungsobjekt toNutzungsobjekt(NutzungsobjektEntity nutzungsobjektEntity,
+    AbrechnungNutzungsobjekt toNutzungsobjekt(NutzungsobjektEntity nutzungsobjektEntity, boolean changeable,
             List<AbrechnungPosition> positionen, List<AbrechnungMast> masten);
 
     AbrechnungPosition toPosition(AbrechnungPositionEntity abrechnungPositionEntity);
@@ -43,25 +43,29 @@ public interface AbrechnungEntityMapper {
     @Mapping(target = "masten", ignore = true)
     AbrechnungEntity toEntity(Abrechnung abrechnung);
 
-    @InheritConfiguration(name = "toEntity")
+    @InheritConfiguration
     void updateEntity(Abrechnung abrechnung, @MappingTarget AbrechnungEntity abrechnungEntity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "adressdaten", source = "abrechnungNutzungsobjekt")
     NutzungsobjektEntity toEntity(AbrechnungNutzungsobjekt abrechnungNutzungsobjekt);
 
+    @InheritConfiguration
+    @Mapping(target = "nutzungen", ignore = true)
+    void updateEntity(AbrechnungNutzungsobjekt abrechnungNutzungsobjekt, @MappingTarget NutzungsobjektEntity nutzungsobjektEntity);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nutzungsobjekt", ignore = true)
     AbrechnungPositionEntity toEntity(AbrechnungPosition abrechnungPosition);
 
-    @InheritConfiguration(name = "toEntity")
+    @InheritConfiguration
     void updateEntity(AbrechnungPosition abrechnungPosition, @MappingTarget AbrechnungPositionEntity abrechnungPositionEntity);
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "nutzungsobjekt", ignore = true)
     AbrechnungMastEntity toEntity(AbrechnungMast abrechnungMast);
 
-    @InheritConfiguration(name = "toEntity")
+    @InheritConfiguration
     void updateEntity(AbrechnungMast abrechnungMast, @MappingTarget AbrechnungMastEntity abrechnungMastEntity);
 
 }

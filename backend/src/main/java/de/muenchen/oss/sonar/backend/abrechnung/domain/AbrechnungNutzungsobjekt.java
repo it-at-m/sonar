@@ -12,6 +12,7 @@ import org.springframework.util.StringUtils;
 
 public record AbrechnungNutzungsobjekt(
         UUID id,
+        boolean changeable,
         Adressart art,
         String adresse,
         String hausnummerVon,

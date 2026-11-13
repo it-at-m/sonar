@@ -27,7 +27,9 @@ public interface AbrechnungDTOMapper {
 
     NutzungsobjektResponseDTO toDTO(AbrechnungNutzungsobjekt abrechnungNutzungsobjekt);
 
-    AbrechnungNutzungsobjekt toAbrechnungNutzungsobjekt(AbrechnungNutzungsobjektRequestDTO abrechnungNutzungsobjektRequestDTO);
+    @Mapping(target = "id", expression = "java(nutzungsobjekt.takenOverId() == null ? nutzungsobjekt.id() : nutzungsobjekt.takenOverId())")
+    @Mapping(target = "changeable", expression = "java(nutzungsobjekt.takenOverId() == null)")
+    AbrechnungNutzungsobjekt toAbrechnungNutzungsobjekt(AbrechnungNutzungsobjektRequestDTO nutzungsobjekt);
 
     AbrechnungPosition toAbrechnungPosition(AbrechnungPositionRequestDTO abrechnungPositionRequestDTO);
 
