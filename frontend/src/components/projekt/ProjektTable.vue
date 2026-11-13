@@ -33,7 +33,7 @@ import { computed } from "vue";
 
 const HEADERS = [
   { title: "Projektnummer", key: "projektnummer" },
-  { title: "Stadtbezirk", key: "stadtbezirk" },
+  { title: "Stadtbezirk", key: "stadtbezirk", sortable: false },
   { title: "Abrechnung Beginn", key: "abrechnungBeginn" },
   { title: "Abrechnung Ende", key: "abrechnungEnde" },
   { title: "Adressen/Flurnummern", key: "anzahlAdressen", sortable: false },

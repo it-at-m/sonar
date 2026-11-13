@@ -394,63 +394,6 @@ class ProjektIntegrationTest {
         }
 
         @Test
-        void givenStadtbezirkAscending_thenOrderByItsNummer() {
-            final ProjektAdresseEntity adresse0002 = new ProjektAdresseEntity();
-            adresse0002.setAnzahlMahnungen(0);
-            adresse0002.setSondernutzungErlaubt(false);
-
-            final AdressdatenEmbeddable adressdaten0002 = adresse0002.getAdressdaten();
-            adressdaten0002.setArt(Adressart.ADRESSE);
-            adressdaten0002.setAdresse("Marienplatz");
-            adressdaten0002.setHausnummerVon("8");
-            adresse0002.addNutzung(Nutzung.BAUZAUN);
-            adressdaten0002.setUnerlaubteNutzungVon(BEGINN);
-            adressdaten0002.setUnerlaubteNutzungBis(ENDE);
-
-            final ProjektEntity projekt0002 = new ProjektEntity();
-            projekt0002.setProjektnummer("2026-0002");
-            projekt0002.setStadtbezirk(Stadtbezirk.BEZIRK_05_AU_HAIDHAUSEN);
-            projekt0002.setAbrechnungBeginn(BEGINN);
-            projekt0002.setAbrechnungEnde(ENDE);
-            projekt0002.addAdresse(adresse0002);
-            projektRepository.save(projekt0002);
-
-            final ProjektAdresseEntity adresse0003 = new ProjektAdresseEntity();
-            adresse0003.setAnzahlMahnungen(0);
-            adresse0003.setSondernutzungErlaubt(false);
-
-            final AdressdatenEmbeddable adressdaten0003 = adresse0003.getAdressdaten();
-            adressdaten0003.setArt(Adressart.ADRESSE);
-            adressdaten0003.setAdresse("Marienplatz");
-            adressdaten0003.setHausnummerVon("8");
-            adresse0003.addNutzung(Nutzung.BAUZAUN);
-            adressdaten0003.setUnerlaubteNutzungVon(BEGINN);
-            adressdaten0003.setUnerlaubteNutzungBis(ENDE);
-
-            final ProjektEntity projekt0003 = new ProjektEntity();
-            projekt0003.setProjektnummer("2026-0003");
-            projekt0003.setStadtbezirk(Stadtbezirk.BEZIRK_02_LUDWIGSVORSTADT_ISARVORSTADT);
-            projekt0003.setAbrechnungBeginn(BEGINN);
-            projekt0003.setAbrechnungEnde(ENDE);
-            projekt0003.addAdresse(adresse0003);
-            projektRepository.save(projekt0003);
-
-            restTestClient.get()
-                    .uri(uriBuilder -> uriBuilder
-                            .path("/projekt")
-                            .queryParam("sortBy", "STADTBEZIRK")
-                            .queryParam("sortDirection", "ASC")
-                            .build())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
-                    .exchange()
-                    .expectStatus().isOk()
-                    .expectBody()
-                    .jsonPath("$.content..projektnummer")
-                    .value(new ParameterizedTypeReference<List<String>>() {
-                    }, projektnummern -> assertThat(projektnummern).containsExactly("2026-0001", "2026-0003", "2026-0002"));
-        }
-
-        @Test
         void givenUnknownSortBy_thenRejectTheRequest() {
             restTestClient.get()
                     .uri(uriBuilder -> uriBuilder

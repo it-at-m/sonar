@@ -214,7 +214,6 @@ paths:
           default: PROJEKTNUMMER
           enum:
           - PROJEKTNUMMER
-          - STADTBEZIRK
           - ABRECHNUNG_BEGINN
           - ABRECHNUNG_ENDE
       - name: sortDirection

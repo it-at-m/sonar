@@ -4,7 +4,6 @@ import type { ProjektSort } from "@/types/projekt/ProjektSort";
 
 const SORT_BY_OF_COLUMN: Record<string, GetProjekteByPageAndSizeSortByEnum> = {
   projektnummer: "PROJEKTNUMMER",
-  stadtbezirk: "STADTBEZIRK",
   abrechnungBeginn: "ABRECHNUNG_BEGINN",
   abrechnungEnde: "ABRECHNUNG_ENDE",
 };
