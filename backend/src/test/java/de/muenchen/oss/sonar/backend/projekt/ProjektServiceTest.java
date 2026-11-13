@@ -9,13 +9,17 @@ import static org.mockito.Mockito.when;
 
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
+import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
+import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -49,6 +53,9 @@ class ProjektServiceTest {
     @Spy
     private final ProjektEntityMapper projektEntityMapper = Mappers.getMapper(ProjektEntityMapper.class);
 
+    @Mock
+    private StadtbezirkService stadtbezirkService;
+
     @InjectMocks
     private ProjektService unitUnderTest;
 
@@ -60,7 +67,7 @@ class ProjektServiceTest {
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of()));
 
-            unitUnderTest.getAllProjekte(0, 10, null, null, null, sortBy, direction);
+            unitUnderTest.getPermittedProjekte(0, 10, null, null, null, sortBy, direction);
 
             verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), pageRequestCaptor.capture());
             return pageRequestCaptor.getValue().getSort();
@@ -110,7 +117,7 @@ class ProjektServiceTest {
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest)))
                     .thenReturn(new PageImpl<>(projekte, pageRequest, projekte.size()));
 
-            final Page<Projekt> result = unitUnderTest.getAllProjekte(0, 10, null, null, null, null, null);
+            final Page<Projekt> result = unitUnderTest.getPermittedProjekte(0, 10, null, null, null, null, null);
 
             verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest));
             assertThat(result.getTotalElements()).isEqualTo(projekte.size());
@@ -144,7 +151,7 @@ class ProjektServiceTest {
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest)))
                     .thenReturn(new PageImpl<>(List.of(projektEntity), pageRequest, 1));
 
-            final Page<Projekt> result = unitUnderTest.getAllProjekte(2, 25, "2026-", BEGINN, ENDE, null, null);
+            final Page<Projekt> result = unitUnderTest.getPermittedProjekte(2, 25, "2026-", BEGINN, ENDE, null, null);
 
             verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest));
             assertThat(result.getContent()).hasSize(1);
@@ -203,18 +210,40 @@ class ProjektServiceTest {
             final ProjektEntity projektEntity = new ProjektEntity();
             projektEntity.setId(projektId);
             projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
+            projektEntity.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             projektEntity.setAbrechnungBeginn(BEGINN);
             projektEntity.setAbrechnungEnde(ENDE);
             projektEntity.addAdresse(adresseEntity);
 
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
             when(projektRepository.findById(projektId)).thenReturn(Optional.of(projektEntity));
 
             final Projekt result = unitUnderTest.getProjekt(projektId);
 
             assertThat(result.id()).isEqualTo(projektId);
             assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
+            assertThat(result.stadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             assertThat(result.adressen()).hasSize(1);
             assertThat(result.adressen().getFirst().adresse()).isEqualTo("Marienplatz");
+        }
+
+        @Test
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbidden() {
+            final UUID projektId = UUID.randomUUID();
+
+            final ProjektEntity projektEntity = new ProjektEntity();
+            projektEntity.setId(projektId);
+            projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
+            projektEntity.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+            projektEntity.setAbrechnungBeginn(BEGINN);
+            projektEntity.setAbrechnungEnde(ENDE);
+
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING));
+            when(projektRepository.findById(projektId)).thenReturn(Optional.of(projektEntity));
+
+            assertThatExceptionOfType(ForbiddenException.class)
+                    .isThrownBy(() -> unitUnderTest.getProjekt(projektId))
+                    .withMessageContaining(projektId.toString());
         }
 
         @Test
@@ -229,13 +258,36 @@ class ProjektServiceTest {
     }
 
     @Nested
+    class ExistsProjekt {
+        @Test
+        void givenProjektInAStadtbezirkOfTheUser_thenReturnTrue() {
+            final UUID projektId = UUID.randomUUID();
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING));
+            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING)))
+                    .thenReturn(true);
+
+            assertThat(unitUnderTest.existsProjekt(projektId)).isTrue();
+        }
+
+        @Test
+        void givenNoProjektInTheStadtbezirkeOfTheUser_thenReturnFalse() {
+            final UUID projektId = UUID.randomUUID();
+            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
+            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL))).thenReturn(false);
+
+            assertThat(unitUnderTest.existsProjekt(projektId)).isFalse();
+        }
+    }
+
+    @Nested
     class CreateProjekt {
         @Test
         void givenProjekt_thenReturnSavedProjekt() {
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, true);
-            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
+                    List.of(adresse));
 
             final UUID savedId = UUID.randomUUID();
             when(projektRepository.save(any(ProjektEntity.class))).thenAnswer(invocation -> {
@@ -249,6 +301,7 @@ class ProjektServiceTest {
             verify(projektRepository).save(any(ProjektEntity.class));
             assertThat(result.id()).isEqualTo(savedId);
             assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
+            assertThat(result.stadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             assertThat(result.adressen()).hasSize(1);
             assertThat(result.adressen().getFirst().flurstueck()).isEqualTo("1234/5");
             assertThat(result.adressen().getFirst().sondernutzungErlaubt()).isTrue();
