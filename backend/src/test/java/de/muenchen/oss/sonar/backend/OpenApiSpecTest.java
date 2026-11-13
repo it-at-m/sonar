@@ -7,7 +7,6 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
-import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleRepository;
 import de.muenchen.oss.sonar.backend.theentity.TheEntityRepository;
 import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchRepository;
 import java.nio.charset.StandardCharsets;
@@ -77,9 +76,6 @@ class OpenApiSpecTest {
 
     @MockitoBean
     private ProjektRepository projektRepository;
-
-    @MockitoBean
-    private StadtbezirkRolleRepository stadtbezirkRolleRepository;
 
     @MockitoBean
     private TheEntityRepository theEntityRepository;

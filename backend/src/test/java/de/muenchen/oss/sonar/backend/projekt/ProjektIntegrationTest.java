@@ -14,8 +14,6 @@ import de.muenchen.oss.sonar.backend.projekt.dto.ProjektAdresseResponseDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektRequestDTO;
 import de.muenchen.oss.sonar.backend.projekt.dto.ProjektResponseDTO;
 import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
-import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleEntity;
-import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleRepository;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -61,9 +59,6 @@ class ProjektIntegrationTest {
     private ProjektRepository projektRepository;
 
     @Autowired
-    private StadtbezirkRolleRepository stadtbezirkRolleRepository;
-
-    @Autowired
     private TransactionTemplate transactionTemplate;
 
     private UUID projektId;
@@ -71,12 +66,6 @@ class ProjektIntegrationTest {
     @BeforeEach
     public void setUp() {
         projektRepository.deleteAll();
-        stadtbezirkRolleRepository.deleteAll();
-
-        final StadtbezirkRolleEntity altstadtLehelMitte = new StadtbezirkRolleEntity();
-        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
-        altstadtLehelMitte.setRolle("SB_Mitte");
-        stadtbezirkRolleRepository.save(altstadtLehelMitte);
 
         final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
         adresse.setAnzahlMahnungen(0);
@@ -142,11 +131,6 @@ class ProjektIntegrationTest {
             projektMoosach.addAdresse(adresseMoosach);
             projektRepository.save(projektMoosach);
 
-            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
-            moosachNord.setRolle("SB_Nord");
-            stadtbezirkRolleRepository.save(moosachNord);
-
             restTestClient.get()
                     .uri("/projekt")
                     .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
@@ -200,11 +184,6 @@ class ProjektIntegrationTest {
             projektMoosach.setAbrechnungEnde(ENDE);
             projektMoosach.addAdresse(adresseMoosach);
             projektRepository.save(projektMoosach);
-
-            final StadtbezirkRolleEntity sendlingSued = new StadtbezirkRolleEntity();
-            sendlingSued.setStadtbezirk(Stadtbezirk.BEZIRK_06_SENDLING);
-            sendlingSued.setRolle("SB_Sued");
-            stadtbezirkRolleRepository.save(sendlingSued);
 
             restTestClient.get()
                     .uri("/projekt")
@@ -416,16 +395,6 @@ class ProjektIntegrationTest {
 
         @Test
         void givenStadtbezirkAscending_thenOrderByItsNummer() {
-            final StadtbezirkRolleEntity allachUntermenzingMitte = new StadtbezirkRolleEntity();
-            allachUntermenzingMitte.setStadtbezirk(Stadtbezirk.BEZIRK_23_ALLACH_UNTERMENZING);
-            allachUntermenzingMitte.setRolle("SB_Mitte");
-            stadtbezirkRolleRepository.save(allachUntermenzingMitte);
-
-            final StadtbezirkRolleEntity auHaidhausenMitte = new StadtbezirkRolleEntity();
-            auHaidhausenMitte.setStadtbezirk(Stadtbezirk.BEZIRK_05_AU_HAIDHAUSEN);
-            auHaidhausenMitte.setRolle("SB_Mitte");
-            stadtbezirkRolleRepository.save(auHaidhausenMitte);
-
             final ProjektAdresseEntity adresse0002 = new ProjektAdresseEntity();
             adresse0002.setAnzahlMahnungen(0);
             adresse0002.setSondernutzungErlaubt(false);
@@ -440,7 +409,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0002 = new ProjektEntity();
             projekt0002.setProjektnummer("2026-0002");
-            projekt0002.setStadtbezirk(Stadtbezirk.BEZIRK_23_ALLACH_UNTERMENZING);
+            projekt0002.setStadtbezirk(Stadtbezirk.BEZIRK_05_AU_HAIDHAUSEN);
             projekt0002.setAbrechnungBeginn(BEGINN);
             projekt0002.setAbrechnungEnde(ENDE);
             projekt0002.addAdresse(adresse0002);
@@ -460,7 +429,7 @@ class ProjektIntegrationTest {
 
             final ProjektEntity projekt0003 = new ProjektEntity();
             projekt0003.setProjektnummer("2026-0003");
-            projekt0003.setStadtbezirk(Stadtbezirk.BEZIRK_05_AU_HAIDHAUSEN);
+            projekt0003.setStadtbezirk(Stadtbezirk.BEZIRK_02_LUDWIGSVORSTADT_ISARVORSTADT);
             projekt0003.setAbrechnungBeginn(BEGINN);
             projekt0003.setAbrechnungEnde(ENDE);
             projekt0003.addAdresse(adresse0003);
@@ -789,11 +758,6 @@ class ProjektIntegrationTest {
 
         @Test
         void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
-            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
-            moosachNord.setRolle("SB_Nord");
-            stadtbezirkRolleRepository.save(moosachNord);
-
             restTestClient.get()
                     .uri("/projekt/{projektId}", projektId)
                     .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")

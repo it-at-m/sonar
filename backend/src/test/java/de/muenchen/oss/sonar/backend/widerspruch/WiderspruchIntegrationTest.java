@@ -17,8 +17,6 @@ import de.muenchen.oss.sonar.backend.projekt.ProjektAdresseEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
-import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleEntity;
-import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleRepository;
 import de.muenchen.oss.sonar.backend.widerspruch.dto.WiderspruchRequestDTO;
 import de.muenchen.oss.sonar.backend.widerspruch.dto.WiderspruchResponseDTO;
 import java.math.BigDecimal;
@@ -74,9 +72,6 @@ class WiderspruchIntegrationTest {
     @Autowired
     private ProjektRepository projektRepository;
 
-    @Autowired
-    private StadtbezirkRolleRepository stadtbezirkRolleRepository;
-
     private UUID projektId;
 
     private UUID abrechnungId;
@@ -86,12 +81,6 @@ class WiderspruchIntegrationTest {
         abrechnungRepository.deleteAll();
         widerspruchRepository.deleteAll();
         projektRepository.deleteAll();
-        stadtbezirkRolleRepository.deleteAll();
-
-        final StadtbezirkRolleEntity altstadtLehelMitte = new StadtbezirkRolleEntity();
-        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
-        altstadtLehelMitte.setRolle("SB_Mitte");
-        stadtbezirkRolleRepository.save(altstadtLehelMitte);
 
         final ProjektAdresseEntity projektAdresse = new ProjektAdresseEntity();
         projektAdresse.setAnzahlMahnungen(0);

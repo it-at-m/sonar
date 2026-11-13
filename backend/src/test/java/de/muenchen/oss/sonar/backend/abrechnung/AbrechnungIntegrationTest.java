@@ -21,8 +21,6 @@ import de.muenchen.oss.sonar.backend.projekt.ProjektAdresseEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
 import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
-import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleEntity;
-import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkRolleRepository;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -80,9 +78,6 @@ class AbrechnungIntegrationTest {
     private ProjektRepository projektRepository;
 
     @Autowired
-    private StadtbezirkRolleRepository stadtbezirkRolleRepository;
-
-    @Autowired
     private TransactionTemplate transactionTemplate;
 
     private UUID projektId;
@@ -95,12 +90,6 @@ class AbrechnungIntegrationTest {
                 .sorted(Comparator.comparing(AbrechnungEntity::getVersionsnummer).reversed())
                 .forEach(abrechnungRepository::delete);
         projektRepository.deleteAll();
-        stadtbezirkRolleRepository.deleteAll();
-
-        final StadtbezirkRolleEntity altstadtLehelMitte = new StadtbezirkRolleEntity();
-        altstadtLehelMitte.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
-        altstadtLehelMitte.setRolle("SB_Mitte");
-        stadtbezirkRolleRepository.save(altstadtLehelMitte);
 
         final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
         adresse.setAnzahlMahnungen(0);
@@ -585,11 +574,6 @@ class AbrechnungIntegrationTest {
 
         @Test
         void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
-            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
-            moosachNord.setRolle("SB_Nord");
-            stadtbezirkRolleRepository.save(moosachNord);
-
             restTestClient.get()
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
@@ -828,11 +812,6 @@ class AbrechnungIntegrationTest {
 
         @Test
         void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
-            final StadtbezirkRolleEntity moosachNord = new StadtbezirkRolleEntity();
-            moosachNord.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
-            moosachNord.setRolle("SB_Nord");
-            stadtbezirkRolleRepository.save(moosachNord);
-
             final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
