@@ -34,7 +34,7 @@ public class ProjektService {
     private final StadtbezirkService stadtbezirkService;
 
     @Transactional(readOnly = true)
-    public Page<Projekt> getAllProjekte(final int pageNumber, final int pageSize, final String projektnummer,
+    public Page<Projekt> getPermittedProjekte(final int pageNumber, final int pageSize, final String projektnummer,
             final LocalDate abrechnungBeginn, final LocalDate abrechnungEnde, final ProjektSortBy sortBy,
             final Sort.Direction direction) {
         final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde,

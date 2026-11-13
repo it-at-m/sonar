@@ -67,7 +67,7 @@ class ProjektServiceTest {
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of()));
 
-            unitUnderTest.getAllProjekte(0, 10, null, null, null, sortBy, direction);
+            unitUnderTest.getPermittedProjekte(0, 10, null, null, null, sortBy, direction);
 
             verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), pageRequestCaptor.capture());
             return pageRequestCaptor.getValue().getSort();
@@ -117,7 +117,7 @@ class ProjektServiceTest {
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest)))
                     .thenReturn(new PageImpl<>(projekte, pageRequest, projekte.size()));
 
-            final Page<Projekt> result = unitUnderTest.getAllProjekte(0, 10, null, null, null, null, null);
+            final Page<Projekt> result = unitUnderTest.getPermittedProjekte(0, 10, null, null, null, null, null);
 
             verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest));
             assertThat(result.getTotalElements()).isEqualTo(projekte.size());
@@ -151,7 +151,7 @@ class ProjektServiceTest {
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest)))
                     .thenReturn(new PageImpl<>(List.of(projektEntity), pageRequest, 1));
 
-            final Page<Projekt> result = unitUnderTest.getAllProjekte(2, 25, "2026-", BEGINN, ENDE, null, null);
+            final Page<Projekt> result = unitUnderTest.getPermittedProjekte(2, 25, "2026-", BEGINN, ENDE, null, null);
 
             verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest));
             assertThat(result.getContent()).hasSize(1);
