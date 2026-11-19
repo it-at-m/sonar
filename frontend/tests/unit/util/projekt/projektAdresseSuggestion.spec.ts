@@ -164,6 +164,14 @@ describe("projektAdresseSuggestion.ts", () => {
       expect(nutzungsobjekt.hausnummerBis).toBe("");
     });
 
+    it("givenSuggestion_thenMarkTheAdresseAsTakenOverFromTheProjekt", () => {
+      const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+
+      applyProjektAdresseSuggestion(nutzungsobjekt, suggestion());
+
+      expect(nutzungsobjekt.uebernahme).toEqual({ quelle: "PROJEKT" });
+    });
+
     it("givenSuggestion_thenKeepWhatTheProjektDoesNotKnow", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
       nutzungsobjekt.bemerkung = "Zweite Mahnung";

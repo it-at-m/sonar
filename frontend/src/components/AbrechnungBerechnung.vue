@@ -8,7 +8,6 @@
         id="berechnung-zeitraum-von"
         label="Zeitraum von"
         :model-value="abrechnung.zeitraumVon"
-        :readonly="readonly || undefined"
         :rules="[requiredRule]"
         @update:model-value="setZeitraumVon"
       />
@@ -21,7 +20,6 @@
         id="berechnung-zeitraum-bis"
         v-model="abrechnung.zeitraumBis"
         label="Zeitraum bis"
-        :readonly="readonly || undefined"
         :rules="[requiredRule]"
         :zeitraum-beginn="abrechnung.zeitraumVon"
         zeitraum-einheit="week"
@@ -108,7 +106,10 @@ import { computed, ref, watchEffect } from "vue";
 
 import AbrechnungNutzungsobjektPanel from "@/components/AbrechnungNutzungsobjektPanel.vue";
 import SonarDateField from "@/components/common/SonarDateField.vue";
-import { createAbrechnungNutzungsobjekt } from "@/util/abrechnung/abrechnungNutzungsobjektForm";
+import {
+  createAbrechnungNutzungsobjekt,
+  uebernommenesNutzungsobjektId,
+} from "@/util/abrechnung/abrechnungNutzungsobjektForm";
 import {
   alignPositionenToZeitraum,
   moveBeginneWithZeitraumVon,
@@ -165,7 +166,7 @@ function selectableNutzungsobjekte(index: number): NutzungsobjektSuggestion[] {
   const selectedByOtherEntries = new Set(
     abrechnung.value.nutzungsobjekte
       .filter((_, other) => other !== index)
-      .map((other) => other.uebernommenesNutzungsobjektId)
+      .map(uebernommenesNutzungsobjektId)
   );
   return nutzungsobjektSuggestions.filter(
     (suggestion) => !selectedByOtherEntries.has(suggestion.id)

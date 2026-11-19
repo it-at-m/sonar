@@ -1,5 +1,4 @@
-import type { Adresse } from "@/types/common/Adresse";
-import type { UnerlaubteNutzung } from "@/types/common/UnerlaubteNutzung";
+import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/AbrechnungNutzungsobjektForm";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import { ApiFactory } from "@/api/ApiFactory";
@@ -15,8 +14,9 @@ export async function fetchProjektAdresseSuggestions(
 }
 
 export function applyProjektAdresseSuggestion(
-  entry: Adresse & UnerlaubteNutzung,
+  nutzungsobjekt: AbrechnungNutzungsobjektForm,
   suggestion: ProjektAdresseSuggestion
 ): void {
-  Object.assign(entry, suggestion);
+  Object.assign(nutzungsobjekt, suggestion);
+  nutzungsobjekt.uebernahme = { quelle: "PROJEKT" };
 }

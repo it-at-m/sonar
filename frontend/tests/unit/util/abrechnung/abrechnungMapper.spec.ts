@@ -435,8 +435,10 @@ describe("abrechnungMapper.ts", () => {
         AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
 
       const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
-      nutzungsobjekt.uebernommenesNutzungsobjektId =
-        "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d";
+      nutzungsobjekt.uebernahme = {
+        quelle: "NUTZUNGSOBJEKT",
+        nutzungsobjektId: "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d",
+      };
       nutzungsobjekt.adresse = "Marienplatz";
       nutzungsobjekt.hausnummerVon = "8";
 
@@ -519,7 +521,7 @@ describe("abrechnungMapper.ts", () => {
       expect(nutzungsobjekt.tageUnerlaubteNutzung).toBe(10);
       expect(nutzungsobjekt.bemerkung).toBe("Erste Fassung");
       expect(nutzungsobjekt.aufschlag50prozent).toBe(true);
-      expect(nutzungsobjekt.uebernommenesNutzungsobjektId).toBeNull();
+      expect(nutzungsobjekt.uebernahme).toBeNull();
 
       const position = itemAt(nutzungsobjekt.positionen);
       expect(position.beginn).toBe("2026-01-01");

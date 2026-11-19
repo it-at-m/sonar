@@ -65,7 +65,7 @@ public class ProjektController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate abrechnungEnde,
             @RequestParam(defaultValue = "PROJEKTNUMMER") final ProjektSortBy sortBy,
             @RequestParam(defaultValue = "DESC") final Sort.Direction sortDirection) {
-        return projektService.getAllProjekte(pageNumber, pageSize, projektnummer, abrechnungBeginn, abrechnungEnde, sortBy, sortDirection)
+        return projektService.getPermittedProjekte(pageNumber, pageSize, projektnummer, abrechnungBeginn, abrechnungEnde, sortBy, sortDirection)
                 .map(projektDTOMapper::toDTO);
     }
 

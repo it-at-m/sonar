@@ -18,6 +18,16 @@ function fieldsFor(art: ProjektAdresseRequestDTOArtEnum) {
   });
 }
 
+function disabledOfEveryField(
+  wrapper: ReturnType<typeof fieldsFor>
+): unknown[] {
+  return [
+    wrapper.findComponent({ name: "v-radio-group" }),
+    ...wrapper.findAllComponents({ name: "v-text-field" }),
+    wrapper.findComponent({ name: "v-select" }),
+  ].map((field) => field.props("disabled"));
+}
+
 function labelsFor(
   art: ProjektAdresseRequestDTOArtEnum
 ): (string | undefined)[] {
@@ -134,6 +144,44 @@ describe("AdresseFields.vue", () => {
       "adresse-0-adresse",
       "adresse-0-hausnummer-von",
       "adresse-0-hausnummer-bis",
+    ]);
+  });
+
+  it("givenDisabled_thenDisableEveryField", () => {
+    const wrapper = shallowMount(AdresseFields, {
+      props: {
+        modelValue: createProjektAdresse(),
+        idPrefix: "adresse-0",
+        disabled: true,
+      },
+      global: { renderStubDefaultSlot: true },
+    });
+
+    expect(disabledOfEveryField(wrapper)).toStrictEqual([
+      true,
+      true,
+      true,
+      true,
+      true,
+    ]);
+  });
+
+  it("givenNotDisabled_thenLeaveEveryFieldToTheForm", () => {
+    const wrapper = shallowMount(AdresseFields, {
+      props: {
+        modelValue: createProjektAdresse(),
+        idPrefix: "adresse-0",
+        disabled: false,
+      },
+      global: { renderStubDefaultSlot: true },
+    });
+
+    expect(disabledOfEveryField(wrapper)).toStrictEqual([
+      null,
+      null,
+      null,
+      null,
+      null,
     ]);
   });
 });

@@ -25,7 +25,6 @@
                 :aria-label="`Beginn der Position ${index + 1}`"
                 density="compact"
                 :disabled="(!readonly && index === 0) || undefined"
-                :readonly="readonly || undefined"
                 :rules="beginnRules(index)"
               />
             </td>
@@ -36,7 +35,6 @@
                 :aria-label="`Ende der Position ${index + 1}`"
                 density="compact"
                 :disabled="!readonly || undefined"
-                :readonly="readonly || undefined"
               />
             </td>
             <td>
@@ -72,7 +70,7 @@
                 :aria-label="`Fläche der Position ${index + 1}`"
                 control-variant="hidden"
                 density="compact"
-                :disabled="hasLaengeUndBreite(position)"
+                :disabled="hasLaengeUndBreite(position) || undefined"
                 :precision="2"
                 :rules="[requiredRule, greaterThanZeroRule]"
                 :title="

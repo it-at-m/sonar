@@ -41,10 +41,14 @@
       indeterminate
     />
 
-    <!-- readonly on the form reaches every input, on the tabs it hides the buttons of the Berechnung. -->
+    <!--
+      disabled on the form reaches every input whose own disabled is undefined. An explicit false
+      would unlock the input again, so the components inside pass "|| undefined".
+      readonly on the tabs hides the buttons of the Berechnung.
+    -->
     <v-form
       v-else
-      readonly
+      disabled
     >
       <abrechnung-tabs
         v-model="abrechnung"

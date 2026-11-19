@@ -232,16 +232,10 @@ describe("SonarDateField.vue", () => {
     );
   });
 
-  it("givenReadonly_thenMakeTheCalendarInert", () => {
-    const wrapper = mountField({ modelValue: "", readonly: true });
+  it("givenDisabled_thenPassItOnToTheDateInput", () => {
+    const wrapper = mountField({ modelValue: "", disabled: true });
 
-    expect(dateInput(wrapper).props("pickerProps")).toEqual({ disabled: true });
-  });
-
-  it("givenNoReadonly_thenLeaveTheCalendarToTheForm", () => {
-    expect(
-      dateInput(mountField({ modelValue: "" })).props("pickerProps")
-    ).toBeUndefined();
+    expect(dateInput(wrapper).props("disabled")).toBe(true);
   });
 
   it("givenAnyField_thenKeepTheCalendarIconInsideIt", () => {

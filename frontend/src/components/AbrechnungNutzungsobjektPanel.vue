@@ -69,33 +69,33 @@
           :id="`${idPrefix}-uebernahme-aufheben`"
           :prepend-icon="mdiLinkVariantOff"
           variant="text"
-          @click="nutzungsobjekt.uebernommenesNutzungsobjektId = null"
+          @click="nutzungsobjekt.uebernahme = null"
         >
           Übernahme aufheben
         </v-btn>
       </div>
 
       <v-alert
-        v-if="uebernommen && !readonly"
+        v-if="nutzungsobjekt.uebernahme && !readonly"
         class="mb-4"
         density="compact"
-        text="Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung."
+        :text="UEBERNAHME_HINWEISE[nutzungsobjekt.uebernahme.quelle]"
         type="info"
         variant="tonal"
       />
 
       <adresse-fields
+        :disabled="uebernommen"
         :id-prefix="idPrefix"
         :model-value="nutzungsobjekt"
-        :readonly="uebernommen"
       >
         <template #after-nutzung>
           <v-checkbox
             :id="`${idPrefix}-aufschlag50prozent`"
             v-model="nutzungsobjekt.aufschlag50prozent"
+            :disabled="uebernommen || undefined"
             hide-details
             label="Aufschlag 50 %"
-            :readonly="uebernommen"
           />
         </template>
       </adresse-fields>
@@ -119,9 +119,9 @@
       />
 
       <unerlaubte-nutzung-fields
+        :disabled="uebernommen"
         :id-prefix="idPrefix"
         :model-value="nutzungsobjekt"
-        :readonly="uebernommen"
       />
 
       <v-row>
@@ -131,9 +131,9 @@
             v-model="nutzungsobjekt.bemerkung"
             auto-grow
             counter
+            :disabled="uebernommen || undefined"
             label="Bemerkung"
             maxlength="10000"
-            :readonly="uebernommen"
             rows="2"
           />
         </v-col>
@@ -145,6 +145,7 @@
 <script setup lang="ts">
 import type { AbrechnungNutzungsobjektForm } from "@/types/abrechnung/AbrechnungNutzungsobjektForm";
 import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
+import type { Uebernahme } from "@/types/abrechnung/Uebernahme";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
 import {
@@ -178,9 +179,14 @@ const { nutzungsobjektSuggestions = [], readonly = false } = defineProps<{
 
 const emit = defineEmits<{ remove: [] }>();
 
-const uebernommen = computed(
-  () => nutzungsobjekt.value.uebernommenesNutzungsobjektId !== null
-);
+const UEBERNAHME_HINWEISE: Record<Uebernahme["quelle"], string> = {
+  PROJEKT:
+    "Die Daten stammen aus dem Projekt und lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung.",
+  NUTZUNGSOBJEKT:
+    "Das Nutzungsobjekt gehört auch zu anderen Abrechnungen. Seine Daten lassen sich hier nicht ändern, nur die Positionen und Masten gehören zu dieser Abrechnung.",
+};
+
+const uebernommen = computed(() => nutzungsobjekt.value.uebernahme !== null);
 
 /**
  * Counted over both tables, because a Nutzungsobjekt has to keep either a Position or a Mast. The
