@@ -4,7 +4,7 @@ info:
   description: Mocked subset of the sonar-rpc-client API.
   version: 0.0.1-SNAPSHOT
 servers:
-- url: http://localhost:8086
+- url: http://localhost:8089
   description: Generated server url
 paths:
   /api/koopr/projects/{projectNumber}:
