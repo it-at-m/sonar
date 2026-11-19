@@ -1,0 +1,18 @@
+{
+  "priority": 10,
+  "request": {
+    "method": "GET",
+    "urlPathPattern": "/api/(kookv|koopr)/projects/[^/]+"
+  },
+  "response": {
+    "status": 404,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "status": 404,
+      "error": "Not Found",
+      "message": "Project not found"
+    }
+  }
+}
