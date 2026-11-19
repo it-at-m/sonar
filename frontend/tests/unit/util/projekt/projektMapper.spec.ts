@@ -6,6 +6,7 @@ import { describe, expect, it } from "vitest";
 import {
   ProjektAdresseRequestDTOArtEnum,
   ProjektAdresseRequestDTONutzungenEnum,
+  ProjektRequestDTOStadtbezirkEnum,
 } from "@/api/generated/sonar-backend";
 import { createProjektAdresse } from "@/util/projekt/projektAdresseForm";
 import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
@@ -19,6 +20,7 @@ function adresseWith(
 function projektWith(overrides: Partial<ProjektForm>): ProjektForm {
   return {
     projektnummer: "2026-0001",
+    stadtbezirk: ProjektRequestDTOStadtbezirkEnum.BEZIRK_01_ALTSTADT_LEHEL,
     abrechnungBeginn: "2026-01-01",
     abrechnungEnde: "2026-03-31",
     adressen: [adresseWith({ adresse: "Marienplatz", hausnummerVon: "8" })],
@@ -75,6 +77,24 @@ describe("projektMapper.ts", () => {
       );
       expect(itemAt(dto.adressen).anzahlMahnungen).toBe(2);
       expect(itemAt(dto.adressen).sondernutzungErlaubt).toBe(true);
+    });
+
+    it("givenStadtbezirk_thenSendIt", () => {
+      const projekt = projektWith({
+        stadtbezirk: ProjektRequestDTOStadtbezirkEnum.BEZIRK_06_SENDLING,
+      });
+
+      const dto = toProjektRequestDTO(projekt);
+
+      expect(dto.stadtbezirk).toBe(
+        ProjektRequestDTOStadtbezirkEnum.BEZIRK_06_SENDLING
+      );
+    });
+
+    it("givenNoStadtbezirk_thenThrow", () => {
+      const projekt = projektWith({ stadtbezirk: null });
+
+      expect(() => toProjektRequestDTO(projekt)).toThrow();
     });
 
     it("givenSeveralNutzungen_thenSendAllOfThem", () => {

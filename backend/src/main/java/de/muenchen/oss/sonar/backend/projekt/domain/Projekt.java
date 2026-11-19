@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.projekt.domain;
 
 import de.muenchen.oss.sonar.backend.common.Zeitraum;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
@@ -10,6 +11,7 @@ import java.util.UUID;
 public record Projekt(
         UUID id,
         String projektnummer,
+        Stadtbezirk stadtbezirk,
         LocalDate abrechnungBeginn,
         LocalDate abrechnungEnde,
         BigDecimal verwaltungsgebuehr,

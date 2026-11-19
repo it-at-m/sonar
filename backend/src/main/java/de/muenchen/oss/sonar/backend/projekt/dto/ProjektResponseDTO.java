@@ -1,5 +1,6 @@
 package de.muenchen.oss.sonar.backend.projekt.dto;
 
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
@@ -7,6 +8,7 @@ import java.util.UUID;
 public record ProjektResponseDTO(
         UUID id,
         String projektnummer,
+        Stadtbezirk stadtbezirk,
         LocalDate abrechnungBeginn,
         LocalDate abrechnungEnde,
         List<ProjektAdresseResponseDTO> adressen) {
