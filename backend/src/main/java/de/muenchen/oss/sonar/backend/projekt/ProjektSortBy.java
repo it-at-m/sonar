@@ -8,6 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ProjektSortBy {
 
     PROJEKTNUMMER("projektnummer"),
+    STADTBEZIRK("stadtbezirk"),
     ABRECHNUNG_BEGINN("abrechnungBeginn"),
     ABRECHNUNG_ENDE("abrechnungEnde");
 

@@ -173,6 +173,19 @@ describe("WiderspruchAnlegenView.vue", () => {
     );
   });
 
+  it("givenAbrechnungOfAProjektOutsideTheStadtbezirkeOfTheUser_thenReportTheMissingZustaendigkeit", async () => {
+    stubFetch(403);
+    const wrapper = mountView();
+
+    await fillDatumEingang(wrapper, new Date(2026, 3, 1));
+    await submit(wrapper);
+
+    expect(useSnackbarStore().queue[0]?.text).toBe(
+      "Sie sind für den Stadtbezirk dieses Projekts nicht zuständig."
+    );
+    expect(push).not.toHaveBeenCalled();
+  });
+
   it("givenAbbrechenClicked_thenReturnToTheAbrechnungenWithoutSaving", async () => {
     const fetchSpy = stubFetch();
     const wrapper = mountView();
