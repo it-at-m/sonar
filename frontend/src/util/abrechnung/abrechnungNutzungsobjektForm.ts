@@ -10,7 +10,8 @@ import { hasUnerlaubteNutzung } from "@/util/common/unerlaubteNutzungForm";
 
 export function createAbrechnungNutzungsobjekt(): AbrechnungNutzungsobjektForm {
   return {
-    id: crypto.randomUUID(),
+    key: crypto.randomUUID(),
+    id: null,
     uebernahme: null,
     art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
     adresse: "",

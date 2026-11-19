@@ -11,7 +11,8 @@ const HUNDREDTHS_PER_UNIT = 100;
 
 export function createAbrechnungPosition(): AbrechnungPositionForm {
   return {
-    id: crypto.randomUUID(),
+    key: crypto.randomUUID(),
+    id: null,
     beginn: "",
     ende: "",
     laenge: null,

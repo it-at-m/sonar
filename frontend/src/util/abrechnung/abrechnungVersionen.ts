@@ -15,6 +15,9 @@ export async function fetchAbrechnungVersionen(
 }
 
 export function abrechnungVersionLabel(version: AbrechnungVersion): string {
+  if (version.entwurf) {
+    return `Version ${version.versionsnummer} (Entwurf)`;
+  }
   return version.aktuell
     ? `Version ${version.versionsnummer} (aktuell)`
     : `Version ${version.versionsnummer}`;

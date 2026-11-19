@@ -1,13 +1,15 @@
 <template>
   <v-menu @update:model-value="onMenuToggled">
     <template #activator="{ props: activatorProps }">
-      <v-btn
+      <v-chip
         v-bind="activatorProps"
         aria-label="Versionen der Abrechnung anzeigen"
-        density="comfortable"
-        :icon="mdiEye"
-        variant="text"
-      />
+        :append-icon="mdiMenuDown"
+        :prepend-icon="entwurf ? mdiPencil : mdiEye"
+        size="small"
+      >
+        {{ abrechnungStatusLabel(entwurf) }}
+      </v-chip>
     </template>
 
     <v-list>
@@ -35,7 +37,7 @@
           v-for="version in versionen"
           :key="version.id"
           :title="abrechnungVersionLabel(version)"
-          :to="`/projekte/${projektId}/abrechnungen/${version.id}/ansehen`"
+          :to="versionLink(version)"
         />
       </template>
     </v-list>
@@ -45,20 +47,31 @@
 <script setup lang="ts">
 import type { AbrechnungVersion } from "@/types/abrechnung/AbrechnungVersion";
 
-import { mdiEye } from "@mdi/js";
+import { mdiEye, mdiMenuDown, mdiPencil } from "@mdi/js";
 import { ref } from "vue";
 
+import { abrechnungStatusLabel } from "@/util/abrechnung/abrechnungStatus";
 import {
   abrechnungVersionLabel,
   fetchAbrechnungVersionen,
 } from "@/util/abrechnung/abrechnungVersionen";
 
-const { abrechnungId, projektId } = defineProps<{
+const {
+  abrechnungId,
+  projektId,
+  entwurf = false,
+} = defineProps<{
   projektId: string;
   abrechnungId: string;
+  entwurf?: boolean;
 }>();
 
 const versionen = ref<AbrechnungVersion[]>();
+
+function versionLink(version: AbrechnungVersion): string {
+  const ziel = version.entwurf ? "bearbeiten" : "ansehen";
+  return `/projekte/${projektId}/abrechnungen/${version.id}/${ziel}`;
+}
 
 /**
  * The versions are loaded when the menu opens and not when it mounts. That way the requests do not

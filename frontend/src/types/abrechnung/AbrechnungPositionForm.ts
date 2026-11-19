@@ -1,5 +1,6 @@
 export interface AbrechnungPositionForm {
-  id: string;
+  key: string;
+  id: string | null;
   beginn: string;
   ende: string;
   laenge: number | null;

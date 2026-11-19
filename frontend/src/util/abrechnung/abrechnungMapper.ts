@@ -52,7 +52,8 @@ function toNutzungsobjektRequestDTO(
   nutzungsobjekt: AbrechnungNutzungsobjektForm
 ): AbrechnungNutzungsobjektRequestDTO {
   return {
-    id: uebernommenesNutzungsobjektId(nutzungsobjekt),
+    id: nutzungsobjekt.id ?? undefined,
+    takenOverId: uebernommenesNutzungsobjektId(nutzungsobjekt),
     ...toAdresseRequestFields(nutzungsobjekt),
     ...toUnerlaubteNutzungRequestFields(nutzungsobjekt),
     bemerkung: nutzungsobjekt.bemerkung.trim() || undefined,
@@ -90,7 +91,8 @@ function toNutzungsobjektForm(
   nutzungsobjekt: AbrechnungNutzungsobjektResponseDTO
 ): AbrechnungNutzungsobjektForm {
   return {
-    id: crypto.randomUUID(),
+    key: crypto.randomUUID(),
+    id: null,
     uebernahme: null,
     art: nutzungsobjekt.art ?? ProjektAdresseRequestDTOArtEnum.ADRESSE,
     adresse: nutzungsobjekt.adresse ?? "",
@@ -114,7 +116,8 @@ function toPositionForm(
   position: AbrechnungPositionResponseDTO
 ): AbrechnungPositionForm {
   return {
-    id: crypto.randomUUID(),
+    key: crypto.randomUUID(),
+    id: null,
     beginn: toIsoDateString(position.beginn),
     ende: toIsoDateString(position.ende),
     laenge: position.laenge ?? null,
@@ -125,7 +128,8 @@ function toPositionForm(
 
 function toMastForm(mast: AbrechnungMastResponseDTO): AbrechnungMastForm {
   return {
-    id: crypto.randomUUID(),
+    key: crypto.randomUUID(),
+    id: null,
     beginn: toIsoDateString(mast.beginn),
     ende: toIsoDateString(mast.ende),
   };
@@ -135,6 +139,7 @@ function toPositionRequestDTO(
   position: AbrechnungPositionForm
 ): AbrechnungPositionRequestDTO {
   return {
+    id: position.id ?? undefined,
     beginn: new Date(position.beginn),
     ende: new Date(position.ende),
     laenge: position.laenge ?? undefined,
@@ -147,7 +152,38 @@ function toPositionRequestDTO(
 
 function toMastRequestDTO(mast: AbrechnungMastForm): AbrechnungMastRequestDTO {
   return {
+    id: mast.id ?? undefined,
     beginn: new Date(mast.beginn),
     ende: new Date(mast.ende),
   };
+}
+
+export function rememberSavedIds(
+  abrechnung: AbrechnungForm,
+  gespeicherteAbrechnung: AbrechnungResponseDTO
+): void {
+  abrechnung.nutzungsobjekte.forEach((nutzungsobjekt, nutzungsobjektIndex) => {
+    const gespeichertesNutzungsobjekt =
+      gespeicherteAbrechnung.nutzungsobjekte?.[nutzungsobjektIndex];
+    const gespeicherteId = gespeichertesNutzungsobjekt?.id;
+    if (
+      gespeicherteId !== undefined &&
+      !gespeichertesNutzungsobjekt?.changeable
+    ) {
+      nutzungsobjekt.id = null;
+      nutzungsobjekt.uebernahme = {
+        quelle: "NUTZUNGSOBJEKT",
+        nutzungsobjektId: gespeicherteId,
+      };
+    } else {
+      nutzungsobjekt.id = gespeicherteId ?? null;
+    }
+    nutzungsobjekt.positionen.forEach((position, positionIndex) => {
+      position.id =
+        gespeichertesNutzungsobjekt?.positionen?.[positionIndex]?.id ?? null;
+    });
+    nutzungsobjekt.masten.forEach((mast, mastIndex) => {
+      mast.id = gespeichertesNutzungsobjekt?.masten?.[mastIndex]?.id ?? null;
+    });
+  });
 }

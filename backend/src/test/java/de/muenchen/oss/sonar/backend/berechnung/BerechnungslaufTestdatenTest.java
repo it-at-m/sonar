@@ -75,7 +75,7 @@ class BerechnungslaufTestdatenTest {
     }
 
     private static Abrechnung toAbrechnung(final JsonNode input) {
-        return new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
+        return new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, false, "1000000001", false, null, null,
                 zeitraumVon(input), abrechnungsdatum(input), AbrechnungsArt.ENDABRECHNUNG, null, false,
                 toNutzungsobjekte(input));
     }
@@ -123,7 +123,7 @@ class BerechnungslaufTestdatenTest {
         final int letztesLeerzeichen = adressname.lastIndexOf(' ');
         final String strasse = letztesLeerzeichen < 0 ? adressname : adressname.substring(0, letztesLeerzeichen);
         final String hausnummer = letztesLeerzeichen < 0 ? null : adressname.substring(letztesLeerzeichen + 1);
-        return new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE, strasse, hausnummer,
+        return new AbrechnungNutzungsobjekt(UUID.randomUUID(), false, Adressart.ADRESSE, strasse, hausnummer,
                 null, null, null, null, null, null, null, null, null, aufschlag50prozent, positionen, masten);
     }
 

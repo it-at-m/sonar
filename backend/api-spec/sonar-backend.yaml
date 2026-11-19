@@ -484,7 +484,8 @@ paths:
          Any version may be requested and the answer is always the whole chain, so a user who opened an
          old version still gets the full list.
          The entries are ordered by descending Versionsnummer, so the newest version comes first.
-         An entry carries only what a version list needs, the UUID and the Versionsnummer.
+         An entry carries only what a version list needs: the UUID, the Versionsnummer and whether the
+         version is a draft.
       operationId: getAbrechnungVersionen
       parameters:
       - name: projektId
@@ -1662,6 +1663,8 @@ components:
         versionsnummer:
           type: integer
           format: int32
+        draft:
+          type: boolean
     NutzungsobjektResponseDTO:
       type: object
       properties:

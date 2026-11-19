@@ -31,11 +31,11 @@ class AbrechnungEntityMapperTest {
         void givenAbrechnung_thenDropTheIdAndLeaveTheChildrenToTheService() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null,
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null, false,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
             final UUID projektId = UUID.randomUUID();
-            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), projektId, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), projektId, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final AbrechnungEntity result = abrechnungEntityMapper.toEntity(abrechnung);
@@ -53,10 +53,10 @@ class AbrechnungEntityMapperTest {
         void givenAbrechnung_thenLeaveThePlaceInTheChainOfVersionsUnset() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null,
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(null, false,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 3, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 3, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final AbrechnungEntity result = abrechnungEntityMapper.toEntity(abrechnung);
@@ -69,7 +69,7 @@ class AbrechnungEntityMapperTest {
         void givenNutzungsobjekt_thenDropTheIdAndMoveTheAdressdatenIntoTheEmbeddable() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
 
@@ -126,7 +126,7 @@ class AbrechnungEntityMapperTest {
 
             final AbrechnungMast mast = new AbrechnungMast(UUID.randomUUID(), VON, BIS);
 
-            final AbrechnungNutzungsobjekt result = abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjektEntity, List.of(),
+            final AbrechnungNutzungsobjekt result = abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjektEntity, true, List.of(),
                     List.of(mast));
 
             assertThat(result.positionen()).isEmpty();
@@ -154,7 +154,7 @@ class AbrechnungEntityMapperTest {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
 
-            final AbrechnungNutzungsobjekt result = abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjektEntity, List.of(position), List.of());
+            final AbrechnungNutzungsobjekt result = abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjektEntity, true, List.of(position), List.of());
 
             assertThat(result.id()).isEqualTo(nutzungsobjektId);
             assertThat(result.art()).isEqualTo(Adressart.ADRESSE);
@@ -175,7 +175,7 @@ class AbrechnungEntityMapperTest {
             nutzungsobjektEntity.getAdressdaten().setArt(Adressart.ADRESSE);
             nutzungsobjektEntity.getAdressdaten().setAdresse("Marienplatz");
 
-            final AbrechnungNutzungsobjekt result = abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjektEntity, List.of(), List.of());
+            final AbrechnungNutzungsobjekt result = abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjektEntity, true, List.of(), List.of());
 
             assertThat(result.adresse()).isEqualTo("Marienplatz");
             assertThat(result.positionen()).isEmpty();
@@ -201,7 +201,7 @@ class AbrechnungEntityMapperTest {
 
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
 

@@ -140,7 +140,8 @@ public class AbrechnungController {
      * Any version may be requested and the answer is always the whole chain, so a user who opened an
      * old version still gets the full list.
      * The entries are ordered by descending Versionsnummer, so the newest version comes first.
-     * An entry carries only what a version list needs, the UUID and the Versionsnummer.
+     * An entry carries only what a version list needs: the UUID, the Versionsnummer and whether the
+     * version is a draft.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungId the UUID of any version of the Abrechnung

@@ -32,9 +32,9 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -55,9 +55,9 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -74,9 +74,9 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -94,9 +94,9 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -113,13 +113,13 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition ohneMast = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt ueberspannt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(mitMast),
                     List.of(new AbrechnungMast(null, VON, BIS)));
             final AbrechnungNutzungsobjekt nurFlaeche = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null, null,
                     null, null, null, null, false, List.of(ohneMast), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(ueberspannt, nurFlaeche));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -138,12 +138,12 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition zweiteWoche = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 14),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt frueh = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(ersteWoche), List.of());
             final AbrechnungNutzungsobjekt spaet = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, null, null,
                     null, null, null, null, false, List.of(zweiteWoche), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(frueh, spaet));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -160,9 +160,9 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 12, 31),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -178,10 +178,10 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position),
                     List.of(new AbrechnungMast(null, VON, LocalDate.of(2026, 12, 31))));
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -196,9 +196,9 @@ class BerechnungsergebnisServiceTest {
         void givenNutzungsobjektWithoutPosition_thenChargeNoFlaeche() {
             final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
@@ -216,9 +216,9 @@ class BerechnungsergebnisServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(null, null, 1, null, false, "1000000001", false, null, null,
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(

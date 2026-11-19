@@ -15,7 +15,7 @@
         <tbody>
           <tr
             v-for="(position, index) in positionen"
-            :key="position.id"
+            :key="position.key"
           >
             <td>
               <sonar-date-field

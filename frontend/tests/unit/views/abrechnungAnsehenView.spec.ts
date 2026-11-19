@@ -349,6 +349,63 @@ describe("AbrechnungAnsehenView.vue", () => {
     );
   });
 
+  it("givenEntwurf_thenOfferToBearbeitenIt", async () => {
+    const entwurf: AbrechnungResponseDTO = {
+      id: ZWEITE_VERSION_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 2,
+      draft: true,
+      geschaeftspartnerId: "1000000001",
+      zustellungsbevollmaechtigterGenutzt: false,
+      zeitraumVon: new Date("2026-01-01"),
+      zeitraumBis: new Date("2026-03-31"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      widerspruchVorhanden: false,
+      neuereVersionVorhanden: false,
+      nutzungsobjekte: [],
+    };
+    const { wrapper } = await mountView(
+      stubFetch(entwurf, [
+        { id: ZWEITE_VERSION_ID, versionsnummer: 2 },
+        { id: ERSTE_VERSION_ID, versionsnummer: 1 },
+      ]),
+      ZWEITE_VERSION_ID
+    );
+
+    const bearbeiten = wrapper
+      .findAllComponents({ name: "VBtn" })
+      .find((button) => button.text() === "Entwurf bearbeiten");
+
+    expect(bearbeiten?.props("to")).toBe(
+      `/projekte/${PROJEKT_ID}/abrechnungen/${ZWEITE_VERSION_ID}/bearbeiten`
+    );
+  });
+
+  it("givenFinalizedAbrechnung_thenOfferNoBearbeitung", async () => {
+    const abgeschlosseneAbrechnung: AbrechnungResponseDTO = {
+      id: ERSTE_VERSION_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 1,
+      draft: false,
+      geschaeftspartnerId: "1000000001",
+      zustellungsbevollmaechtigterGenutzt: false,
+      zeitraumVon: new Date("2026-01-01"),
+      zeitraumBis: new Date("2026-03-31"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      widerspruchVorhanden: false,
+      neuereVersionVorhanden: false,
+      nutzungsobjekte: [],
+    };
+    const { wrapper } = await mountView(
+      stubFetch(abgeschlosseneAbrechnung, [
+        { id: ERSTE_VERSION_ID, versionsnummer: 1 },
+      ]),
+      ERSTE_VERSION_ID
+    );
+
+    expect(wrapper.text()).not.toContain("Entwurf bearbeiten");
+  });
+
   it("givenFailingAbrechnungRequest_thenReportItAndReturnToTheAbrechnungen", async () => {
     const fetchSpy = vi.fn().mockRejectedValue(new Error("offline"));
     vi.stubGlobal("fetch", fetchSpy);

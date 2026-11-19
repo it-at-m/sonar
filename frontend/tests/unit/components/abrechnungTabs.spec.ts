@@ -58,7 +58,7 @@ describe("AbrechnungTabs.vue", () => {
       abrechnungsArt: null,
       nutzungsobjekte: [
         {
-          id: "nutzungsobjekt-0",
+          key: "nutzungsobjekt-0",
           art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
           adresse: "",
           hausnummerVon: "",
@@ -94,7 +94,7 @@ describe("AbrechnungTabs.vue", () => {
       abrechnungsArt: null,
       nutzungsobjekte: [
         {
-          id: "nutzungsobjekt-0",
+          key: "nutzungsobjekt-0",
           art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
           adresse: "",
           hausnummerVon: "",
@@ -130,7 +130,7 @@ describe("AbrechnungTabs.vue", () => {
       abrechnungsArt: null,
       nutzungsobjekte: [
         {
-          id: "nutzungsobjekt-0",
+          key: "nutzungsobjekt-0",
           art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
           adresse: "Musterstraße",
           hausnummerVon: "1",
@@ -147,7 +147,7 @@ describe("AbrechnungTabs.vue", () => {
           masten: [],
         },
         {
-          id: "nutzungsobjekt-1",
+          key: "nutzungsobjekt-1",
           art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
           adresse: "",
           hausnummerVon: "",
@@ -185,7 +185,7 @@ describe("AbrechnungTabs.vue", () => {
         abrechnungsArt: null,
         nutzungsobjekte: [
           {
-            id: "nutzungsobjekt-0",
+            key: "nutzungsobjekt-0",
             art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
             adresse: "",
             hausnummerVon: "",
@@ -225,7 +225,7 @@ describe("AbrechnungTabs.vue", () => {
         abrechnungsArt: null,
         nutzungsobjekte: [
           {
-            id: "nutzungsobjekt-0",
+            key: "nutzungsobjekt-0",
             art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
             adresse: "",
             hausnummerVon: "",

@@ -32,6 +32,18 @@ describe("abrechnungVersionMapper.ts", () => {
       ]);
     });
 
+    it("givenDraft_thenMarkOnlyItAsEntwurf", () => {
+      const versionen = toAbrechnungVersionen([
+        { id: "id-2", versionsnummer: 2, draft: true },
+        { id: "id-1", versionsnummer: 1, draft: false },
+      ]);
+
+      expect(versionen.map((version) => version.entwurf)).toEqual([
+        true,
+        false,
+      ]);
+    });
+
     it("givenVersionWithoutId_thenDropItBecauseItLeadsNowhere", () => {
       const versionen = toAbrechnungVersionen([
         { id: "id-1", versionsnummer: 1 },

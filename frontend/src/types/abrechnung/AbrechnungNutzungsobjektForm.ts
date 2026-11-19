@@ -6,7 +6,8 @@ import type { UnerlaubteNutzung } from "@/types/common/UnerlaubteNutzung";
 
 export interface AbrechnungNutzungsobjektForm
   extends Adresse, UnerlaubteNutzung {
-  id: string;
+  key: string;
+  id: string | null;
   uebernahme: Uebernahme | null;
   bemerkung: string;
   aufschlag50prozent: boolean;

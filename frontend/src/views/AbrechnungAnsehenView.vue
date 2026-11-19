@@ -14,6 +14,14 @@
         {{ title }}
       </h1>
       <v-spacer />
+      <v-btn
+        v-if="angezeigteAbrechnung?.draft"
+        color="primary"
+        :prepend-icon="mdiPencil"
+        :to="`/projekte/${projektId}/abrechnungen/${abrechnungId}/bearbeiten`"
+      >
+        Entwurf bearbeiten
+      </v-btn>
       <v-select
         v-if="versionen.length > 1"
         id="abrechnung-version"
@@ -62,7 +70,7 @@
 import type { AbrechnungResponseDTO } from "@/api/generated/sonar-backend";
 import type { AbrechnungVersion } from "@/types/abrechnung/AbrechnungVersion";
 
-import { mdiArrowLeft } from "@mdi/js";
+import { mdiArrowLeft, mdiPencil } from "@mdi/js";
 import { computed, ref, watch } from "vue";
 import { useRouter } from "vue-router";
 

@@ -149,13 +149,22 @@ describe("nutzungsobjektSuggestion.ts", () => {
 
     it("givenSuggestion_thenKeepTheEntryAndItsPositionen", () => {
       const nutzungsobjekt = createAbrechnungNutzungsobjekt();
-      const entryId = nutzungsobjekt.id;
+      const entryKey = nutzungsobjekt.key;
       const positionen = nutzungsobjekt.positionen;
 
       applyNutzungsobjektSuggestion(nutzungsobjekt, suggestion());
 
-      expect(nutzungsobjekt.id).toBe(entryId);
+      expect(nutzungsobjekt.key).toBe(entryKey);
       expect(nutzungsobjekt.positionen).toBe(positionen);
+    });
+
+    it("givenEntryWithItsOwnSavedNutzungsobjekt_thenForgetItsId", () => {
+      const nutzungsobjekt = createAbrechnungNutzungsobjekt();
+      nutzungsobjekt.id = "123e4567-e89b-12d3-a456-426614174031";
+
+      applyNutzungsobjektSuggestion(nutzungsobjekt, suggestion());
+
+      expect(nutzungsobjekt.id).toBeNull();
     });
   });
 });

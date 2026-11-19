@@ -139,6 +139,25 @@ describe("abrechnungForm.ts", () => {
 
       expect(isDirty()).toBe(true);
     });
+
+    it("givenEntriesSavedAsEntwurf_thenReturnFalse", () => {
+      const { abrechnung, isDirty, markSaved } = useAbrechnungForm();
+      abrechnung.value.geschaeftspartnerId = "1000000001";
+
+      markSaved();
+
+      expect(isDirty()).toBe(false);
+    });
+
+    it("givenEntryAfterSavingAsEntwurf_thenReturnTrue", () => {
+      const { abrechnung, isDirty, markSaved } = useAbrechnungForm();
+      abrechnung.value.geschaeftspartnerId = "1000000001";
+      markSaved();
+
+      abrechnung.value.geschaeftspartnerId = "1000000002";
+
+      expect(isDirty()).toBe(true);
+    });
   });
 
   describe("uebernehmen", () => {

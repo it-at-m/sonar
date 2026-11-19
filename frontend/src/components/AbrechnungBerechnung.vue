@@ -48,9 +48,9 @@
     >
       <v-tab
         v-for="tab in nutzungsobjektTabs"
-        :key="tab.nutzungsobjekt.id"
+        :key="tab.nutzungsobjekt.key"
         :aria-label="tab.invalid ? `${tab.label} enthält Fehler` : undefined"
-        :value="tab.nutzungsobjekt.id"
+        :value="tab.nutzungsobjekt.key"
       >
         {{ tab.label }}
         <v-icon
@@ -78,9 +78,9 @@
     <!-- eager, because the rules of an unmounted input never run -->
     <v-tabs-window-item
       v-for="tab in nutzungsobjektTabs"
-      :key="tab.nutzungsobjekt.id"
+      :key="tab.nutzungsobjekt.key"
       eager
-      :value="tab.nutzungsobjekt.id"
+      :value="tab.nutzungsobjekt.key"
     >
       <abrechnung-nutzungsobjekt-panel
         :model-value="tab.nutzungsobjekt"
@@ -149,7 +149,9 @@ watchEffect(() => {
   }
 });
 
-const activeNutzungsobjekt = ref(abrechnung.value.nutzungsobjekte[0]?.id ?? "");
+const activeNutzungsobjekt = ref(
+  abrechnung.value.nutzungsobjekte[0]?.key ?? ""
+);
 
 const nutzungsobjektTabs = computed(() =>
   abrechnung.value.nutzungsobjekte.map((nutzungsobjekt, index) => ({
@@ -188,20 +190,20 @@ function setZeitraumVon(zeitraumVon: string | null | undefined): void {
 function addNutzungsobjekt(): void {
   const nutzungsobjekt = createAbrechnungNutzungsobjekt();
   abrechnung.value.nutzungsobjekte.push(nutzungsobjekt);
-  activeNutzungsobjekt.value = nutzungsobjekt.id;
+  activeNutzungsobjekt.value = nutzungsobjekt.key;
 }
 
 function removeNutzungsobjekt(index: number): void {
   const removed = abrechnung.value.nutzungsobjekte[index];
   abrechnung.value.nutzungsobjekte.splice(index, 1);
-  if (removed?.id !== activeNutzungsobjekt.value) {
+  if (removed?.key !== activeNutzungsobjekt.value) {
     return;
   }
   const next =
     abrechnung.value.nutzungsobjekte[
       Math.min(index, abrechnung.value.nutzungsobjekte.length - 1)
     ];
-  activeNutzungsobjekt.value = next?.id ?? "";
+  activeNutzungsobjekt.value = next?.key ?? "";
 }
 
 /** Selects the tab of the Nutzungsobjekt an offending input belongs to, so it can take the focus. */
@@ -212,7 +214,7 @@ function showError(errorId: string): void {
   }
   const nutzungsobjekt = abrechnung.value.nutzungsobjekte[index];
   if (nutzungsobjekt !== undefined) {
-    activeNutzungsobjekt.value = nutzungsobjekt.id;
+    activeNutzungsobjekt.value = nutzungsobjekt.key;
   }
 }
 

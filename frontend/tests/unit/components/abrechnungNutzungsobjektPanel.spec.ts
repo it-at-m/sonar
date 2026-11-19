@@ -228,7 +228,7 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
   it("givenOnePositionAndOneMast_thenAllowRemovingBoth", () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
     nutzungsobjekt.masten.push({
-      id: "123e4567-e89b-12d3-a456-426614174004",
+      key: "123e4567-e89b-12d3-a456-426614174004",
       beginn: "2026-01-01",
       ende: "2026-01-31",
     });
@@ -245,7 +245,7 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
   it("givenNutzungsobjekt_thenOfferItsMasten", () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
     nutzungsobjekt.masten.push({
-      id: "123e4567-e89b-12d3-a456-426614174004",
+      key: "123e4567-e89b-12d3-a456-426614174004",
       beginn: "2026-01-01",
       ende: "2026-01-31",
     });

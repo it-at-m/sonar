@@ -71,8 +71,24 @@ describe("abrechnungVersionen.ts", () => {
   describe("abrechnungVersionLabel", () => {
     it("givenAktuelleVersion_thenAppendAktuell", () => {
       expect(
-        abrechnungVersionLabel({ id: "id-3", versionsnummer: 3, aktuell: true })
+        abrechnungVersionLabel({
+          id: "id-3",
+          versionsnummer: 3,
+          aktuell: true,
+          entwurf: false,
+        })
       ).toBe("Version 3 (aktuell)");
+    });
+
+    it("givenEntwurf_thenAppendEntwurfInsteadOfAktuell", () => {
+      expect(
+        abrechnungVersionLabel({
+          id: "id-3",
+          versionsnummer: 3,
+          aktuell: true,
+          entwurf: true,
+        })
+      ).toBe("Version 3 (Entwurf)");
     });
 
     it("givenAeltereVersion_thenNameOnlyTheVersionsnummer", () => {
@@ -81,6 +97,7 @@ describe("abrechnungVersionen.ts", () => {
           id: "id-2",
           versionsnummer: 2,
           aktuell: false,
+          entwurf: false,
         })
       ).toBe("Version 2");
     });
@@ -89,8 +106,8 @@ describe("abrechnungVersionen.ts", () => {
   describe("abrechnungVersionOptions", () => {
     it("givenVersionen_thenUseTheAbrechnungIdAsValue", () => {
       const options = abrechnungVersionOptions([
-        { id: "id-2", versionsnummer: 2, aktuell: true },
-        { id: "id-1", versionsnummer: 1, aktuell: false },
+        { id: "id-2", versionsnummer: 2, aktuell: true, entwurf: false },
+        { id: "id-1", versionsnummer: 1, aktuell: false, entwurf: false },
       ]);
 
       expect(options).toEqual([

@@ -60,7 +60,7 @@ describe("AbrechnungMastenTable.vue", () => {
 
   it("givenClickedHinzufuegenWithAMastPresent_thenAppendOneMastWithAnEmptyZeitraum", async () => {
     const masten: AbrechnungMastForm[] = [
-      { id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
+      { key: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
     ];
     const wrapper = mountTable(masten);
 
@@ -73,7 +73,7 @@ describe("AbrechnungMastenTable.vue", () => {
 
   it("givenAMast_thenRunItsZeitraumInWholeMonths", () => {
     const wrapper = mountTable([
-      { id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
+      { key: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
     ]);
 
     expect(endeField(wrapper, 1)?.props("zeitraumBeginn")).toBe("2026-01-01");
@@ -82,20 +82,20 @@ describe("AbrechnungMastenTable.vue", () => {
 
   it("givenClickedEntfernen_thenDropThatMast", async () => {
     const masten: AbrechnungMastForm[] = [
-      { id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
-      { id: "mast-0002", beginn: "2026-02-01", ende: "2026-02-28" },
+      { key: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" },
+      { key: "mast-0002", beginn: "2026-02-01", ende: "2026-02-28" },
     ];
     const wrapper = mountTable(masten);
 
     await removeButton(wrapper, 1)?.trigger("click");
 
     expect(masten).toHaveLength(1);
-    expect(masten[0]?.id).toBe("mast-0002");
+    expect(masten[0]?.key).toBe("mast-0002");
   });
 
   it("givenNothingLeftToRemove_thenDisableEntfernen", () => {
     const wrapper = mountTable(
-      [{ id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" }],
+      [{ key: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" }],
       false
     );
 
@@ -104,7 +104,7 @@ describe("AbrechnungMastenTable.vue", () => {
 
   it("givenReadonly_thenOfferNeitherToAddNorToRemove", () => {
     const wrapper = mountTable(
-      [{ id: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" }],
+      [{ key: "mast-0001", beginn: "2026-01-01", ende: "2026-01-31" }],
       true,
       true
     );

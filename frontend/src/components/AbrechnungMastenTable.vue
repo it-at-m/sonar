@@ -12,7 +12,7 @@
         <tbody>
           <tr
             v-for="(mast, index) in masten"
-            :key="mast.id"
+            :key="mast.key"
           >
             <td>
               <sonar-date-field

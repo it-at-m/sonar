@@ -13,24 +13,35 @@
     multi-sort
     no-data-text="Es sind noch keine Abrechnungen angelegt."
   >
-    <template #[`item.ansehen`]="{ item }">
+    <template #[`item.status`]="{ item }">
       <abrechnung-versionen-menu
         v-if="item.id && item.versionsnummer > 1"
         :abrechnung-id="item.id"
+        :entwurf="item.entwurf"
         :projekt-id="projektId"
       />
-      <v-btn
+      <v-chip
+        v-else-if="item.id && item.entwurf"
+        :aria-label="`Entwurf der Abrechnung ${item.geschaeftspartnerId} bearbeiten`"
+        :prepend-icon="mdiPencil"
+        size="small"
+        :to="`/projekte/${projektId}/abrechnungen/${item.id}/bearbeiten`"
+      >
+        {{ abrechnungStatusLabel(item.entwurf) }}
+      </v-chip>
+      <v-chip
         v-else-if="item.id"
         :aria-label="`Abrechnung ${item.geschaeftspartnerId} ansehen`"
-        density="comfortable"
-        :icon="mdiEye"
+        :prepend-icon="mdiEye"
+        size="small"
         :to="`/projekte/${projektId}/abrechnungen/${item.id}/ansehen`"
-        variant="text"
-      />
+      >
+        {{ abrechnungStatusLabel(item.entwurf) }}
+      </v-chip>
     </template>
 
     <template #[`item.widerspruch`]="{ item }">
-      <span v-if="item.id">
+      <span v-if="item.id && !item.entwurf">
         <v-btn
           :aria-label="widerspruchLabel(item)"
           density="comfortable"
@@ -49,7 +60,7 @@
 
     <template #[`item.neueVersion`]="{ item }">
       <v-btn
-        v-if="item.id"
+        v-if="item.id && !item.entwurf"
         :aria-label="`Neue Version der Abrechnung ${item.geschaeftspartnerId} anlegen`"
         density="comfortable"
         :icon="mdiFileDocumentPlus"
@@ -78,10 +89,12 @@ import {
   mdiChatPlus,
   mdiEye,
   mdiFileDocumentPlus,
+  mdiPencil,
 } from "@mdi/js";
 
 import AbrechnungVersionenMenu from "@/components/AbrechnungVersionenMenu.vue";
 import BerechnungDurchfuehrenDialog from "@/components/berechnung/BerechnungDurchfuehrenDialog.vue";
+import { abrechnungStatusLabel } from "@/util/abrechnung/abrechnungStatus";
 
 const HEADERS = [
   { title: "Geschäftspartner:in", key: "geschaeftspartnerId" },
@@ -89,7 +102,7 @@ const HEADERS = [
   { title: "Zeitraum bis", key: "zeitraumBis" },
   { title: "Art", key: "abrechnungsArt" },
   { title: "Nutzungsobjekte", key: "anzahlNutzungsobjekte", sortable: false },
-  { title: "Ansehen", key: "ansehen", sortable: false },
+  { title: "Status", key: "status", sortable: false },
   { title: "Widerspruch", key: "widerspruch", sortable: false },
   { title: "Neue Version", key: "neueVersion", sortable: false },
   { title: "Berechnung", key: "berechnung", sortable: false },
