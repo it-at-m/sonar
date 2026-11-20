@@ -1050,8 +1050,11 @@ components:
          <p>
          The id names an own Nutzungsobjekt of the draft that is changed, and the details update it. The
          takenOverId names a Nutzungsobjekt that a finalized Abrechnung of the Projekt bills. It is taken
-         over as it is stored, and the other details are ignored. At most one of the two is given. Without
-         either, the Nutzungsobjekt is new.
+         over as it is stored, so the fields of the Nutzungsobjekt itself are ignored: the Adresse, the
+         Nutzungen, the unerlaubte Nutzung, bemerkung and aufschlag50prozent.
+         The positionen and masten are not ignored. This Abrechnung bills them, so they are processed as
+         for an own Nutzungsobjekt. At most one of the two ids is given. Without either, the
+         Nutzungsobjekt is new.
          </p>
     AbrechnungPositionRequestDTO:
       required:
