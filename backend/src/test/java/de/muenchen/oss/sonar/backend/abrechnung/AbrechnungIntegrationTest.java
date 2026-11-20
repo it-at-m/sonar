@@ -818,10 +818,10 @@ class AbrechnungIntegrationTest {
 
         @Test
         void givenProjektInStadtbezirkOfAnotherRole_thenReturnNotFound() {
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null, null,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true,
-                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                    List.of(new AbrechnungPositionRequestDTO(null, VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
                             new BigDecimal("36.00"))),
                     List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
