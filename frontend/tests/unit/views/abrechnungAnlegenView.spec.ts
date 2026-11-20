@@ -221,6 +221,63 @@ describe("AbrechnungAnlegenView.vue", () => {
     expect(push).not.toHaveBeenCalled();
   });
 
+  it("givenSaveInProgress_thenLockTheFormUntilTheResponseArrives", async () => {
+    const entwurf: AbrechnungResponseDTO = {
+      id: ENTWURF_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 1,
+      draft: true,
+      geschaeftspartnerId: "1000000001",
+      zeitraumVon: new Date("2026-01-01"),
+      zeitraumBis: new Date("2026-03-31"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      nutzungsobjekte: [],
+    };
+    const fetchSpy = stubFetch(entwurf);
+    const answer = fetchSpy.getMockImplementation();
+    const saveResponse = Promise.withResolvers<Response>();
+    fetchSpy.mockImplementation((url: string, init?: RequestInit) =>
+      init?.method === "POST" ? saveResponse.promise : answer?.(url, init)
+    );
+    const wrapper = await mountView({});
+    await enter(wrapper, {
+      geschaeftspartnerId: "1000000001",
+      zustellungsbevollmaechtigterGenutzt: false,
+      zustellungsbevollmaechtigterId: "",
+      zustellungsbevollmaechtigterTyp: null,
+      zeitraumVon: "2026-01-01",
+      zeitraumBis: "2026-03-31",
+      abrechnungsArt: AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG,
+      nutzungsobjekte: [
+        {
+          ...createAbrechnungNutzungsobjekt(),
+          positionen: [
+            {
+              key: "position",
+              id: null,
+              beginn: "2026-01-01",
+              ende: "2026-03-31",
+              laenge: 12,
+              breite: 3,
+              flaeche: 36,
+            },
+          ],
+        },
+      ],
+    });
+    const tabsContainer = wrapper.findComponent({ name: "AbrechnungTabs" })
+      .element.parentElement;
+
+    await save(wrapper);
+
+    expect(tabsContainer?.hasAttribute("inert")).toBe(true);
+
+    saveResponse.resolve(jsonResponse(entwurf));
+    await flushPromises();
+
+    expect(tabsContainer?.hasAttribute("inert")).toBe(false);
+  });
+
   it("givenNewAbrechnung_whenSavedTwice_thenSendTheSavedIdsTheSecondTime", async () => {
     const fetchSpy = stubFetch({
       id: ENTWURF_ID,

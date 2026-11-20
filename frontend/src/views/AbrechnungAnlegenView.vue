@@ -24,13 +24,15 @@
       ref="form"
       @submit.prevent="save"
     >
-      <abrechnung-tabs
-        ref="tabs"
-        v-model="abrechnung"
-        :invalid-nutzungsobjekte="invalidNutzungsobjekte"
-        :nutzungsobjekt-suggestions="nutzungsobjektSuggestions"
-        :suggestions="suggestions"
-      />
+      <div :inert="saving || undefined">
+        <abrechnung-tabs
+          ref="tabs"
+          v-model="abrechnung"
+          :invalid-nutzungsobjekte="invalidNutzungsobjekte"
+          :nutzungsobjekt-suggestions="nutzungsobjektSuggestions"
+          :suggestions="suggestions"
+        />
+      </div>
 
       <div class="d-flex justify-end mt-6">
         <v-btn
