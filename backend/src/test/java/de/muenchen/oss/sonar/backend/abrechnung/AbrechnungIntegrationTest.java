@@ -973,7 +973,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO responseDTO = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1444,7 +1444,7 @@ class AbrechnungIntegrationTest {
 
             final UUID draftId = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1454,7 +1454,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, draftId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1518,7 +1518,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_FINALIZE_PATH, projektId, zweiteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk();
 
@@ -1649,7 +1649,7 @@ class AbrechnungIntegrationTest {
 
             final UUID zweiteVersionId = restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1659,7 +1659,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
@@ -2252,7 +2252,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2276,7 +2276,7 @@ class AbrechnungIntegrationTest {
 
             final UUID nutzungsobjektDesDrafts = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(draftDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2295,7 +2295,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(andereAbrechnungDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2303,7 +2303,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(NUTZUNGSOBJEKT_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<NutzungsobjektResponseDTO>>() {
@@ -2331,7 +2331,7 @@ class AbrechnungIntegrationTest {
 
             final UUID draftId = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2350,7 +2350,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draftId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2393,7 +2393,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO draft = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2404,7 +2404,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draft.id())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2457,7 +2457,7 @@ class AbrechnungIntegrationTest {
 
             final UUID draftId = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2476,7 +2476,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draftId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2549,7 +2549,7 @@ class AbrechnungIntegrationTest {
 
             final UUID draftId = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2559,7 +2559,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draftId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2608,7 +2608,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2630,7 +2630,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2650,7 +2650,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO draft = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2672,7 +2672,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draft.id())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2701,7 +2701,7 @@ class AbrechnungIntegrationTest {
 
             final UUID draftId = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2720,7 +2720,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draftId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2740,7 +2740,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO draft = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2760,7 +2760,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draft.id())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2801,7 +2801,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO draft = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(ersteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2828,7 +2828,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.put()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, draft.id())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(zweiteFassung)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2857,7 +2857,7 @@ class AbrechnungIntegrationTest {
 
             final UUID draftId = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2867,7 +2867,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_FINALIZE_PATH, projektId, draftId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -2910,7 +2910,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_FINALIZE_PATH, projektId, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isEqualTo(HttpStatus.CONFLICT);
         }
@@ -2919,7 +2919,7 @@ class AbrechnungIntegrationTest {
         void givenUnknownAbrechnung_thenReturnNotFound() {
             restTestClient.post()
                     .uri(ABRECHNUNG_FINALIZE_PATH, projektId, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
         }
