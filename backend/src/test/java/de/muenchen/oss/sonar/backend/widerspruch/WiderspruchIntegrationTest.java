@@ -16,6 +16,7 @@ import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektAdresseEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import de.muenchen.oss.sonar.backend.widerspruch.dto.WiderspruchRequestDTO;
 import de.muenchen.oss.sonar.backend.widerspruch.dto.WiderspruchResponseDTO;
 import java.math.BigDecimal;
@@ -92,6 +93,7 @@ class WiderspruchIntegrationTest {
 
         final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer("2026-0001");
+        projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
         projekt.setAbrechnungBeginn(VON);
         projekt.setAbrechnungEnde(BIS);
         projekt.addAdresse(projektAdresse);
@@ -254,7 +256,7 @@ class WiderspruchIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -278,7 +280,7 @@ class WiderspruchIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
