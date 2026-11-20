@@ -13,7 +13,7 @@ public final class FlaechenabrechnungService {
 
     private static final boolean GRUND_BEIM_EINZIGEN_ABSCHNITT = true;
 
-    public static Flaechenabrechnung berechne(final List<Flaechenadresse> adressen, final List<Flaechenadresse> verbundadressen,
+    public static Flaechenabrechnung berechne(final List<Flaechenadresse> adressen, final List<Flaechenadresse> vorgaengerAdressen,
             final int anzahlWochen) {
 
         if (anzahlWochen == 0) {
@@ -21,7 +21,7 @@ public final class FlaechenabrechnungService {
         }
 
         final List<Flaechenwoche> wochen = IntStream.rangeClosed(1, anzahlWochen)
-                .mapToObj(woche -> FlaechenwocheService.berechne(adressen, verbundadressen, woche))
+                .mapToObj(woche -> FlaechenwocheService.berechne(adressen, vorgaengerAdressen, woche))
                 .toList();
 
         final List<String> gruende = wochen.stream().map(Flaechenwoche::zwischenabrechnungGrund).toList();

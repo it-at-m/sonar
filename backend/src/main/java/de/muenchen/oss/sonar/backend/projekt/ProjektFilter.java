@@ -1,11 +1,13 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
 import java.time.LocalDate;
+import java.util.UUID;
 
 public record ProjektFilter(
         String projektnummer,
         LocalDate abrechnungBeginn,
-        LocalDate abrechnungEnde) {
+        LocalDate abrechnungEnde,
+        UUID sharesAdresseWithProjektId) {
 
     public ProjektFilter {
         projektnummer = trimmedOrNull(projektnummer);

@@ -17,7 +17,7 @@ public final class BerechnungsergebnisService {
         final Vorabrechnung vorabrechnung = berechnungslauf.vorabrechnung();
 
         final Flaechenabrechnung flaechen = FlaechenabrechnungService.berechne(berechnungslauf.flaechenadressen(),
-                berechnungslauf.verbundflaechenadressen(), zeitraum.anzahlWochen());
+                berechnungslauf.vorgaengerFlaechenadressen(), zeitraum.anzahlWochen());
         final Ueberspannungsabrechnung ueberspannungen = UeberspannungsabrechnungService.berechne(
                 berechnungslauf.ueberspannungsadressen());
 
@@ -36,7 +36,7 @@ public final class BerechnungsergebnisService {
                 zeitraum.ende(),
                 Zusammenfassung.schreibe(lfdNr, berechnungslauf.projekt(), berechnungslauf.username(), zeitraum,
                         berechnungslauf.flaechenadressen(), berechnungslauf.ueberspannungsadressen(),
-                        berechnungslauf.verbundflaechenadressen()),
+                        berechnungslauf.vorgaengerFlaechenadressen()),
                 Berechnungslog.schreibe(lfdNr, flaechen, ueberspannungen, gebuehren, vorabrechnung),
                 gebuehren.flaechen(),
                 gebuehren.ueberspannungen(),

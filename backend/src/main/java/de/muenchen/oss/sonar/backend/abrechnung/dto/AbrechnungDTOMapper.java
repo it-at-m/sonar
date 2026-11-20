@@ -5,6 +5,8 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnungsanschluss;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.NutzungsobjektSuggestion;
 import java.util.UUID;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -17,6 +19,8 @@ public interface AbrechnungDTOMapper {
 
     AbrechnungVersionResponseDTO toDTO(AbrechnungVersion abrechnungVersion);
 
+    AbrechnungsanschlussResponseDTO toDTO(Abrechnungsanschluss abrechnungsanschluss);
+
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "versionsnummer", ignore = true)
     @Mapping(target = "vorgaengerAbrechnungId", ignore = true)
@@ -24,7 +28,9 @@ public interface AbrechnungDTOMapper {
     @Mapping(target = "neuereVersionVorhanden", ignore = true)
     Abrechnung toAbrechnung(UUID projektId, AbrechnungRequestDTO abrechnungRequestDTO);
 
-    NutzungsobjektResponseDTO toDTO(AbrechnungNutzungsobjekt abrechnungNutzungsobjekt);
+    @Mapping(target = ".", source = "nutzungsobjekt")
+    @Mapping(target = "projektnummer", source = "vorgaengerProjektnummer")
+    NutzungsobjektResponseDTO toDTO(NutzungsobjektSuggestion nutzungsobjektSuggestion);
 
     AbrechnungNutzungsobjekt toAbrechnungNutzungsobjekt(AbrechnungNutzungsobjektRequestDTO abrechnungNutzungsobjektRequestDTO);
 

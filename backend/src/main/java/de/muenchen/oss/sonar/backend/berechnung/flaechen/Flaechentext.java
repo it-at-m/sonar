@@ -77,7 +77,7 @@ public final class Flaechentext {
         final StringBuilder protokoll = new StringBuilder()
                 .append("Woche ").append(woche.woche()).append(System.lineSeparator())
                 .append(verteilung(woche))
-                .append(zeilen(woche.verbundverteilung()))
+                .append(zeilen(woche.vorgaengerVerteilung()))
                 .append("    Baustellenfläche: ").append(gebuehrenstufe(woche));
 
         for (final Gebuehrenposten posten : woche.posten()) {

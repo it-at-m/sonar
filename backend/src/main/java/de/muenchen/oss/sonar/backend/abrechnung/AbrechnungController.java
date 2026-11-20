@@ -4,6 +4,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungDTOMapper;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungVersionResponseDTO;
+import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungsanschlussResponseDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.NutzungsobjektResponseDTO;
 import de.muenchen.oss.sonar.backend.configuration.OpenAPIDocumentationConfiguration;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -42,6 +43,7 @@ public class AbrechnungController {
 
     private static final String PROJEKT_ID = "projektId";
     private static final String STATUS_NOT_FOUND = "404";
+    private static final String PROJEKT_NOT_FOUND = "the Projekt does not exist";
 
     private final AbrechnungService abrechnungService;
     private final NutzungsobjektService nutzungsobjektService;
@@ -67,7 +69,7 @@ public class AbrechnungController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @ApiResponse(responseCode = "400", description = "the pagination or sort parameters are invalid", content = @Content)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
     public Page<AbrechnungResponseDTO> getAbrechnungenByPageAndSize(@PathVariable(PROJEKT_ID) final UUID projektId,
             @RequestParam(defaultValue = "0") @Min(0) final int pageNumber,
             @RequestParam(defaultValue = "10") @Min(1) @Max(100) final int pageSize,
@@ -107,11 +109,30 @@ public class AbrechnungController {
      */
     @GetMapping("/nutzungsobjekt")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
     public List<NutzungsobjektResponseDTO> getNutzungsobjekte(@PathVariable(PROJEKT_ID) final UUID projektId) {
         return nutzungsobjektService.getNutzungsobjekteOfProjekt(projektId).stream()
                 .map(abrechnungDTOMapper::toDTO)
                 .toList();
+    }
+
+    /**
+     * Retrieve what a new Abrechnung of a Projekt has to keep to.
+     * The first Abrechnung of a Projekt with a Vorgaenger continues where the Vorgaenger stops. It has
+     * to start the day after the latest zeitraumBis of the Abrechnungen of the Vorgaenger. Only the
+     * newest version of each of these Abrechnungen counts. While the Vorgaenger has no Abrechnung, the
+     * Projekt cannot get one either.
+     * Any other Abrechnung may start on any day. This holds for the first Abrechnung of a Projekt
+     * without Vorgaenger, for every later Abrechnung of a Projekt, and for every new version.
+     *
+     * @param projektId the UUID of the Projekt the new Abrechnung belongs to
+     * @return whether an Abrechnung can be created, and the day it has to start, if any
+     */
+    @GetMapping("/anschluss")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
+    public AbrechnungsanschlussResponseDTO getAbrechnungsanschluss(@PathVariable(PROJEKT_ID) final UUID projektId) {
+        return abrechnungDTOMapper.toDTO(abrechnungService.getAbrechnungsanschluss(projektId));
     }
 
     /**
@@ -155,6 +176,8 @@ public class AbrechnungController {
      * Create a new Abrechnung for a Projekt.
      * Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
      * An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
+     * The first Abrechnung of a Projekt with a Vorgaenger has to start on the day that
+     * GET /projekt/{projektId}/abrechnung/anschluss names.
      *
      * @param projektId the UUID of the Projekt the Abrechnung belongs to
      * @param abrechnungRequestDTO the details of the Abrechnung to create
@@ -162,8 +185,13 @@ public class AbrechnungController {
      */
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    @ApiResponse(responseCode = "400", description = "the details of the Abrechnung are invalid", content = @Content)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    @ApiResponse(
+            responseCode = "400",
+            description = "the details of the Abrechnung are invalid, or it does not start the day after the Vorgaenger stops",
+            content = @Content
+    )
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
+    @ApiResponse(responseCode = "409", description = "the Projekt has no Abrechnung yet and its Vorgaenger has none either", content = @Content)
     public AbrechnungResponseDTO saveAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
             @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
         return abrechnungDTOMapper.toDTO(

@@ -42,8 +42,11 @@ public class ProjektEntity extends BaseEntity {
     @Column(nullable = false)
     @NotNull private LocalDate abrechnungEnde;
 
-    @Column(name = "verbundenes_projekt_id")
-    private UUID verbundenesProjektId;
+    @Column(name = "vorgaenger_projekt_id", unique = true)
+    private UUID vorgaengerProjektId;
+
+    @Column(nullable = false)
+    private boolean verknuepfungAbgelehnt;
 
     @OneToMany(cascade = CascadeType.ALL, orphanRemoval = true)
     @JoinColumn(name = "projekt_id", nullable = false)

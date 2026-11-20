@@ -4,9 +4,10 @@ import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaechenadresse;
 import de.muenchen.oss.sonar.backend.berechnung.flaechen.Flaechentext;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Ueberspannungsadresse;
 import de.muenchen.oss.sonar.backend.berechnung.ueberspannungen.Ueberspannungstext;
+import de.muenchen.oss.sonar.backend.projekt.domain.LinkedProjekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
-import java.time.LocalDate;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
@@ -20,24 +21,40 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class Zusammenfassung {
 
-    public static String schreibe(final int lfdNr, final Projekt projekt, final String username,
-            final LocalDate beginnMassnahme, final LocalDate endeMassnahme, final int anzahlWochen,
-            final List<Flaechenadresse> alleAdressen, final List<Ueberspannungsadresse> adressenMitMasten) {
+    public static String schreibe(final int lfdNr, final Projekt projekt, final String username, final Massnahmezeitraum zeitraum,
+            final List<Flaechenadresse> eigeneAdressen, final List<Ueberspannungsadresse> adressenMitMasten,
+            final List<Flaechenadresse> vorgaengerAdressen) {
 
         final StringBuilder zusammenfassung = new StringBuilder()
                 .append("Abrechnung ").append(lfdNr)
-                .append(" von Bauprojekt ").append(projekt.projektnummer()).append(System.lineSeparator())
+                .append(" von Bauprojekt ").append(projekt.projektnummer()).append(System.lineSeparator());
+
+        if (!projekt.vorgaengerProjekte().isEmpty()) {
+            zusammenfassung.append("    Vorgängerprojekte    : ")
+                    .append(projekt.vorgaengerProjekte().stream()
+                            .map(LinkedProjekt::projektnummer)
+                            .collect(Collectors.joining(", ")))
+                    .append(System.lineSeparator());
+        }
+
+        zusammenfassung
                 .append("    Ersteller Abrechnung : ").append(username).append(System.lineSeparator())
-                .append("    Anzahl Adressen      : ").append(alleAdressen.size()).append(System.lineSeparator())
-                .append("    Abrechnungszeitraum  : ").append(beginnMassnahme)
-                .append(" - ").append(endeMassnahme).append(System.lineSeparator())
-                .append("    Anzahl Wochen : ").append(anzahlWochen).append(System.lineSeparator())
+                .append("    Anzahl Adressen      : ").append(eigeneAdressen.size()).append(System.lineSeparator())
+                .append("    Abrechnungszeitraum  : ").append(zeitraum.beginn())
+                .append(" - ").append(zeitraum.ende()).append(System.lineSeparator())
+                .append("    Anzahl Wochen : ").append(zeitraum.anzahlWochen()).append(System.lineSeparator())
                 .append(System.lineSeparator());
 
-        if (!alleAdressen.isEmpty()) {
+        if (!eigeneAdressen.isEmpty()) {
             zusammenfassung.append("Flächen").append(System.lineSeparator())
                     .append("----------------------").append(System.lineSeparator());
-            alleAdressen.forEach(adresse -> zusammenfassung.append(Flaechentext.zusammenfassung(adresse)));
+            eigeneAdressen.forEach(adresse -> zusammenfassung.append(Flaechentext.zusammenfassung(adresse)));
+        }
+
+        if (!vorgaengerAdressen.isEmpty()) {
+            zusammenfassung.append("Flächen der Vorgängerprojekte").append(System.lineSeparator())
+                    .append("----------------------").append(System.lineSeparator());
+            vorgaengerAdressen.forEach(adresse -> zusammenfassung.append(Flaechentext.zusammenfassung(adresse)));
         }
 
         if (!adressenMitMasten.isEmpty()) {

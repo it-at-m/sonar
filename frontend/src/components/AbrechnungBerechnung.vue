@@ -6,8 +6,15 @@
     >
       <sonar-date-field
         id="berechnung-zeitraum-von"
+        :disabled="zeitraumVonVorgegeben"
+        :hint="
+          zeitraumVonVorgegeben
+            ? 'Schließt an die letzte Abrechnung des Vorgängerprojekts an'
+            : undefined
+        "
         label="Zeitraum von"
         :model-value="abrechnung.zeitraumVon"
+        :persistent-hint="zeitraumVonVorgegeben"
         :rules="[requiredRule]"
         @update:model-value="setZeitraumVon"
       />
@@ -128,11 +135,13 @@ const {
   invalidNutzungsobjekte,
   nutzungsobjektSuggestions = [],
   readonly = false,
+  zeitraumVonVorgegeben = false,
 } = defineProps<{
   suggestions: ProjektAdresseSuggestion[];
   invalidNutzungsobjekte: number[];
   nutzungsobjektSuggestions?: NutzungsobjektSuggestion[];
   readonly?: boolean;
+  zeitraumVonVorgegeben?: boolean;
 }>();
 
 watchEffect(() => {

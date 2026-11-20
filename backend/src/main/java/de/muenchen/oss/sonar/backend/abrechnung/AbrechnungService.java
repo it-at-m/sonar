@@ -2,12 +2,16 @@ package de.muenchen.oss.sonar.backend.abrechnung;
 
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NEWER_VERSION_ALREADY_EXISTS;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
+import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_VORGAENGER_WITHOUT_ABRECHNUNG;
+import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_ZEITRAUM_VON_NOT_AFTER_VORGAENGER;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnungsanschluss;
+import de.muenchen.oss.sonar.backend.common.BadRequestException;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
@@ -120,15 +124,49 @@ public class AbrechnungService {
                 .orElse(null);
     }
 
+    @Transactional(readOnly = true)
+    public Abrechnungsanschluss getAbrechnungsanschluss(final UUID projektId) {
+        if (!projektService.existsProjekt(projektId)) {
+            throw new NotFoundException(String.format(MSG_NOT_FOUND, projektId));
+        }
+        log.info("Get the Abrechnungsanschluss of Projekt {}", projektId);
+        return abrechnungsanschlussOf(projektId);
+    }
+
+    private Abrechnungsanschluss abrechnungsanschlussOf(final UUID projektId) {
+        final UUID vorgaengerProjektId = projektService.getVorgaengerProjektId(projektId);
+        // Only the first Abrechnung of a Projekt continues where its Vorgaenger stops. Later ones and new versions start on any day.
+        if (vorgaengerProjektId == null || abrechnungRepository.existsByProjektId(projektId)) {
+            return Abrechnungsanschluss.FREI;
+        }
+        final Pageable latestZeitraumBis = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, AbrechnungSortBy.ZEITRAUM_BIS.getEntityAttribute()));
+        return abrechnungRepository.findNewestVersionsByProjektId(vorgaengerProjektId, latestZeitraumBis).stream()
+                .findFirst()
+                .map(abrechnung -> Abrechnungsanschluss.beginntAm(abrechnung.getZeitraumBis().plusDays(1)))
+                .orElse(Abrechnungsanschluss.NICHT_MOEGLICH);
+    }
+
     @Transactional
     public Abrechnung createAbrechnung(final Abrechnung abrechnung) {
         if (!projektService.existsProjekt(abrechnung.projektId())) {
             throw new NotFoundException(String.format(MSG_NOT_FOUND, abrechnung.projektId()));
         }
+        checkAbrechnungsanschluss(abrechnung);
         final AbrechnungEntity abrechnungEntity = toAbrechnungEntity(abrechnung);
         abrechnungEntity.setVersionsnummer(FIRST_VERSION_NUMBER);
         log.debug("Create Abrechnung {}", abrechnungEntity);
         return toAbrechnung(abrechnungRepository.save(abrechnungEntity), false);
+    }
+
+    private void checkAbrechnungsanschluss(final Abrechnung abrechnung) {
+        final Abrechnungsanschluss abrechnungsanschluss = abrechnungsanschlussOf(abrechnung.projektId());
+        if (!abrechnungsanschluss.anlegenMoeglich()) {
+            throw new ConflictException(String.format(MSG_VORGAENGER_WITHOUT_ABRECHNUNG, abrechnung.projektId()));
+        }
+        if (abrechnungsanschluss.zeitraumVon() != null && !abrechnungsanschluss.zeitraumVon().equals(abrechnung.zeitraumVon())) {
+            throw new BadRequestException(
+                    String.format(MSG_ZEITRAUM_VON_NOT_AFTER_VORGAENGER, abrechnung.projektId(), abrechnungsanschluss.zeitraumVon()));
+        }
     }
 
     /**

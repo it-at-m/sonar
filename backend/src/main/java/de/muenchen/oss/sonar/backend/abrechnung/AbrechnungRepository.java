@@ -37,4 +37,6 @@ public interface AbrechnungRepository extends CrudRepository<AbrechnungEntity, U
 
     boolean existsByVorgaengerAbrechnungId(UUID vorgaengerAbrechnungId);
 
+    boolean existsByProjektId(UUID projektId);
+
 }

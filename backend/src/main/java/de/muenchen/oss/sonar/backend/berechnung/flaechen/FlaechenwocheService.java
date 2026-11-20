@@ -8,31 +8,44 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Stream;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
 
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
 public final class FlaechenwocheService {
 
-    public static Flaechenwoche berechne(final List<Flaechenadresse> adressen, final int woche) {
+    public static Flaechenwoche berechne(final List<Flaechenadresse> adressen, final List<Flaechenadresse> vorgaengerAdressen,
+            final int woche) {
 
         final List<Flaechenverteilung> verteilung = new ArrayList<>();
+        final List<Flaechenverteilung> vorgaengerVerteilung = new ArrayList<>();
         final StringBuilder zwischenabrechnungGrund = new StringBuilder();
 
         for (final Flaechenadresse adresse : adressen) {
             final List<Flaechenbeitrag> beitraege = FlaechenadresseService.beitraege(adresse, woche);
-            verteilung.addAll(verteilungPerFlaechenzeitindex(adresse, beitraege));
+            // A Woche that the Position of another Projekt governs is charged in the Abrechnung of that Projekt.
+            (FlaechenadresseService.isChargedInOtherProjekt(adresse, woche) ? vorgaengerVerteilung : verteilung)
+                    .addAll(verteilungPerFlaechenzeitindex(adresse, beitraege));
             zwischenabrechnungGrund.append(zwischenabrechnungGrund(adresse, beitraege));
         }
 
-        final BigDecimal baustellenflaecheQm = verteilung.stream()
+        for (final Flaechenadresse adresse : vorgaengerAdressen) {
+            final List<Flaechenbeitrag> beitraege = FlaechenadresseService.beitraege(adresse, woche);
+            vorgaengerVerteilung.addAll(verteilungPerFlaechenzeitindex(adresse, beitraege));
+            zwischenabrechnungGrund.append(zwischenabrechnungGrund(adresse, beitraege));
+        }
+
+        final BigDecimal baustellenflaecheQm = Stream.concat(verteilung.stream(), vorgaengerVerteilung.stream())
                 .map(Flaechenverteilung::flaecheQm)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
         final Flaechengroessenstufe flaechengroessenstufe = Flaechengroessenstufe
                 .from(baustellenflaecheQm.setScale(0, RoundingMode.CEILING).intValueExact());
 
-        return new Flaechenwoche(woche, baustellenflaecheQm, flaechengroessenstufe, verteilung,
-                postenPerGebuehrensatz(verteilung, flaechengroessenstufe), zwischenabrechnungGrund.toString());
+        final List<Gebuehrenposten> posten = postenPerGebuehrensatz(verteilung, flaechengroessenstufe);
+
+        return new Flaechenwoche(woche, baustellenflaecheQm, flaechengroessenstufe, verteilung, vorgaengerVerteilung, posten,
+                zwischenabrechnungGrund.toString());
     }
 
     private static List<Flaechenverteilung> verteilungPerFlaechenzeitindex(final Flaechenadresse adresse,
