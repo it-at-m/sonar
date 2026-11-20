@@ -91,7 +91,8 @@ public class AbrechnungEntity extends BaseEntity {
             inverseJoinColumns = @JoinColumn(name = "nutzungsobjekt_id", nullable = false),
             uniqueConstraints = @UniqueConstraint(
                     name = "uq_abrechnung_nutzungsobjekt__nutzungsobjekt_id",
-                    columnNames = { "abrechnung_id", "nutzungsobjekt_id" }
+                    columnNames = { "abrechnung_id", "nutzungsobjekt_id" },
+                    options = "deferrable initially deferred"
             )
     )
     @OrderColumn(name = "sort_order", nullable = false)
