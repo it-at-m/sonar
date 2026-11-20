@@ -2,23 +2,23 @@
   <v-app-bar color="primary">
     <v-row class="align-center">
       <v-col
-        cols="3"
+        cols="auto"
         class="d-flex align-center justify-start"
       >
         <v-app-bar-nav-icon
           class="mx-2"
           @click="emit('clickedNavIcon')"
         />
-        <router-link to="/">
-          <v-toolbar-title class="font-weight-bold">
-            <span class="text-white">Sonar</span>
+        <router-link
+          to="/"
+          class="app-title"
+        >
+          <v-toolbar-title class="font-weight-bold d-none d-sm-block">
+            Sonar
           </v-toolbar-title>
         </router-link>
       </v-col>
-      <v-col
-        cols="6"
-        class="d-flex align-center justify-center"
-      >
+      <v-col class="d-flex align-center justify-center">
         <v-text-field
           id="searchField"
           v-model="query"
@@ -33,7 +33,7 @@
         />
       </v-col>
       <v-col
-        cols="3"
+        cols="auto"
         class="d-flex align-center justify-end"
       >
         <app-switcher
@@ -69,7 +69,6 @@ import { useUserInfoStore } from "@/stores/userinfo";
 
 const userInfoStore = useUserInfoStore();
 const snackbarStore = useSnackbarStore();
-
 const query = ref<string>("");
 
 async function search(): Promise<void> {
@@ -84,3 +83,10 @@ const emit = defineEmits<{
   clickedNavIcon: [];
 }>();
 </script>
+
+<style scoped>
+.app-title {
+  color: inherit;
+  text-decoration: none;
+}
+</style>
