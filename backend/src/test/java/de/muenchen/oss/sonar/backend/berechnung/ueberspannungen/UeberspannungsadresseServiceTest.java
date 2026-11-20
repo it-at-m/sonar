@@ -23,7 +23,7 @@ class UeberspannungsadresseServiceTest {
             final AbrechnungMast erster = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30));
             final AbrechnungMast zweiter = new AbrechnungMast(null, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(erster, zweiter));
 
             final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
@@ -36,7 +36,7 @@ class UeberspannungsadresseServiceTest {
             final AbrechnungMast spaeter = new AbrechnungMast(null, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 6, 30));
             final AbrechnungMast frueher = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 4, 30));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(spaeter, frueher));
 
             final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
@@ -50,7 +50,7 @@ class UeberspannungsadresseServiceTest {
             final AbrechnungMast kurz = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 28));
             final AbrechnungMast lang = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(kurz, lang));
 
             final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
@@ -61,7 +61,7 @@ class UeberspannungsadresseServiceTest {
         @Test
         void givenNutzungsobjektWithoutMasten_thenCarryNoMonat() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, null, null);
 
             final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
@@ -74,7 +74,7 @@ class UeberspannungsadresseServiceTest {
         void givenNutzungsobjekt_thenLabelTheAdresseTheWayTheBescheidPrintsIt() {
             final AbrechnungMast erfasst = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 6, 30));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(erfasst));
 
             final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, BERECHNUNGSDATUM);
@@ -86,7 +86,7 @@ class UeberspannungsadresseServiceTest {
         void givenMastStartingAfterTheBerechnungsdatum_thenCarryNoMonatForIt() {
             final AbrechnungMast kuenftig = new AbrechnungMast(null, LocalDate.of(2026, 5, 1), LocalDate.of(2026, 9, 30));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(kuenftig));
 
             final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 3, 31));
@@ -99,7 +99,7 @@ class UeberspannungsadresseServiceTest {
             final AbrechnungMast laufend = new AbrechnungMast(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 28));
             final AbrechnungMast kuenftig = new AbrechnungMast(null, LocalDate.of(2026, 5, 1), LocalDate.of(2026, 9, 30));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.UEBERSPANNUNG), null,
                     null, null, null, null, false, null, List.of(laufend, kuenftig));
 
             final Ueberspannungsadresse adresse = UeberspannungsadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 3, 31));

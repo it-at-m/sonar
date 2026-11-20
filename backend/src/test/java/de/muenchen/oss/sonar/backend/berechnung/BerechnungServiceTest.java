@@ -53,9 +53,9 @@ class BerechnungServiceTest {
         void givenOneFlaecheOverThreeWochen_thenChargeTheRecordedGebuehr() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, ENDE,
                     new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false, Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, false, "1000000001", false, null, null,
                     BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID))
                     .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
@@ -82,9 +82,9 @@ class BerechnungServiceTest {
         void givenNoVorabrechnung_thenStartAtLfdNrOneAndChargeTheWholeBetrag() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, ENDE,
                     new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false, Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, false, "1000000001", false, null, null,
                     BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID))
                     .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, new BigDecimal("42"), List.of()));
@@ -103,9 +103,9 @@ class BerechnungServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(),
                     LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 22),
                     new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false, Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, false, "1000000001", false, null, null,
                     LocalDate.of(2026, 3, 2), LocalDate.of(2026, 3, 22), AbrechnungsArt.ENDABRECHNUNG, null, false,
                     List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID)).thenReturn(
@@ -125,9 +125,9 @@ class BerechnungServiceTest {
             final LocalDate berechnungsdatumWaehrendDerPosition = LocalDate.of(2025, 1, 26);
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, LocalDate.of(2025, 3, 30),
                     new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false, Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, false, "1000000001", false, null, null,
                     BEGINN, LocalDate.of(2025, 3, 30), AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID)).thenReturn(
                     new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, LocalDate.of(2025, 3, 30), BigDecimal.ZERO, List.of()));
@@ -149,9 +149,9 @@ class BerechnungServiceTest {
         void givenAnAbrechnung_thenTheZusammenfassungNamesTheProjektAndTheUser() {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), BEGINN, ENDE,
                     new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE,
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false, Adressart.ADRESSE,
                     "Musterstrasse", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, "1000000001", false, null, null,
+            final Abrechnung abrechnung = new Abrechnung(ABRECHNUNG_ID, PROJEKT_ID, 1, null, false, "1000000001", false, null, null,
                     BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
             when(projektService.getProjekt(PROJEKT_ID))
                     .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));

@@ -23,7 +23,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenZeitraum_thenDeriveTheTageInclusive() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, BIS, null, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(31);
@@ -32,7 +32,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenOnlyTage_thenKeepThem() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, 12, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(12);
@@ -41,7 +41,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenMatchingZeitraumAndTage_thenKeepThem() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, BIS, 31, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(31);
@@ -50,14 +50,14 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenContradictingTage_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, BIS, 12, null, false, List.of(POSITION), List.of())).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenNeitherZeitraumNorTage_thenLeaveThemEmpty() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.tageUnerlaubteNutzung()).isNull();
@@ -69,21 +69,21 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenOnlyBeginn_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     VON, null, null, null, false, List.of(POSITION), List.of())).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenOnlyEnde_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, BIS, null, null, false, List.of(POSITION), List.of())).isInstanceOf(IllegalArgumentException.class);
         }
 
         @Test
         void givenInvertedZeitraum_thenThrow() {
             assertThatThrownBy(() -> new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     BIS, VON, null, null, false, List.of(POSITION), List.of())).isInstanceOf(IllegalArgumentException.class);
         }
     }
@@ -93,7 +93,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenNoPositionen_thenReturnAnEmptyList() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, null, null);
 
             assertThat(nutzungsobjekt.positionen()).isEmpty();
@@ -105,7 +105,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenNoMasten_thenReturnAnEmptyList() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, null, null);
 
             assertThat(nutzungsobjekt.masten()).isEmpty();
@@ -115,7 +115,7 @@ class AbrechnungNutzungsobjektTest {
         void givenMasten_thenKeepThem() {
             final AbrechnungMast mast = new AbrechnungMast(null, VON, BIS);
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, null, List.of(mast));
 
             assertThat(nutzungsobjekt.masten()).containsExactly(mast);
@@ -128,7 +128,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenAdresseWithOneHausnummer_thenNameItWithThatHausnummer() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Marienplatz 8");
@@ -137,7 +137,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenAdresseWithHausnummernbereich_thenNameItWithBothHausnummern() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", "10", null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", "10", null, null, null, null,
                     null, null, null, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Marienplatz 8–10");
@@ -146,7 +146,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenAdresseWithoutHausnummer_thenNameItWithTheStrasseAlone() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", null, null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", null, null, null, null, null, null,
                     null, null, null, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Marienplatz");
@@ -155,7 +155,7 @@ class AbrechnungNutzungsobjektTest {
         @Test
         void givenFlurstueck_thenNameItWithTheGemarkung() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.FLURSTUECK, null, null, null, "123/4", "Sendling", null, null,
+                    null, false, Adressart.FLURSTUECK, null, null, null, "123/4", "Sendling", null, null,
                     null, null, null, null, false, List.of(POSITION), List.of());
 
             assertThat(nutzungsobjekt.adressbezeichnung()).isEqualTo("Flurstück 123/4, Sendling");

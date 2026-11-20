@@ -1,5 +1,6 @@
 import type { AbrechnungVersionResponseDTO } from "@/api/generated/sonar-backend";
 
+import { mdiEye, mdiPencil } from "@mdi/js";
 import { flushPromises, mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -28,16 +29,16 @@ function stubFetch(
   return fetchSpy;
 }
 
-function mountMenu() {
+function mountMenu(entwurf = false) {
   return mount(AbrechnungVersionenMenu, {
-    props: { projektId: PROJEKT_ID, abrechnungId: ABRECHNUNG_ID },
+    props: { projektId: PROJEKT_ID, abrechnungId: ABRECHNUNG_ID, entwurf },
     global: { plugins: [vuetify] },
     attachTo: document.body,
   });
 }
 
 async function openMenu(wrapper: ReturnType<typeof mountMenu>) {
-  await wrapper.find("button").trigger("click");
+  await wrapper.find(".v-chip").trigger("click");
   await flushPromises();
 }
 
@@ -70,11 +71,11 @@ describe("AbrechnungVersionenMenu.vue", () => {
     document.body.innerHTML = "";
   });
 
-  it("givenMenu_thenNameItsButtonForScreenReaders", () => {
+  it("givenMenu_thenNameItsActivatorForScreenReaders", () => {
     stubFetch([]);
     const wrapper = mountMenu();
 
-    expect(wrapper.find("button").attributes("aria-label")).toBe(
+    expect(wrapper.find(".v-chip").attributes("aria-label")).toBe(
       "Versionen der Abrechnung anzeigen"
     );
   });
@@ -127,6 +128,57 @@ describe("AbrechnungVersionenMenu.vue", () => {
     expect(listItems(wrapper).map((item) => item.props("title"))).toEqual([
       "Version 2 (aktuell)",
       "Version 1",
+    ]);
+  });
+
+  it("givenFinalizedAbrechnung_thenShowAbgeschlossenOnTheActivator", () => {
+    stubFetch([]);
+    const wrapper = mountMenu(false);
+
+    expect(wrapper.find(".v-chip").text()).toBe("Abgeschlossen");
+  });
+
+  it("givenEntwurf_thenShowEntwurfOnTheActivator", () => {
+    stubFetch([]);
+    const wrapper = mountMenu(true);
+
+    expect(wrapper.find(".v-chip").text()).toBe("Entwurf");
+  });
+
+  it("givenFinalizedAbrechnung_thenTheActivatorCarriesTheEye", () => {
+    stubFetch([]);
+    const wrapper = mountMenu(false);
+
+    expect(wrapper.findComponent({ name: "VChip" }).props("prependIcon")).toBe(
+      mdiEye
+    );
+  });
+
+  it("givenEntwurf_thenTheActivatorCarriesThePencil", () => {
+    stubFetch([]);
+    const wrapper = mountMenu(true);
+
+    expect(wrapper.findComponent({ name: "VChip" }).props("prependIcon")).toBe(
+      mdiPencil
+    );
+  });
+
+  it("givenVersionThatIsAnEntwurf_thenLeadItToItsBearbeitung", async () => {
+    stubFetch([
+      { id: ABRECHNUNG_ID, versionsnummer: 2, draft: true },
+      { id: VORGAENGER_ID, versionsnummer: 1, draft: false },
+    ]);
+    const wrapper = mountMenu(true);
+
+    await openMenu(wrapper);
+
+    expect(listItems(wrapper).map((item) => item.props("title"))).toEqual([
+      "Version 2 (Entwurf)",
+      "Version 1",
+    ]);
+    expect(listItems(wrapper).map((item) => item.props("to"))).toEqual([
+      `/projekte/${PROJEKT_ID}/abrechnungen/${ABRECHNUNG_ID}/bearbeiten`,
+      `/projekte/${PROJEKT_ID}/abrechnungen/${VORGAENGER_ID}/ansehen`,
     ]);
   });
 

@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +32,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mapstruct.factory.Mappers;
 import org.mockito.ArgumentCaptor;
+import org.mockito.InOrder;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Spy;
@@ -402,13 +404,13 @@ class AbrechnungServiceTest {
     @Nested
     class CreateAbrechnung {
         @Test
-        void givenAbrechnung_thenReturnSavedAbrechnung() {
+        void givenAbrechnung_thenAssignItsNutzungsobjekteBeforeSavingIt() {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
-                    VON, BIS, null, "Bemerkung", true, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+                    null, true, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, true, List.of(position), List.of());
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final UUID savedId = UUID.randomUUID();
@@ -416,26 +418,17 @@ class AbrechnungServiceTest {
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(savedId);
-                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
-                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
-                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
                 return toSave;
             });
 
             final Abrechnung result = unitUnderTest.createAbrechnung(abrechnung);
 
-            verify(abrechnungRepository).save(any(AbrechnungEntity.class));
+            final ArgumentCaptor<AbrechnungEntity> assignedCaptor = ArgumentCaptor.forClass(AbrechnungEntity.class);
+            final InOrder assignThenSave = inOrder(nutzungsobjektService, abrechnungRepository);
+            assignThenSave.verify(nutzungsobjektService).assignNutzungsobjekte(assignedCaptor.capture(), eq(abrechnung));
+            assignThenSave.verify(abrechnungRepository).save(assignedCaptor.getValue());
             assertThat(result.id()).isEqualTo(savedId);
             assertThat(result.projektId()).isEqualTo(PROJEKT_ID);
-            assertThat(result.nutzungsobjekte()).hasSize(1);
-
-            final AbrechnungNutzungsobjekt savedNutzungsobjekt = result.nutzungsobjekte().getFirst();
-            assertThat(savedNutzungsobjekt.adresse()).isEqualTo("Marienplatz");
-            assertThat(savedNutzungsobjekt.hausnummerBis()).isEqualTo("12");
-            assertThat(savedNutzungsobjekt.tageUnerlaubteNutzung()).isEqualTo(90);
-            assertThat(savedNutzungsobjekt.aufschlag50prozent()).isTrue();
-            assertThat(savedNutzungsobjekt.positionen()).hasSize(1);
-            assertThat(savedNutzungsobjekt.positionen().getFirst().flaeche()).isEqualByComparingTo("36.00");
         }
 
         @Test
@@ -443,18 +436,15 @@ class AbrechnungServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
                     new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, true, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(UUID.randomUUID());
-                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
-                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
-                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
                 return toSave;
             });
 
@@ -469,88 +459,8 @@ class AbrechnungServiceTest {
         }
 
         @Test
-        void givenUebernommenesNutzungsobjekt_thenBillTheStoredOneInsteadOfACopy() {
-            final UUID nutzungsobjektId = UUID.randomUUID();
-            final NutzungsobjektEntity gespeichertesNutzungsobjekt = new NutzungsobjektEntity();
-            gespeichertesNutzungsobjekt.setId(nutzungsobjektId);
-
-            final AdressdatenEmbeddable gespeicherteAdressdaten = gespeichertesNutzungsobjekt.getAdressdaten();
-            gespeicherteAdressdaten.setArt(Adressart.ADRESSE);
-            gespeicherteAdressdaten.setAdresse("Marienplatz");
-            gespeicherteAdressdaten.setHausnummerVon("8");
-
-            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"));
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    nutzungsobjektId, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
-                    null, null, null, "Wird ignoriert", false, List.of(position), List.of());
-            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
-
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
-            when(nutzungsobjektService.selectedPreexistingNutzungsobjekte(abrechnung))
-                    .thenReturn(Map.of(nutzungsobjektId, gespeichertesNutzungsobjekt));
-            when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
-                final AbrechnungEntity toSave = invocation.getArgument(0);
-                toSave.setId(UUID.randomUUID());
-                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
-                return toSave;
-            });
-
-            final Abrechnung result = unitUnderTest.createAbrechnung(abrechnung);
-
-            final ArgumentCaptor<AbrechnungEntity> savedCaptor = ArgumentCaptor.forClass(AbrechnungEntity.class);
-            verify(abrechnungRepository).save(savedCaptor.capture());
-            assertThat(savedCaptor.getValue().getNutzungsobjekte()).containsExactly(gespeichertesNutzungsobjekt);
-            assertThat(savedCaptor.getValue().getPositionen().getFirst().getNutzungsobjekt()).isSameAs(gespeichertesNutzungsobjekt);
-            assertThat(result.nutzungsobjekte().getFirst().id()).isEqualTo(nutzungsobjektId);
-            assertThat(result.nutzungsobjekte().getFirst().adresse()).isEqualTo("Marienplatz");
-            assertThat(result.nutzungsobjekte().getFirst().positionen()).hasSize(1);
-        }
-
-        @Test
-        void givenSeveralNeueNutzungsobjekte_thenLinkEachPositionToItsOwnNutzungsobjekt() {
-            final AbrechnungPosition positionAmMarienplatz = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
-                    new BigDecimal("3.00"), new BigDecimal("36.00"));
-            final AbrechnungNutzungsobjekt marienplatz = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
-                    null, null, null, null, true, List.of(positionAmMarienplatz), List.of());
-
-            final AbrechnungPosition positionInDerSendlingerStrasse = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
-                    new BigDecimal("3.00"), new BigDecimal("45.00"));
-            final AbrechnungNutzungsobjekt sendlingerStrasse = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
-                    null, null, null, null, false, List.of(positionInDerSendlingerStrasse), List.of());
-
-            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
-                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(marienplatz, sendlingerStrasse));
-
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
-            when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
-                final AbrechnungEntity toSave = invocation.getArgument(0);
-                toSave.setId(UUID.randomUUID());
-                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
-                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
-                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
-                return toSave;
-            });
-
-            final Abrechnung result = unitUnderTest.createAbrechnung(abrechnung);
-
-            final ArgumentCaptor<AbrechnungEntity> savedCaptor = ArgumentCaptor.forClass(AbrechnungEntity.class);
-            verify(abrechnungRepository).save(savedCaptor.capture());
-            final AbrechnungEntity saved = savedCaptor.getValue();
-            assertThat(saved.getNutzungsobjekte()).hasSize(2);
-            assertThat(saved.getPositionen().getFirst().getNutzungsobjekt()).isSameAs(saved.getNutzungsobjekte().getFirst());
-            assertThat(saved.getPositionen().getLast().getNutzungsobjekt()).isSameAs(saved.getNutzungsobjekte().getLast());
-
-            assertThat(result.nutzungsobjekte()).extracting(AbrechnungNutzungsobjekt::adresse)
-                    .containsExactly("Marienplatz", "Sendlinger Straße");
-        }
-
-        @Test
         void givenUnknownProjekt_thenThrowNotFound() {
-            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
             when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(false);
 
@@ -558,6 +468,32 @@ class AbrechnungServiceTest {
                     .isInstanceOf(NotFoundException.class);
             verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
         }
+
+        @Test
+        void givenAbrechnung_thenSaveItAsADraft() {
+            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, true, List.of(position), List.of());
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
+
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
+                final AbrechnungEntity toSave = invocation.getArgument(0);
+                toSave.setId(UUID.randomUUID());
+                return toSave;
+            });
+
+            final Abrechnung result = unitUnderTest.createAbrechnung(abrechnung);
+
+            final ArgumentCaptor<AbrechnungEntity> savedCaptor = ArgumentCaptor.forClass(AbrechnungEntity.class);
+            verify(abrechnungRepository).save(savedCaptor.capture());
+            assertThat(savedCaptor.getValue().isDraft()).isTrue();
+            assertThat(result.draft()).isTrue();
+        }
+
     }
 
     @Nested
@@ -713,6 +649,70 @@ class AbrechnungServiceTest {
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(abrechnungId.toString());
         }
+
+        @Test
+        void givenFinalizedAbrechnung_thenNoneOfItsNutzungsobjekteIsChangeable() {
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setId(UUID.randomUUID());
+            nutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            nutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            nutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+
+            final UUID abrechnungId = UUID.randomUUID();
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setId(abrechnungId);
+            abrechnung.setProjektId(PROJEKT_ID);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setDraft(false);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+
+            when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
+
+            final Abrechnung result = unitUnderTest.getAbrechnung(PROJEKT_ID, abrechnungId);
+
+            assertThat(result.nutzungsobjekte()).extracting(AbrechnungNutzungsobjekt::changeable).containsExactly(false);
+            verify(nutzungsobjektService, never()).ownNutzungsobjekte(any(AbrechnungEntity.class));
+        }
+
+        @Test
+        void givenDraft_thenOnlyItsOwnNutzungsobjekteAreChangeable() {
+            final UUID eigenesNutzungsobjektId = UUID.randomUUID();
+            final NutzungsobjektEntity eigenesNutzungsobjekt = new NutzungsobjektEntity();
+            eigenesNutzungsobjekt.setId(eigenesNutzungsobjektId);
+            eigenesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            eigenesNutzungsobjekt.getAdressdaten().setAdresse("Sendlinger Straße");
+            eigenesNutzungsobjekt.getAdressdaten().setHausnummerVon("1");
+
+            final NutzungsobjektEntity uebernommenesNutzungsobjekt = new NutzungsobjektEntity();
+            uebernommenesNutzungsobjekt.setId(UUID.randomUUID());
+            uebernommenesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            uebernommenesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            uebernommenesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+
+            final UUID draftId = UUID.randomUUID();
+            final AbrechnungEntity draft = new AbrechnungEntity();
+            draft.setId(draftId);
+            draft.setProjektId(PROJEKT_ID);
+            draft.setVersionsnummer(1);
+            draft.setDraft(true);
+            draft.setGeschaeftspartnerId("1000000001");
+            draft.setZeitraumVon(VON);
+            draft.setZeitraumBis(BIS);
+            draft.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            draft.addNutzungsobjekt(uebernommenesNutzungsobjekt);
+            draft.addNutzungsobjekt(eigenesNutzungsobjekt);
+
+            when(abrechnungRepository.findByIdAndProjektId(draftId, PROJEKT_ID)).thenReturn(Optional.of(draft));
+            when(nutzungsobjektService.ownNutzungsobjekte(draft)).thenReturn(Map.of(eigenesNutzungsobjektId, eigenesNutzungsobjekt));
+
+            final Abrechnung result = unitUnderTest.getAbrechnung(PROJEKT_ID, draftId);
+
+            assertThat(result.nutzungsobjekte()).extracting(AbrechnungNutzungsobjekt::changeable).containsExactly(false, true);
+        }
     }
 
     @Nested
@@ -724,9 +724,9 @@ class AbrechnungServiceTest {
             final UUID zweiteVersionId = UUID.randomUUID();
             final UUID dritteVersionId = UUID.randomUUID();
             when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
-                    new AbrechnungVersion(ersteVersionId, 1, null),
-                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
-                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId)));
+                    new AbrechnungVersion(ersteVersionId, 1, null, false),
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId, false),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId, false)));
 
             final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, zweiteVersionId);
 
@@ -741,9 +741,9 @@ class AbrechnungServiceTest {
             final UUID zweiteVersionId = UUID.randomUUID();
             final UUID dritteVersionId = UUID.randomUUID();
             when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
-                    new AbrechnungVersion(ersteVersionId, 1, null),
-                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
-                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId)));
+                    new AbrechnungVersion(ersteVersionId, 1, null, false),
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId, false),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId, false)));
 
             final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, ersteVersionId);
 
@@ -757,9 +757,9 @@ class AbrechnungServiceTest {
             final UUID zweiteVersionId = UUID.randomUUID();
             final UUID dritteVersionId = UUID.randomUUID();
             when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
-                    new AbrechnungVersion(ersteVersionId, 1, null),
-                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
-                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId)));
+                    new AbrechnungVersion(ersteVersionId, 1, null, false),
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId, false),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId, false)));
 
             final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, dritteVersionId);
 
@@ -771,7 +771,7 @@ class AbrechnungServiceTest {
         void givenVersionWithoutAnyOtherVersion_thenReturnOnlyThatVersion() {
             final UUID abrechnungId = UUID.randomUUID();
             when(abrechnungRepository.findByProjektId(PROJEKT_ID))
-                    .thenReturn(List.of(new AbrechnungVersion(abrechnungId, 1, null)));
+                    .thenReturn(List.of(new AbrechnungVersion(abrechnungId, 1, null, false)));
 
             final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, abrechnungId);
 
@@ -785,10 +785,10 @@ class AbrechnungServiceTest {
             final UUID fremdeErsteVersionId = UUID.randomUUID();
             final UUID fremdeZweiteVersionId = UUID.randomUUID();
             when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
-                    new AbrechnungVersion(eigeneErsteVersionId, 1, null),
-                    new AbrechnungVersion(eigeneZweiteVersionId, 2, eigeneErsteVersionId),
-                    new AbrechnungVersion(fremdeErsteVersionId, 1, null),
-                    new AbrechnungVersion(fremdeZweiteVersionId, 2, fremdeErsteVersionId)));
+                    new AbrechnungVersion(eigeneErsteVersionId, 1, null, false),
+                    new AbrechnungVersion(eigeneZweiteVersionId, 2, eigeneErsteVersionId, false),
+                    new AbrechnungVersion(fremdeErsteVersionId, 1, null, false),
+                    new AbrechnungVersion(fremdeZweiteVersionId, 2, fremdeErsteVersionId, false)));
 
             final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, eigeneErsteVersionId);
 
@@ -802,9 +802,9 @@ class AbrechnungServiceTest {
             final UUID zweiteVersionId = UUID.randomUUID();
             final UUID dritteVersionId = UUID.randomUUID();
             when(abrechnungRepository.findByProjektId(PROJEKT_ID)).thenReturn(List.of(
-                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId),
-                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId),
-                    new AbrechnungVersion(ersteVersionId, 1, null)));
+                    new AbrechnungVersion(zweiteVersionId, 2, ersteVersionId, false),
+                    new AbrechnungVersion(dritteVersionId, 3, zweiteVersionId, false),
+                    new AbrechnungVersion(ersteVersionId, 1, null, false)));
 
             final List<AbrechnungVersion> versionen = unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, ersteVersionId);
 
@@ -815,7 +815,7 @@ class AbrechnungServiceTest {
         void givenUnknownAbrechnung_thenThrowNotFound() {
             final UUID abrechnungId = UUID.randomUUID();
             when(abrechnungRepository.findByProjektId(PROJEKT_ID))
-                    .thenReturn(List.of(new AbrechnungVersion(UUID.randomUUID(), 1, null)));
+                    .thenReturn(List.of(new AbrechnungVersion(UUID.randomUUID(), 1, null, false)));
 
             assertThatThrownBy(() -> unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, abrechnungId))
                     .isInstanceOf(NotFoundException.class)
@@ -850,9 +850,9 @@ class AbrechnungServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
                     new BigDecimal("3.00"), new BigDecimal("45.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, false, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(position), List.of());
-            final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000002", false, null, null,
+            final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000002", false, null, null,
                     VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final UUID savedId = UUID.randomUUID();
@@ -861,9 +861,6 @@ class AbrechnungServiceTest {
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(savedId);
-                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
-                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
-                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
                 return toSave;
             });
 
@@ -876,12 +873,11 @@ class AbrechnungServiceTest {
             assertThat(saved.getVorgaengerAbrechnungId()).isEqualTo(vorgaengerId);
             assertThat(saved.getGeschaeftspartnerId()).isEqualTo("1000000002");
             assertThat(saved.getAbrechnungsArt()).isEqualTo(AbrechnungsArt.ZWISCHENABRECHNUNG);
-            assertThat(saved.getNutzungsobjekte()).hasSize(1);
+            verify(nutzungsobjektService).assignNutzungsobjekte(saved, geaenderteAbrechnung);
 
             assertThat(result.id()).isEqualTo(savedId);
             assertThat(result.versionsnummer()).isEqualTo(3);
             assertThat(result.neuereVersionVorhanden()).isFalse();
-            assertThat(result.nutzungsobjekte().getFirst().adresse()).isEqualTo("Sendlinger Straße");
         }
 
         @Test
@@ -896,7 +892,7 @@ class AbrechnungServiceTest {
             vorgaenger.setZeitraumBis(BIS);
             vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
 
-            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
 
             when(abrechnungRepository.findByIdAndProjektId(vorgaengerId, PROJEKT_ID)).thenReturn(Optional.of(vorgaenger));
@@ -911,7 +907,7 @@ class AbrechnungServiceTest {
         @Test
         void givenVorgaengerOfAnotherProjekt_thenThrowNotFound() {
             final UUID vorgaengerId = UUID.randomUUID();
-            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
             when(abrechnungRepository.findByIdAndProjektId(vorgaengerId, PROJEKT_ID)).thenReturn(Optional.empty());
 
@@ -919,6 +915,244 @@ class AbrechnungServiceTest {
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(vorgaengerId.toString());
             verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
+        }
+
+        @Test
+        void givenVorgaenger_thenSaveTheNextVersionAsADraft() {
+            final UUID vorgaengerId = UUID.randomUUID();
+            final AbrechnungEntity vorgaenger = new AbrechnungEntity();
+            vorgaenger.setId(vorgaengerId);
+            vorgaenger.setProjektId(PROJEKT_ID);
+            vorgaenger.setVersionsnummer(1);
+            vorgaenger.setGeschaeftspartnerId("1000000001");
+            vorgaenger.setZeitraumVon(VON);
+            vorgaenger.setZeitraumBis(BIS);
+            vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+
+            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, true, List.of(position), List.of());
+            final Abrechnung naechsteVersion = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null,
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
+
+            when(abrechnungRepository.findByIdAndProjektId(vorgaengerId, PROJEKT_ID)).thenReturn(Optional.of(vorgaenger));
+            when(abrechnungRepository.existsByVorgaengerAbrechnungId(vorgaengerId)).thenReturn(false);
+            when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
+                final AbrechnungEntity toSave = invocation.getArgument(0);
+                toSave.setId(UUID.randomUUID());
+                return toSave;
+            });
+
+            final Abrechnung result = unitUnderTest.createNextVersion(vorgaengerId, naechsteVersion);
+
+            final ArgumentCaptor<AbrechnungEntity> savedCaptor = ArgumentCaptor.forClass(AbrechnungEntity.class);
+            verify(abrechnungRepository).save(savedCaptor.capture());
+            assertThat(savedCaptor.getValue().isDraft()).isTrue();
+            assertThat(result.draft()).isTrue();
+        }
+
+        @Test
+        void givenVorgaengerThatIsADraft_thenThrowConflict() {
+            final UUID vorgaengerId = UUID.randomUUID();
+            final AbrechnungEntity vorgaenger = new AbrechnungEntity();
+            vorgaenger.setId(vorgaengerId);
+            vorgaenger.setProjektId(PROJEKT_ID);
+            vorgaenger.setVersionsnummer(1);
+            vorgaenger.setDraft(true);
+            vorgaenger.setGeschaeftspartnerId("1000000001");
+            vorgaenger.setZeitraumVon(VON);
+            vorgaenger.setZeitraumBis(BIS);
+            vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
+
+            when(abrechnungRepository.findByIdAndProjektId(vorgaengerId, PROJEKT_ID)).thenReturn(Optional.of(vorgaenger));
+
+            assertThatThrownBy(() -> unitUnderTest.createNextVersion(vorgaengerId, abrechnung))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessageContaining(vorgaengerId.toString());
+            verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
+        }
+    }
+
+    @Nested
+    class UpdateDraft {
+        @Test
+        void givenDraft_thenReplaceItsDetailsAndKeepItsPlaceInTheChain() {
+            final NutzungsobjektEntity bisherigesNutzungsobjekt = new NutzungsobjektEntity();
+            bisherigesNutzungsobjekt.setId(UUID.randomUUID());
+            bisherigesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            bisherigesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            bisherigesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+
+            final UUID draftId = UUID.randomUUID();
+            final UUID vorgaengerId = UUID.randomUUID();
+            final AbrechnungEntity draft = new AbrechnungEntity();
+            draft.setId(draftId);
+            draft.setProjektId(PROJEKT_ID);
+            draft.setVersionsnummer(2);
+            draft.setVorgaengerAbrechnungId(vorgaengerId);
+            draft.setDraft(true);
+            draft.setGeschaeftspartnerId("1000000001");
+            draft.setZeitraumVon(VON);
+            draft.setZeitraumBis(BIS);
+            draft.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            draft.addNutzungsobjekt(bisherigesNutzungsobjekt);
+
+            final AbrechnungNutzungsobjekt neuesNutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, true, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
+                    null, null, null, null, false, List.of(), List.of());
+            final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000002", false, null, null,
+                    VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, null, false, List.of(neuesNutzungsobjekt));
+
+            when(abrechnungRepository.findByIdAndProjektId(draftId, PROJEKT_ID)).thenReturn(Optional.of(draft));
+
+            final Abrechnung result = unitUnderTest.updateDraft(draftId, geaenderteAbrechnung);
+
+            assertThat(draft.getGeschaeftspartnerId()).isEqualTo("1000000002");
+            assertThat(draft.getAbrechnungsArt()).isEqualTo(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            assertThat(result.id()).isEqualTo(draftId);
+            assertThat(result.versionsnummer()).isEqualTo(2);
+            assertThat(result.vorgaengerAbrechnungId()).isEqualTo(vorgaengerId);
+            assertThat(result.draft()).isTrue();
+        }
+
+        @Test
+        void givenDraft_thenAssignTheNutzungsobjekteFlushAndOnlyThenDeleteTheFormerOnes() {
+            final NutzungsobjektEntity bisherigesNutzungsobjekt = new NutzungsobjektEntity();
+            final UUID bisherigesNutzungsobjektId = UUID.randomUUID();
+            bisherigesNutzungsobjekt.setId(bisherigesNutzungsobjektId);
+            bisherigesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            bisherigesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            bisherigesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+
+            final UUID draftId = UUID.randomUUID();
+            final AbrechnungEntity draft = new AbrechnungEntity();
+            draft.setId(draftId);
+            draft.setProjektId(PROJEKT_ID);
+            draft.setVersionsnummer(1);
+            draft.setDraft(true);
+            draft.setGeschaeftspartnerId("1000000001");
+            draft.setZeitraumVon(VON);
+            draft.setZeitraumBis(BIS);
+            draft.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            draft.addNutzungsobjekt(bisherigesNutzungsobjekt);
+
+            final AbrechnungNutzungsobjekt neuesNutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false, List.of(), List.of());
+            final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000001", false, null, null,
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(neuesNutzungsobjekt));
+
+            when(abrechnungRepository.findByIdAndProjektId(draftId, PROJEKT_ID)).thenReturn(Optional.of(draft));
+
+            unitUnderTest.updateDraft(draftId, geaenderteAbrechnung);
+
+            final InOrder assignFlushDelete = inOrder(nutzungsobjektService, abrechnungRepository);
+            assignFlushDelete.verify(nutzungsobjektService).assignNutzungsobjekte(draft, geaenderteAbrechnung);
+            assignFlushDelete.verify(abrechnungRepository).flush();
+            assignFlushDelete.verify(nutzungsobjektService).deleteUnbilled(List.of(bisherigesNutzungsobjektId));
+        }
+
+        @Test
+        void givenFinalizedAbrechnung_thenThrowConflict() {
+            final UUID abrechnungId = UUID.randomUUID();
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setId(abrechnungId);
+            abrechnung.setProjektId(PROJEKT_ID);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+
+            final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000002", false, null, null,
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
+
+            when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
+
+            assertThatThrownBy(() -> unitUnderTest.updateDraft(abrechnungId, geaenderteAbrechnung))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessageContaining(abrechnungId.toString());
+            assertThat(abrechnung.getGeschaeftspartnerId()).isEqualTo("1000000001");
+        }
+
+        @Test
+        void givenAbrechnungOfAnotherProjekt_thenThrowNotFound() {
+            final UUID abrechnungId = UUID.randomUUID();
+            final Abrechnung geaenderteAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, false, "1000000002", false, null, null,
+                    VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
+            when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> unitUnderTest.updateDraft(abrechnungId, geaenderteAbrechnung))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(abrechnungId.toString());
+        }
+
+    }
+
+    @Nested
+    class FinalizeDraft {
+        @Test
+        void givenDraft_thenItIsNoDraftAnyMore() {
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setId(UUID.randomUUID());
+            nutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            nutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            nutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+
+            final UUID draftId = UUID.randomUUID();
+            final AbrechnungEntity draft = new AbrechnungEntity();
+            draft.setId(draftId);
+            draft.setProjektId(PROJEKT_ID);
+            draft.setVersionsnummer(1);
+            draft.setDraft(true);
+            draft.setGeschaeftspartnerId("1000000001");
+            draft.setZeitraumVon(VON);
+            draft.setZeitraumBis(BIS);
+            draft.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            draft.addNutzungsobjekt(nutzungsobjekt);
+
+            when(abrechnungRepository.findByIdAndProjektId(draftId, PROJEKT_ID)).thenReturn(Optional.of(draft));
+
+            final Abrechnung result = unitUnderTest.finalizeDraft(PROJEKT_ID, draftId);
+
+            assertThat(draft.isDraft()).isFalse();
+            assertThat(result.id()).isEqualTo(draftId);
+            assertThat(result.draft()).isFalse();
+            assertThat(result.nutzungsobjekte()).extracting(AbrechnungNutzungsobjekt::adresse).containsExactly("Marienplatz");
+        }
+
+        @Test
+        void givenFinalizedAbrechnung_thenThrowConflict() {
+            final UUID abrechnungId = UUID.randomUUID();
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setId(abrechnungId);
+            abrechnung.setProjektId(PROJEKT_ID);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+
+            when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.of(abrechnung));
+
+            assertThatThrownBy(() -> unitUnderTest.finalizeDraft(PROJEKT_ID, abrechnungId))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessageContaining(abrechnungId.toString());
+        }
+
+        @Test
+        void givenAbrechnungOfAnotherProjekt_thenThrowNotFound() {
+            final UUID abrechnungId = UUID.randomUUID();
+            when(abrechnungRepository.findByIdAndProjektId(abrechnungId, PROJEKT_ID)).thenReturn(Optional.empty());
+
+            assertThatThrownBy(() -> unitUnderTest.finalizeDraft(PROJEKT_ID, abrechnungId))
+                    .isInstanceOf(NotFoundException.class)
+                    .hasMessageContaining(abrechnungId.toString());
         }
     }
 }

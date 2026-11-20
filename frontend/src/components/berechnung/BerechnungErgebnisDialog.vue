@@ -178,12 +178,17 @@
         >
           Drucken
         </v-btn>
-        <v-btn
-          variant="text"
-          @click="open = false"
+        <slot
+          :close="close"
+          name="actions"
         >
-          Schließen
-        </v-btn>
+          <v-btn
+            variant="text"
+            @click="close"
+          >
+            Schließen
+          </v-btn>
+        </slot>
       </v-card-actions>
     </v-card>
   </v-dialog>
@@ -267,6 +272,10 @@ function ueberspannungAbschnitte(
 
 function printErgebnis(): void {
   window.print();
+}
+
+function close(): void {
+  open.value = false;
 }
 </script>
 

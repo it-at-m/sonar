@@ -14,6 +14,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.Table;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.Size;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.LinkedHashSet;
 import java.util.Set;
@@ -60,6 +61,11 @@ public class NutzungsobjektEntity extends BaseEntity {
 
     public void addNutzung(final Nutzung nutzung) {
         nutzungen.add(nutzung);
+    }
+
+    public void setNutzungen(final Collection<Nutzung> entries) {
+        nutzungen.clear();
+        nutzungen.addAll(entries);
     }
 
 }

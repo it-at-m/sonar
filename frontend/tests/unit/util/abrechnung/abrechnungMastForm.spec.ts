@@ -11,8 +11,8 @@ describe("abrechnungMastForm.ts", () => {
       expect(mast.ende).toBe("");
     });
 
-    it("givenTwoNewMasten_thenGiveThemDifferentIds", () => {
-      expect(createAbrechnungMast().id).not.toBe(createAbrechnungMast().id);
+    it("givenTwoNewMasten_thenGiveThemDifferentKeys", () => {
+      expect(createAbrechnungMast().key).not.toBe(createAbrechnungMast().key);
     });
   });
 });

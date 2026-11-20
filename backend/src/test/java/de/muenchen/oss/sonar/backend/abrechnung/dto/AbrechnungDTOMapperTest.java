@@ -34,12 +34,12 @@ class AbrechnungDTOMapperTest {
             final AbrechnungPosition position = new AbrechnungPosition(UUID.randomUUID(), VON, BIS,
                     new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
             final AbrechnungMast mast = new AbrechnungMast(UUID.randomUUID(), VON, BIS);
-            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(), false,
                     Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     VON, BIS, null, "Bemerkung", true, List.of(position), List.of(mast));
             final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), LocalDate.of(2026, 4, 1), null, null,
                     null, null, false, false, null);
-            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 2, null, "1000000001", true,
+            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), UUID.randomUUID(), 2, null, false, "1000000001", true,
                     "2000000002", ZustellungsbevollmaechtigterTyp.VORMUND, VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG,
                     widerspruch, true, List.of(nutzungsobjekt));
 
@@ -85,12 +85,13 @@ class AbrechnungDTOMapperTest {
 
         @Test
         void givenAbrechnungVersion_thenReturnsCorrectDTO() {
-            final AbrechnungVersion abrechnungVersion = new AbrechnungVersion(UUID.randomUUID(), 2, UUID.randomUUID());
+            final AbrechnungVersion abrechnungVersion = new AbrechnungVersion(UUID.randomUUID(), 2, UUID.randomUUID(), true);
 
             final AbrechnungVersionResponseDTO result = abrechnungDTOMapper.toDTO(abrechnungVersion);
 
             assertThat(result.id()).isEqualTo(abrechnungVersion.id());
             assertThat(result.versionsnummer()).isEqualTo(2);
+            assertThat(result.draft()).isTrue();
         }
     }
 
@@ -99,9 +100,9 @@ class AbrechnungDTOMapperTest {
         @Test
         void givenRequestDTO_thenTakeTheProjektFromThePath() {
             final UUID projektId = UUID.randomUUID();
-            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
+            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(null,
                     VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null, null,
                     Adressart.ADRESSE, "Marienplatz", "8", "12", null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, 12, null, false, List.of(positionDTO), List.of());
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
@@ -127,8 +128,8 @@ class AbrechnungDTOMapperTest {
 
         @Test
         void givenMasten_thenCarryThemIntoTheNutzungsobjekt() {
-            final AbrechnungMastRequestDTO mastDTO = new AbrechnungMastRequestDTO(VON, BIS);
-            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
+            final AbrechnungMastRequestDTO mastDTO = new AbrechnungMastRequestDTO(null, VON, BIS);
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null, null,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     null, null, null, null, false, List.of(), List.of(mastDTO));
             final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
@@ -146,7 +147,7 @@ class AbrechnungDTOMapperTest {
 
         @Test
         void givenPosition_thenKeepTheFlaecheAsGiven() {
-            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
+            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(null,
                     VON, BIS, new BigDecimal("1.15"), new BigDecimal("0.10"), new BigDecimal("5.00"));
 
             final AbrechnungPosition result = abrechnungDTOMapper.toAbrechnungPosition(positionDTO);
@@ -156,7 +157,7 @@ class AbrechnungDTOMapperTest {
 
         @Test
         void givenOnlyFlaeche_thenKeepItAsGiven() {
-            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(
+            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(null,
                     VON, BIS, null, null, new BigDecimal("5.00"));
 
             final AbrechnungPosition result = abrechnungDTOMapper.toAbrechnungPosition(positionDTO);
@@ -164,6 +165,53 @@ class AbrechnungDTOMapperTest {
             assertThat(result.laenge()).isNull();
             assertThat(result.breite()).isNull();
             assertThat(result.flaeche()).isEqualByComparingTo("5.00");
+        }
+
+        @Test
+        void givenPositionWithId_thenKeepTheId() {
+            final UUID positionId = UUID.randomUUID();
+            final AbrechnungPositionRequestDTO positionDTO = new AbrechnungPositionRequestDTO(positionId,
+                    VON, BIS, null, null, new BigDecimal("5.00"));
+
+            final AbrechnungPosition result = abrechnungDTOMapper.toAbrechnungPosition(positionDTO);
+
+            assertThat(result.id()).isEqualTo(positionId);
+        }
+
+        @Test
+        void givenMastWithId_thenKeepTheId() {
+            final UUID mastId = UUID.randomUUID();
+            final AbrechnungMastRequestDTO mastDTO = new AbrechnungMastRequestDTO(mastId, VON, BIS);
+
+            final AbrechnungMast result = abrechnungDTOMapper.toAbrechnungMast(mastDTO);
+
+            assertThat(result.id()).isEqualTo(mastId);
+        }
+
+        @Test
+        void givenOwnNutzungsobjekt_thenNameItAndKeepItChangeable() {
+            final UUID eigenesNutzungsobjektId = UUID.randomUUID();
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(eigenesNutzungsobjektId,
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false, List.of(), List.of());
+
+            final AbrechnungNutzungsobjekt result = abrechnungDTOMapper.toAbrechnungNutzungsobjekt(nutzungsobjektDTO);
+
+            assertThat(result.id()).isEqualTo(eigenesNutzungsobjektId);
+            assertThat(result.changeable()).isTrue();
+        }
+
+        @Test
+        void givenTakenOverNutzungsobjekt_thenNameItAndMarkItUnchangeable() {
+            final UUID uebernommenesNutzungsobjektId = UUID.randomUUID();
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjektDTO = new AbrechnungNutzungsobjektRequestDTO(null,
+                    uebernommenesNutzungsobjektId, Adressart.ADRESSE, "Marienplatz", "8", null, null, null,
+                    List.of(Nutzung.BAUZAUN), null, null, null, null, null, false, List.of(), List.of());
+
+            final AbrechnungNutzungsobjekt result = abrechnungDTOMapper.toAbrechnungNutzungsobjekt(nutzungsobjektDTO);
+
+            assertThat(result.id()).isEqualTo(uebernommenesNutzungsobjektId);
+            assertThat(result.changeable()).isFalse();
         }
     }
 }

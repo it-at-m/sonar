@@ -60,13 +60,13 @@ describe("AbrechnungBerechnung.vue", () => {
     await addNutzungsobjekt(wrapper);
 
     expect(abrechnung.value.nutzungsobjekte).toHaveLength(2);
-    expect(activeTab(wrapper)).toBe(abrechnung.value.nutzungsobjekte[1]?.id);
+    expect(activeTab(wrapper)).toBe(abrechnung.value.nutzungsobjekte[1]?.key);
   });
 
   it("givenRemovedShownNutzungsobjekt_thenSelectARemainingTab", async () => {
     const { abrechnung, wrapper } = mountBerechnung();
     await addNutzungsobjekt(wrapper);
-    const remaining = abrechnung.value.nutzungsobjekte[0]?.id;
+    const remaining = abrechnung.value.nutzungsobjekte[0]?.key;
 
     await removeNutzungsobjekt(wrapper, 1);
 
@@ -77,7 +77,7 @@ describe("AbrechnungBerechnung.vue", () => {
   it("givenRemovedHiddenNutzungsobjekt_thenKeepTheSelection", async () => {
     const { abrechnung, wrapper } = mountBerechnung();
     await addNutzungsobjekt(wrapper);
-    const shown = abrechnung.value.nutzungsobjekte[1]?.id;
+    const shown = abrechnung.value.nutzungsobjekte[1]?.key;
 
     await removeNutzungsobjekt(wrapper, 0);
 
@@ -100,13 +100,13 @@ describe("AbrechnungBerechnung.vue", () => {
     wrapper.vm.showError("berechnung-nutzungsobjekt-0-adresse");
     await wrapper.vm.$nextTick();
 
-    expect(activeTab(wrapper)).toBe(abrechnung.value.nutzungsobjekte[0]?.id);
+    expect(activeTab(wrapper)).toBe(abrechnung.value.nutzungsobjekte[0]?.key);
   });
 
   it("givenErrorOutsideTheNutzungsobjekte_thenKeepTheSelection", async () => {
     const { abrechnung, wrapper } = mountBerechnung();
     await addNutzungsobjekt(wrapper);
-    const shown = abrechnung.value.nutzungsobjekte[1]?.id;
+    const shown = abrechnung.value.nutzungsobjekte[1]?.key;
 
     wrapper.vm.showError("berechnung-zeitraum-von");
     await wrapper.vm.$nextTick();

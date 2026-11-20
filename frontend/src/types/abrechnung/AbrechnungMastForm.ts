@@ -1,5 +1,6 @@
 export interface AbrechnungMastForm {
-  id: string;
+  key: string;
+  id: string | null;
   beginn: string;
   ende: string;
 }

@@ -118,6 +118,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -144,6 +145,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -195,6 +197,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -212,6 +215,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -229,6 +233,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -243,11 +248,12 @@ describe("AbrechnungTable.vue", () => {
     );
   });
 
-  it("givenSingleVersion_thenLinkStraightToIt", () => {
+  it("givenFinalizedSingleVersion_thenMarkItAbgeschlossenAndLinkStraightToIt", () => {
     const wrapper = mountTable([
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -257,21 +263,11 @@ describe("AbrechnungTable.vue", () => {
       },
     ]);
 
-    const button = wrapper.find('[aria-label*="ansehen"]');
+    const chip = wrapper.findComponent({ name: "VChip" });
 
-    expect(button.exists()).toBe(true);
-    expect(button.classes()).not.toContain("v-btn--disabled");
-    expect(button.attributes("aria-label")).toBe(
-      "Abrechnung 1000000001 ansehen"
-    );
-    expect(
-      wrapper
-        .findAllComponents({ name: "VBtn" })
-        .find((candidate) =>
-          candidate.attributes("aria-label")?.includes("ansehen")
-        )
-        ?.props("to")
-    ).toBe(
+    expect(chip.text()).toBe("Abgeschlossen");
+    expect(chip.attributes("aria-label")).toBe("Abrechnung 1000000001 ansehen");
+    expect(chip.props("to")).toBe(
       "/projekte/123e4567-e89b-12d3-a456-426614174000/abrechnungen/123e4567-e89b-12d3-a456-426614174001/ansehen"
     );
   });
@@ -281,6 +277,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 2,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -309,6 +306,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 2,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -326,6 +324,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -343,6 +342,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 2,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -363,6 +363,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -397,6 +398,7 @@ describe("AbrechnungTable.vue", () => {
       {
         id: "123e4567-e89b-12d3-a456-426614174001",
         versionsnummer: 1,
+        entwurf: false,
         geschaeftspartnerId: "1000000001",
         zeitraumVon: "01.01.2026",
         zeitraumBis: "31.03.2026",
@@ -413,5 +415,89 @@ describe("AbrechnungTable.vue", () => {
       "1000000001"
     );
     expect(berechnungDialog(wrapper).props("projektId")).toBe(PROJEKT_ID);
+  });
+
+  it("givenEntwurf_thenMarkItAndLeadToItsBearbeitung", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        entwurf: true,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    const chip = wrapper.findComponent({ name: "VChip" });
+
+    expect(chip.text()).toBe("Entwurf");
+    expect(chip.attributes("aria-label")).toBe(
+      "Entwurf der Abrechnung 1000000001 bearbeiten"
+    );
+    expect(chip.props("to")).toBe(
+      "/projekte/123e4567-e89b-12d3-a456-426614174000/abrechnungen/123e4567-e89b-12d3-a456-426614174001/bearbeiten"
+    );
+  });
+
+  it("givenEntwurfWithSeveralVersionen_thenTellTheVersionenMenuItIsAnEntwurf", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 2,
+        entwurf: true,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(versionenMenu(wrapper).props("entwurf")).toBe(true);
+    expect(wrapper.find('[aria-label*="bearbeiten"]').exists()).toBe(false);
+  });
+
+  it("givenEntwurf_thenOfferNeitherWiderspruchNorNeueVersion", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        entwurf: true,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(widerspruchButton(wrapper).exists()).toBe(false);
+    expect(neueVersionButton(wrapper).exists()).toBe(false);
+  });
+
+  it("givenEntwurf_thenStillOfferTheBerechnung", () => {
+    const wrapper = mountTable([
+      {
+        id: "123e4567-e89b-12d3-a456-426614174001",
+        versionsnummer: 1,
+        entwurf: true,
+        geschaeftspartnerId: "1000000001",
+        zeitraumVon: "01.01.2026",
+        zeitraumBis: "31.03.2026",
+        abrechnungsArt: "Endabrechnung",
+        anzahlNutzungsobjekte: 1,
+        widerspruchVorhanden: false,
+      },
+    ]);
+
+    expect(berechnungDialog(wrapper).props("abrechnungId")).toBe(
+      "123e4567-e89b-12d3-a456-426614174001"
+    );
   });
 });

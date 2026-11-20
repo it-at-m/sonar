@@ -92,6 +92,89 @@ paths:
           description: OK
       security:
       - bearerAuth: []
+  /projekt/{projektId}/abrechnung/{abrechnungId}:
+    get:
+      tags:
+      - abrechnung-controller
+      summary: Retrieve a single Abrechnung of a Projekt.
+      description: |-
+        Retrieve a single Abrechnung of a Projekt.
+         Fetches the Abrechnung together with its Nutzungsobjekte, whatever version it is.
+      operationId: getAbrechnung
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the requested Abrechnung
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "200":
+          description: the Abrechnung represented as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
+    put:
+      tags:
+      - abrechnung-controller
+      summary: Change a draft of an Abrechnung.
+      description: |-
+        Change a draft of an Abrechnung.
+         The details of the request replace the ones of the draft as a whole. The draft keeps its
+         UUID and its place in the chain of versions.
+         A finalized Abrechnung is refused, because it cannot be changed any more.
+      operationId: updateAbrechnung
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the draft to change
+        required: true
+        schema:
+          type: string
+          format: uuid
+      requestBody:
+        description: the new details of the draft
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AbrechnungRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: the details of the draft are invalid
+        "404":
+          description: "the Projekt has no Abrechnung with that UUID, or the draft\
+            \ has no Position or Mast with a given id"
+        "409":
+          description: the Abrechnung is not a draft
+        "200":
+          description: the changed draft as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
   /theEntity:
     get:
       tags:
@@ -362,6 +445,7 @@ paths:
         Create a new Abrechnung for a Projekt.
          Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
          An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
+         The Abrechnung starts as a draft. It can be changed until it is finalized.
       operationId: saveAbrechnung
       parameters:
       - name: projektId
@@ -401,7 +485,8 @@ paths:
          Any version may be requested and the answer is always the whole chain, so a user who opened an
          old version still gets the full list.
          The entries are ordered by descending Versionsnummer, so the newest version comes first.
-         An entry carries only what a version list needs, the UUID and the Versionsnummer.
+         An entry carries only what a version list needs: the UUID, the Versionsnummer and whether the
+         version is a draft.
       operationId: getAbrechnungVersionen
       parameters:
       - name: projektId
@@ -441,7 +526,8 @@ paths:
          The given Abrechnung stays as it is and the details of the request become a version of its own.
          They may differ from the ones of the Vorgaenger in every field.
          Only the latest version can be carried forward, so an Abrechnung that already has a newer
-         version is refused.
+         version is refused. A draft is changed instead of carried forward, so it is refused as well.
+         The new version starts as a draft. It can be changed until it is finalized.
       operationId: saveAbrechnungVersion
       parameters:
       - name: projektId
@@ -471,9 +557,47 @@ paths:
         "404":
           description: the Projekt has no Abrechnung with that UUID
         "409":
-          description: the Abrechnung already has a newer version
+          description: the Abrechnung is a draft or already has a newer version
         "201":
           description: the created version as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/abrechnung/{abrechnungId}/finalize:
+    post:
+      tags:
+      - abrechnung-controller
+      summary: Finalize a draft of an Abrechnung.
+      description: |-
+        Finalize a draft of an Abrechnung.
+         The draft becomes an Abrechnung with the details it has. From then on it cannot be changed
+         any more. Instead it can be carried forward to a new version, and it can receive a Widerspruch.
+      operationId: finalizeAbrechnung
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: abrechnungId
+        in: path
+        description: the UUID of the draft to finalize
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt has no Abrechnung with that UUID
+        "409":
+          description: the Abrechnung is not a draft
+        "200":
+          description: the finalized Abrechnung as a DTO
           content:
             application/json:
               schema:
@@ -535,6 +659,7 @@ paths:
       description: |-
         Create the Widerspruch of an Abrechnung.
          An Abrechnung carries at most one Widerspruch, so a second one is refused.
+         A draft cannot receive a Widerspruch.
       operationId: saveWiderspruch
       parameters:
       - name: abrechnungId
@@ -557,7 +682,7 @@ paths:
         "404":
           description: the Abrechnung does not exist
         "409":
-          description: the Abrechnung already has a Widerspruch
+          description: the Abrechnung is a draft or already has a Widerspruch
         "201":
           description: the created Widerspruch as a DTO
           content:
@@ -597,41 +722,6 @@ paths:
                 $ref: "#/components/schemas/ProjektResponseDTO"
       security:
       - bearerAuth: []
-  /projekt/{projektId}/abrechnung/{abrechnungId}:
-    get:
-      tags:
-      - abrechnung-controller
-      summary: Retrieve a single Abrechnung of a Projekt.
-      description: |-
-        Retrieve a single Abrechnung of a Projekt.
-         Fetches the Abrechnung together with its Nutzungsobjekte, whatever version it is.
-      operationId: getAbrechnung
-      parameters:
-      - name: projektId
-        in: path
-        description: the UUID of the Projekt the Abrechnung belongs to
-        required: true
-        schema:
-          type: string
-          format: uuid
-      - name: abrechnungId
-        in: path
-        description: the UUID of the requested Abrechnung
-        required: true
-        schema:
-          type: string
-          format: uuid
-      responses:
-        "404":
-          description: the Projekt has no Abrechnung with that UUID
-        "200":
-          description: the Abrechnung represented as a DTO
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/AbrechnungResponseDTO"
-      security:
-      - bearerAuth: []
   /projekt/{projektId}/abrechnung/nutzungsobjekt:
     get:
       tags:
@@ -639,7 +729,9 @@ paths:
       summary: Retrieve the Nutzungsobjekte of a Projekt.
       description: |-
         Retrieve the Nutzungsobjekte of a Projekt.
-         Fetches every Nutzungsobjekt that an Abrechnung of the Projekt bills, each of them once.
+         Fetches every Nutzungsobjekt that a finalized Abrechnung of the Projekt bills, each of them once.
+         These are the Nutzungsobjekte that can be taken over. A draft can still change its own ones, so
+         they are left out.
          The order is by Adresse and Flurstueck.
       operationId: getNutzungsobjekte
       parameters:
@@ -856,6 +948,370 @@ components:
           format: uuid
         textAttribute:
           type: string
+    AbrechnungMastRequestDTO:
+      required:
+      - beginn
+      - ende
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+    AbrechnungNutzungsobjektRequestDTO:
+      required:
+      - art
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        takenOverId:
+          type: string
+          format: uuid
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          maxLength: 255
+          minLength: 1
+          type: string
+        hausnummerVon:
+          maxLength: 20
+          minLength: 1
+          type: string
+        hausnummerBis:
+          maxLength: 20
+          minLength: 1
+          type: string
+        flurstueck:
+          maxLength: 255
+          minLength: 1
+          type: string
+        gemarkung:
+          maxLength: 255
+          minLength: 1
+          type: string
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
+          maxLength: 255
+          minLength: 1
+          type: string
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          minimum: 1
+          type: integer
+          format: int32
+        bemerkung:
+          maxLength: 10000
+          minLength: 0
+          type: string
+        aufschlag50prozent:
+          type: boolean
+        positionen:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungPositionRequestDTO"
+        masten:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungMastRequestDTO"
+      description: |-
+        A Nutzungsobjekt of the Abrechnung to store.
+         <p>
+         The id names an own Nutzungsobjekt of the draft that is changed, and the details update it. The
+         takenOverId names a Nutzungsobjekt that a finalized Abrechnung of the Projekt bills. It is taken
+         over as it is stored, so the fields of the Nutzungsobjekt itself are ignored: the Adresse, the
+         Nutzungen, the unerlaubte Nutzung, bemerkung and aufschlag50prozent.
+         The positionen and masten are not ignored. This Abrechnung bills them, so they are processed as
+         for an own Nutzungsobjekt. At most one of the two ids is given. Without either, the
+         Nutzungsobjekt is new.
+         </p>
+    AbrechnungPositionRequestDTO:
+      required:
+      - beginn
+      - ende
+      - flaeche
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+        laenge:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        breite:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+        flaeche:
+          minimum: 0
+          exclusiveMinimum: true
+          type: number
+    AbrechnungRequestDTO:
+      required:
+      - abrechnungsArt
+      - geschaeftspartnerId
+      - nutzungsobjekte
+      - zeitraumBis
+      - zeitraumVon
+      type: object
+      properties:
+        geschaeftspartnerId:
+          maxLength: 10
+          minLength: 1
+          type: string
+        zustellungsbevollmaechtigterGenutzt:
+          type: boolean
+        zustellungsbevollmaechtigterId:
+          maxLength: 10
+          minLength: 1
+          type: string
+        zustellungsbevollmaechtigterTyp:
+          type: string
+          enum:
+          - GESETZLICHER_VERTRETER
+          - VORMUND
+          - BETREUER
+          - NACHLASSVERWALTER
+          - NACHLASSPFLEGER
+          - TESTAMENTSVOLLSTRECKER
+          - ZWANGSVERWALTER
+          - PFLEGER
+          - VORSTAND
+          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
+          - LIQUIDATOR
+          - KONKURSVERWALTER
+          - STEUERLICHER_VERTRETER
+          - EMPFANGSBEVOLLMAECHTIGTER
+          - VERGLEICHSVERWALTER
+          - GESAMTRECHTSNACHFOLGER
+          - VERWALTER_NACH_DEM_WEG
+          - GESCHAEFTSFUEHRER
+          - GESELLSCHAFTER
+          - INSOLVENZVERWALTER
+          - NACHTRAGSLIQUIDATOR
+          - TREUHAENDER
+          - VORLAEUFIGER_INSOLVENZVERWALTER
+        zeitraumVon:
+          type: string
+          format: date
+        zeitraumBis:
+          type: string
+          format: date
+        abrechnungsArt:
+          type: string
+          enum:
+          - ENDABRECHNUNG
+          - ZWISCHENABRECHNUNG
+        nutzungsobjekte:
+          minItems: 1
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungNutzungsobjektRequestDTO"
+      description: |-
+        The Abrechnung to create.
+         <p>
+         An Abrechnung is created below its Projekt, so the path decides which one it belongs to.
+         </p>
+    AbrechnungMastResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+    AbrechnungNutzungsobjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        changeable:
+          type: boolean
+        art:
+          type: string
+          enum:
+          - ADRESSE
+          - FLURSTUECK
+        adresse:
+          type: string
+        hausnummerVon:
+          type: string
+        hausnummerBis:
+          type: string
+        flurstueck:
+          type: string
+        gemarkung:
+          type: string
+        nutzungen:
+          type: array
+          items:
+            type: string
+            enum:
+            - AUFZUEGE
+            - AUTOKRAENE
+            - BAGGER
+            - BAUWAGEN
+            - BAUZAUN
+            - CONTAINER
+            - BAUGERUESTE
+            - HAUSKANALANSCHLUSS
+            - KRAENE
+            - MATERIALLAGERUNG
+            - UEBERSPANNUNG
+            - HEBEBUEHNEN
+            - SONSTIGES
+        nutzungSonstiges:
+          type: string
+        unerlaubteNutzungVon:
+          type: string
+          format: date
+        unerlaubteNutzungBis:
+          type: string
+          format: date
+        tageUnerlaubteNutzung:
+          type: integer
+          format: int32
+        bemerkung:
+          type: string
+        aufschlag50prozent:
+          type: boolean
+        positionen:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungPositionResponseDTO"
+        masten:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungMastResponseDTO"
+    AbrechnungPositionResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        beginn:
+          type: string
+          format: date
+        ende:
+          type: string
+          format: date
+        laenge:
+          type: number
+        breite:
+          type: number
+        flaeche:
+          type: number
+    AbrechnungResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektId:
+          type: string
+          format: uuid
+        versionsnummer:
+          type: integer
+          format: int32
+        vorgaengerAbrechnungId:
+          type: string
+          format: uuid
+        draft:
+          type: boolean
+        geschaeftspartnerId:
+          type: string
+        zustellungsbevollmaechtigterGenutzt:
+          type: boolean
+        zustellungsbevollmaechtigterId:
+          type: string
+        zustellungsbevollmaechtigterTyp:
+          type: string
+          enum:
+          - GESETZLICHER_VERTRETER
+          - VORMUND
+          - BETREUER
+          - NACHLASSVERWALTER
+          - NACHLASSPFLEGER
+          - TESTAMENTSVOLLSTRECKER
+          - ZWANGSVERWALTER
+          - PFLEGER
+          - VORSTAND
+          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
+          - LIQUIDATOR
+          - KONKURSVERWALTER
+          - STEUERLICHER_VERTRETER
+          - EMPFANGSBEVOLLMAECHTIGTER
+          - VERGLEICHSVERWALTER
+          - GESAMTRECHTSNACHFOLGER
+          - VERWALTER_NACH_DEM_WEG
+          - GESCHAEFTSFUEHRER
+          - GESELLSCHAFTER
+          - INSOLVENZVERWALTER
+          - NACHTRAGSLIQUIDATOR
+          - TREUHAENDER
+          - VORLAEUFIGER_INSOLVENZVERWALTER
+        zeitraumVon:
+          type: string
+          format: date
+        zeitraumBis:
+          type: string
+          format: date
+        abrechnungsArt:
+          type: string
+          enum:
+          - ENDABRECHNUNG
+          - ZWISCHENABRECHNUNG
+        widerspruchVorhanden:
+          type: boolean
+        neuereVersionVorhanden:
+          type: boolean
+        nutzungsobjekte:
+          type: array
+          items:
+            $ref: "#/components/schemas/AbrechnungNutzungsobjektResponseDTO"
     ProjektAdresseRequestDTO:
       required:
       - anzahlMahnungen
@@ -1078,346 +1534,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektAdresseResponseDTO"
-    AbrechnungMastRequestDTO:
-      required:
-      - beginn
-      - ende
-      type: object
-      properties:
-        beginn:
-          type: string
-          format: date
-        ende:
-          type: string
-          format: date
-    AbrechnungNutzungsobjektRequestDTO:
-      required:
-      - art
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        art:
-          type: string
-          enum:
-          - ADRESSE
-          - FLURSTUECK
-        adresse:
-          maxLength: 255
-          minLength: 1
-          type: string
-        hausnummerVon:
-          maxLength: 20
-          minLength: 1
-          type: string
-        hausnummerBis:
-          maxLength: 20
-          minLength: 1
-          type: string
-        flurstueck:
-          maxLength: 255
-          minLength: 1
-          type: string
-        gemarkung:
-          maxLength: 255
-          minLength: 1
-          type: string
-        nutzungen:
-          type: array
-          items:
-            type: string
-            enum:
-            - AUFZUEGE
-            - AUTOKRAENE
-            - BAGGER
-            - BAUWAGEN
-            - BAUZAUN
-            - CONTAINER
-            - BAUGERUESTE
-            - HAUSKANALANSCHLUSS
-            - KRAENE
-            - MATERIALLAGERUNG
-            - UEBERSPANNUNG
-            - HEBEBUEHNEN
-            - SONSTIGES
-        nutzungSonstiges:
-          maxLength: 255
-          minLength: 1
-          type: string
-        unerlaubteNutzungVon:
-          type: string
-          format: date
-        unerlaubteNutzungBis:
-          type: string
-          format: date
-        tageUnerlaubteNutzung:
-          minimum: 1
-          type: integer
-          format: int32
-        bemerkung:
-          maxLength: 10000
-          minLength: 0
-          type: string
-        aufschlag50prozent:
-          type: boolean
-        positionen:
-          type: array
-          items:
-            $ref: "#/components/schemas/AbrechnungPositionRequestDTO"
-        masten:
-          type: array
-          items:
-            $ref: "#/components/schemas/AbrechnungMastRequestDTO"
-    AbrechnungPositionRequestDTO:
-      required:
-      - beginn
-      - ende
-      - flaeche
-      type: object
-      properties:
-        beginn:
-          type: string
-          format: date
-        ende:
-          type: string
-          format: date
-        laenge:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-        breite:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-        flaeche:
-          minimum: 0
-          exclusiveMinimum: true
-          type: number
-    AbrechnungRequestDTO:
-      required:
-      - abrechnungsArt
-      - geschaeftspartnerId
-      - nutzungsobjekte
-      - zeitraumBis
-      - zeitraumVon
-      type: object
-      properties:
-        geschaeftspartnerId:
-          maxLength: 10
-          minLength: 1
-          type: string
-        zustellungsbevollmaechtigterGenutzt:
-          type: boolean
-        zustellungsbevollmaechtigterId:
-          maxLength: 10
-          minLength: 1
-          type: string
-        zustellungsbevollmaechtigterTyp:
-          type: string
-          enum:
-          - GESETZLICHER_VERTRETER
-          - VORMUND
-          - BETREUER
-          - NACHLASSVERWALTER
-          - NACHLASSPFLEGER
-          - TESTAMENTSVOLLSTRECKER
-          - ZWANGSVERWALTER
-          - PFLEGER
-          - VORSTAND
-          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
-          - LIQUIDATOR
-          - KONKURSVERWALTER
-          - STEUERLICHER_VERTRETER
-          - EMPFANGSBEVOLLMAECHTIGTER
-          - VERGLEICHSVERWALTER
-          - GESAMTRECHTSNACHFOLGER
-          - VERWALTER_NACH_DEM_WEG
-          - GESCHAEFTSFUEHRER
-          - GESELLSCHAFTER
-          - INSOLVENZVERWALTER
-          - NACHTRAGSLIQUIDATOR
-          - TREUHAENDER
-          - VORLAEUFIGER_INSOLVENZVERWALTER
-        zeitraumVon:
-          type: string
-          format: date
-        zeitraumBis:
-          type: string
-          format: date
-        abrechnungsArt:
-          type: string
-          enum:
-          - ENDABRECHNUNG
-          - ZWISCHENABRECHNUNG
-        nutzungsobjekte:
-          minItems: 1
-          type: array
-          items:
-            $ref: "#/components/schemas/AbrechnungNutzungsobjektRequestDTO"
-      description: |-
-        The Abrechnung to create.
-         <p>
-         An Abrechnung is created below its Projekt, so the path decides which one it belongs to.
-         </p>
-    AbrechnungMastResponseDTO:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        beginn:
-          type: string
-          format: date
-        ende:
-          type: string
-          format: date
-    AbrechnungNutzungsobjektResponseDTO:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        art:
-          type: string
-          enum:
-          - ADRESSE
-          - FLURSTUECK
-        adresse:
-          type: string
-        hausnummerVon:
-          type: string
-        hausnummerBis:
-          type: string
-        flurstueck:
-          type: string
-        gemarkung:
-          type: string
-        nutzungen:
-          type: array
-          items:
-            type: string
-            enum:
-            - AUFZUEGE
-            - AUTOKRAENE
-            - BAGGER
-            - BAUWAGEN
-            - BAUZAUN
-            - CONTAINER
-            - BAUGERUESTE
-            - HAUSKANALANSCHLUSS
-            - KRAENE
-            - MATERIALLAGERUNG
-            - UEBERSPANNUNG
-            - HEBEBUEHNEN
-            - SONSTIGES
-        nutzungSonstiges:
-          type: string
-        unerlaubteNutzungVon:
-          type: string
-          format: date
-        unerlaubteNutzungBis:
-          type: string
-          format: date
-        tageUnerlaubteNutzung:
-          type: integer
-          format: int32
-        bemerkung:
-          type: string
-        aufschlag50prozent:
-          type: boolean
-        positionen:
-          type: array
-          items:
-            $ref: "#/components/schemas/AbrechnungPositionResponseDTO"
-        masten:
-          type: array
-          items:
-            $ref: "#/components/schemas/AbrechnungMastResponseDTO"
-    AbrechnungPositionResponseDTO:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        beginn:
-          type: string
-          format: date
-        ende:
-          type: string
-          format: date
-        laenge:
-          type: number
-        breite:
-          type: number
-        flaeche:
-          type: number
-    AbrechnungResponseDTO:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        projektId:
-          type: string
-          format: uuid
-        versionsnummer:
-          type: integer
-          format: int32
-        vorgaengerAbrechnungId:
-          type: string
-          format: uuid
-        geschaeftspartnerId:
-          type: string
-        zustellungsbevollmaechtigterGenutzt:
-          type: boolean
-        zustellungsbevollmaechtigterId:
-          type: string
-        zustellungsbevollmaechtigterTyp:
-          type: string
-          enum:
-          - GESETZLICHER_VERTRETER
-          - VORMUND
-          - BETREUER
-          - NACHLASSVERWALTER
-          - NACHLASSPFLEGER
-          - TESTAMENTSVOLLSTRECKER
-          - ZWANGSVERWALTER
-          - PFLEGER
-          - VORSTAND
-          - GESCHAEFTSFUEHRENDER_GESELLSCHAFTER
-          - LIQUIDATOR
-          - KONKURSVERWALTER
-          - STEUERLICHER_VERTRETER
-          - EMPFANGSBEVOLLMAECHTIGTER
-          - VERGLEICHSVERWALTER
-          - GESAMTRECHTSNACHFOLGER
-          - VERWALTER_NACH_DEM_WEG
-          - GESCHAEFTSFUEHRER
-          - GESELLSCHAFTER
-          - INSOLVENZVERWALTER
-          - NACHTRAGSLIQUIDATOR
-          - TREUHAENDER
-          - VORLAEUFIGER_INSOLVENZVERWALTER
-        zeitraumVon:
-          type: string
-          format: date
-        zeitraumBis:
-          type: string
-          format: date
-        abrechnungsArt:
-          type: string
-          enum:
-          - ENDABRECHNUNG
-          - ZWISCHENABRECHNUNG
-        widerspruchVorhanden:
-          type: boolean
-        neuereVersionVorhanden:
-          type: boolean
-        nutzungsobjekte:
-          type: array
-          items:
-            $ref: "#/components/schemas/AbrechnungNutzungsobjektResponseDTO"
     BerechnungResponseDTO:
       type: object
       properties:
@@ -1611,6 +1727,8 @@ components:
         versionsnummer:
           type: integer
           format: int32
+        draft:
+          type: boolean
     NutzungsobjektResponseDTO:
       type: object
       properties:

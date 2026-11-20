@@ -1,6 +1,8 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
+import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_DRAFT;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NEWER_VERSION_ALREADY_EXISTS;
+import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_A_DRAFT;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
@@ -125,11 +127,16 @@ public class AbrechnungService {
     /**
      * Only the latest version can be carried forward, so a Vorgänger that already has a Nachfolger is
      * refused. That keeps the versions of an Abrechnung a chain instead of a tree.
+     * A draft is changed in place instead, so it is never carried forward and never has a newer
+     * version.
      */
     @Transactional
     public Abrechnung createNextVersion(final UUID vorgaengerAbrechnungId, final Abrechnung abrechnung) {
         final AbrechnungEntity vorgaenger = abrechnungRepository.findByIdAndProjektId(vorgaengerAbrechnungId, abrechnung.projektId())
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, vorgaengerAbrechnungId)));
+        if (vorgaenger.isDraft()) {
+            throw new ConflictException(String.format(MSG_DRAFT, vorgaengerAbrechnungId));
+        }
         if (abrechnungRepository.existsByVorgaengerAbrechnungId(vorgaengerAbrechnungId)) {
             throw new ConflictException(String.format(MSG_NEWER_VERSION_ALREADY_EXISTS, vorgaengerAbrechnungId));
         }
@@ -140,26 +147,44 @@ public class AbrechnungService {
         return toAbrechnung(abrechnungRepository.save(nextVersion), false);
     }
 
-    private AbrechnungEntity toAbrechnungEntity(final Abrechnung abrechnung) {
-        final Map<UUID, NutzungsobjektEntity> selectedPreexistingNutzungsobjekte = nutzungsobjektService
-                .selectedPreexistingNutzungsobjekte(abrechnung);
-        final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
-        for (final AbrechnungNutzungsobjekt nutzungsobjekt : abrechnung.nutzungsobjekte()) {
-            final NutzungsobjektEntity nutzungsobjektEntity = nutzungsobjekt.id() == null
-                    ? abrechnungEntityMapper.toEntity(nutzungsobjekt)
-                    : selectedPreexistingNutzungsobjekte.get(nutzungsobjekt.id());
-            abrechnungEntity.addNutzungsobjekt(nutzungsobjektEntity);
-            for (final AbrechnungPosition position : nutzungsobjekt.positionen()) {
-                final AbrechnungPositionEntity positionEntity = abrechnungEntityMapper.toEntity(position);
-                positionEntity.setNutzungsobjekt(nutzungsobjektEntity);
-                abrechnungEntity.addPosition(positionEntity);
-            }
-            for (final AbrechnungMast mast : nutzungsobjekt.masten()) {
-                final AbrechnungMastEntity mastEntity = abrechnungEntityMapper.toEntity(mast);
-                mastEntity.setNutzungsobjekt(nutzungsobjektEntity);
-                abrechnungEntity.addMast(mastEntity);
-            }
+    @Transactional
+    public Abrechnung updateDraft(final UUID abrechnungId, final Abrechnung abrechnung) {
+        final AbrechnungEntity draft = findDraft(abrechnung.projektId(), abrechnungId);
+        final List<UUID> previousNutzungsobjektIds = draft.getNutzungsobjekte().stream()
+                .map(NutzungsobjektEntity::getId)
+                .toList();
+        abrechnungEntityMapper.updateEntity(abrechnung, draft);
+        nutzungsobjektService.assignNutzungsobjekte(draft, abrechnung);
+        log.debug("Update draft {}", draft);
+        // Hibernate hands out the ids of the new Nutzungsobjekte only when it flushes. The answer groups the
+        // Positionen by those ids, and the search for unbilled Nutzungsobjekte has to see the new state.
+        abrechnungRepository.flush();
+        // An own Nutzungsobjekt that the request leaves out would stay behind without an Abrechnung.
+        nutzungsobjektService.deleteUnbilled(previousNutzungsobjektIds);
+        return toAbrechnung(draft, false);
+    }
+
+    @Transactional
+    public Abrechnung finalizeDraft(final UUID projektId, final UUID abrechnungId) {
+        final AbrechnungEntity draft = findDraft(projektId, abrechnungId);
+        draft.setDraft(false);
+        log.info("Finalize draft {} of Projekt {}", abrechnungId, projektId);
+        return toAbrechnung(draft, false);
+    }
+
+    private AbrechnungEntity findDraft(final UUID projektId, final UUID abrechnungId) {
+        final AbrechnungEntity abrechnungEntity = abrechnungRepository.findByIdAndProjektId(abrechnungId, projektId)
+                .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, abrechnungId)));
+        if (!abrechnungEntity.isDraft()) {
+            throw new ConflictException(String.format(MSG_NOT_A_DRAFT, abrechnungId));
         }
+        return abrechnungEntity;
+    }
+
+    private AbrechnungEntity toAbrechnungEntity(final Abrechnung abrechnung) {
+        final AbrechnungEntity abrechnungEntity = abrechnungEntityMapper.toEntity(abrechnung);
+        abrechnungEntity.setDraft(true);
+        nutzungsobjektService.assignNutzungsobjekte(abrechnungEntity, abrechnung);
         return abrechnungEntity;
     }
 
@@ -172,6 +197,9 @@ public class AbrechnungService {
      * Several Abrechnungen bill the same Nutzungsobjekt, and each of them shows only its own.
      */
     private List<AbrechnungNutzungsobjekt> toNutzungsobjekte(final AbrechnungEntity abrechnungEntity) {
+        final Set<UUID> changeableIds = abrechnungEntity.isDraft()
+                ? nutzungsobjektService.ownNutzungsobjekte(abrechnungEntity).keySet()
+                : Set.of();
         final Map<UUID, List<AbrechnungPosition>> positionenJeNutzungsobjekt = abrechnungEntity.getPositionen().stream()
                 .collect(Collectors.groupingBy(position -> position.getNutzungsobjekt().getId(),
                         Collectors.mapping(abrechnungEntityMapper::toPosition, Collectors.toList())));
@@ -180,6 +208,7 @@ public class AbrechnungService {
                         Collectors.mapping(abrechnungEntityMapper::toMast, Collectors.toList())));
         return abrechnungEntity.getNutzungsobjekte().stream()
                 .map(nutzungsobjekt -> abrechnungEntityMapper.toNutzungsobjekt(nutzungsobjekt,
+                        changeableIds.contains(nutzungsobjekt.getId()),
                         positionenJeNutzungsobjekt.getOrDefault(nutzungsobjekt.getId(), List.of()),
                         mastenJeNutzungsobjekt.getOrDefault(nutzungsobjekt.getId(), List.of())))
                 .toList();

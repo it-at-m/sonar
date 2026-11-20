@@ -1,8 +1,10 @@
 package de.muenchen.oss.sonar.backend.abrechnung;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -24,16 +26,25 @@ public interface AbrechnungRepository extends CrudRepository<AbrechnungEntity, U
     @Query(
         "select distinct nutzungsobjekt from AbrechnungEntity abrechnung "
                 + "join abrechnung.nutzungsobjekte nutzungsobjekt "
-                + "where abrechnung.projektId = :projektId "
+                + "where abrechnung.projektId = :projektId and abrechnung.draft = false "
                 + "order by nutzungsobjekt.adressdaten.adresse, nutzungsobjekt.adressdaten.hausnummerVon, "
                 + "nutzungsobjekt.adressdaten.flurstueck, nutzungsobjekt.adressdaten.gemarkung"
     )
-    List<NutzungsobjektEntity> findNutzungsobjekteByProjektId(@Param("projektId") UUID projektId);
+    List<NutzungsobjektEntity> findNutzungsobjekteOfFinalizedAbrechnungenByProjektId(@Param("projektId") UUID projektId);
+
+    @Query(
+        "select distinct nutzungsobjekt.id from AbrechnungEntity abrechnung "
+                + "join abrechnung.nutzungsobjekte nutzungsobjekt "
+                + "where abrechnung.draft = false and nutzungsobjekt.id in :nutzungsobjektIds"
+    )
+    Set<UUID> findNutzungsobjektIdsOfFinalizedAbrechnungen(@Param("nutzungsobjektIds") Collection<UUID> nutzungsobjektIds);
 
     List<AbrechnungVersion> findByProjektId(UUID projektId);
 
     Optional<AbrechnungEntity> findByIdAndProjektId(UUID id, UUID projektId);
 
     boolean existsByVorgaengerAbrechnungId(UUID vorgaengerAbrechnungId);
+
+    void flush();
 
 }

@@ -8,7 +8,11 @@ export function toAbrechnungVersionen(
     .map((version) =>
       version.id === undefined
         ? undefined
-        : { id: version.id, versionsnummer: version.versionsnummer ?? 1 }
+        : {
+            id: version.id,
+            versionsnummer: version.versionsnummer ?? 1,
+            entwurf: version.draft ?? false,
+          }
     )
     .filter((version) => version !== undefined)
     .sort((links, rechts) => rechts.versionsnummer - links.versionsnummer);

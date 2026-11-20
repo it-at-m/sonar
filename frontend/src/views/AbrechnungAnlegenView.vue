@@ -14,7 +14,7 @@
     </h1>
 
     <v-progress-circular
-      v-if="loadingVorgaenger"
+      v-if="loading"
       color="primary"
       indeterminate
     />
@@ -24,13 +24,15 @@
       ref="form"
       @submit.prevent="save"
     >
-      <abrechnung-tabs
-        ref="tabs"
-        v-model="abrechnung"
-        :invalid-nutzungsobjekte="invalidNutzungsobjekte"
-        :nutzungsobjekt-suggestions="nutzungsobjektSuggestions"
-        :suggestions="suggestions"
-      />
+      <div :inert="saving || undefined">
+        <abrechnung-tabs
+          ref="tabs"
+          v-model="abrechnung"
+          :invalid-nutzungsobjekte="invalidNutzungsobjekte"
+          :nutzungsobjekt-suggestions="nutzungsobjektSuggestions"
+          :suggestions="suggestions"
+        />
+      </div>
 
       <div class="d-flex justify-end mt-6">
         <v-btn
@@ -45,10 +47,39 @@
           :loading="saving"
           type="submit"
         >
-          Speichern
+          Entwurf speichern
         </v-btn>
       </div>
     </v-form>
+
+    <berechnung-dialog
+      v-if="entwurf?.id"
+      v-model="berechnungDialogOpen"
+      :abrechnung-id="entwurf.id"
+      :projekt-id="projektId"
+    >
+      <template #ergebnis-actions="{ close }">
+        <v-btn
+          variant="text"
+          @click="close"
+        >
+          Weiter bearbeiten
+        </v-btn>
+        <v-btn
+          variant="text"
+          @click="keepEntwurf"
+        >
+          Als Entwurf behalten
+        </v-btn>
+        <v-btn
+          color="primary"
+          :loading="finalizing"
+          @click="finalize"
+        >
+          Abrechnung abschließen
+        </v-btn>
+      </template>
+    </berechnung-dialog>
 
     <yes-no-dialog
       v-model="saveLeaveDialog"
@@ -61,7 +92,10 @@
 </template>
 
 <script setup lang="ts">
-import type { AbrechnungResponseDTO } from "@/api/generated/sonar-backend";
+import type {
+  AbrechnungRequestDTO,
+  AbrechnungResponseDTO,
+} from "@/api/generated/sonar-backend";
 import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
@@ -75,12 +109,14 @@ import {
   ResponseError,
 } from "@/api/generated/sonar-backend";
 import AbrechnungTabs from "@/components/AbrechnungTabs.vue";
+import BerechnungDialog from "@/components/berechnung/BerechnungDialog.vue";
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import { useSaveLeave } from "@/composables/saveLeave";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
 import {
+  rememberSavedIds,
   toAbrechnungForm,
   toAbrechnungRequestDTO,
 } from "@/util/abrechnung/abrechnungMapper";
@@ -88,9 +124,14 @@ import { nutzungsobjektOfError } from "@/util/abrechnung/abrechnungTabs";
 import { fetchNutzungsobjektSuggestions } from "@/util/abrechnung/nutzungsobjektSuggestion";
 import { fetchProjektAdresseSuggestions } from "@/util/projekt/projektAdresseSuggestion";
 
-const { projektId, vorgaengerAbrechnungId = undefined } = defineProps<{
+const {
+  projektId,
+  vorgaengerAbrechnungId = undefined,
+  entwurfId = undefined,
+} = defineProps<{
   projektId: string;
   vorgaengerAbrechnungId?: string;
+  entwurfId?: string;
 }>();
 
 const router = useRouter();
@@ -99,11 +140,16 @@ const snackbarStore = useSnackbarStore();
 const form = useTemplateRef("form");
 const tabs = useTemplateRef("tabs");
 const saving = ref(false);
+const finalizing = ref(false);
+const berechnungDialogOpen = ref(false);
+const entwurf = ref<AbrechnungResponseDTO>();
 const suggestions = ref<ProjektAdresseSuggestion[]>([]);
 const nutzungsobjektSuggestions = ref<NutzungsobjektSuggestion[]>([]);
-const loadingVorgaenger = ref(vorgaengerAbrechnungId !== undefined);
+const loading = ref(
+  vorgaengerAbrechnungId !== undefined || entwurfId !== undefined
+);
 
-const { abrechnung, isDirty, uebernehmen } = useAbrechnungForm();
+const { abrechnung, isDirty, markSaved, uebernehmen } = useAbrechnungForm();
 
 const {
   cancel,
@@ -114,10 +160,19 @@ const {
   saveLeaveDialogTitle,
 } = useSaveLeave(isDirty);
 
-const title = computed(() =>
-  vorgaengerAbrechnungId === undefined
+const title = computed(() => {
+  if (entwurfId !== undefined) {
+    return "Entwurf der Abrechnung bearbeiten";
+  }
+  return vorgaengerAbrechnungId === undefined
     ? "Abrechnung anlegen"
-    : "Neue Version der Abrechnung anlegen"
+    : "Neue Version der Abrechnung anlegen";
+});
+
+const isNewVersion = computed(
+  () =>
+    vorgaengerAbrechnungId !== undefined ||
+    (entwurf.value?.versionsnummer ?? 1) > 1
 );
 
 const invalidNutzungsobjekte = computed(() =>
@@ -127,31 +182,44 @@ const invalidNutzungsobjekte = computed(() =>
 );
 
 function errorText(error: unknown): string {
-  const isNewVersion = vorgaengerAbrechnungId !== undefined;
   if (error instanceof ResponseError) {
     if (error.response.status === 400) {
-      return isNewVersion
+      return isNewVersion.value
         ? "Die neue Version konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben."
         : "Die Abrechnung konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben.";
     }
     if (error.response.status === 404) {
-      return isNewVersion
+      if (entwurf.value !== undefined) {
+        return "Der Entwurf der Abrechnung wurde nicht gefunden.";
+      }
+      return isNewVersion.value
         ? "Die Abrechnung, zu der die neue Version gehört, wurde nicht gefunden."
         : "Das Projekt wurde nicht gefunden.";
     }
     if (error.response.status === 409) {
-      return "Zu dieser Abrechnung besteht bereits eine neuere Version.";
+      return entwurf.value === undefined
+        ? "Zu dieser Abrechnung besteht bereits eine neuere Version."
+        : "Die Abrechnung ist bereits abgeschlossen und lässt sich nicht mehr ändern.";
     }
   }
-  return isNewVersion
+  return isNewVersion.value
     ? "Die neue Version konnte nicht gespeichert werden."
     : "Die Abrechnung konnte nicht gespeichert werden.";
 }
 
-function savedText(gespeicherteAbrechnung: AbrechnungResponseDTO): string {
-  return vorgaengerAbrechnungId === undefined
-    ? `Die Abrechnung ${gespeicherteAbrechnung.id} wurde angelegt.`
-    : `Die Version ${gespeicherteAbrechnung.versionsnummer} der Abrechnung wurde angelegt.`;
+function finalizeErrorText(error: unknown): string {
+  if (error instanceof ResponseError && error.response.status === 409) {
+    return "Die Abrechnung ist bereits abgeschlossen.";
+  }
+  return "Die Abrechnung konnte nicht abgeschlossen werden. Sie bleibt als Entwurf erhalten.";
+}
+
+function finalizedText(
+  abgeschlosseneAbrechnung: AbrechnungResponseDTO
+): string {
+  return isNewVersion.value
+    ? `Die Version ${abgeschlosseneAbrechnung.versionsnummer} der Abrechnung wurde abgeschlossen.`
+    : `Die Abrechnung ${abgeschlosseneAbrechnung.id} wurde abgeschlossen.`;
 }
 
 async function showFirstError(
@@ -167,6 +235,26 @@ async function showFirstError(
   document.getElementById(id)?.focus();
 }
 
+function saveEntwurf(
+  requestDTO: AbrechnungRequestDTO
+): Promise<AbrechnungResponseDTO> {
+  const abrechnungApi = ApiFactory.getInstance(AbrechnungControllerApi);
+  if (entwurf.value?.id !== undefined) {
+    return abrechnungApi.updateAbrechnung(
+      projektId,
+      entwurf.value.id,
+      requestDTO
+    );
+  }
+  return vorgaengerAbrechnungId === undefined
+    ? abrechnungApi.saveAbrechnung(projektId, requestDTO)
+    : abrechnungApi.saveAbrechnungVersion(
+        projektId,
+        vorgaengerAbrechnungId,
+        requestDTO
+      );
+}
+
 async function save(): Promise<void> {
   const validation = await form.value?.validate();
   if (!validation?.valid) {
@@ -176,22 +264,10 @@ async function save(): Promise<void> {
 
   saving.value = true;
   try {
-    const abrechnungApi = ApiFactory.getInstance(AbrechnungControllerApi);
-    const requestDTO = toAbrechnungRequestDTO(abrechnung.value);
-    const saved =
-      vorgaengerAbrechnungId === undefined
-        ? await abrechnungApi.saveAbrechnung(projektId, requestDTO)
-        : await abrechnungApi.saveAbrechnungVersion(
-            projektId,
-            vorgaengerAbrechnungId,
-            requestDTO
-          );
-    snackbarStore.push({
-      text: savedText(saved),
-      color: STATUS_INDICATORS.SUCCESS,
-    });
-    isSave.value = true;
-    await router.push(`/projekte/${projektId}/abrechnungen`);
+    entwurf.value = await saveEntwurf(toAbrechnungRequestDTO(abrechnung.value));
+    rememberSavedIds(abrechnung.value, entwurf.value);
+    markSaved();
+    berechnungDialogOpen.value = true;
   } catch (error) {
     snackbarStore.push({
       text: errorText(error),
@@ -200,6 +276,44 @@ async function save(): Promise<void> {
   } finally {
     saving.value = false;
   }
+}
+
+async function finalize(): Promise<void> {
+  if (entwurf.value?.id === undefined) {
+    return;
+  }
+
+  finalizing.value = true;
+  try {
+    const abgeschlosseneAbrechnung = await ApiFactory.getInstance(
+      AbrechnungControllerApi
+    ).finalizeAbrechnung(projektId, entwurf.value.id);
+    snackbarStore.push({
+      text: finalizedText(abgeschlosseneAbrechnung),
+      color: STATUS_INDICATORS.SUCCESS,
+    });
+    await returnToAbrechnungen();
+  } catch (error) {
+    snackbarStore.push({
+      text: finalizeErrorText(error),
+      color: STATUS_INDICATORS.ERROR,
+    });
+  } finally {
+    finalizing.value = false;
+  }
+}
+
+async function keepEntwurf(): Promise<void> {
+  snackbarStore.push({
+    text: "Die Abrechnung wurde als Entwurf gespeichert.",
+    color: STATUS_INDICATORS.SUCCESS,
+  });
+  await returnToAbrechnungen();
+}
+
+async function returnToAbrechnungen(): Promise<void> {
+  isSave.value = true;
+  await router.push(`/projekte/${projektId}/abrechnungen`);
 }
 
 function abbrechen(): void {
@@ -235,10 +349,37 @@ async function loadVorgaenger(abrechnungId: string): Promise<void> {
       AbrechnungControllerApi
     ).getAbrechnung(projektId, abrechnungId);
     uebernehmen(toAbrechnungForm(vorgaenger));
-    loadingVorgaenger.value = false;
+    loading.value = false;
   } catch {
     snackbarStore.push({
       text: "Die Abrechnung konnte nicht geladen werden. Es lässt sich daher keine neue Version anlegen.",
+      color: STATUS_INDICATORS.ERROR,
+    });
+    await router.push(`/projekte/${projektId}/abrechnungen`);
+  }
+}
+
+async function loadEntwurf(abrechnungId: string): Promise<void> {
+  try {
+    const geladenerEntwurf = await ApiFactory.getInstance(
+      AbrechnungControllerApi
+    ).getAbrechnung(projektId, abrechnungId);
+    if (!geladenerEntwurf.draft) {
+      snackbarStore.push({
+        text: "Die Abrechnung ist bereits abgeschlossen und lässt sich nicht mehr ändern.",
+        color: STATUS_INDICATORS.ERROR,
+      });
+      await router.push(`/projekte/${projektId}/abrechnungen`);
+      return;
+    }
+    const entwurfForm = toAbrechnungForm(geladenerEntwurf);
+    rememberSavedIds(entwurfForm, geladenerEntwurf);
+    uebernehmen(entwurfForm);
+    entwurf.value = geladenerEntwurf;
+    loading.value = false;
+  } catch {
+    snackbarStore.push({
+      text: "Der Entwurf der Abrechnung konnte nicht geladen werden.",
       color: STATUS_INDICATORS.ERROR,
     });
     await router.push(`/projekte/${projektId}/abrechnungen`);
@@ -250,6 +391,9 @@ onMounted(() => {
   void loadNutzungsobjekte();
   if (vorgaengerAbrechnungId !== undefined) {
     void loadVorgaenger(vorgaengerAbrechnungId);
+  }
+  if (entwurfId !== undefined) {
+    void loadEntwurf(entwurfId);
   }
 });
 </script>

@@ -8,6 +8,7 @@ import java.util.UUID;
 
 public record AbrechnungNutzungsobjektResponseDTO(
         UUID id,
+        boolean changeable,
         Adressart art,
         String adresse,
         String hausnummerVon,

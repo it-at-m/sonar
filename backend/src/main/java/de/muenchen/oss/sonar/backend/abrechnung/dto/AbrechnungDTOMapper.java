@@ -20,18 +20,19 @@ public interface AbrechnungDTOMapper {
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "versionsnummer", ignore = true)
     @Mapping(target = "vorgaengerAbrechnungId", ignore = true)
+    @Mapping(target = "draft", ignore = true)
     @Mapping(target = "widerspruch", ignore = true)
     @Mapping(target = "neuereVersionVorhanden", ignore = true)
     Abrechnung toAbrechnung(UUID projektId, AbrechnungRequestDTO abrechnungRequestDTO);
 
     NutzungsobjektResponseDTO toDTO(AbrechnungNutzungsobjekt abrechnungNutzungsobjekt);
 
-    AbrechnungNutzungsobjekt toAbrechnungNutzungsobjekt(AbrechnungNutzungsobjektRequestDTO abrechnungNutzungsobjektRequestDTO);
+    @Mapping(target = "id", expression = "java(nutzungsobjekt.takenOverId() == null ? nutzungsobjekt.id() : nutzungsobjekt.takenOverId())")
+    @Mapping(target = "changeable", expression = "java(nutzungsobjekt.takenOverId() == null)")
+    AbrechnungNutzungsobjekt toAbrechnungNutzungsobjekt(AbrechnungNutzungsobjektRequestDTO nutzungsobjekt);
 
-    @Mapping(target = "id", ignore = true)
     AbrechnungPosition toAbrechnungPosition(AbrechnungPositionRequestDTO abrechnungPositionRequestDTO);
 
-    @Mapping(target = "id", ignore = true)
     AbrechnungMast toAbrechnungMast(AbrechnungMastRequestDTO abrechnungMastRequestDTO);
 
 }

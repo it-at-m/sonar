@@ -54,7 +54,7 @@
 
     <projekt-form-adresse-card
       v-for="(adresse, index) in projekt.adressen"
-      :key="adresse.id"
+      :key="adresse.key"
       :id-prefix="`adresse-${index}`"
       :model-value="adresse"
       :position="index + 1"

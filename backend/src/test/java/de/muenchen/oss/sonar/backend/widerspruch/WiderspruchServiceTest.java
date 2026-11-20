@@ -107,5 +107,22 @@ class WiderspruchServiceTest {
                     .hasMessageContaining(ABRECHNUNG_ID.toString());
             verify(widerspruchRepository, never()).save(any(WiderspruchEntity.class));
         }
+
+        @Test
+        void givenDraft_thenThrowConflict() {
+            final Widerspruch widerspruch = new Widerspruch(null, EINGANG, null, null, null, null, false, false, null);
+
+            final AbrechnungEntity draft = new AbrechnungEntity();
+            draft.setId(ABRECHNUNG_ID);
+            draft.setDraft(true);
+
+            when(abrechnungRepository.findById(ABRECHNUNG_ID)).thenReturn(Optional.of(draft));
+
+            assertThatThrownBy(() -> unitUnderTest.createWiderspruch(ABRECHNUNG_ID, widerspruch))
+                    .isInstanceOf(ConflictException.class)
+                    .hasMessageContaining(ABRECHNUNG_ID.toString());
+            verify(widerspruchRepository, never()).save(any(WiderspruchEntity.class));
+            assertThat(draft.getWiderspruch()).isNull();
+        }
     }
 }

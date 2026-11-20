@@ -16,11 +16,24 @@ import java.time.LocalDate;
 import java.util.List;
 import java.util.UUID;
 
+/**
+ * A Nutzungsobjekt of the Abrechnung to store.
+ * <p>
+ * The id names an own Nutzungsobjekt of the draft that is changed, and the details update it. The
+ * takenOverId names a Nutzungsobjekt that a finalized Abrechnung of the Projekt bills. It is taken
+ * over as it is stored, so the fields of the Nutzungsobjekt itself are ignored: the Adresse, the
+ * Nutzungen, the unerlaubte Nutzung, bemerkung and aufschlag50prozent.
+ * The positionen and masten are not ignored. This Abrechnung bills them, so they are processed as
+ * for an own Nutzungsobjekt. At most one of the two ids is given. Without either, the
+ * Nutzungsobjekt is new.
+ * </p>
+ */
 @AdressartValid
 @NutzungValid
 @UnerlaubteNutzungValid
 public record AbrechnungNutzungsobjektRequestDTO(
         UUID id,
+        UUID takenOverId,
         @NotNull Adressart art,
         @Size(min = 1, max = 255) String adresse,
         @Size(min = 1, max = 20) String hausnummerVon,

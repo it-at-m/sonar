@@ -51,6 +51,14 @@ describe("abrechnungTableRowMapper.ts", () => {
       expect(row.abrechnungsArt).toBe("");
     });
 
+    it("givenEntwurf_thenMarkIt", () => {
+      expect(toAbrechnungTableRow({ draft: true }).entwurf).toBe(true);
+    });
+
+    it("givenMissingEntwurf_thenTreatItAsFinalized", () => {
+      expect(toAbrechnungTableRow({}).entwurf).toBe(false);
+    });
+
     it("givenNutzungsobjekte_thenCountThem", () => {
       const row = toAbrechnungTableRow({
         nutzungsobjekte: [{ adresse: "A" }, { adresse: "B" }],

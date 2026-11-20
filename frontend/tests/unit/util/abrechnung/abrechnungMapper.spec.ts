@@ -8,6 +8,7 @@ import {
 } from "@/api/generated/sonar-backend";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import {
+  rememberSavedIds,
   toAbrechnungForm,
   toAbrechnungRequestDTO,
 } from "@/util/abrechnung/abrechnungMapper";
@@ -102,8 +103,8 @@ describe("abrechnungMapper.ts", () => {
       nutzungsobjekt.hausnummerVon = "8";
       nutzungsobjekt.positionen = [];
       nutzungsobjekt.masten = [
-        { id: crypto.randomUUID(), beginn: "2026-01-01", ende: "2026-01-31" },
-        { id: crypto.randomUUID(), beginn: "2026-02-01", ende: "2026-02-28" },
+        { key: crypto.randomUUID(), beginn: "2026-01-01", ende: "2026-01-31" },
+        { key: crypto.randomUUID(), beginn: "2026-02-01", ende: "2026-02-28" },
       ];
 
       const nutzungsobjektRequestDTO = itemAt(
@@ -424,6 +425,7 @@ describe("abrechnungMapper.ts", () => {
       );
 
       expect(nutzungsobjektRequestDTO.id).toBeUndefined();
+      expect(nutzungsobjektRequestDTO.takenOverId).toBeUndefined();
     });
 
     it("givenUebernommenesNutzungsobjekt_thenNameItSoTheStoredOneIsBilled", () => {
@@ -453,9 +455,100 @@ describe("abrechnungMapper.ts", () => {
         toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
       );
 
-      expect(nutzungsobjektRequestDTO.id).toBe(
+      expect(nutzungsobjektRequestDTO.takenOverId).toBe(
         "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d"
       );
+      expect(nutzungsobjektRequestDTO.id).toBeUndefined();
+    });
+
+    it("givenOwnSavedNutzungsobjekt_thenSendItsId", () => {
+      const { abrechnung } = useAbrechnungForm();
+      abrechnung.value.abrechnungsArt =
+        AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.id = "123e4567-e89b-12d3-a456-426614174031";
+      nutzungsobjekt.positionen = [];
+
+      const nutzungsobjektRequestDTO = itemAt(
+        toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
+      );
+
+      expect(nutzungsobjektRequestDTO.id).toBe(
+        "123e4567-e89b-12d3-a456-426614174031"
+      );
+      expect(nutzungsobjektRequestDTO.takenOverId).toBeUndefined();
+    });
+
+    it("givenSavedPositionAndMast_thenSendTheirIds", () => {
+      const { abrechnung } = useAbrechnungForm();
+      abrechnung.value.abrechnungsArt =
+        AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.positionen = [
+        {
+          key: crypto.randomUUID(),
+          id: "123e4567-e89b-12d3-a456-426614174003",
+          beginn: "2026-01-01",
+          ende: "2026-03-31",
+          laenge: null,
+          breite: null,
+          flaeche: 36,
+        },
+      ];
+      nutzungsobjekt.masten = [
+        {
+          key: crypto.randomUUID(),
+          id: "123e4567-e89b-12d3-a456-426614174004",
+          beginn: "2026-01-01",
+          ende: "2026-01-31",
+        },
+      ];
+
+      const nutzungsobjektRequestDTO = itemAt(
+        toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
+      );
+
+      expect(itemAt(nutzungsobjektRequestDTO.positionen ?? []).id).toBe(
+        "123e4567-e89b-12d3-a456-426614174003"
+      );
+      expect(itemAt(nutzungsobjektRequestDTO.masten ?? []).id).toBe(
+        "123e4567-e89b-12d3-a456-426614174004"
+      );
+    });
+
+    it("givenNewPositionAndMast_thenSendNoId", () => {
+      const { abrechnung } = useAbrechnungForm();
+      abrechnung.value.abrechnungsArt =
+        AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.positionen = [
+        {
+          key: crypto.randomUUID(),
+          id: null,
+          beginn: "2026-01-01",
+          ende: "2026-03-31",
+          laenge: null,
+          breite: null,
+          flaeche: 36,
+        },
+      ];
+      nutzungsobjekt.masten = [
+        {
+          key: crypto.randomUUID(),
+          id: null,
+          beginn: "2026-01-01",
+          ende: "2026-01-31",
+        },
+      ];
+
+      const nutzungsobjektRequestDTO = itemAt(
+        toAbrechnungRequestDTO(abrechnung.value).nutzungsobjekte
+      );
+
+      expect(
+        itemAt(nutzungsobjektRequestDTO.positionen ?? []).id
+      ).toBeUndefined();
+      expect(itemAt(nutzungsobjektRequestDTO.masten ?? []).id).toBeUndefined();
     });
   });
 
@@ -608,6 +701,172 @@ describe("abrechnungMapper.ts", () => {
       expect(form.nutzungsobjekte).toHaveLength(1);
       expect(itemAt(form.nutzungsobjekte).adresse).toBe("");
       expect(itemAt(form.nutzungsobjekte).positionen).toHaveLength(1);
+    });
+
+    it("givenSavedPositionAndMast_thenLeaveThemUnsavedForANewAbrechnung", () => {
+      const form = toAbrechnungForm({
+        abrechnungsArt: "ENDABRECHNUNG",
+        nutzungsobjekte: [
+          {
+            art: "ADRESSE",
+            adresse: "Marienplatz",
+            hausnummerVon: "8",
+            aufschlag50prozent: false,
+            positionen: [
+              {
+                id: "123e4567-e89b-12d3-a456-426614174003",
+                beginn: new Date("2026-01-01"),
+                ende: new Date("2026-03-31"),
+                flaeche: 36,
+              },
+            ],
+            masten: [
+              {
+                id: "123e4567-e89b-12d3-a456-426614174004",
+                beginn: new Date("2026-01-01"),
+                ende: new Date("2026-01-31"),
+              },
+            ],
+          },
+        ],
+      });
+
+      const nutzungsobjekt = itemAt(form.nutzungsobjekte);
+      expect(itemAt(nutzungsobjekt.positionen).id).toBeNull();
+      expect(itemAt(nutzungsobjekt.masten).id).toBeNull();
+    });
+  });
+
+  describe("rememberSavedIds", () => {
+    it("givenSavedAbrechnung_thenGiveEachPositionAndMastTheIdAtItsPlace", () => {
+      const { abrechnung } = useAbrechnungForm();
+      const marienplatz = itemAt(abrechnung.value.nutzungsobjekte);
+      marienplatz.positionen = [
+        {
+          key: "position-0001",
+          id: null,
+          beginn: "2026-01-01",
+          ende: "2026-01-31",
+          laenge: null,
+          breite: null,
+          flaeche: 36,
+        },
+        {
+          key: "position-0002",
+          id: null,
+          beginn: "2026-02-01",
+          ende: "2026-02-28",
+          laenge: null,
+          breite: null,
+          flaeche: 45,
+        },
+      ];
+      marienplatz.masten = [
+        {
+          key: "mast-0001",
+          id: null,
+          beginn: "2026-01-01",
+          ende: "2026-01-31",
+        },
+      ];
+
+      rememberSavedIds(abrechnung.value, {
+        nutzungsobjekte: [
+          {
+            positionen: [
+              {
+                id: "123e4567-e89b-12d3-a456-426614174011",
+                beginn: new Date("2026-01-01"),
+                ende: new Date("2026-01-31"),
+                flaeche: 36,
+              },
+              {
+                id: "123e4567-e89b-12d3-a456-426614174012",
+                beginn: new Date("2026-02-01"),
+                ende: new Date("2026-02-28"),
+                flaeche: 45,
+              },
+            ],
+            masten: [
+              {
+                id: "123e4567-e89b-12d3-a456-426614174021",
+                beginn: new Date("2026-01-01"),
+                ende: new Date("2026-01-31"),
+              },
+            ],
+          },
+        ],
+      });
+
+      expect(marienplatz.positionen.map((position) => position.id)).toEqual([
+        "123e4567-e89b-12d3-a456-426614174011",
+        "123e4567-e89b-12d3-a456-426614174012",
+      ]);
+      expect(itemAt(marienplatz.masten).id).toBe(
+        "123e4567-e89b-12d3-a456-426614174021"
+      );
+    });
+
+    it("givenEntryTheAnswerLacks_thenLeaveItUnsaved", () => {
+      const { abrechnung } = useAbrechnungForm();
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.positionen = [
+        {
+          key: "position-0001",
+          id: "123e4567-e89b-12d3-a456-426614174011",
+          beginn: "2026-01-01",
+          ende: "2026-01-31",
+          laenge: null,
+          breite: null,
+          flaeche: 36,
+        },
+      ];
+
+      rememberSavedIds(abrechnung.value, { nutzungsobjekte: [] });
+
+      expect(itemAt(nutzungsobjekt.positionen).id).toBeNull();
+    });
+
+    it("givenChangeableNutzungsobjekt_thenRememberItsId", () => {
+      const { abrechnung } = useAbrechnungForm();
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+
+      rememberSavedIds(abrechnung.value, {
+        nutzungsobjekte: [
+          {
+            id: "123e4567-e89b-12d3-a456-426614174031",
+            changeable: true,
+            positionen: [],
+            masten: [],
+          },
+        ],
+      });
+
+      expect(nutzungsobjekt.id).toBe("123e4567-e89b-12d3-a456-426614174031");
+      expect(nutzungsobjekt.uebernahme).toBeNull();
+    });
+
+    it("givenNutzungsobjektTheDraftCannotChange_thenRestoreItsUebernahme", () => {
+      const { abrechnung } = useAbrechnungForm();
+      const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+      nutzungsobjekt.id = "123e4567-e89b-12d3-a456-426614174031";
+
+      rememberSavedIds(abrechnung.value, {
+        nutzungsobjekte: [
+          {
+            id: "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d",
+            changeable: false,
+            positionen: [],
+            masten: [],
+          },
+        ],
+      });
+
+      expect(nutzungsobjekt.uebernahme).toEqual({
+        quelle: "NUTZUNGSOBJEKT",
+        nutzungsobjektId: "7c6b5a4d-3e2f-4a1b-9c8d-7e6f5a4b3c2d",
+      });
+      expect(nutzungsobjekt.id).toBeNull();
     });
   });
 });

@@ -24,7 +24,7 @@ class FlaechenadresseServiceTest {
             final AbrechnungPosition fruehere = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(spaetere, fruehere), List.of());
 
             final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
@@ -42,7 +42,7 @@ class FlaechenadresseServiceTest {
             final AbrechnungPosition zweite = new AbrechnungPosition(null, LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 31),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(erste, zweite), List.of());
 
             final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
@@ -58,7 +58,7 @@ class FlaechenadresseServiceTest {
             final AbrechnungPosition laengere = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 31),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(kuerzere, laengere), List.of());
 
             final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
@@ -71,7 +71,7 @@ class FlaechenadresseServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true, List.of(position), List.of());
 
             final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
@@ -83,7 +83,7 @@ class FlaechenadresseServiceTest {
         @Test
         void givenNoPositionen_thenHoldNoFlaecheAndNoWoche() {
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
-                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, false, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(), List.of());
 
             final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));

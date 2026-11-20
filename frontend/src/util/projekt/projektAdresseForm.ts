@@ -6,7 +6,7 @@ import { hasUnerlaubteNutzung } from "@/util/common/unerlaubteNutzungForm";
 
 export function createProjektAdresse(): ProjektAdresseForm {
   return {
-    id: crypto.randomUUID(),
+    key: crypto.randomUUID(),
     art: ProjektAdresseRequestDTOArtEnum.ADRESSE,
     adresse: "",
     hausnummerVon: "",

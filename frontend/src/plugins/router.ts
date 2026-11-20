@@ -62,6 +62,13 @@ const routes = [
     meta: {},
   },
   {
+    path: "/projekte/:projektId/abrechnungen/:entwurfId/bearbeiten",
+    name: "abrechnung-bearbeiten",
+    component: AbrechnungAnlegenView,
+    props: true,
+    meta: {},
+  },
+  {
     path: "/projekte/:projektId/abrechnungen/:vorgaengerAbrechnungId/version/anlegen",
     name: "abrechnung-version-anlegen",
     component: AbrechnungAnlegenView,

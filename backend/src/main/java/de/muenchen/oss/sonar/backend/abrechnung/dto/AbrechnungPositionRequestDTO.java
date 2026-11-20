@@ -6,9 +6,11 @@ import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.UUID;
 
 @ZeitraumOrdered(von = "beginn", bis = "ende", message = "Das Ende einer Position darf nicht vor deren Beginn liegen.")
 public record AbrechnungPositionRequestDTO(
+        UUID id,
         @NotNull LocalDate beginn,
         @NotNull LocalDate ende,
         @DecimalMin(value = "0", inclusive = false) @Digits(integer = 10, fraction = 2) BigDecimal laenge,
