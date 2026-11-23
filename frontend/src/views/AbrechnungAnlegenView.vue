@@ -1,6 +1,7 @@
 <template>
   <v-container>
     <v-btn
+      v-if="canLeaveWithoutFinalizing"
       class="mb-2"
       :prepend-icon="mdiArrowLeft"
       variant="text"
@@ -36,6 +37,7 @@
 
       <div class="d-flex justify-end mt-6">
         <v-btn
+          v-if="canLeaveWithoutFinalizing"
           class="mr-2"
           variant="text"
           @click="abbrechen"
@@ -47,7 +49,7 @@
           :loading="saving"
           type="submit"
         >
-          Entwurf speichern
+          Zur Berechnung
         </v-btn>
       </div>
     </v-form>
@@ -64,12 +66,6 @@
           @click="close"
         >
           Weiter bearbeiten
-        </v-btn>
-        <v-btn
-          variant="text"
-          @click="keepEntwurf"
-        >
-          Als Entwurf behalten
         </v-btn>
         <v-btn
           color="primary"
@@ -173,6 +169,10 @@ const isNewVersion = computed(
   () =>
     vorgaengerAbrechnungId !== undefined ||
     (entwurf.value?.versionsnummer ?? 1) > 1
+);
+
+const canLeaveWithoutFinalizing = computed(
+  () => entwurfId === undefined && entwurf.value === undefined
 );
 
 const invalidNutzungsobjekte = computed(() =>
@@ -301,14 +301,6 @@ async function finalize(): Promise<void> {
   } finally {
     finalizing.value = false;
   }
-}
-
-async function keepEntwurf(): Promise<void> {
-  snackbarStore.push({
-    text: "Die Abrechnung wurde als Entwurf gespeichert.",
-    color: STATUS_INDICATORS.SUCCESS,
-  });
-  await returnToAbrechnungen();
 }
 
 async function returnToAbrechnungen(): Promise<void> {

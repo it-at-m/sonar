@@ -544,6 +544,47 @@ describe("AbrechnungAnlegenView.vue", () => {
     ).toMatchObject({ geschaeftspartnerId: "1000000007" });
   });
 
+  it("givenEntwurfId_thenOfferNoWayBackWithoutFinalizing", async () => {
+    stubFetch({
+      id: ENTWURF_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 1,
+      draft: true,
+      geschaeftspartnerId: "1000000001",
+      zeitraumVon: new Date("2026-01-01"),
+      zeitraumBis: new Date("2026-03-31"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      nutzungsobjekte: [],
+    });
+
+    const wrapper = await mountView({ entwurfId: ENTWURF_ID });
+
+    expect(wrapper.text()).not.toContain("Zurück zu den Abrechnungen");
+    expect(wrapper.text()).not.toContain("Abbrechen");
+  });
+
+  it("givenNewAbrechnung_whenSaved_thenOfferNoWayBackWithoutFinalizing", async () => {
+    stubFetch({
+      id: ENTWURF_ID,
+      projektId: PROJEKT_ID,
+      versionsnummer: 1,
+      draft: true,
+      geschaeftspartnerId: "1000000001",
+      zeitraumVon: new Date("2026-01-01"),
+      zeitraumBis: new Date("2026-03-31"),
+      abrechnungsArt: "ENDABRECHNUNG",
+      nutzungsobjekte: [],
+    });
+    const wrapper = await mountView({});
+    expect(wrapper.text()).toContain("Zurück zu den Abrechnungen");
+    expect(wrapper.text()).toContain("Abbrechen");
+
+    await save(wrapper);
+
+    expect(wrapper.text()).not.toContain("Zurück zu den Abrechnungen");
+    expect(wrapper.text()).not.toContain("Abbrechen");
+  });
+
   it("givenEntwurfIdOfAFinalizedAbrechnung_thenReturnToTheAbrechnungen", async () => {
     stubFetch({
       id: ENTWURF_ID,
@@ -663,51 +704,6 @@ describe("AbrechnungAnlegenView.vue", () => {
     });
     expect(useSnackbarStore().queue.at(-1)?.text).toBe(
       `Die Abrechnung ${ENTWURF_ID} wurde abgeschlossen.`
-    );
-    expect(push).toHaveBeenCalledWith(ABRECHNUNGEN_PATH);
-  });
-
-  it("givenErgebnis_whenAlsEntwurfBehalten_thenReturnWithoutFinalizing", async () => {
-    const fetchSpy = stubFetch({
-      id: ENTWURF_ID,
-      projektId: PROJEKT_ID,
-      versionsnummer: 1,
-      draft: true,
-      geschaeftspartnerId: "1000000001",
-      zeitraumVon: new Date("2026-01-01"),
-      zeitraumBis: new Date("2026-03-31"),
-      abrechnungsArt: "ENDABRECHNUNG",
-      nutzungsobjekte: [
-        {
-          art: "ADRESSE",
-          adresse: "Marienplatz",
-          hausnummerVon: "8",
-          nutzungen: ["BAUZAUN"],
-          aufschlag50prozent: false,
-          positionen: [
-            {
-              beginn: new Date("2026-01-01"),
-              ende: new Date("2026-03-31"),
-              laenge: 12,
-              breite: 3,
-              flaeche: 36,
-            },
-          ],
-          masten: [],
-        },
-      ],
-    });
-    const wrapper = await mountView({ entwurfId: ENTWURF_ID });
-
-    await save(wrapper);
-    await calculate();
-    await clickButton("Als Entwurf behalten");
-
-    expect(
-      requests(fetchSpy).some((request) => request.url.endsWith("/finalize"))
-    ).toBe(false);
-    expect(useSnackbarStore().queue.at(-1)?.text).toBe(
-      "Die Abrechnung wurde als Entwurf gespeichert."
     );
     expect(push).toHaveBeenCalledWith(ABRECHNUNGEN_PATH);
   });
