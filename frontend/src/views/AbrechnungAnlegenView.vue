@@ -40,6 +40,22 @@
         >
           Abbrechen
         </v-btn>
+        <berechnung-durchfuehren-dialog
+          :projekt-id="projektId"
+          :unsaved-abrechnung="abrechnung"
+        >
+          <template #activator="{ open }">
+            <v-btn
+              class="mr-2"
+              :disabled="saving"
+              :prepend-icon="mdiCalculator"
+              variant="text"
+              @click="openBerechnung(open)"
+            >
+              Berechnen
+            </v-btn>
+          </template>
+        </berechnung-durchfuehren-dialog>
         <v-btn
           color="primary"
           :loading="saving"
@@ -65,7 +81,7 @@ import type { AbrechnungResponseDTO } from "@/api/generated/sonar-backend";
 import type { NutzungsobjektSuggestion } from "@/types/abrechnung/NutzungsobjektSuggestion";
 import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSuggestion";
 
-import { mdiArrowLeft } from "@mdi/js";
+import { mdiArrowLeft, mdiCalculator } from "@mdi/js";
 import { computed, nextTick, onMounted, ref, useTemplateRef } from "vue";
 import { useRouter } from "vue-router";
 
@@ -75,6 +91,7 @@ import {
   ResponseError,
 } from "@/api/generated/sonar-backend";
 import AbrechnungTabs from "@/components/AbrechnungTabs.vue";
+import BerechnungDurchfuehrenDialog from "@/components/berechnung/BerechnungDurchfuehrenDialog.vue";
 import YesNoDialog from "@/components/common/YesNoDialog.vue";
 import { useAbrechnungForm } from "@/composables/abrechnungForm";
 import { useSaveLeave } from "@/composables/saveLeave";
@@ -167,10 +184,17 @@ async function showFirstError(
   document.getElementById(id)?.focus();
 }
 
-async function save(): Promise<void> {
+async function validateForm(): Promise<boolean> {
   const validation = await form.value?.validate();
   if (!validation?.valid) {
     await showFirstError(validation?.errors ?? []);
+    return false;
+  }
+  return true;
+}
+
+async function save(): Promise<void> {
+  if (!(await validateForm())) {
     return;
   }
 
@@ -199,6 +223,12 @@ async function save(): Promise<void> {
     });
   } finally {
     saving.value = false;
+  }
+}
+
+async function openBerechnung(open: () => void): Promise<void> {
+  if (await validateForm()) {
+    open();
   }
 }
 

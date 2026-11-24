@@ -140,6 +140,24 @@ public class AbrechnungService {
         return toAbrechnung(abrechnungRepository.save(nextVersion), false);
     }
 
+    @Transactional(readOnly = true)
+    public Abrechnung resolvePreexistingNutzungsobjekte(final Abrechnung abrechnung) {
+        final Map<UUID, NutzungsobjektEntity> selectedPreexistingNutzungsobjekte = nutzungsobjektService
+                .selectedPreexistingNutzungsobjekte(abrechnung);
+        final List<AbrechnungNutzungsobjekt> nutzungsobjekte = abrechnung.nutzungsobjekte().stream()
+                .map(nutzungsobjekt -> nutzungsobjekt.id() == null
+                        ? nutzungsobjekt
+                        : abrechnungEntityMapper.toNutzungsobjekt(selectedPreexistingNutzungsobjekte.get(nutzungsobjekt.id()),
+                                nutzungsobjekt.positionen(), nutzungsobjekt.masten()))
+                .toList();
+        return new Abrechnung(abrechnung.id(), abrechnung.projektId(), abrechnung.versionsnummer(),
+                abrechnung.vorgaengerAbrechnungId(), abrechnung.geschaeftspartnerId(),
+                abrechnung.zustellungsbevollmaechtigterGenutzt(), abrechnung.zustellungsbevollmaechtigterId(),
+                abrechnung.zustellungsbevollmaechtigterTyp(), abrechnung.zeitraumVon(), abrechnung.zeitraumBis(),
+                abrechnung.abrechnungsArt(), abrechnung.widerspruch(), abrechnung.neuereVersionVorhanden(),
+                nutzungsobjekte);
+    }
+
     private AbrechnungEntity toAbrechnungEntity(final Abrechnung abrechnung) {
         final Map<UUID, NutzungsobjektEntity> selectedPreexistingNutzungsobjekte = nutzungsobjektService
                 .selectedPreexistingNutzungsobjekte(abrechnung);

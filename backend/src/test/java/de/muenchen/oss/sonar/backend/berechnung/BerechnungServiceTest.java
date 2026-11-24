@@ -2,6 +2,9 @@ package de.muenchen.oss.sonar.backend.berechnung;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungService;
@@ -11,6 +14,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.berechnung.domain.Berechnungsergebnis;
 import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
@@ -47,7 +51,7 @@ class BerechnungServiceTest {
     private BerechnungService unitUnderTest;
 
     @Nested
-    class PreviewBerechnung {
+    class PreviewBerechnungOfSavedAbrechnung {
 
         @Test
         void givenOneFlaecheOverThreeWochen_thenChargeTheRecordedGebuehr() {
@@ -61,7 +65,7 @@ class BerechnungServiceTest {
                     .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
-            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
+            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnungOfSavedAbrechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("225");
             assertThat(ergebnis.gebuehrUeberspannungen()).isEqualByComparingTo("0");
@@ -90,7 +94,7 @@ class BerechnungServiceTest {
                     .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, new BigDecimal("42"), List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
-            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
+            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnungOfSavedAbrechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
 
             assertThat(ergebnis.lfdNr()).isEqualTo(1);
             assertThat(ergebnis.gebuehrVerwaltung()).isEqualByComparingTo("42");
@@ -114,7 +118,7 @@ class BerechnungServiceTest {
                             List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
-            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, LocalDate.of(2026, 1, 31));
+            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnungOfSavedAbrechnung(PROJEKT_ID, ABRECHNUNG_ID, LocalDate.of(2026, 1, 31));
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("0");
             assertThat(ergebnis.gebuehrGesamt()).isEqualByComparingTo("0");
@@ -133,7 +137,7 @@ class BerechnungServiceTest {
                     new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, LocalDate.of(2025, 3, 30), BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
-            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID,
+            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnungOfSavedAbrechnung(PROJEKT_ID, ABRECHNUNG_ID,
                     berechnungsdatumWaehrendDerPosition);
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("225");
@@ -157,7 +161,7 @@ class BerechnungServiceTest {
                     .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenReturn(abrechnung);
 
-            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
+            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnungOfSavedAbrechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM);
 
             assertThat(ergebnis.zusammenfassung())
                     .contains("Abrechnung 1 von Bauprojekt P-0001")
@@ -172,7 +176,7 @@ class BerechnungServiceTest {
                     .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
             when(abrechnungService.getAbrechnung(PROJEKT_ID, ABRECHNUNG_ID)).thenThrow(new NotFoundException("not found"));
 
-            assertThatThrownBy(() -> unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM))
+            assertThatThrownBy(() -> unitUnderTest.previewBerechnungOfSavedAbrechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM))
                     .isInstanceOf(NotFoundException.class);
         }
 
@@ -180,8 +184,54 @@ class BerechnungServiceTest {
         void givenAnUnknownProjekt_thenThrowNotFound() {
             when(projektService.getProjekt(PROJEKT_ID)).thenThrow(new NotFoundException("not found"));
 
-            assertThatThrownBy(() -> unitUnderTest.previewBerechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM))
+            assertThatThrownBy(() -> unitUnderTest.previewBerechnungOfSavedAbrechnung(PROJEKT_ID, ABRECHNUNG_ID, BERECHNUNGSDATUM))
                     .isInstanceOf(NotFoundException.class);
+        }
+    }
+
+    @Nested
+    class PreviewBerechnungOfUnsavedAbrechnung {
+
+        @Test
+        void givenResolvedAbrechnung_thenChargeItInsteadOfTheEnteredOne() {
+            final UUID nutzungsobjektId = UUID.randomUUID();
+            final AbrechnungPosition position = new AbrechnungPosition(null, BEGINN, ENDE,
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
+            final AbrechnungNutzungsobjekt enteredNutzungsobjekt = new AbrechnungNutzungsobjekt(nutzungsobjektId, Adressart.ADRESSE,
+                    "Sendlinger Straße", "1", null, null, null, null, null, null, null, null, null, false, List.of(position), List.of());
+            final Abrechnung enteredAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null,
+                    BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(enteredNutzungsobjekt));
+            final AbrechnungNutzungsobjekt storedNutzungsobjekt = new AbrechnungNutzungsobjekt(nutzungsobjektId, Adressart.ADRESSE,
+                    "Marienplatz", "8", null, null, null, null, null, null, null, null, null, true, List.of(position), List.of());
+            final Abrechnung resolvedAbrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null,
+                    BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(storedNutzungsobjekt));
+            when(projektService.getProjekt(PROJEKT_ID))
+                    .thenReturn(new Projekt(PROJEKT_ID, "P-0001", Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, BEGINN, ENDE, BigDecimal.ZERO, List.of()));
+            when(abrechnungService.resolvePreexistingNutzungsobjekte(enteredAbrechnung)).thenReturn(resolvedAbrechnung);
+
+            final Berechnungsergebnis ergebnis = unitUnderTest.previewBerechnungOfUnsavedAbrechnung(enteredAbrechnung, BERECHNUNGSDATUM);
+
+            assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("337.50");
+            assertThat(ergebnis.zusammenfassung())
+                    .contains("Marienplatz 8")
+                    .contains("50%-Aufschlag : true")
+                    .doesNotContain("Sendlinger Straße");
+        }
+
+        @Test
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenBeforeResolvingTheNutzungsobjekte() {
+            final AbrechnungPosition position = new AbrechnungPosition(null, BEGINN, ENDE,
+                    new BigDecimal("50.00"), new BigDecimal("1.00"), new BigDecimal("50.00"));
+            final AbrechnungNutzungsobjekt uebernommenesNutzungsobjekt = new AbrechnungNutzungsobjekt(UUID.randomUUID(),
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null, null, null, null, null, false, List.of(position),
+                    List.of());
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null,
+                    BEGINN, ENDE, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(uebernommenesNutzungsobjekt));
+            when(projektService.getProjekt(PROJEKT_ID)).thenThrow(new ForbiddenException("forbidden"));
+
+            assertThatThrownBy(() -> unitUnderTest.previewBerechnungOfUnsavedAbrechnung(abrechnung, BERECHNUNGSDATUM))
+                    .isInstanceOf(ForbiddenException.class);
+            verify(abrechnungService, never()).resolvePreexistingNutzungsobjekte(any());
         }
     }
 }

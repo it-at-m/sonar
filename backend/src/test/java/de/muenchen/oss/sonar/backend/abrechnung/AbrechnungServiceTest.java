@@ -9,6 +9,7 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
@@ -19,6 +20,7 @@ import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
 import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchEntity;
+import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Arrays;
@@ -919,6 +921,66 @@ class AbrechnungServiceTest {
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(vorgaengerId.toString());
             verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
+        }
+    }
+
+    @Nested
+    class ResolvePreexistingNutzungsobjekte {
+        @Test
+        void givenUebernommenesNutzungsobjekt_thenTakeItsStoredDetailsWithTheEnteredPositionenAndMasten() {
+            final UUID nutzungsobjektId = UUID.randomUUID();
+            final NutzungsobjektEntity storedNutzungsobjekt = new NutzungsobjektEntity();
+            storedNutzungsobjekt.setId(nutzungsobjektId);
+            storedNutzungsobjekt.setAufschlag50prozent(true);
+            storedNutzungsobjekt.setBemerkung("Aus der Erstabrechnung");
+            storedNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AdressdatenEmbeddable storedAdressdaten = storedNutzungsobjekt.getAdressdaten();
+            storedAdressdaten.setArt(Adressart.ADRESSE);
+            storedAdressdaten.setAdresse("Marienplatz");
+            storedAdressdaten.setHausnummerVon("8");
+
+            final AbrechnungPosition enteredPosition = new AbrechnungPosition(null, VON, BIS, new BigDecimal("15.00"),
+                    new BigDecimal("3.00"), new BigDecimal("45.00"));
+            final AbrechnungMast enteredMast = new AbrechnungMast(null, VON, BIS);
+            final AbrechnungNutzungsobjekt uebernommenesNutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    nutzungsobjektId, Adressart.ADRESSE, "Sendlinger Straße", "1", null, null, null, List.of(Nutzung.CONTAINER), null,
+                    null, null, null, "Wird ignoriert", false, List.of(enteredPosition), List.of(enteredMast));
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(uebernommenesNutzungsobjekt));
+
+            when(nutzungsobjektService.selectedPreexistingNutzungsobjekte(abrechnung))
+                    .thenReturn(Map.of(nutzungsobjektId, storedNutzungsobjekt));
+
+            final Abrechnung result = unitUnderTest.resolvePreexistingNutzungsobjekte(abrechnung);
+
+            assertThat(result.nutzungsobjekte()).singleElement().satisfies(nutzungsobjekt -> {
+                assertThat(nutzungsobjekt.id()).isEqualTo(nutzungsobjektId);
+                assertThat(nutzungsobjekt.adresse()).isEqualTo("Marienplatz");
+                assertThat(nutzungsobjekt.hausnummerVon()).isEqualTo("8");
+                assertThat(nutzungsobjekt.nutzungen()).containsExactly(Nutzung.BAUZAUN);
+                assertThat(nutzungsobjekt.bemerkung()).isEqualTo("Aus der Erstabrechnung");
+                assertThat(nutzungsobjekt.aufschlag50prozent()).isTrue();
+                assertThat(nutzungsobjekt.positionen()).containsExactly(enteredPosition);
+                assertThat(nutzungsobjekt.masten()).containsExactly(enteredMast);
+            });
+        }
+
+        @Test
+        void givenOnlyNewNutzungsobjekte_thenKeepTheAbrechnungAsEntered() {
+            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
+            final AbrechnungNutzungsobjekt newNutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Kaufingerstraße", "1", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, true, List.of(position), List.of());
+            final Widerspruch widerspruch = new Widerspruch(UUID.randomUUID(), VON, null, null, null, null, false, false, null);
+            final Abrechnung abrechnung = new Abrechnung(UUID.randomUUID(), PROJEKT_ID, 2, UUID.randomUUID(), "1000000001", true,
+                    "1000000002", ZustellungsbevollmaechtigterTyp.BETREUER, VON, BIS, AbrechnungsArt.ZWISCHENABRECHNUNG, widerspruch,
+                    false, List.of(newNutzungsobjekt));
+
+            final Abrechnung result = unitUnderTest.resolvePreexistingNutzungsobjekte(abrechnung);
+
+            assertThat(result).isEqualTo(abrechnung);
         }
     }
 }
