@@ -159,6 +159,7 @@ paths:
       description: |-
         Retrieve Projekte with pagination.
          Fetches a paginated list of Projekte based on the provided page number and size.
+         Only Projekte in a Stadtbezirk assigned to one of the roles of the user are part of the result.
          The optional search criteria are combined with AND and apply to the whole result, not just to
          the requested page. The same holds for the order, which is applied by the database.
       operationId: getProjekteByPageAndSize
@@ -573,6 +574,7 @@ paths:
       description: |-
         Retrieve a single Projekt.
          Fetches the Projekt together with its Adressen.
+         A Projekt in a Stadtbezirk assigned to none of the roles of the user is refused.
       operationId: getProjekt
       parameters:
       - name: projektId
@@ -583,6 +585,8 @@ paths:
           type: string
           format: uuid
       responses:
+        "403":
+          description: the Projekt lies outside the Stadtbezirke of the user
         "404":
           description: the Projekt does not exist
         "200":
@@ -927,12 +931,41 @@ components:
       - abrechnungEnde
       - adressen
       - projektnummer
+      - stadtbezirk
       type: object
       properties:
         projektnummer:
           maxLength: 20
           minLength: 1
           type: string
+        stadtbezirk:
+          type: string
+          enum:
+          - BEZIRK_01_ALTSTADT_LEHEL
+          - BEZIRK_02_LUDWIGSVORSTADT_ISARVORSTADT
+          - BEZIRK_03_MAXVORSTADT
+          - BEZIRK_04_SCHWABING_WEST
+          - BEZIRK_05_AU_HAIDHAUSEN
+          - BEZIRK_06_SENDLING
+          - BEZIRK_07_SENDLING_WESTPARK
+          - BEZIRK_08_SCHWANTHALERHOEHE
+          - BEZIRK_09_NEUHAUSEN_NYMPHENBURG
+          - BEZIRK_10_MOOSACH
+          - BEZIRK_11_MILBERTSHOFEN_AM_HART
+          - BEZIRK_12_SCHWABING_FREIMANN
+          - BEZIRK_13_BOGENHAUSEN
+          - BEZIRK_14_BERG_AM_LAIM
+          - BEZIRK_15_TRUDERING_RIEM
+          - BEZIRK_16_RAMERSDORF_PERLACH
+          - BEZIRK_17_OBERGIESING_FASANGARTEN
+          - BEZIRK_18_UNTERGIESING_HARLACHING
+          - BEZIRK_19_THALKIRCHEN_OBERSENDLING_FORSTENRIED_FUERSTENRIED_SOLLN
+          - BEZIRK_20_HADERN
+          - BEZIRK_21_PASING_OBERMENZING
+          - BEZIRK_22_AUBING_LOCHHAUSEN_LANGWIED
+          - BEZIRK_23_ALLACH_UNTERMENZING
+          - BEZIRK_24_FELDMOCHING_HASENBERGL
+          - BEZIRK_25_LAIM
         abrechnungBeginn:
           type: string
           format: date
@@ -1007,6 +1040,34 @@ components:
           format: uuid
         projektnummer:
           type: string
+        stadtbezirk:
+          type: string
+          enum:
+          - BEZIRK_01_ALTSTADT_LEHEL
+          - BEZIRK_02_LUDWIGSVORSTADT_ISARVORSTADT
+          - BEZIRK_03_MAXVORSTADT
+          - BEZIRK_04_SCHWABING_WEST
+          - BEZIRK_05_AU_HAIDHAUSEN
+          - BEZIRK_06_SENDLING
+          - BEZIRK_07_SENDLING_WESTPARK
+          - BEZIRK_08_SCHWANTHALERHOEHE
+          - BEZIRK_09_NEUHAUSEN_NYMPHENBURG
+          - BEZIRK_10_MOOSACH
+          - BEZIRK_11_MILBERTSHOFEN_AM_HART
+          - BEZIRK_12_SCHWABING_FREIMANN
+          - BEZIRK_13_BOGENHAUSEN
+          - BEZIRK_14_BERG_AM_LAIM
+          - BEZIRK_15_TRUDERING_RIEM
+          - BEZIRK_16_RAMERSDORF_PERLACH
+          - BEZIRK_17_OBERGIESING_FASANGARTEN
+          - BEZIRK_18_UNTERGIESING_HARLACHING
+          - BEZIRK_19_THALKIRCHEN_OBERSENDLING_FORSTENRIED_FUERSTENRIED_SOLLN
+          - BEZIRK_20_HADERN
+          - BEZIRK_21_PASING_OBERMENZING
+          - BEZIRK_22_AUBING_LOCHHAUSEN_LANGWIED
+          - BEZIRK_23_ALLACH_UNTERMENZING
+          - BEZIRK_24_FELDMOCHING_HASENBERGL
+          - BEZIRK_25_LAIM
         abrechnungBeginn:
           type: string
           format: date

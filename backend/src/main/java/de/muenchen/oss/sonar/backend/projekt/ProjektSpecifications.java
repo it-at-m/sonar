@@ -15,6 +15,7 @@ public final class ProjektSpecifications {
     private static final String PROJEKTNUMMER = "projektnummer";
     private static final String ABRECHNUNG_BEGINN = "abrechnungBeginn";
     private static final String ABRECHNUNG_ENDE = "abrechnungEnde";
+    private static final String STADTBEZIRK = "stadtbezirk";
 
     public static Specification<ProjektEntity> matching(final ProjektFilter filter) {
         final List<Specification<ProjektEntity>> specifications = new ArrayList<>();
@@ -29,8 +30,13 @@ public final class ProjektSpecifications {
         if (filter.abrechnungEnde() != null) {
             specifications.add((root, query, builder) -> builder.equal(root.get(ABRECHNUNG_ENDE), filter.abrechnungEnde()));
         }
+        if (filter.permittedStadtbezirke().isEmpty()) {
+            specifications.add((root, query, builder) -> builder.disjunction());
+        } else {
+            specifications.add((root, query, builder) -> root.get(STADTBEZIRK).in(filter.permittedStadtbezirke()));
+        }
 
-        return specifications.isEmpty() ? Specification.unrestricted() : Specification.allOf(specifications);
+        return Specification.allOf(specifications);
     }
 
     /**

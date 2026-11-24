@@ -1,6 +1,7 @@
 package de.muenchen.oss.sonar.backend.projekt.dto;
 
 import de.muenchen.oss.sonar.backend.common.ZeitraumOrdered;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.NotNull;
@@ -11,6 +12,7 @@ import java.util.List;
 @ZeitraumOrdered(von = "abrechnungBeginn", bis = "abrechnungEnde", message = "Das Ende der Abrechnung darf nicht vor deren Beginn liegen.")
 public record ProjektRequestDTO(
         @NotNull @Size(min = 1, max = 20) String projektnummer,
+        @NotNull Stadtbezirk stadtbezirk,
         @NotNull LocalDate abrechnungBeginn,
         @NotNull LocalDate abrechnungEnde,
         @NotEmpty List<@Valid ProjektAdresseRequestDTO> adressen) {
