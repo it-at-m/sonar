@@ -107,6 +107,4 @@ function updateThemeColor(value: unknown): void {
 }
 </script>
 
-<style scoped>
-
-</style>
+<style scoped></style>
