@@ -13,6 +13,11 @@ public interface ProjektDTOMapper {
 
     @Mapping(target = "id", ignore = true)
     @Mapping(target = "verwaltungsgebuehr", expression = "java(Projekt.VERWALTUNGSGEBUEHR)")
+    @Mapping(target = "vorgaengerProjektId", ignore = true)
+    @Mapping(target = "vorgaengerProjekte", ignore = true)
+    @Mapping(target = "nachfolgerProjekte", ignore = true)
+    @Mapping(target = "verknuepfungAbgelehnt", ignore = true)
+    @Mapping(target = "verknuepfungMoeglich", ignore = true)
     Projekt toProjekt(ProjektRequestDTO projektRequestDTO);
 
     @Mapping(target = "id", ignore = true)

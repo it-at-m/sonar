@@ -13,6 +13,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.Size;
 import java.time.LocalDate;
+import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -39,9 +40,12 @@ import org.springframework.web.bind.annotation.RestController;
 @SecurityRequirement(name = OpenAPIDocumentationConfiguration.SECURITY_SCHEME_NAME)
 public class ProjektController {
 
+    private static final String PROJEKT_ID = "projektId";
     private static final String STATUS_NOT_FOUND = "404";
+    private static final String PROJEKT_NOT_FOUND = "the Projekt does not exist";
 
     private final ProjektService projektService;
+    private final VorgaengerService vorgaengerService;
     private final ProjektDTOMapper projektDTOMapper;
 
     /**
@@ -51,8 +55,6 @@ public class ProjektController {
      * the requested page. The same holds for the order, which is applied by the database.
      * Each Projekt comes with the Projekte linked to it: its Vorgaenger and its Nachfolger, in the
      * order in which they are linked.
-     * Two Projekte share an Adresse when the Art, Adresse, Hausnummern, Flurstueck and Gemarkung of
-     * one of their Adressen agree, regardless of case. A Projekt shares every Adresse with itself.
      *
      * @param pageNumber the number of the requested page (default: 0)
      * @param pageSize the size of the page to retrieve (default: 10, at most 100)
@@ -61,7 +63,6 @@ public class ProjektController {
      * @param abrechnungEnde the exact end of the billing period to search for
      * @param sortBy the column to order by (default: PROJEKTNUMMER)
      * @param sortDirection the direction to order in (default: DESC)
-     * @param sharesAdresseWithProjektId the Projekt each found Projekt shares an Adresse with
      * @return a page of Projekte represented as DTOs
      */
     @GetMapping
@@ -73,10 +74,8 @@ public class ProjektController {
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate abrechnungBeginn,
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) final LocalDate abrechnungEnde,
             @RequestParam(defaultValue = "PROJEKTNUMMER") final ProjektSortBy sortBy,
-            @RequestParam(defaultValue = "DESC") final Sort.Direction sortDirection,
-            @RequestParam(required = false) final UUID sharesAdresseWithProjektId) {
-        return projektService.getAllProjekte(pageNumber, pageSize, projektnummer, abrechnungBeginn, abrechnungEnde, sortBy, sortDirection,
-                sharesAdresseWithProjektId)
+            @RequestParam(defaultValue = "DESC") final Sort.Direction sortDirection) {
+        return projektService.getAllProjekte(pageNumber, pageSize, projektnummer, abrechnungBeginn, abrechnungEnde, sortBy, sortDirection)
                 .map(projektDTOMapper::toDTO);
     }
 
@@ -90,9 +89,28 @@ public class ProjektController {
      */
     @GetMapping("{projektId}")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
-    public ProjektResponseDTO getProjekt(@PathVariable("projektId") final UUID projektId) {
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
+    public ProjektResponseDTO getProjekt(@PathVariable(PROJEKT_ID) final UUID projektId) {
         return projektDTOMapper.toDTO(projektService.getProjekt(projektId));
+    }
+
+    /**
+     * Retrieve the Projekte that can become the Vorgaenger of a Projekt.
+     * A Projekt can become the Vorgaenger when it has no Nachfolger and shares an Adresse with the
+     * Projekt. Two Projekte share an Adresse when the Art, Adresse, Hausnummern, Flurstueck and
+     * Gemarkung of one of their Adressen agree, regardless of case. The highest Projektnummer comes
+     * first.
+     *
+     * @param projektId the UUID of the Projekt that looks for its Vorgaenger
+     * @return the Projekte that can become its Vorgaenger, represented as DTOs
+     */
+    @GetMapping("{projektId}/vorgaenger-vorschlaege")
+    @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
+    public List<ProjektResponseDTO> getVorgaengerVorschlaege(@PathVariable(PROJEKT_ID) final UUID projektId) {
+        return vorgaengerService.getVorgaengerVorschlaege(projektId).stream()
+                .map(projektDTOMapper::toDTO)
+                .toList();
     }
 
     /**
@@ -131,9 +149,9 @@ public class ProjektController {
             responseCode = "409", description = "the Projekt is already linked, or the Vorgaenger has a Nachfolger",
             content = @Content
     )
-    public ProjektResponseDTO updateVorgaengerProjekt(@PathVariable("projektId") final UUID projektId,
+    public ProjektResponseDTO updateVorgaengerProjekt(@PathVariable(PROJEKT_ID) final UUID projektId,
             @Valid @RequestBody final VorgaengerProjektRequestDTO vorgaengerProjektRequestDTO) {
-        return projektDTOMapper.toDTO(projektService.linkToVorgaenger(projektId, vorgaengerProjektRequestDTO.vorgaengerProjektId()));
+        return projektDTOMapper.toDTO(vorgaengerService.linkToVorgaenger(projektId, vorgaengerProjektRequestDTO.vorgaengerProjektId()));
     }
 
     /**
@@ -147,10 +165,10 @@ public class ProjektController {
      */
     @PutMapping("{projektId}/verknuepfung-abgelehnt")
     @ResponseStatus(HttpStatus.OK)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
     @ApiResponse(responseCode = "409", description = "the Projekt is already linked", content = @Content)
-    public ProjektResponseDTO updateVerknuepfungAbgelehnt(@PathVariable("projektId") final UUID projektId) {
-        return projektDTOMapper.toDTO(projektService.declineVorgaenger(projektId));
+    public ProjektResponseDTO updateVerknuepfungAbgelehnt(@PathVariable(PROJEKT_ID) final UUID projektId) {
+        return projektDTOMapper.toDTO(vorgaengerService.declineVorgaenger(projektId));
     }
 
     /**
@@ -162,10 +180,10 @@ public class ProjektController {
      */
     @DeleteMapping("{projektId}/vorgaenger")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
+    @ApiResponse(responseCode = STATUS_NOT_FOUND, description = PROJEKT_NOT_FOUND, content = @Content)
     @ApiResponse(responseCode = "409", description = "the Projekt has a Nachfolger", content = @Content)
-    public void deleteVorgaengerProjekt(@PathVariable("projektId") final UUID projektId) {
-        projektService.unlinkFromVorgaenger(projektId);
+    public void deleteVorgaengerProjekt(@PathVariable(PROJEKT_ID) final UUID projektId) {
+        vorgaengerService.unlinkFromVorgaenger(projektId);
     }
 
 }

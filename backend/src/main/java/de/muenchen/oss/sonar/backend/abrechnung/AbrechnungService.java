@@ -15,6 +15,7 @@ import de.muenchen.oss.sonar.backend.common.BadRequestException;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.projekt.VorgaengerService;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -49,6 +50,7 @@ public class AbrechnungService {
 
     private final AbrechnungRepository abrechnungRepository;
     private final ProjektService projektService;
+    private final VorgaengerService vorgaengerService;
     private final AbrechnungEntityMapper abrechnungEntityMapper;
     private final NutzungsobjektService nutzungsobjektService;
 
@@ -134,7 +136,7 @@ public class AbrechnungService {
     }
 
     private Abrechnungsanschluss abrechnungsanschlussOf(final UUID projektId) {
-        final UUID vorgaengerProjektId = projektService.getVorgaengerProjektId(projektId);
+        final UUID vorgaengerProjektId = vorgaengerService.getVorgaengerProjektId(projektId);
         // Only the first Abrechnung of a Projekt continues where its Vorgaenger stops. Later ones and new versions start on any day.
         if (vorgaengerProjektId == null || abrechnungRepository.existsByProjektId(projektId)) {
             return Abrechnungsanschluss.FREI;
