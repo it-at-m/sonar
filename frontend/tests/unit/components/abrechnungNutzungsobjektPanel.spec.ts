@@ -4,6 +4,7 @@ import type { ProjektAdresseSuggestion } from "@/types/projekt/ProjektAdresseSug
 
 import { shallowMount } from "@vue/test-utils";
 import { describe, expect, it } from "vitest";
+import { nextTick, reactive } from "vue";
 
 import {
   ProjektAdresseRequestDTOArtEnum,
@@ -57,7 +58,7 @@ function mountPanel(
 ) {
   return shallowMount(AbrechnungNutzungsobjektPanel, {
     props: {
-      modelValue: nutzungsobjekt,
+      modelValue: reactive(nutzungsobjekt),
       idPrefix: "berechnung-nutzungsobjekt-0",
       label: "Adresse 1",
       nutzungsobjektSuggestions,
@@ -120,7 +121,8 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
     const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION]);
 
-    await suggestionEntries(wrapper)[0]?.vm.$emit("click");
+    suggestionEntries(wrapper)[0]?.vm.$emit("click");
+    await nextTick();
 
     expect(nutzungsobjekt.adresse).toBe("Marienplatz");
     expect(nutzungsobjekt.hausnummerVon).toBe("8");
@@ -137,7 +139,8 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     const positionen = nutzungsobjekt.positionen;
     const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION]);
 
-    await suggestionEntries(wrapper)[0]?.vm.$emit("click");
+    suggestionEntries(wrapper)[0]?.vm.$emit("click");
+    await nextTick();
 
     expect(nutzungsobjekt.bemerkung).toBe("Zweite Mahnung");
     expect(nutzungsobjekt.positionen).toBe(positionen);
@@ -147,7 +150,8 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
     const nutzungsobjekt = createAbrechnungNutzungsobjekt();
     const wrapper = mountPanel(nutzungsobjekt, [SUGGESTION]);
 
-    await suggestionEntries(wrapper)[0]?.vm.$emit("click");
+    suggestionEntries(wrapper)[0]?.vm.$emit("click");
+    await nextTick();
 
     expect(wrapper.findComponent(AdresseFields).props("disabled")).toBe(true);
     expect(
@@ -284,7 +288,8 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
       NUTZUNGSOBJEKT_SUGGESTION,
     ]);
 
-    await nutzungsobjektEntries(wrapper)[0]?.vm.$emit("click");
+    nutzungsobjektEntries(wrapper)[0]?.vm.$emit("click");
+    await nextTick();
 
     expect(nutzungsobjekt.uebernahme).toEqual({
       quelle: "NUTZUNGSOBJEKT",
@@ -302,7 +307,8 @@ describe("AbrechnungNutzungsobjektPanel.vue", () => {
       NUTZUNGSOBJEKT_SUGGESTION,
     ]);
 
-    await nutzungsobjektEntries(wrapper)[0]?.vm.$emit("click");
+    nutzungsobjektEntries(wrapper)[0]?.vm.$emit("click");
+    await nextTick();
 
     expect(nutzungsobjekt.positionen).toBe(positionen);
   });
