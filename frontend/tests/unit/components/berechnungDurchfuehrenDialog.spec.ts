@@ -714,4 +714,34 @@ describe("BerechnungDurchfuehrenDialog.vue", () => {
       "Das Projekt oder ein übernommenes Nutzungsobjekt wurde nicht gefunden."
     );
   });
+
+  it("givenAnUnsavedAbrechnungOfAProjektOutsideTheStadtbezirkeOfTheUser_thenReportTheMissingZustaendigkeit", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi.fn().mockResolvedValue(new Response("", { status: 403 }))
+    );
+    const { abrechnung } = useAbrechnungForm();
+    abrechnung.value.geschaeftspartnerId = GESCHAEFTSPARTNER_ID;
+    abrechnung.value.zeitraumVon = "2026-01-05";
+    abrechnung.value.zeitraumBis = "2026-01-25";
+    abrechnung.value.abrechnungsArt =
+      AbrechnungRequestDTOAbrechnungsArtEnum.ENDABRECHNUNG;
+    const nutzungsobjekt = itemAt(abrechnung.value.nutzungsobjekte);
+    nutzungsobjekt.adresse = "Marienplatz";
+    nutzungsobjekt.hausnummerVon = "8";
+    const position = itemAt(nutzungsobjekt.positionen);
+    position.beginn = "2026-01-05";
+    position.ende = "2026-01-25";
+    position.laenge = 12;
+    position.breite = 3;
+    position.flaeche = 36;
+    const wrapper = mountDialogWithActivator(abrechnung.value);
+
+    await openDialogThroughActivator(wrapper);
+    await submit();
+
+    expect(useSnackbarStore().queue[0]?.text).toBe(
+      "Sie sind für den Stadtbezirk dieses Projekts nicht zuständig."
+    );
+  });
 });

@@ -1008,5 +1008,21 @@ class AbrechnungServiceTest {
 
             assertThat(result).isEqualTo(abrechnung);
         }
+
+        @Test
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutLoadingNutzungsobjekte() {
+            final AbrechnungPosition position = new AbrechnungPosition(null, VON, BIS, new BigDecimal("12.00"),
+                    new BigDecimal("3.00"), new BigDecimal("36.00"));
+            final AbrechnungNutzungsobjekt uebernommenesNutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false, List.of(position), List.of());
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(uebernommenesNutzungsobjekt));
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(PROJEKT_ID);
+
+            assertThatThrownBy(() -> unitUnderTest.resolvePreexistingNutzungsobjekte(abrechnung))
+                    .isInstanceOf(ForbiddenException.class);
+            verify(nutzungsobjektService, never()).selectedPreexistingNutzungsobjekte(any());
+        }
     }
 }

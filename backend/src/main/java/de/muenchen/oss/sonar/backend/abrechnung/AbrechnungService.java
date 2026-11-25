@@ -141,6 +141,7 @@ public class AbrechnungService {
 
     @Transactional(readOnly = true)
     public Abrechnung resolvePreexistingNutzungsobjekte(final Abrechnung abrechnung) {
+        projektZugriffService.checkZugriffOnProjekt(abrechnung.projektId());
         final Map<UUID, NutzungsobjektEntity> selectedPreexistingNutzungsobjekte = nutzungsobjektService
                 .selectedPreexistingNutzungsobjekte(abrechnung);
         final List<AbrechnungNutzungsobjekt> nutzungsobjekte = abrechnung.nutzungsobjekte().stream()
