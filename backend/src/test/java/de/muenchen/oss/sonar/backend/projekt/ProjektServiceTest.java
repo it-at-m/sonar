@@ -4,6 +4,8 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -19,7 +21,6 @@ import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkService;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
-import java.util.Set;
 import java.util.UUID;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
@@ -55,6 +56,9 @@ class ProjektServiceTest {
 
     @Mock
     private StadtbezirkService stadtbezirkService;
+
+    @Mock
+    private ProjektZugriffService projektZugriffService;
 
     @InjectMocks
     private ProjektService unitUnderTest;
@@ -215,11 +219,11 @@ class ProjektServiceTest {
             projektEntity.setAbrechnungEnde(ENDE);
             projektEntity.addAdresse(adresseEntity);
 
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
             when(projektRepository.findById(projektId)).thenReturn(Optional.of(projektEntity));
 
             final Projekt result = unitUnderTest.getProjekt(projektId);
 
+            verify(projektZugriffService).checkZugriffOnProjekt(projektId);
             assertThat(result.id()).isEqualTo(projektId);
             assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
             assertThat(result.stadtbezirk()).isEqualTo(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
@@ -228,22 +232,13 @@ class ProjektServiceTest {
         }
 
         @Test
-        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbidden() {
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutLoadingIt() {
             final UUID projektId = UUID.randomUUID();
-
-            final ProjektEntity projektEntity = new ProjektEntity();
-            projektEntity.setId(projektId);
-            projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
-            projektEntity.setStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
-            projektEntity.setAbrechnungBeginn(BEGINN);
-            projektEntity.setAbrechnungEnde(ENDE);
-
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING));
-            when(projektRepository.findById(projektId)).thenReturn(Optional.of(projektEntity));
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(projektId);
 
             assertThatExceptionOfType(ForbiddenException.class)
-                    .isThrownBy(() -> unitUnderTest.getProjekt(projektId))
-                    .withMessageContaining(projektId.toString());
+                    .isThrownBy(() -> unitUnderTest.getProjekt(projektId));
+            verify(projektRepository, never()).findById(any());
         }
 
         @Test
@@ -254,28 +249,6 @@ class ProjektServiceTest {
             assertThatExceptionOfType(NotFoundException.class)
                     .isThrownBy(() -> unitUnderTest.getProjekt(projektId))
                     .withMessageContaining(projektId.toString());
-        }
-    }
-
-    @Nested
-    class ExistsProjekt {
-        @Test
-        void givenProjektInAStadtbezirkOfTheUser_thenReturnTrue() {
-            final UUID projektId = UUID.randomUUID();
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING));
-            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL, Stadtbezirk.BEZIRK_06_SENDLING)))
-                    .thenReturn(true);
-
-            assertThat(unitUnderTest.existsProjekt(projektId)).isTrue();
-        }
-
-        @Test
-        void givenNoProjektInTheStadtbezirkeOfTheUser_thenReturnFalse() {
-            final UUID projektId = UUID.randomUUID();
-            when(stadtbezirkService.getStadtbezirkeOfCurrentUser()).thenReturn(Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL));
-            when(projektRepository.existsByIdAndStadtbezirkIn(projektId, Set.of(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL))).thenReturn(false);
-
-            assertThat(unitUnderTest.existsProjekt(projektId)).isFalse();
         }
     }
 
@@ -305,6 +278,20 @@ class ProjektServiceTest {
             assertThat(result.adressen()).hasSize(1);
             assertThat(result.adressen().getFirst().flurstueck()).isEqualTo("1234/5");
             assertThat(result.adressen().getFirst().sondernutzungErlaubt()).isTrue();
+        }
+
+        @Test
+        void givenStadtbezirkOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutSaving() {
+            final ProjektAdresse adresse = new ProjektAdresse(
+                    null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
+                    BEGINN, ENDE, null, 1, true);
+            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, Stadtbezirk.BEZIRK_10_MOOSACH, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR,
+                    List.of(adresse));
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnStadtbezirk(Stadtbezirk.BEZIRK_10_MOOSACH);
+
+            assertThatExceptionOfType(ForbiddenException.class)
+                    .isThrownBy(() -> unitUnderTest.createProjekt(projekt));
+            verify(projektRepository, never()).save(any(ProjektEntity.class));
         }
     }
 }

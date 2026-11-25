@@ -1,0 +1,88 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/koopr/projects/2507318MMB0300"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "quitt": "000",
+      "proj_nr_bs": "2507318MMB0300",
+      "proj_nr_ds": "25073180200300",
+      "beendet": "",
+      "adressenperiode": [
+        {
+          "adresse": {
+            "strassenklartext": "FINKENBOGEN",
+            "str_nr": "99001",
+            "hnr_von": "0027",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "stadtbezirk": "017"
+        },
+        {
+          "adresse": {
+            "strassenklartext": "AHORNWINKEL",
+            "str_nr": "99002",
+            "hnr_von": "0012",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "SEITE FINKENBOGEN",
+          "stadtbezirk": "017"
+        },
+        {
+          "adresse": {
+            "strassenklartext": "",
+            "str_nr": "",
+            "hnr_von": "",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "stadtbezirk": ""
+        },
+        {
+          "adresse": {
+            "strassenklartext": "",
+            "str_nr": "",
+            "hnr_von": "",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "stadtbezirk": ""
+        }
+      ],
+      "fallstatus": "04",
+      "datum_baubeginn": "20250602",
+      "datum_bauende": "20260916",
+      "gebuehren": {
+        "datum_1": "20250521",
+        "gebuehr_1": "84.00",
+        "datum_2": "20260330",
+        "gebuehr_2": "132.00",
+        "datum_3": "",
+        "gebuehr_3": "",
+        "datum_4": ""
+      }
+    }
+  }
+}

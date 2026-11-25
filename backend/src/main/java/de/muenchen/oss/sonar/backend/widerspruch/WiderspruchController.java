@@ -41,6 +41,7 @@ public class WiderspruchController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Widerspruch are invalid", content = @Content)
+    @ApiResponse(responseCode = "403", description = "the Projekt of the Abrechnung lies outside the Stadtbezirke of the user", content = @Content)
     @ApiResponse(responseCode = "404", description = "the Abrechnung does not exist", content = @Content)
     @ApiResponse(responseCode = "409", description = "the Abrechnung already has a Widerspruch", content = @Content)
     public WiderspruchResponseDTO saveWiderspruch(@PathVariable("abrechnungId") final UUID abrechnungId,

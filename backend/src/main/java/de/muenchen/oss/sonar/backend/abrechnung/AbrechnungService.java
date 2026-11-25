@@ -10,7 +10,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
-import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.projekt.ProjektZugriffService;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.Deque;
@@ -44,16 +44,14 @@ public class AbrechnungService {
     private static final int FIRST_VERSION_NUMBER = 1;
 
     private final AbrechnungRepository abrechnungRepository;
-    private final ProjektService projektService;
+    private final ProjektZugriffService projektZugriffService;
     private final AbrechnungEntityMapper abrechnungEntityMapper;
     private final NutzungsobjektService nutzungsobjektService;
 
     @Transactional(readOnly = true)
     public Page<Abrechnung> getAbrechnungenOfProjekt(final UUID projektId, final int pageNumber, final int pageSize,
             final List<AbrechnungSortBy> sortBy, final List<Sort.Direction> directions) {
-        if (!projektService.existsProjekt(projektId)) {
-            throw new NotFoundException(String.format(MSG_NOT_FOUND, projektId));
-        }
+        projektZugriffService.checkZugriffOnProjekt(projektId);
         final Sort sort = resolveSortWithInputOrDefaults(sortBy, directions);
         log.info("Get Abrechnungen of Projekt {} at Page {} with a PageSize of {} ordered by {}", projektId, pageNumber, pageSize, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
@@ -65,6 +63,7 @@ public class AbrechnungService {
     @Transactional(readOnly = true)
     public Abrechnung getAbrechnung(final UUID projektId, final UUID abrechnungId) {
         log.info("Get Abrechnung {} of Projekt {}", abrechnungId, projektId);
+        projektZugriffService.checkZugriffOnProjekt(projektId);
         final AbrechnungEntity abrechnungEntity = abrechnungRepository.findByIdAndProjektId(abrechnungId, projektId)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, abrechnungId)));
         return toAbrechnung(abrechnungEntity, abrechnungRepository.existsByVorgaengerAbrechnungId(abrechnungId));
@@ -73,6 +72,7 @@ public class AbrechnungService {
     @Transactional(readOnly = true)
     public List<AbrechnungVersion> getVersionenOfAbrechnung(final UUID projektId, final UUID abrechnungId) {
         log.info("Get the versions of Abrechnung {} of Projekt {}", abrechnungId, projektId);
+        projektZugriffService.checkZugriffOnProjekt(projektId);
         final List<AbrechnungVersion> versionenOfProjekt = abrechnungRepository.findByProjektId(projektId);
         final AbrechnungVersion angefragteVersion = versionenOfProjekt.stream()
                 .filter(version -> version.id().equals(abrechnungId))
@@ -113,9 +113,7 @@ public class AbrechnungService {
 
     @Transactional
     public Abrechnung createAbrechnung(final Abrechnung abrechnung) {
-        if (!projektService.existsProjekt(abrechnung.projektId())) {
-            throw new NotFoundException(String.format(MSG_NOT_FOUND, abrechnung.projektId()));
-        }
+        projektZugriffService.checkZugriffOnProjekt(abrechnung.projektId());
         final AbrechnungEntity abrechnungEntity = toAbrechnungEntity(abrechnung);
         abrechnungEntity.setVersionsnummer(FIRST_VERSION_NUMBER);
         log.debug("Create Abrechnung {}", abrechnungEntity);
@@ -128,6 +126,7 @@ public class AbrechnungService {
      */
     @Transactional
     public Abrechnung createNextVersion(final UUID vorgaengerAbrechnungId, final Abrechnung abrechnung) {
+        projektZugriffService.checkZugriffOnProjekt(abrechnung.projektId());
         final AbrechnungEntity vorgaenger = abrechnungRepository.findByIdAndProjektId(vorgaengerAbrechnungId, abrechnung.projektId())
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, vorgaengerAbrechnungId)));
         if (abrechnungRepository.existsByVorgaengerAbrechnungId(vorgaengerAbrechnungId)) {

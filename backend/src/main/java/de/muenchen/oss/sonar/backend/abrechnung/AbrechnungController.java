@@ -41,7 +41,9 @@ import org.springframework.web.bind.annotation.RestController;
 public class AbrechnungController {
 
     private static final String PROJEKT_ID = "projektId";
+    private static final String STATUS_FORBIDDEN = "403";
     private static final String STATUS_NOT_FOUND = "404";
+    private static final String PROJEKT_FORBIDDEN = "the Projekt lies outside the Stadtbezirke of the user";
 
     private final AbrechnungService abrechnungService;
     private final NutzungsobjektService nutzungsobjektService;
@@ -67,6 +69,7 @@ public class AbrechnungController {
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @ApiResponse(responseCode = "400", description = "the pagination or sort parameters are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_FORBIDDEN, description = PROJEKT_FORBIDDEN, content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
     public Page<AbrechnungResponseDTO> getAbrechnungenByPageAndSize(@PathVariable(PROJEKT_ID) final UUID projektId,
             @RequestParam(defaultValue = "0") @Min(0) final int pageNumber,
@@ -105,6 +108,7 @@ public class AbrechnungController {
      */
     @GetMapping("/nutzungsobjekt")
     @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_FORBIDDEN, description = PROJEKT_FORBIDDEN, content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
     public List<NutzungsobjektResponseDTO> getNutzungsobjekte(@PathVariable(PROJEKT_ID) final UUID projektId) {
         return nutzungsobjektService.getNutzungsobjekteOfProjekt(projektId).stream()
@@ -122,6 +126,7 @@ public class AbrechnungController {
      */
     @GetMapping("/{abrechnungId}")
     @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_FORBIDDEN, description = PROJEKT_FORBIDDEN, content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
     public AbrechnungResponseDTO getAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
             @PathVariable("abrechnungId") final UUID abrechnungId) {
@@ -141,6 +146,7 @@ public class AbrechnungController {
      */
     @GetMapping("/{abrechnungId}/version")
     @ResponseStatus(HttpStatus.OK)
+    @ApiResponse(responseCode = STATUS_FORBIDDEN, description = PROJEKT_FORBIDDEN, content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
     public List<AbrechnungVersionResponseDTO> getAbrechnungVersionen(@PathVariable(PROJEKT_ID) final UUID projektId,
             @PathVariable("abrechnungId") final UUID abrechnungId) {
@@ -161,6 +167,7 @@ public class AbrechnungController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Abrechnung are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_FORBIDDEN, description = PROJEKT_FORBIDDEN, content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt does not exist", content = @Content)
     public AbrechnungResponseDTO saveAbrechnung(@PathVariable(PROJEKT_ID) final UUID projektId,
             @Valid @RequestBody final AbrechnungRequestDTO abrechnungRequestDTO) {
@@ -183,6 +190,7 @@ public class AbrechnungController {
     @PostMapping("/{abrechnungId}/version")
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the new version are invalid", content = @Content)
+    @ApiResponse(responseCode = STATUS_FORBIDDEN, description = PROJEKT_FORBIDDEN, content = @Content)
     @ApiResponse(responseCode = STATUS_NOT_FOUND, description = "the Projekt has no Abrechnung with that UUID", content = @Content)
     @ApiResponse(responseCode = "409", description = "the Abrechnung already has a newer version", content = @Content)
     public AbrechnungResponseDTO saveAbrechnungVersion(@PathVariable(PROJEKT_ID) final UUID projektId,

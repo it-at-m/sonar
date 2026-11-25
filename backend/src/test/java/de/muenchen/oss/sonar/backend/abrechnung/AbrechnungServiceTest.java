@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -16,9 +17,10 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
+import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
-import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.projekt.ProjektZugriffService;
 import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchEntity;
 import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.math.BigDecimal;
@@ -56,7 +58,7 @@ class AbrechnungServiceTest {
     private AbrechnungRepository abrechnungRepository;
 
     @Mock
-    private ProjektService projektService;
+    private ProjektZugriffService projektZugriffService;
 
     @Mock
     private NutzungsobjektService nutzungsobjektService;
@@ -72,7 +74,6 @@ class AbrechnungServiceTest {
 
         private Sort captureRequestedSort(final List<AbrechnungSortBy> sortBy, final List<Sort.Direction> directions) {
             final ArgumentCaptor<Pageable> pageRequestCaptor = ArgumentCaptor.forClass(Pageable.class);
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNewestVersionsByProjektId(eq(PROJEKT_ID), any(Pageable.class)))
                     .thenReturn(new PageImpl<>(List.of()));
 
@@ -144,7 +145,6 @@ class AbrechnungServiceTest {
 
             final List<AbrechnungEntity> abrechnungen = List.of(ersteAbrechnung, zweiteAbrechnung);
 
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNewestVersionsByProjektId(PROJEKT_ID, pageRequest))
                     .thenReturn(new PageImpl<>(abrechnungen, pageRequest, abrechnungen.size()));
 
@@ -223,7 +223,6 @@ class AbrechnungServiceTest {
             final Pageable pageRequest = PageRequest.of(0, 10, DEFAULT_SORT);
             final List<AbrechnungEntity> abrechnungen = List.of(mitWiderspruch, ohneWiderspruch);
 
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNewestVersionsByProjektId(PROJEKT_ID, pageRequest))
                     .thenReturn(new PageImpl<>(abrechnungen, pageRequest, abrechnungen.size()));
 
@@ -268,7 +267,6 @@ class AbrechnungServiceTest {
             final Pageable pageRequest = PageRequest.of(0, 10, DEFAULT_SORT);
             final List<AbrechnungEntity> abrechnungen = List.of(neueste);
 
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.findNewestVersionsByProjektId(PROJEKT_ID, pageRequest))
                     .thenReturn(new PageImpl<>(abrechnungen, pageRequest, abrechnungen.size()));
 
@@ -280,12 +278,11 @@ class AbrechnungServiceTest {
         }
 
         @Test
-        void givenUnknownProjekt_thenThrowNotFound() {
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(false);
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutLoadingAbrechnungen() {
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(PROJEKT_ID);
 
             assertThatThrownBy(() -> unitUnderTest.getAbrechnungenOfProjekt(PROJEKT_ID, 0, 10, null, null))
-                    .isInstanceOf(NotFoundException.class)
-                    .hasMessageContaining(PROJEKT_ID.toString());
+                    .isInstanceOf(ForbiddenException.class);
             verify(abrechnungRepository, never()).findNewestVersionsByProjektId(any(UUID.class), any(Pageable.class));
         }
 
@@ -414,7 +411,6 @@ class AbrechnungServiceTest {
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final UUID savedId = UUID.randomUUID();
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(savedId);
@@ -450,7 +446,6 @@ class AbrechnungServiceTest {
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(UUID.randomUUID());
@@ -489,7 +484,6 @@ class AbrechnungServiceTest {
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(nutzungsobjektService.selectedPreexistingNutzungsobjekte(abrechnung))
                     .thenReturn(Map.of(nutzungsobjektId, gespeichertesNutzungsobjekt));
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
@@ -527,7 +521,6 @@ class AbrechnungServiceTest {
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(marienplatz, sendlingerStrasse));
 
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
             when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
                 final AbrechnungEntity toSave = invocation.getArgument(0);
                 toSave.setId(UUID.randomUUID());
@@ -551,13 +544,13 @@ class AbrechnungServiceTest {
         }
 
         @Test
-        void givenUnknownProjekt_thenThrowNotFound() {
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutSaving() {
             final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
                     AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
-            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(false);
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(PROJEKT_ID);
 
             assertThatThrownBy(() -> unitUnderTest.createAbrechnung(abrechnung))
-                    .isInstanceOf(NotFoundException.class);
+                    .isInstanceOf(ForbiddenException.class);
             verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
         }
     }
@@ -715,6 +708,16 @@ class AbrechnungServiceTest {
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(abrechnungId.toString());
         }
+
+        @Test
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutLoadingTheAbrechnung() {
+            final UUID abrechnungId = UUID.randomUUID();
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(PROJEKT_ID);
+
+            assertThatThrownBy(() -> unitUnderTest.getAbrechnung(PROJEKT_ID, abrechnungId))
+                    .isInstanceOf(ForbiddenException.class);
+            verify(abrechnungRepository, never()).findByIdAndProjektId(any(UUID.class), any(UUID.class));
+        }
     }
 
     @Nested
@@ -833,6 +836,16 @@ class AbrechnungServiceTest {
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(abrechnungId.toString());
         }
+
+        @Test
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutLoadingVersionen() {
+            final UUID abrechnungId = UUID.randomUUID();
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(PROJEKT_ID);
+
+            assertThatThrownBy(() -> unitUnderTest.getVersionenOfAbrechnung(PROJEKT_ID, abrechnungId))
+                    .isInstanceOf(ForbiddenException.class);
+            verify(abrechnungRepository, never()).findByProjektId(any(UUID.class));
+        }
     }
 
     @Nested
@@ -920,6 +933,19 @@ class AbrechnungServiceTest {
             assertThatThrownBy(() -> unitUnderTest.createNextVersion(vorgaengerId, abrechnung))
                     .isInstanceOf(NotFoundException.class)
                     .hasMessageContaining(vorgaengerId.toString());
+            verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
+        }
+
+        @Test
+        void givenProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutSaving() {
+            final UUID vorgaengerId = UUID.randomUUID();
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(PROJEKT_ID);
+
+            assertThatThrownBy(() -> unitUnderTest.createNextVersion(vorgaengerId, abrechnung))
+                    .isInstanceOf(ForbiddenException.class);
+            verify(abrechnungRepository, never()).findByIdAndProjektId(any(UUID.class), any(UUID.class));
             verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
         }
     }

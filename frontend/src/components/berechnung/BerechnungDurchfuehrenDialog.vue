@@ -120,6 +120,9 @@ function errorText(error: unknown): string {
         ? "Die Berechnung konnte nicht durchgeführt werden. Bitte prüfen Sie Ihre Eingaben."
         : "Das Abrechnungsdatum ist ungültig.";
     }
+    if (error.response.status === 403) {
+      return "Sie sind für den Stadtbezirk dieses Projekts nicht zuständig.";
+    }
     if (error.response.status === 404) {
       return isUnsaved
         ? "Das Projekt oder ein übernommenes Nutzungsobjekt wurde nicht gefunden."
