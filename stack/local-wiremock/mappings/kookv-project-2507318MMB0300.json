@@ -1,0 +1,108 @@
+{
+  "request": {
+    "method": "GET",
+    "urlPath": "/api/kookv/projects/2507318MMB0300"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
+    },
+    "jsonBody": {
+      "quitt": "000",
+      "projnr_ds": "25073180200300",
+      "projnr_bs": "2507318MMB0300",
+      "beendet": "",
+      "kunden_dateien": {
+        "name1": "Lindenwerk Bau GmbH",
+        "name2": "",
+        "strkl": "Birkenhain",
+        "hnr": "018",
+        "bu": "",
+        "plz": "81379",
+        "ort": "Muenchen"
+      },
+      "bauleitung": {
+        "bauleiter_name": "Mara Winter"
+      },
+      "datum_beginn_ve": "20260330",
+      "datum_ende_ve": "20260902",
+      "datum_beginn_alte_ve": "20250602",
+      "datum_ende_alte_ve": "20260902",
+      "nutzungsart": {
+        "code": ["13", "", "", "", "", "", "", "", "", "", "", ""],
+        "sonstiges_text": ""
+      },
+      "adressenperiode": [
+        {
+          "adresse": {
+            "strassenklartext": "FINKENBOGEN",
+            "str_nr": "99001",
+            "hnr_von": "0027",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "laenge": "",
+          "breite": "",
+          "flaeche": "746.80",
+          "anzahl_masten": ""
+        },
+        {
+          "adresse": {
+            "strassenklartext": "AHORNWINKEL",
+            "str_nr": "99002",
+            "hnr_von": "0012",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "SEITE FINKENBOGEN",
+          "laenge": "",
+          "breite": "",
+          "flaeche": "144.20",
+          "anzahl_masten": ""
+        },
+        {
+          "adresse": {
+            "strassenklartext": "",
+            "str_nr": "",
+            "hnr_von": "",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "laenge": "",
+          "breite": "",
+          "flaeche": "",
+          "anzahl_masten": ""
+        },
+        {
+          "adresse": {
+            "strassenklartext": "",
+            "str_nr": "",
+            "hnr_von": "",
+            "bu_von": "",
+            "hnr_bis": ""
+          },
+          "flurstueck": {
+            "flurnr": ""
+          },
+          "lage": "",
+          "laenge": "",
+          "breite": "",
+          "flaeche": "",
+          "anzahl_masten": ""
+        }
+      ]
+    }
+  }
+}

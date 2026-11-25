@@ -1631,6 +1631,11 @@ components:
         bemerkung:
           type: string
     PageMetadata:
+      required:
+      - number
+      - size
+      - totalElements
+      - totalPages
       type: object
       properties:
         size:
@@ -1646,6 +1651,9 @@ components:
           type: integer
           format: int64
     PagedModelTheEntityResponseDTO:
+      required:
+      - content
+      - page
       type: object
       properties:
         content:
@@ -1655,6 +1663,9 @@ components:
         page:
           $ref: "#/components/schemas/PageMetadata"
     PagedModelProjektResponseDTO:
+      required:
+      - content
+      - page
       type: object
       properties:
         content:
@@ -1664,6 +1675,9 @@ components:
         page:
           $ref: "#/components/schemas/PageMetadata"
     PagedModelAbrechnungResponseDTO:
+      required:
+      - content
+      - page
       type: object
       properties:
         content:
