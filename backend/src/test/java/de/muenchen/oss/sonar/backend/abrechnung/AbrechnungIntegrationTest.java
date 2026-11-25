@@ -20,6 +20,7 @@ import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektAdresseEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektEntity;
 import de.muenchen.oss.sonar.backend.projekt.ProjektRepository;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -101,6 +102,7 @@ class AbrechnungIntegrationTest {
 
         final ProjektEntity projekt = new ProjektEntity();
         projekt.setProjektnummer("2026-0001");
+        projekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
         projekt.setAbrechnungBeginn(VON);
         projekt.setAbrechnungEnde(BIS);
         projekt.addAdresse(adresse);
@@ -143,6 +145,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -189,7 +192,7 @@ class AbrechnungIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -291,7 +294,7 @@ class AbrechnungIntegrationTest {
                             .queryParam("pageNumber", "0")
                             .queryParam("pageSize", "2")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -305,7 +308,7 @@ class AbrechnungIntegrationTest {
                             .queryParam("pageNumber", "1")
                             .queryParam("pageSize", "2")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -378,7 +381,7 @@ class AbrechnungIntegrationTest {
                             .queryParam("sortBy", "ZEITRAUM_BIS")
                             .queryParam("sortDirection", "ASC")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -479,7 +482,7 @@ class AbrechnungIntegrationTest {
                             .queryParam("sortBy", "ABRECHNUNGS_ART,ZEITRAUM_VON")
                             .queryParam("sortDirection", "ASC,DESC")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -496,7 +499,7 @@ class AbrechnungIntegrationTest {
                             .path(ABRECHNUNG_PATH)
                             .queryParam("sortBy", "ZEITRAUM_VON,ZEITRAUM_BIS,ABRECHNUNGS_ART,GESCHAEFTSPARTNER_ID,ZEITRAUM_VON")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk();
         }
@@ -535,7 +538,7 @@ class AbrechnungIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -551,7 +554,7 @@ class AbrechnungIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -564,9 +567,31 @@ class AbrechnungIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(UUID.randomUUID()))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isForbidden();
+        }
+
+        @Test
+        void givenNoSachbearbeiterRole_thenReturnForbidden() {
+            restTestClient.get()
+                    .uri(uriBuilder -> uriBuilder
+                            .path(ABRECHNUNG_PATH)
+                            .build(projektId))
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isForbidden();
         }
 
         @Test
@@ -576,7 +601,7 @@ class AbrechnungIntegrationTest {
                             .path(ABRECHNUNG_PATH)
                             .queryParam("sortBy", "GEHEIMES_FELD")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -588,7 +613,7 @@ class AbrechnungIntegrationTest {
                             .path(ABRECHNUNG_PATH)
                             .queryParam("pageSize", "101")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -600,7 +625,7 @@ class AbrechnungIntegrationTest {
                             .path(ABRECHNUNG_PATH)
                             .queryParam("pageNumber", "-1")
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isBadRequest();
         }
@@ -621,7 +646,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO responseDTO = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -675,7 +700,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -703,7 +728,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO responseDTO = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -747,7 +772,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO responseDTO = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -776,11 +801,33 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isNotFound();
+
+            assertThat(abrechnungRepository.count()).isZero();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, null, null, null, true,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                            new BigDecimal("36.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isForbidden();
 
             assertThat(abrechnungRepository.count()).isZero();
         }
@@ -798,7 +845,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -820,7 +867,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -842,7 +889,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO responseDTO = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -882,7 +929,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -898,7 +945,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -943,7 +990,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -995,7 +1042,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, abrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(AbrechnungResponseDTO.class)
@@ -1043,6 +1090,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -1058,7 +1106,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_BY_ID_PATH, anderesProjektId, fremdeAbrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
         }
@@ -1067,9 +1115,46 @@ class AbrechnungIntegrationTest {
         void givenUnknownAbrechnung_thenReturnNotFound() {
             restTestClient.get()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setAufschlag50prozent(true);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(projektId);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
+            final UUID abrechnungId = abrechnungRepository.save(abrechnung).getId();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_BY_ID_PATH, projektId, abrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isForbidden();
         }
     }
 
@@ -1117,7 +1202,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO neueVersion = restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1183,7 +1268,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1191,7 +1276,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(AbrechnungResponseDTO.class)
@@ -1246,7 +1331,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1258,7 +1343,7 @@ class AbrechnungIntegrationTest {
                     .uri(uriBuilder -> uriBuilder
                             .path(ABRECHNUNG_PATH)
                             .build(projektId))
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody()
@@ -1311,7 +1396,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1319,7 +1404,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1341,13 +1426,63 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
                     .expectStatus().isNotFound();
 
             assertThat(abrechnungRepository.count()).isZero();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final AbrechnungPositionEntity vorgaengerPosition = new AbrechnungPositionEntity();
+            vorgaengerPosition.setBeginn(VON);
+            vorgaengerPosition.setEnde(BIS);
+            vorgaengerPosition.setLaenge(new BigDecimal("12.00"));
+            vorgaengerPosition.setBreite(new BigDecimal("3.00"));
+            vorgaengerPosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity vorgaengerNutzungsobjekt = new NutzungsobjektEntity();
+            vorgaengerNutzungsobjekt.setAufschlag50prozent(true);
+
+            final AdressdatenEmbeddable vorgaengerAdressdaten = vorgaengerNutzungsobjekt.getAdressdaten();
+            vorgaengerAdressdaten.setArt(Adressart.ADRESSE);
+            vorgaengerAdressdaten.setAdresse("Marienplatz");
+            vorgaengerAdressdaten.setHausnummerVon("8");
+            vorgaengerNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity vorgaenger = new AbrechnungEntity();
+            vorgaenger.setProjektId(projektId);
+            vorgaenger.setVersionsnummer(1);
+            vorgaenger.setGeschaeftspartnerId("1000000001");
+            vorgaenger.setZeitraumVon(VON);
+            vorgaenger.setZeitraumBis(BIS);
+            vorgaenger.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            vorgaengerPosition.setNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaenger.addNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaenger.addPosition(vorgaengerPosition);
+            final UUID vorgaengerId = abrechnungRepository.save(vorgaenger).getId();
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
+                    null, null, null, null, true,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                            new BigDecimal("36.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, vorgaengerId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isForbidden();
+
+            assertThat(abrechnungRepository.count()).isEqualTo(1);
         }
     }
 
@@ -1395,7 +1530,7 @@ class AbrechnungIntegrationTest {
 
             final UUID zweiteVersionId = restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1405,7 +1540,7 @@ class AbrechnungIntegrationTest {
 
             final UUID dritteVersionId = restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, zweiteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1415,7 +1550,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, zweiteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -1470,7 +1605,7 @@ class AbrechnungIntegrationTest {
 
             final UUID zweiteVersionId = restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1480,7 +1615,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, ersteVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
@@ -1521,7 +1656,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, einzigeVersionId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
@@ -1599,7 +1734,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, eigeneAbrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(neueVersionDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1607,7 +1742,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, fremdeAbrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<AbrechnungVersionResponseDTO>>() {
@@ -1648,6 +1783,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -1663,7 +1799,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, anderesProjektId, fremdeAbrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
         }
@@ -1672,7 +1808,7 @@ class AbrechnungIntegrationTest {
         void givenUnknownAbrechnung_thenReturnNotFound() {
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, projektId, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
         }
@@ -1681,9 +1817,46 @@ class AbrechnungIntegrationTest {
         void givenUnknownProjekt_thenReturnNotFound() {
             restTestClient.get()
                     .uri(ABRECHNUNG_VERSION_PATH, UUID.randomUUID(), UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("12.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setAufschlag50prozent(true);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Marienplatz");
+            adressdaten.setHausnummerVon("8");
+            nutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(projektId);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000001");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
+            final UUID abrechnungId = abrechnungRepository.save(abrechnung).getId();
+
+            restTestClient.get()
+                    .uri(ABRECHNUNG_VERSION_PATH, projektId, abrechnungId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isForbidden();
         }
 
     }
@@ -1748,7 +1921,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(NUTZUNGSOBJEKT_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectHeader().contentType(MediaType.APPLICATION_JSON)
@@ -1794,6 +1967,7 @@ class AbrechnungIntegrationTest {
 
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -1836,7 +2010,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(NUTZUNGSOBJEKT_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<NutzungsobjektResponseDTO>>() {
@@ -1850,9 +2024,18 @@ class AbrechnungIntegrationTest {
         void givenUnknownProjekt_thenReturnNotFound() {
             restTestClient.get()
                     .uri(NUTZUNGSOBJEKT_PATH, UUID.randomUUID())
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenProjektInStadtbezirkOfAnotherRole_thenReturnForbidden() {
+            restTestClient.get()
+                    .uri(NUTZUNGSOBJEKT_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Nord")
+                    .exchange()
+                    .expectStatus().isForbidden();
         }
 
     }
@@ -1911,7 +2094,7 @@ class AbrechnungIntegrationTest {
 
             final AbrechnungResponseDTO zweiteAbrechnung = restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1934,7 +2117,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(ABRECHNUNG_BY_ID_PATH, projektId, ersteAbrechnungId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(AbrechnungResponseDTO.class)
@@ -1960,7 +2143,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -1968,7 +2151,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(NUTZUNGSOBJEKT_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<NutzungsobjektResponseDTO>>() {
@@ -1982,6 +2165,7 @@ class AbrechnungIntegrationTest {
         void givenNutzungsobjektOfAnotherProjekt_thenReturnNotFound() {
             final ProjektEntity anderesProjekt = new ProjektEntity();
             anderesProjekt.setProjektnummer("2026-0002");
+            anderesProjekt.setStadtbezirk(Stadtbezirk.BEZIRK_01_ALTSTADT_LEHEL);
             anderesProjekt.setAbrechnungBeginn(VON);
             anderesProjekt.setAbrechnungEnde(BIS);
 
@@ -2006,7 +2190,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, anderesProjektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2032,7 +2216,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.post()
                     .uri(ABRECHNUNG_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .body(requestDTO)
                     .accept(MediaType.APPLICATION_JSON)
                     .exchange()
@@ -2040,7 +2224,7 @@ class AbrechnungIntegrationTest {
 
             restTestClient.get()
                     .uri(NUTZUNGSOBJEKT_PATH, projektId)
-                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer SB_Mitte")
                     .exchange()
                     .expectStatus().isOk()
                     .expectBody(new ParameterizedTypeReference<List<NutzungsobjektResponseDTO>>() {

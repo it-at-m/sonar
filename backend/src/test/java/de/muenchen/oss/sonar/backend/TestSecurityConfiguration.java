@@ -14,7 +14,9 @@ import org.springframework.security.oauth2.jwt.JwtDecoder;
  * Configures a mocked JwtDecoder as Spring bean to test authorization via roles.
  * When an Authorization header is provided in the request, the Bearer value is mapped to an
  * equivalent role if registered in {@link TestSecurityConfiguration#MOCKED_ROLES}.
+ * Several roles are joined with "+".
  * e.g. Authorization: "Bearer reader" -> Role reader
+ * e.g. Authorization: "Bearer SB_Mitte+SB_Sued" -> Roles SB_Mitte and SB_Sued
  */
 @TestConfiguration
 @RequiredArgsConstructor
@@ -22,7 +24,7 @@ public class TestSecurityConfiguration {
 
     private final SecurityProperties securityProperties;
 
-    private static final List<String> MOCKED_ROLES = List.of("reader", "writer");
+    private static final List<String> MOCKED_ROLES = List.of("reader", "writer", "SB_Nord", "SB_Mitte", "SB_Mitte+SB_Sued");
 
     @Bean
     public JwtDecoder mockedJwtDecoder() {
@@ -43,7 +45,7 @@ public class TestSecurityConfiguration {
                         "resource_access",
                         Map.of(
                                 securityProperties.getClientId(),
-                                Map.of("roles", List.of(role))))
+                                Map.of("roles", List.of(role.split("\\+")))))
                 .build();
     }
 

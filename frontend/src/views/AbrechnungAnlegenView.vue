@@ -134,6 +134,9 @@ function errorText(error: unknown): string {
         ? "Die neue Version konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben."
         : "Die Abrechnung konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben.";
     }
+    if (error.response.status === 403) {
+      return "Sie sind für den Stadtbezirk dieses Projekts nicht zuständig.";
+    }
     if (error.response.status === 404) {
       return isNewVersion
         ? "Die Abrechnung, zu der die neue Version gehört, wurde nicht gefunden."

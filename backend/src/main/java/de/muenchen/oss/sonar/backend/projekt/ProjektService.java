@@ -4,6 +4,7 @@ import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG
 
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
+import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkService;
 import java.time.LocalDate;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,15 @@ public class ProjektService {
 
     private final ProjektRepository projektRepository;
     private final ProjektEntityMapper projektEntityMapper;
+    private final StadtbezirkService stadtbezirkService;
+    private final ProjektZugriffService projektZugriffService;
 
     @Transactional(readOnly = true)
-    public Page<Projekt> getAllProjekte(final int pageNumber, final int pageSize, final String projektnummer,
+    public Page<Projekt> getPermittedProjekte(final int pageNumber, final int pageSize, final String projektnummer,
             final LocalDate abrechnungBeginn, final LocalDate abrechnungEnde, final ProjektSortBy sortBy,
             final Sort.Direction direction) {
-        final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde);
+        final ProjektFilter filter = new ProjektFilter(projektnummer, abrechnungBeginn, abrechnungEnde,
+                stadtbezirkService.getStadtbezirkeOfCurrentUser());
         final Sort sort = resolveSortWithInputOrDefaults(sortBy, direction);
         log.info("Get Projekte at Page {} with a PageSize of {} matching {} ordered by {}", pageNumber, pageSize, filter, sort);
         final Pageable pageRequest = PageRequest.of(pageNumber, pageSize, sort);
@@ -45,18 +49,16 @@ public class ProjektService {
     @Transactional(readOnly = true)
     public Projekt getProjekt(final UUID projektId) {
         log.info("Get Projekt {}", projektId);
+        projektZugriffService.checkZugriffOnProjekt(projektId);
         return projektRepository
                 .findById(projektId)
                 .map(projektEntityMapper::toProjekt)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, projektId)));
     }
 
-    public boolean existsProjekt(final UUID projektId) {
-        return projektRepository.existsById(projektId);
-    }
-
     @Transactional
     public Projekt createProjekt(final Projekt projekt) {
+        projektZugriffService.checkZugriffOnStadtbezirk(projekt.stadtbezirk());
         final ProjektEntity projektEntity = projektEntityMapper.toEntity(projekt);
         log.debug("Create Projekt {}", projektEntity);
         return projektEntityMapper.toProjekt(projektRepository.save(projektEntity));

@@ -33,6 +33,7 @@ import { computed } from "vue";
 
 const HEADERS = [
   { title: "Projektnummer", key: "projektnummer" },
+  { title: "Stadtbezirk", key: "stadtbezirk" },
   { title: "Abrechnung Beginn", key: "abrechnungBeginn" },
   { title: "Abrechnung Ende", key: "abrechnungEnde" },
   { title: "Adressen/Flurnummern", key: "anzahlAdressen", sortable: false },
@@ -53,8 +54,6 @@ const props = defineProps<{
 }>();
 
 const noDataText = computed(() =>
-  props.filtered
-    ? "Keine Projekte gefunden."
-    : "Es sind noch keine Projekte angelegt."
+  props.filtered ? "Keine Projekte gefunden." : "Keine Projekte sichtbar."
 );
 </script>

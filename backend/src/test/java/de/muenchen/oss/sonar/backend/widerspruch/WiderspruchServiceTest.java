@@ -3,6 +3,7 @@ package de.muenchen.oss.sonar.backend.widerspruch;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -10,7 +11,9 @@ import static org.mockito.Mockito.when;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungEntity;
 import de.muenchen.oss.sonar.backend.abrechnung.AbrechnungRepository;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
+import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
+import de.muenchen.oss.sonar.backend.projekt.ProjektZugriffService;
 import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
 import java.time.LocalDate;
 import java.util.Optional;
@@ -38,6 +41,9 @@ class WiderspruchServiceTest {
 
     @Spy
     private final WiderspruchEntityMapper widerspruchEntityMapper = Mappers.getMapper(WiderspruchEntityMapper.class);
+
+    @Mock
+    private ProjektZugriffService projektZugriffService;
 
     @InjectMocks
     private WiderspruchService unitUnderTest;
@@ -106,6 +112,24 @@ class WiderspruchServiceTest {
                     .isInstanceOf(ConflictException.class)
                     .hasMessageContaining(ABRECHNUNG_ID.toString());
             verify(widerspruchRepository, never()).save(any(WiderspruchEntity.class));
+        }
+
+        @Test
+        void givenAbrechnungOfAProjektOutsideTheStadtbezirkeOfTheUser_thenThrowForbiddenWithoutSaving() {
+            final Widerspruch widerspruch = new Widerspruch(null, EINGANG, null, null, null, null, false, false, null);
+            final UUID projektId = UUID.randomUUID();
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setId(ABRECHNUNG_ID);
+            abrechnung.setProjektId(projektId);
+
+            when(abrechnungRepository.findById(ABRECHNUNG_ID)).thenReturn(Optional.of(abrechnung));
+            doThrow(new ForbiddenException("forbidden")).when(projektZugriffService).checkZugriffOnProjekt(projektId);
+
+            assertThatThrownBy(() -> unitUnderTest.createWiderspruch(ABRECHNUNG_ID, widerspruch))
+                    .isInstanceOf(ForbiddenException.class);
+            verify(widerspruchRepository, never()).save(any(WiderspruchEntity.class));
+            verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
         }
     }
 }
