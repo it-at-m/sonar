@@ -1,9 +1,7 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
-import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_FORBIDDEN;
 import static de.muenchen.oss.sonar.backend.common.ExceptionMessageConstants.MSG_NOT_FOUND;
 
-import de.muenchen.oss.sonar.backend.common.ForbiddenException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.stadtbezirk.StadtbezirkService;
@@ -32,6 +30,7 @@ public class ProjektService {
     private final ProjektRepository projektRepository;
     private final ProjektEntityMapper projektEntityMapper;
     private final StadtbezirkService stadtbezirkService;
+    private final ProjektZugriffService projektZugriffService;
 
     @Transactional(readOnly = true)
     public Page<Projekt> getPermittedProjekte(final int pageNumber, final int pageSize, final String projektnummer,
@@ -50,20 +49,16 @@ public class ProjektService {
     @Transactional(readOnly = true)
     public Projekt getProjekt(final UUID projektId) {
         log.info("Get Projekt {}", projektId);
-        final ProjektEntity projektEntity = projektRepository.findById(projektId)
+        projektZugriffService.checkZugriffOnProjekt(projektId);
+        return projektRepository
+                .findById(projektId)
+                .map(projektEntityMapper::toProjekt)
                 .orElseThrow(() -> new NotFoundException(String.format(MSG_NOT_FOUND, projektId)));
-        if (!stadtbezirkService.getStadtbezirkeOfCurrentUser().contains(projektEntity.getStadtbezirk())) {
-            throw new ForbiddenException(String.format(MSG_FORBIDDEN, projektId));
-        }
-        return projektEntityMapper.toProjekt(projektEntity);
-    }
-
-    public boolean existsProjekt(final UUID projektId) {
-        return projektRepository.existsByIdAndStadtbezirkIn(projektId, stadtbezirkService.getStadtbezirkeOfCurrentUser());
     }
 
     @Transactional
     public Projekt createProjekt(final Projekt projekt) {
+        projektZugriffService.checkZugriffOnStadtbezirk(projekt.stadtbezirk());
         final ProjektEntity projektEntity = projektEntityMapper.toEntity(projekt);
         log.debug("Create Projekt {}", projektEntity);
         return projektEntityMapper.toProjekt(projektRepository.save(projektEntity));
