@@ -72,14 +72,15 @@ function pick(value: unknown): void {
       : gewaehlt;
 }
 
-watch(beginn, (next, previous) => {
-  if (disabled || !next || !date.value) {
+watch([beginn, date], ([next, ende], [previous, previousEnde]) => {
+  const onlyBeginnMoved = next !== previous && ende === previousEnde;
+  if (disabled || !onlyBeginnMoved || !next || !ende) {
     return;
   }
-  const periods = countWholePeriods(previous, date.value, zeitraumEinheit);
+  const periods = countWholePeriods(previous, ende, zeitraumEinheit);
   date.value =
     periods === undefined || zeitraumEinheit === "day"
-      ? snapToLastDayOfPeriod(next, date.value, zeitraumEinheit)
+      ? snapToLastDayOfPeriod(next, ende, zeitraumEinheit)
       : lastDayOfPeriods(next, periods, zeitraumEinheit);
 });
 </script>
