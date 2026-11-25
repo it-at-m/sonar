@@ -6,7 +6,7 @@
     <v-row>
       <v-col
         cols="12"
-        md="4"
+        md="3"
       >
         <v-text-field
           v-model="projekt.projektnummer"
@@ -18,7 +18,7 @@
       </v-col>
       <v-col
         cols="12"
-        md="4"
+        md="3"
       >
         <sonar-date-field
           v-model="projekt.abrechnungBeginn"
@@ -28,13 +28,24 @@
       </v-col>
       <v-col
         cols="12"
-        md="4"
+        md="3"
       >
         <sonar-date-field
           v-model="projekt.abrechnungEnde"
           label="Abrechnung Ende"
           :rules="[requiredRule]"
           :zeitraum-beginn="projekt.abrechnungBeginn"
+        />
+      </v-col>
+      <v-col
+        cols="12"
+        md="3"
+      >
+        <v-autocomplete
+          v-model="projekt.stadtbezirk"
+          label="Stadtbezirk"
+          :items="stadtbezirkOptions"
+          :rules="[requiredRule]"
         />
       </v-col>
     </v-row>
@@ -80,6 +91,7 @@
 
 <script setup lang="ts">
 import type { ProjektRequestDTO } from "@/api/generated/sonar-backend";
+import type { StadtbezirkOption } from "@/types/projekt/StadtbezirkOption";
 
 import { mdiPlus } from "@mdi/js";
 import { useTemplateRef } from "vue";
@@ -90,7 +102,7 @@ import { useProjektForm } from "@/composables/projektForm";
 import { toProjektRequestDTO } from "@/util/projekt/projektMapper";
 import { requiredRule } from "@/util/validationRules";
 
-defineProps<{ saving: boolean }>();
+defineProps<{ saving: boolean; stadtbezirkOptions: StadtbezirkOption[] }>();
 
 const emit = defineEmits<{
   save: [projekt: ProjektRequestDTO];

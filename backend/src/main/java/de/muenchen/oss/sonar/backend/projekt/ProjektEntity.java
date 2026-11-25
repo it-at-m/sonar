@@ -1,9 +1,12 @@
 package de.muenchen.oss.sonar.backend.projekt;
 
 import de.muenchen.oss.sonar.backend.common.BaseEntity;
+import de.muenchen.oss.sonar.backend.stadtbezirk.Stadtbezirk;
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.OrderColumn;
@@ -34,6 +37,10 @@ public class ProjektEntity extends BaseEntity {
 
     @Column(nullable = false, length = 20)
     @NotNull @Size(min = 1, max = 20) private String projektnummer;
+
+    @Column(nullable = false, length = 100)
+    @Enumerated(EnumType.STRING)
+    @NotNull private Stadtbezirk stadtbezirk;
 
     @Column(nullable = false)
     @NotNull private LocalDate abrechnungBeginn;

@@ -29,6 +29,13 @@ describe("projektSortMapper.ts", () => {
       );
     });
 
+    it("givenStadtbezirkColumn_thenSortByStadtbezirk", () => {
+      expect(toProjektSort([{ key: "stadtbezirk", order: "asc" }])).toEqual({
+        sortBy: "STADTBEZIRK",
+        sortDirection: "ASC",
+      });
+    });
+
     it("givenColumnWithoutOrder_thenSortDescending", () => {
       expect(toProjektSort([{ key: "projektnummer" }])).toEqual({
         sortBy: "PROJEKTNUMMER",
