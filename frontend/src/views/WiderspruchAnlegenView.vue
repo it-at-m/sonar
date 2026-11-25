@@ -205,6 +205,9 @@ function errorText(error: unknown): string {
     if (error.response.status === 400) {
       return "Der Widerspruch konnte nicht gespeichert werden. Bitte prüfen Sie Ihre Eingaben.";
     }
+    if (error.response.status === 403) {
+      return "Sie sind für den Stadtbezirk dieses Projekts nicht zuständig.";
+    }
     if (error.response.status === 404) {
       return "Die Abrechnung wurde nicht gefunden.";
     }

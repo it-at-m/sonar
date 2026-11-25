@@ -1,13 +1,16 @@
+import type { StadtbezirkOption } from "@/types/projekt/StadtbezirkOption";
+
 import { mount } from "@vue/test-utils";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 
+import { ProjektRequestDTOStadtbezirkEnum } from "@/api/generated/sonar-backend";
 import SonarDateField from "@/components/common/SonarDateField.vue";
 import ProjektForm from "@/components/projekt/ProjektForm.vue";
 import vuetify from "@/plugins/vuetify";
 
-function mountForm() {
+function mountForm(stadtbezirkOptions: StadtbezirkOption[] = []) {
   return mount(ProjektForm, {
-    props: { saving: false },
+    props: { saving: false, stadtbezirkOptions },
     global: { plugins: [vuetify] },
   });
 }
@@ -67,5 +70,17 @@ describe("ProjektForm.vue", () => {
     );
 
     expect(allowedEnden(wrapper)(new Date(2026, 0, 4))).toBe(false);
+  });
+
+  it("givenStadtbezirkOptions_thenOfferOnlyThoseForSelection", () => {
+    const sendling = {
+      title: "06 Sendling",
+      value: ProjektRequestDTOStadtbezirkEnum.BEZIRK_06_SENDLING,
+    };
+    const wrapper = mountForm([sendling]);
+
+    expect(
+      wrapper.findComponent({ name: "VAutocomplete" }).props("items")
+    ).toEqual([sendling]);
   });
 });
