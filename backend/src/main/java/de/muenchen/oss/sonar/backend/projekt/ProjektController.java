@@ -92,6 +92,7 @@ public class ProjektController {
      * An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
      * Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
      * Either that period or tageUnerlaubteNutzung is given, never both.
+     * The Stadtbezirk has to be assigned to one of the roles of the user.
      *
      * @param projektRequestDTO the details of the Projekt to create
      * @return the created Projekt as a DTO
@@ -99,6 +100,7 @@ public class ProjektController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @ApiResponse(responseCode = "400", description = "the details of the Projekt are invalid", content = @Content)
+    @ApiResponse(responseCode = "403", description = "the Stadtbezirk is not one of the Stadtbezirke of the user", content = @Content)
     public ProjektResponseDTO saveProjekt(@Valid @RequestBody final ProjektRequestDTO projektRequestDTO) {
         return projektDTOMapper.toDTO(projektService.createProjekt(projektDTOMapper.toProjekt(projektRequestDTO)));
     }
