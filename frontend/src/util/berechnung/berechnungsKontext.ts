@@ -9,6 +9,8 @@ import type {
 } from "@/api/generated/sonar-backend";
 import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
 
+import { toRaw } from "vue";
+
 import { ApiFactory } from "@/api/ApiFactory";
 import {
   AbrechnungControllerApi,
@@ -41,6 +43,26 @@ export async function fetchBerechnungsKontext(
 
   return {
     abrechnung: toAbrechnungForm(abrechnung),
+    projekt: await projektRequest,
+    geschaeftspartner: await geschaeftspartnerRequest,
+  };
+}
+
+export async function fetchBerechnungsKontextOfForm(
+  projektId: string,
+  abrechnung: AbrechnungForm
+): Promise<BerechnungsKontext> {
+  // The Kontrolldaten show the form as it was calculated, while the user goes on editing it.
+  const calculatedAbrechnung = structuredClone(toRaw(abrechnung));
+  const projektRequest = ApiFactory.getInstance(ProjektControllerApi)
+    .getProjekt(projektId)
+    .catch(() => undefined);
+  const geschaeftspartnerRequest = fetchGeschaeftspartner(
+    calculatedAbrechnung.geschaeftspartnerId.trim()
+  );
+
+  return {
+    abrechnung: calculatedAbrechnung,
     projekt: await projektRequest,
     geschaeftspartner: await geschaeftspartnerRequest,
   };

@@ -1,14 +1,20 @@
 <template>
-  <v-btn
-    :aria-label="`Berechnung der Abrechnung ${geschaeftspartnerId} erstellen`"
-    density="comfortable"
-    :icon="mdiCalculator"
-    variant="text"
-    @click="openDialog"
-  />
+  <slot
+    name="activator"
+    :open="openDialog"
+  >
+    <v-btn
+      :aria-label="`Berechnung der Abrechnung ${geschaeftspartnerId} erstellen`"
+      density="comfortable"
+      :icon="mdiCalculator"
+      variant="text"
+      @click="openDialog"
+    />
+  </slot>
 
   <v-dialog
     v-model="berechnungDialog"
+    :persistent="calculating"
     width="500"
   >
     <v-card>
@@ -28,6 +34,7 @@
         <v-card-actions>
           <v-spacer />
           <v-btn
+            :disabled="calculating"
             variant="text"
             @click="berechnungDialog = false"
           >
@@ -55,6 +62,7 @@
 
 <script setup lang="ts">
 import type { BerechnungResponseDTO } from "@/api/generated/sonar-backend";
+import type { AbrechnungForm } from "@/types/abrechnung/AbrechnungForm";
 import type { BerechnungsKontext } from "@/util/berechnung/berechnungsKontext";
 
 import { mdiCalculator } from "@mdi/js";
@@ -69,14 +77,24 @@ import BerechnungErgebnisDialog from "@/components/berechnung/BerechnungErgebnis
 import SonarDateField from "@/components/common/SonarDateField.vue";
 import { STATUS_INDICATORS } from "@/constants";
 import { useSnackbarStore } from "@/stores/snackbar";
-import { fetchBerechnungsKontext } from "@/util/berechnung/berechnungsKontext";
+import { toAbrechnungRequestDTO } from "@/util/abrechnung/abrechnungMapper";
+import {
+  fetchBerechnungsKontext,
+  fetchBerechnungsKontextOfForm,
+} from "@/util/berechnung/berechnungsKontext";
 import { toIsoDate } from "@/util/common/isoDate";
 import { requiredRule } from "@/util/validationRules";
 
-const { abrechnungId, projektId } = defineProps<{
+const {
+  abrechnungId = undefined,
+  geschaeftspartnerId = undefined,
+  projektId,
+  unsavedAbrechnung = undefined,
+} = defineProps<{
   projektId: string;
-  abrechnungId: string;
-  geschaeftspartnerId: string;
+  abrechnungId?: string;
+  geschaeftspartnerId?: string;
+  unsavedAbrechnung?: AbrechnungForm;
 }>();
 
 const snackbarStore = useSnackbarStore();
@@ -95,15 +113,20 @@ function openDialog(): void {
 }
 
 function errorText(error: unknown): string {
+  const isUnsaved = unsavedAbrechnung !== undefined;
   if (error instanceof ResponseError) {
     if (error.response.status === 400) {
-      return "Das Abrechnungsdatum ist ungültig.";
+      return isUnsaved
+        ? "Die Berechnung konnte nicht durchgeführt werden. Bitte prüfen Sie Ihre Eingaben."
+        : "Das Abrechnungsdatum ist ungültig.";
     }
     if (error.response.status === 403) {
       return "Sie sind für den Stadtbezirk dieses Projekts nicht zuständig.";
     }
     if (error.response.status === 404) {
-      return "Die Abrechnung wurde nicht gefunden.";
+      return isUnsaved
+        ? "Das Projekt oder ein übernommenes Nutzungsobjekt wurde nicht gefunden."
+        : "Die Abrechnung wurde nicht gefunden.";
     }
   }
   return "Die Berechnung konnte nicht durchgeführt werden.";
@@ -111,21 +134,36 @@ function errorText(error: unknown): string {
 
 async function createBerechnung(): Promise<void> {
   const validation = await form.value?.validate();
-  if (!validation?.valid) {
+  if (!validation?.valid || calculating.value) {
     return;
   }
 
   calculating.value = true;
   try {
-    const preview = await ApiFactory.getInstance(
-      BerechnungControllerApi
-    ).previewBerechnung(
-      projektId,
-      abrechnungId,
-      new Date(abrechnungsdatum.value)
-    );
-    kontext.value = await fetchBerechnungsKontext(projektId, abrechnungId);
-    ergebnis.value = preview;
+    const berechnungApi = ApiFactory.getInstance(BerechnungControllerApi);
+    const berechnungsdatum = new Date(abrechnungsdatum.value);
+    if (unsavedAbrechnung !== undefined) {
+      const preview = await berechnungApi.previewBerechnungOfUnsavedAbrechnung(
+        projektId,
+        berechnungsdatum,
+        toAbrechnungRequestDTO(unsavedAbrechnung)
+      );
+      kontext.value = await fetchBerechnungsKontextOfForm(
+        projektId,
+        unsavedAbrechnung
+      );
+      ergebnis.value = preview;
+    } else if (abrechnungId !== undefined) {
+      const preview = await berechnungApi.previewBerechnungOfSavedAbrechnung(
+        projektId,
+        abrechnungId,
+        berechnungsdatum
+      );
+      kontext.value = await fetchBerechnungsKontext(projektId, abrechnungId);
+      ergebnis.value = preview;
+    } else {
+      throw new Error("Es fehlt die Abrechnung, die berechnet werden soll.");
+    }
     berechnungDialog.value = false;
     ergebnisDialog.value = true;
   } catch (error) {

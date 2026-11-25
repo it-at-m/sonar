@@ -503,7 +503,7 @@ paths:
          given berechnungsdatum. A Position reaching beyond that date is charged only up to it, and one
          beginning after it is left out. The Zeitraum stored on the Abrechnung does not limit the
          Berechnung, so the berechnungsdatum may fall outside it.
-      operationId: previewBerechnung
+      operationId: previewBerechnungOfSavedAbrechnung
       parameters:
       - name: projektId
         in: path
@@ -533,6 +533,61 @@ paths:
           description: the Projekt lies outside the Stadtbezirke of the user
         "404":
           description: the Projekt has no Abrechnung with that UUID
+        "200":
+          description: the result of the Berechnung as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/BerechnungResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/abrechnung/berechnung/preview:
+    post:
+      tags:
+      - berechnung-controller
+      summary: Calculate an unsaved Abrechnung without keeping the result.
+      description: |-
+        Calculate an unsaved Abrechnung without keeping the result.
+         The body is the same as the one that creates an Abrechnung or its next version, so the result
+         can be checked before saving. Nothing is stored.
+         The Berechnung runs on the Nutzungsobjekte, Positionen and Masten of the request, up to the
+         given berechnungsdatum. A Position reaching beyond that date is charged only up to it, and one
+         beginning after it is left out. The Zeitraum of the request does not limit the Berechnung, so
+         the berechnungsdatum may fall outside it.
+         A Nutzungsobjekt sent with the UUID of a stored one keeps its stored details, as it does when
+         saving. Only its Positionen and Masten come from the request.
+      operationId: previewBerechnungOfUnsavedAbrechnung
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      - name: berechnungsdatum
+        in: query
+        description: the last day the Berechnung charges for
+        required: true
+        schema:
+          type: string
+          format: date
+      requestBody:
+        description: the details of the Abrechnung to calculate
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/AbrechnungRequestDTO"
+        required: true
+      responses:
+        "400":
+          description: "the details of the Abrechnung are invalid, or the berechnungsdatum\
+            \ is missing or is not a date"
+        "403":
+          description: the Projekt lies outside the Stadtbezirke of the user
+        "404":
+          description: "the Projekt does not exist, or it has no Nutzungsobjekt with\
+            \ one of the given UUIDs"
         "200":
           description: the result of the Berechnung as a DTO
           content:
