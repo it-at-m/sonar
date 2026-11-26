@@ -6,6 +6,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
+import de.muenchen.oss.sonar.backend.projekt.domain.LinkedProjekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
 import java.time.LocalDate;
@@ -49,7 +50,7 @@ class ProjektEntityMapperTest {
             projektEntity.setAbrechnungEnde(ENDE);
             projektEntity.addAdresse(adresseEntity);
 
-            final Projekt result = projektEntityMapper.toProjekt(projektEntity);
+            final Projekt result = projektEntityMapper.toProjekt(projektEntity, List.of(), List.of(), false);
 
             assertNotNull(result);
             assertThat(result.id()).isEqualTo(projektEntity.getId());
@@ -74,6 +75,41 @@ class ProjektEntityMapperTest {
             assertThat(adresse.anzahlMahnungen()).isEqualTo(adresseEntity.getAnzahlMahnungen());
             assertThat(adresse.sondernutzungErlaubt()).isEqualTo(adresseEntity.isSondernutzungErlaubt());
         }
+
+        @Test
+        void givenLinkedEntity_thenReturnsProjektWithItsPointerAndTheLinkedProjekte() {
+            final UUID vorgaengerId = UUID.randomUUID();
+            final ProjektEntity projektEntity = new ProjektEntity();
+            projektEntity.setId(UUID.randomUUID());
+            projektEntity.setProjektnummer("2026-0002");
+            projektEntity.setAbrechnungBeginn(BEGINN);
+            projektEntity.setAbrechnungEnde(ENDE);
+            projektEntity.setVorgaengerProjektId(vorgaengerId);
+
+            final LinkedProjekt vorgaenger = new LinkedProjekt(vorgaengerId, "2026-0001");
+            final LinkedProjekt nachfolger = new LinkedProjekt(UUID.randomUUID(), "2026-0003");
+
+            final Projekt result = projektEntityMapper.toProjekt(projektEntity, List.of(vorgaenger), List.of(nachfolger), false);
+
+            assertThat(result.vorgaengerProjektId()).isEqualTo(vorgaengerId);
+            assertThat(result.vorgaengerProjekte()).containsExactly(vorgaenger);
+            assertThat(result.nachfolgerProjekte()).containsExactly(nachfolger);
+        }
+
+        @Test
+        void givenAbgelehnteVerknuepfungAndPossibleVorgaenger_thenReturnsProjektWithBoth() {
+            final ProjektEntity projektEntity = new ProjektEntity();
+            projektEntity.setId(UUID.randomUUID());
+            projektEntity.setProjektnummer("2026-0002");
+            projektEntity.setAbrechnungBeginn(BEGINN);
+            projektEntity.setAbrechnungEnde(ENDE);
+            projektEntity.setVerknuepfungAbgelehnt(true);
+
+            final Projekt result = projektEntityMapper.toProjekt(projektEntity, List.of(), List.of(), true);
+
+            assertThat(result.verknuepfungAbgelehnt()).isTrue();
+            assertThat(result.verknuepfungMoeglich()).isTrue();
+        }
     }
 
     @Nested
@@ -83,7 +119,8 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
                     BEGINN, ENDE, null, 1, false);
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse), null, List.of(), List.of(),
+                    false, false);
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 
@@ -114,12 +151,24 @@ class ProjektEntityMapperTest {
             final ProjektAdresse adresse = new ProjektAdresse(
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, 12, 0, false);
-            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse), null, List.of(),
+                    List.of(), false, false);
 
             final ProjektEntity result = projektEntityMapper.toEntity(projekt);
 
             assertThat(result.getId()).isNull();
             assertThat(result.getAdressen().getFirst().getId()).isNull();
+        }
+
+        @Test
+        void givenProjektWithVorgaengerProjekt_thenEntityPointsToIt() {
+            final UUID vorgaengerProjektId = UUID.randomUUID();
+            final Projekt projekt = new Projekt(null, "2026-0002", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(),
+                    vorgaengerProjektId, List.of(), List.of(), false, false);
+
+            final ProjektEntity result = projektEntityMapper.toEntity(projekt);
+
+            assertThat(result.getVorgaengerProjektId()).isEqualTo(vorgaengerProjektId);
         }
     }
 

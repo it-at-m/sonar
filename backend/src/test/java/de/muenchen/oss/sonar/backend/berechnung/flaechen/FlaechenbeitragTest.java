@@ -17,7 +17,7 @@ class FlaechenbeitragTest {
         @Test
         void givenWocheBeforeTheErsteWocheOfTheFlaeche_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 3, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 2, 13);
 
@@ -27,7 +27,7 @@ class FlaechenbeitragTest {
         @Test
         void givenWocheAfterTheLetzteWocheOfTheAdresse_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 14, 13);
 
@@ -37,7 +37,7 @@ class FlaechenbeitragTest {
         @Test
         void givenFlaecheReducedToNothing_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, BigDecimal.ZERO, 5, 13);
 
@@ -47,7 +47,7 @@ class FlaechenbeitragTest {
         @Test
         void givenFlaecheOutsideTheAbrechnungszeitraum_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 5, 13);
 
@@ -57,7 +57,7 @@ class FlaechenbeitragTest {
         @Test
         void givenWocheWithinTheGueltigkeit_thenReturnTrue() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 5, 13);
 
@@ -71,7 +71,7 @@ class FlaechenbeitragTest {
         @Test
         void givenErsteWocheOfTheFlaeche_thenReachTheFirstZeitindex() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 12, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 3, 55);
 
@@ -81,7 +81,7 @@ class FlaechenbeitragTest {
         @Test
         void givenWocheThatMovesTheFlaecheOn_thenReachTheNextZeitindex() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 14, 53);
 
@@ -91,7 +91,7 @@ class FlaechenbeitragTest {
         @Test
         void givenFlaecheThatIsNotAktiv_thenReturnEmpty() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, BigDecimal.ZERO, 5, 13);
 

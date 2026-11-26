@@ -24,7 +24,7 @@ class FlaechentextTest {
             @Test
             void givenAdresseWithOneFlaeche_thenWriteTheWholeBlock() {
                 final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1,
-                        new BigDecimal("100"), new BigDecimal("100"));
+                        new BigDecimal("100"), new BigDecimal("100"), false);
                 final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 3);
 
                 assertThat(Flaechentext.zusammenfassung(adresse)).isEqualTo(
@@ -43,7 +43,7 @@ class FlaechentextTest {
             @Test
             void givenAdresseWithAufschlag_thenSaySo() {
                 final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1,
-                        new BigDecimal("100"), new BigDecimal("100"));
+                        new BigDecimal("100"), new BigDecimal("100"), false);
                 final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", true, List.of(flaeche), 3);
 
                 assertThat(Flaechentext.zusammenfassung(adresse)).contains("   50%-Aufschlag : true");
@@ -52,7 +52,7 @@ class FlaechentextTest {
             @Test
             void givenAdresseWhoseFlaecheIsOutsideTheAbrechnungszeitraum_thenSaySoInsteadOfTheBlock() {
                 final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5,
-                        new BigDecimal("100"), new BigDecimal("100"));
+                        new BigDecimal("100"), new BigDecimal("100"), false);
                 final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 2);
 
                 assertThat(Flaechentext.zusammenfassung(adresse)).isEqualTo(
@@ -78,7 +78,7 @@ class FlaechentextTest {
             @Test
             void givenFlaechenreduzierung_thenWriteItWithoutAPlusSign() {
                 final Flaeche flaeche = new Flaeche("Position 2", LocalDate.of(2026, 1, 29), LocalDate.of(2026, 3, 31), 5,
-                        new BigDecimal("60"), new BigDecimal("-40"));
+                        new BigDecimal("60"), new BigDecimal("-40"), false);
 
                 assertThat(Flaechentext.zusammenfassung(flaeche)).isEqualTo(
                         "   - Fläche Position 2" + NEWLINE
@@ -91,7 +91,7 @@ class FlaechentextTest {
             @Test
             void givenFlaecheOutsideTheAbrechnungszeitraum_thenWriteOnlyThat() {
                 final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5,
-                        new BigDecimal("100"), new BigDecimal("100"));
+                        new BigDecimal("100"), new BigDecimal("100"), false);
 
                 assertThat(Flaechentext.zusammenfassung(flaeche)).isEqualTo(
                         "   - Fläche Position 1" + NEWLINE
@@ -110,7 +110,7 @@ class FlaechentextTest {
                             new Flaechenverteilung("Marienplatz 8", false, ZEITINDEX_1, new BigDecimal("100"), "Position 1"),
                             new Flaechenverteilung("Sendlinger Straße 1", true, ZEITINDEX_2, new BigDecimal("50"),
                                     "Position 1, Position 2")),
-                    List.of(), "");
+                    List.of(), List.of(), "");
 
             assertThat(Flaechentext.verteilung(woche)).isEqualTo(
                     "    Marienplatz 8: 100m² / Zeitindex 1 (Fläche: Position 1)" + NEWLINE
@@ -124,7 +124,7 @@ class FlaechentextTest {
 
         @Test
         void givenWoche_thenWriteTheBaustellenflaecheAndTheStufeItReaches() {
-            final Flaechenwoche woche = new Flaechenwoche(1, new BigDecimal("150"), STUFE_2, List.of(), List.of(), "");
+            final Flaechenwoche woche = new Flaechenwoche(1, new BigDecimal("150"), STUFE_2, List.of(), List.of(), List.of(), "");
 
             assertThat(Flaechentext.gebuehrenstufe(woche)).isEqualTo("150m² --> Gebührenstufe 2" + NEWLINE);
         }
@@ -166,6 +166,7 @@ class FlaechentextTest {
         void givenFlaechenabrechnung_thenWriteOneBlockPerWocheAndTheGesamtgebuehr() {
             final Flaechenwoche woche = new Flaechenwoche(1, new BigDecimal("100"), STUFE_2,
                     List.of(new Flaechenverteilung("Marienplatz 8", false, ZEITINDEX_1, new BigDecimal("100"), "Position 1")),
+                    List.of(),
                     List.of(new Gebuehrenposten(STUFE_2, false, ZEITINDEX_1, new BigDecimal("100"))), "");
             final Flaechenabrechnung flaechen = new Flaechenabrechnung(List.of(woche), List.of(), new BigDecimal("150.00"));
 
@@ -185,6 +186,7 @@ class FlaechentextTest {
         void givenPostenWithoutGebuehr_thenLeaveItOut() {
             final Flaechenwoche woche = new Flaechenwoche(1, new BigDecimal("100"), STUFE_2,
                     List.of(new Flaechenverteilung("Marienplatz 8", false, ZEITINDEX_1, new BigDecimal("100"), "Position 1")),
+                    List.of(),
                     List.of(
                             new Gebuehrenposten(STUFE_2, false, ZEITINDEX_1, new BigDecimal("100")),
                             new Gebuehrenposten(STUFE_2, false, ZEITINDEX_2, BigDecimal.ZERO)),

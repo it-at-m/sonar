@@ -2,6 +2,7 @@ package de.muenchen.oss.sonar.backend.abrechnung;
 
 import static de.muenchen.oss.sonar.backend.TestConstants.SPRING_TEST_PROFILE;
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.tuple;
 
 import de.muenchen.oss.sonar.backend.TestConstants;
 import de.muenchen.oss.sonar.backend.TestSecurityConfiguration;
@@ -13,6 +14,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungPositionResponseDT
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungRequestDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungResponseDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungVersionResponseDTO;
+import de.muenchen.oss.sonar.backend.abrechnung.dto.AbrechnungsanschlussResponseDTO;
 import de.muenchen.oss.sonar.backend.abrechnung.dto.NutzungsobjektResponseDTO;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
@@ -60,6 +62,7 @@ class AbrechnungIntegrationTest {
     private static final String ABRECHNUNG_BY_ID_PATH = "/projekt/{projektId}/abrechnung/{abrechnungId}";
     private static final String ABRECHNUNG_VERSION_PATH = "/projekt/{projektId}/abrechnung/{abrechnungId}/version";
     private static final String NUTZUNGSOBJEKT_PATH = "/projekt/{projektId}/abrechnung/nutzungsobjekt";
+    private static final String ABRECHNUNGSANSCHLUSS_PATH = "/projekt/{projektId}/abrechnung/anschluss";
 
     @Container
     @ServiceConnection
@@ -88,6 +91,8 @@ class AbrechnungIntegrationTest {
         gespeicherteAbrechnungen.stream()
                 .sorted(Comparator.comparing(AbrechnungEntity::getVersionsnummer).reversed())
                 .forEach(abrechnungRepository::delete);
+        transactionTemplate.executeWithoutResult(status -> projektRepository.findAll()
+                .forEach(projekt -> projekt.setVorgaengerProjektId(null)));
         projektRepository.deleteAll();
 
         final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
@@ -1724,7 +1729,7 @@ class AbrechnungIntegrationTest {
 
             transactionTemplate.executeWithoutResult(status -> {
                 final NutzungsobjektEntity gespeichertesNutzungsobjekt = abrechnungRepository
-                        .findNutzungsobjekteByProjektId(projektId).getFirst();
+                        .findNutzungsobjekteImProjektByProjektIdIn(List.of(projektId)).getFirst().nutzungsobjekt();
 
                 final AbrechnungPositionEntity zweitePosition = new AbrechnungPositionEntity();
                 zweitePosition.setBeginn(VON);
@@ -1844,6 +1849,118 @@ class AbrechnungIntegrationTest {
                     .value(nutzungsobjekte -> assertThat(nutzungsobjekte)
                             .extracting(NutzungsobjektResponseDTO::adresse)
                             .containsExactly("Marienplatz"));
+        }
+
+        @Test
+        void givenNutzungsobjektOfAVorgaenger_thenOfferItWithItsProjektnummer() {
+            final ProjektEntity nachfolgerProjekt = new ProjektEntity();
+            nachfolgerProjekt.setProjektnummer("2026-0002");
+            nachfolgerProjekt.setAbrechnungBeginn(VON);
+            nachfolgerProjekt.setAbrechnungEnde(BIS);
+            nachfolgerProjekt.setVorgaengerProjektId(projektId);
+
+            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
+            adresse.setAnzahlMahnungen(0);
+            adresse.setSondernutzungErlaubt(false);
+            adresse.getAdressdaten().setArt(Adressart.ADRESSE);
+            adresse.getAdressdaten().setAdresse("Sendlinger Straße");
+            adresse.getAdressdaten().setHausnummerVon("1");
+            nachfolgerProjekt.addAdresse(adresse);
+
+            final UUID nachfolgerProjektId = projektRepository.save(nachfolgerProjekt).getId();
+
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("15.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("45.00"));
+
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setAufschlag50prozent(false);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Sendlinger Straße");
+            adressdaten.setHausnummerVon("1");
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(projektId);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000002");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
+            abrechnungRepository.save(abrechnung);
+
+            restTestClient.get()
+                    .uri(NUTZUNGSOBJEKT_PATH, nachfolgerProjektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(new ParameterizedTypeReference<List<NutzungsobjektResponseDTO>>() {
+                    })
+                    .value(nutzungsobjekte -> assertThat(nutzungsobjekte)
+                            .extracting(NutzungsobjektResponseDTO::adresse, NutzungsobjektResponseDTO::projektnummer)
+                            .containsExactly(tuple("Sendlinger Straße", "2026-0001")));
+        }
+
+        @Test
+        void givenNutzungsobjektOfANachfolger_thenLeaveItOut() {
+            final ProjektEntity nachfolgerProjekt = new ProjektEntity();
+            nachfolgerProjekt.setProjektnummer("2026-0002");
+            nachfolgerProjekt.setAbrechnungBeginn(VON);
+            nachfolgerProjekt.setAbrechnungEnde(BIS);
+            nachfolgerProjekt.setVorgaengerProjektId(projektId);
+
+            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
+            adresse.setAnzahlMahnungen(0);
+            adresse.setSondernutzungErlaubt(false);
+            adresse.getAdressdaten().setArt(Adressart.ADRESSE);
+            adresse.getAdressdaten().setAdresse("Sendlinger Straße");
+            adresse.getAdressdaten().setHausnummerVon("1");
+            nachfolgerProjekt.addAdresse(adresse);
+
+            final UUID nachfolgerProjektId = projektRepository.save(nachfolgerProjekt).getId();
+
+            final AbrechnungPositionEntity position = new AbrechnungPositionEntity();
+            position.setBeginn(VON);
+            position.setEnde(BIS);
+            position.setLaenge(new BigDecimal("15.00"));
+            position.setBreite(new BigDecimal("3.00"));
+            position.setFlaeche(new BigDecimal("45.00"));
+
+            final NutzungsobjektEntity nutzungsobjekt = new NutzungsobjektEntity();
+            nutzungsobjekt.setAufschlag50prozent(false);
+
+            final AdressdatenEmbeddable adressdaten = nutzungsobjekt.getAdressdaten();
+            adressdaten.setArt(Adressart.ADRESSE);
+            adressdaten.setAdresse("Sendlinger Straße");
+            adressdaten.setHausnummerVon("1");
+
+            final AbrechnungEntity abrechnung = new AbrechnungEntity();
+            abrechnung.setProjektId(nachfolgerProjektId);
+            abrechnung.setVersionsnummer(1);
+            abrechnung.setGeschaeftspartnerId("1000000002");
+            abrechnung.setZeitraumVon(VON);
+            abrechnung.setZeitraumBis(BIS);
+            abrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            position.setNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addNutzungsobjekt(nutzungsobjekt);
+            abrechnung.addPosition(position);
+            abrechnungRepository.save(abrechnung);
+
+            restTestClient.get()
+                    .uri(NUTZUNGSOBJEKT_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(new ParameterizedTypeReference<List<NutzungsobjektResponseDTO>>() {
+                    })
+                    .value(nutzungsobjekte -> assertThat(nutzungsobjekte).isEmpty());
         }
 
         @Test
@@ -2014,6 +2131,90 @@ class AbrechnungIntegrationTest {
         }
 
         @Test
+        void givenNutzungsobjektOfAVorgaenger_thenTakeItOver() {
+            final ProjektEntity nachfolgerProjekt = new ProjektEntity();
+            nachfolgerProjekt.setProjektnummer("2026-0002");
+            nachfolgerProjekt.setAbrechnungBeginn(VON);
+            nachfolgerProjekt.setAbrechnungEnde(BIS);
+            nachfolgerProjekt.setVorgaengerProjektId(projektId);
+
+            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
+            adresse.setAnzahlMahnungen(0);
+            adresse.setSondernutzungErlaubt(false);
+            adresse.getAdressdaten().setArt(Adressart.ADRESSE);
+            adresse.getAdressdaten().setAdresse("Sendlinger Straße");
+            adresse.getAdressdaten().setHausnummerVon("1");
+            nachfolgerProjekt.addAdresse(adresse);
+
+            final UUID nachfolgerProjektId = projektRepository.save(nachfolgerProjekt).getId();
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, true,
+                    List.of(new AbrechnungPositionRequestDTO(LocalDate.of(2026, 4, 1), LocalDate.of(2026, 6, 30),
+                            new BigDecimal("15.00"), new BigDecimal("3.00"), new BigDecimal("45.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null,
+                    LocalDate.of(2026, 4, 1), LocalDate.of(2026, 6, 30), AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_PATH, nachfolgerProjektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated();
+
+            restTestClient.get()
+                    .uri(NUTZUNGSOBJEKT_PATH, nachfolgerProjektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(new ParameterizedTypeReference<List<NutzungsobjektResponseDTO>>() {
+                    })
+                    .value(nutzungsobjekte -> assertThat(nutzungsobjekte)
+                            .extracting(NutzungsobjektResponseDTO::id, NutzungsobjektResponseDTO::projektnummer)
+                            .containsExactly(tuple(nutzungsobjektId, null)));
+        }
+
+        @Test
+        void givenNutzungsobjektOfANachfolger_thenReturnNotFound() {
+            final ProjektEntity vorgaengerProjekt = new ProjektEntity();
+            vorgaengerProjekt.setProjektnummer("2026-0000");
+            vorgaengerProjekt.setAbrechnungBeginn(VON);
+            vorgaengerProjekt.setAbrechnungEnde(BIS);
+
+            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
+            adresse.setAnzahlMahnungen(0);
+            adresse.setSondernutzungErlaubt(false);
+            adresse.getAdressdaten().setArt(Adressart.ADRESSE);
+            adresse.getAdressdaten().setAdresse("Sendlinger Straße");
+            adresse.getAdressdaten().setHausnummerVon("1");
+            vorgaengerProjekt.addAdresse(adresse);
+
+            final UUID vorgaengerProjektId = projektRepository.save(vorgaengerProjekt).getId();
+            transactionTemplate.executeWithoutResult(status -> projektRepository.findById(projektId).orElseThrow()
+                    .setVorgaengerProjektId(vorgaengerProjektId));
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, true,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("15.00"), new BigDecimal("3.00"),
+                            new BigDecimal("45.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000002", false, null, null, VON, BIS,
+                    AbrechnungsArt.ZWISCHENABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_PATH, vorgaengerProjektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
         void givenTheSameNutzungsobjektTwice_thenRefuseToCreateTheAbrechnung() {
             final AbrechnungNutzungsobjektRequestDTO erstesNutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(nutzungsobjektId,
                     Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
@@ -2048,6 +2249,364 @@ class AbrechnungIntegrationTest {
                     .value(nutzungsobjekte -> assertThat(nutzungsobjekte)
                             .extracting(NutzungsobjektResponseDTO::id)
                             .containsExactly(nutzungsobjektId));
+        }
+
+    }
+
+    @Nested
+    class AbrechnungImNachfolger {
+
+        private UUID vorgaengerProjektId;
+
+        @BeforeEach
+        void setUp() {
+            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
+            adresse.setAnzahlMahnungen(0);
+            adresse.setSondernutzungErlaubt(false);
+            adresse.getAdressdaten().setArt(Adressart.ADRESSE);
+            adresse.getAdressdaten().setAdresse("Marienplatz");
+            adresse.getAdressdaten().setHausnummerVon("8");
+
+            final ProjektEntity vorgaengerProjekt = new ProjektEntity();
+            vorgaengerProjekt.setProjektnummer("2026-0000");
+            vorgaengerProjekt.setAbrechnungBeginn(VON);
+            vorgaengerProjekt.setAbrechnungEnde(BIS);
+            vorgaengerProjekt.addAdresse(adresse);
+
+            vorgaengerProjektId = projektRepository.save(vorgaengerProjekt).getId();
+            transactionTemplate.executeWithoutResult(status -> projektRepository.findById(projektId).orElseThrow()
+                    .setVorgaengerProjektId(vorgaengerProjektId));
+        }
+
+        @Test
+        void givenFirstLinkedProjekt_thenAllowAnyDay() {
+            restTestClient.get()
+                    .uri(ABRECHNUNGSANSCHLUSS_PATH, vorgaengerProjektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(AbrechnungsanschlussResponseDTO.class)
+                    .value(dto -> {
+                        assertThat(dto.anlegenMoeglich()).isTrue();
+                        assertThat(dto.zeitraumVon()).isNull();
+                    });
+        }
+
+        @Test
+        void givenVorgaengerWithSeveralAbrechnungen_thenStartTheDayAfterTheLatestZeitraumBis() {
+            final AbrechnungPositionEntity spaetePosition = new AbrechnungPositionEntity();
+            spaetePosition.setBeginn(LocalDate.of(2026, 4, 1));
+            spaetePosition.setEnde(LocalDate.of(2026, 6, 30));
+            spaetePosition.setLaenge(new BigDecimal("12.00"));
+            spaetePosition.setBreite(new BigDecimal("3.00"));
+            spaetePosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity spaetesNutzungsobjekt = new NutzungsobjektEntity();
+            spaetesNutzungsobjekt.setAufschlag50prozent(false);
+            spaetesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            spaetesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            spaetesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+            spaetesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity spaeteAbrechnung = new AbrechnungEntity();
+            spaeteAbrechnung.setProjektId(vorgaengerProjektId);
+            spaeteAbrechnung.setVersionsnummer(1);
+            spaeteAbrechnung.setGeschaeftspartnerId("1000000001");
+            spaeteAbrechnung.setZeitraumVon(LocalDate.of(2026, 4, 1));
+            spaeteAbrechnung.setZeitraumBis(LocalDate.of(2026, 6, 30));
+            spaeteAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            spaetePosition.setNutzungsobjekt(spaetesNutzungsobjekt);
+            spaeteAbrechnung.addNutzungsobjekt(spaetesNutzungsobjekt);
+            spaeteAbrechnung.addPosition(spaetePosition);
+            abrechnungRepository.save(spaeteAbrechnung);
+
+            final AbrechnungPositionEntity fruehePosition = new AbrechnungPositionEntity();
+            fruehePosition.setBeginn(VON);
+            fruehePosition.setEnde(BIS);
+            fruehePosition.setLaenge(new BigDecimal("12.00"));
+            fruehePosition.setBreite(new BigDecimal("3.00"));
+            fruehePosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity fruehesNutzungsobjekt = new NutzungsobjektEntity();
+            fruehesNutzungsobjekt.setAufschlag50prozent(false);
+            fruehesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            fruehesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            fruehesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+            fruehesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity frueheAbrechnung = new AbrechnungEntity();
+            frueheAbrechnung.setProjektId(vorgaengerProjektId);
+            frueheAbrechnung.setVersionsnummer(1);
+            frueheAbrechnung.setGeschaeftspartnerId("1000000001");
+            frueheAbrechnung.setZeitraumVon(VON);
+            frueheAbrechnung.setZeitraumBis(BIS);
+            frueheAbrechnung.setAbrechnungsArt(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            fruehePosition.setNutzungsobjekt(fruehesNutzungsobjekt);
+            frueheAbrechnung.addNutzungsobjekt(fruehesNutzungsobjekt);
+            frueheAbrechnung.addPosition(fruehePosition);
+            abrechnungRepository.save(frueheAbrechnung);
+
+            restTestClient.get()
+                    .uri(ABRECHNUNGSANSCHLUSS_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(AbrechnungsanschlussResponseDTO.class)
+                    .value(dto -> {
+                        assertThat(dto.anlegenMoeglich()).isTrue();
+                        assertThat(dto.zeitraumVon()).isEqualTo(LocalDate.of(2026, 7, 1));
+                    });
+        }
+
+        @Test
+        void givenOlderVersionEndingLater_thenCountOnlyTheNewestVersion() {
+            final AbrechnungPositionEntity erstePosition = new AbrechnungPositionEntity();
+            erstePosition.setBeginn(VON);
+            erstePosition.setEnde(LocalDate.of(2026, 9, 30));
+            erstePosition.setLaenge(new BigDecimal("12.00"));
+            erstePosition.setBreite(new BigDecimal("3.00"));
+            erstePosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
+            erstesNutzungsobjekt.setAufschlag50prozent(false);
+            erstesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            erstesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            erstesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+            erstesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity ersteVersion = new AbrechnungEntity();
+            ersteVersion.setProjektId(vorgaengerProjektId);
+            ersteVersion.setVersionsnummer(1);
+            ersteVersion.setGeschaeftspartnerId("1000000001");
+            ersteVersion.setZeitraumVon(VON);
+            ersteVersion.setZeitraumBis(LocalDate.of(2026, 9, 30));
+            ersteVersion.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            erstePosition.setNutzungsobjekt(erstesNutzungsobjekt);
+            ersteVersion.addNutzungsobjekt(erstesNutzungsobjekt);
+            ersteVersion.addPosition(erstePosition);
+            final UUID ersteVersionId = abrechnungRepository.save(ersteVersion).getId();
+
+            final AbrechnungPositionEntity zweitePosition = new AbrechnungPositionEntity();
+            zweitePosition.setBeginn(VON);
+            zweitePosition.setEnde(LocalDate.of(2026, 6, 30));
+            zweitePosition.setLaenge(new BigDecimal("12.00"));
+            zweitePosition.setBreite(new BigDecimal("3.00"));
+            zweitePosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity zweitesNutzungsobjekt = new NutzungsobjektEntity();
+            zweitesNutzungsobjekt.setAufschlag50prozent(false);
+            zweitesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            zweitesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            zweitesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+            zweitesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity zweiteVersion = new AbrechnungEntity();
+            zweiteVersion.setProjektId(vorgaengerProjektId);
+            zweiteVersion.setVersionsnummer(2);
+            zweiteVersion.setVorgaengerAbrechnungId(ersteVersionId);
+            zweiteVersion.setGeschaeftspartnerId("1000000001");
+            zweiteVersion.setZeitraumVon(VON);
+            zweiteVersion.setZeitraumBis(LocalDate.of(2026, 6, 30));
+            zweiteVersion.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            zweitePosition.setNutzungsobjekt(zweitesNutzungsobjekt);
+            zweiteVersion.addNutzungsobjekt(zweitesNutzungsobjekt);
+            zweiteVersion.addPosition(zweitePosition);
+            abrechnungRepository.save(zweiteVersion);
+
+            restTestClient.get()
+                    .uri(ABRECHNUNGSANSCHLUSS_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(AbrechnungsanschlussResponseDTO.class)
+                    .value(dto -> {
+                        assertThat(dto.anlegenMoeglich()).isTrue();
+                        assertThat(dto.zeitraumVon()).isEqualTo(LocalDate.of(2026, 7, 1));
+                    });
+        }
+
+        @Test
+        void givenVorgaengerWithoutAbrechnung_thenRefuseTheFirstAbrechnung() {
+            restTestClient.get()
+                    .uri(ABRECHNUNGSANSCHLUSS_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(AbrechnungsanschlussResponseDTO.class)
+                    .value(dto -> {
+                        assertThat(dto.anlegenMoeglich()).isFalse();
+                        assertThat(dto.zeitraumVon()).isNull();
+                    });
+        }
+
+        @Test
+        void givenNachfolgerWithOwnAbrechnung_thenAllowAnyDay() {
+            final AbrechnungPositionEntity eigenePosition = new AbrechnungPositionEntity();
+            eigenePosition.setBeginn(VON);
+            eigenePosition.setEnde(BIS);
+            eigenePosition.setLaenge(new BigDecimal("12.00"));
+            eigenePosition.setBreite(new BigDecimal("3.00"));
+            eigenePosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity eigenesNutzungsobjekt = new NutzungsobjektEntity();
+            eigenesNutzungsobjekt.setAufschlag50prozent(false);
+            eigenesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            eigenesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            eigenesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+            eigenesNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity eigeneAbrechnung = new AbrechnungEntity();
+            eigeneAbrechnung.setProjektId(projektId);
+            eigeneAbrechnung.setVersionsnummer(1);
+            eigeneAbrechnung.setGeschaeftspartnerId("1000000001");
+            eigeneAbrechnung.setZeitraumVon(VON);
+            eigeneAbrechnung.setZeitraumBis(BIS);
+            eigeneAbrechnung.setAbrechnungsArt(AbrechnungsArt.ZWISCHENABRECHNUNG);
+            eigenePosition.setNutzungsobjekt(eigenesNutzungsobjekt);
+            eigeneAbrechnung.addNutzungsobjekt(eigenesNutzungsobjekt);
+            eigeneAbrechnung.addPosition(eigenePosition);
+            abrechnungRepository.save(eigeneAbrechnung);
+
+            restTestClient.get()
+                    .uri(ABRECHNUNGSANSCHLUSS_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isOk()
+                    .expectBody(AbrechnungsanschlussResponseDTO.class)
+                    .value(dto -> {
+                        assertThat(dto.anlegenMoeglich()).isTrue();
+                        assertThat(dto.zeitraumVon()).isNull();
+                    });
+        }
+
+        @Test
+        void givenUnknownProjekt_thenReturnNotFound() {
+            restTestClient.get()
+                    .uri(ABRECHNUNGSANSCHLUSS_PATH, UUID.randomUUID())
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer reader")
+                    .exchange()
+                    .expectStatus().isNotFound();
+        }
+
+        @Test
+        void givenFirstAbrechnungStartingTheDayAfterTheVorgaenger_thenAbrechnungIsSaved() {
+            final AbrechnungPositionEntity vorgaengerPosition = new AbrechnungPositionEntity();
+            vorgaengerPosition.setBeginn(VON);
+            vorgaengerPosition.setEnde(BIS);
+            vorgaengerPosition.setLaenge(new BigDecimal("12.00"));
+            vorgaengerPosition.setBreite(new BigDecimal("3.00"));
+            vorgaengerPosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity vorgaengerNutzungsobjekt = new NutzungsobjektEntity();
+            vorgaengerNutzungsobjekt.setAufschlag50prozent(false);
+            vorgaengerNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            vorgaengerNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            vorgaengerNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+            vorgaengerNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity vorgaengerAbrechnung = new AbrechnungEntity();
+            vorgaengerAbrechnung.setProjektId(vorgaengerProjektId);
+            vorgaengerAbrechnung.setVersionsnummer(1);
+            vorgaengerAbrechnung.setGeschaeftspartnerId("1000000001");
+            vorgaengerAbrechnung.setZeitraumVon(VON);
+            vorgaengerAbrechnung.setZeitraumBis(BIS);
+            vorgaengerAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            vorgaengerPosition.setNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaengerAbrechnung.addNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaengerAbrechnung.addPosition(vorgaengerPosition);
+            abrechnungRepository.save(vorgaengerAbrechnung);
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false,
+                    List.of(new AbrechnungPositionRequestDTO(LocalDate.of(2026, 4, 1), LocalDate.of(2026, 6, 30),
+                            new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
+                    LocalDate.of(2026, 4, 1), LocalDate.of(2026, 6, 30), AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isCreated()
+                    .expectBody(AbrechnungResponseDTO.class)
+                    .value(dto -> {
+                        assertThat(dto.projektId()).isEqualTo(projektId);
+                        assertThat(dto.zeitraumVon()).isEqualTo(LocalDate.of(2026, 4, 1));
+                    });
+        }
+
+        @Test
+        void givenFirstAbrechnungStartingOnAnotherDay_thenReturnBadRequest() {
+            final AbrechnungPositionEntity vorgaengerPosition = new AbrechnungPositionEntity();
+            vorgaengerPosition.setBeginn(VON);
+            vorgaengerPosition.setEnde(BIS);
+            vorgaengerPosition.setLaenge(new BigDecimal("12.00"));
+            vorgaengerPosition.setBreite(new BigDecimal("3.00"));
+            vorgaengerPosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity vorgaengerNutzungsobjekt = new NutzungsobjektEntity();
+            vorgaengerNutzungsobjekt.setAufschlag50prozent(false);
+            vorgaengerNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            vorgaengerNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            vorgaengerNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+            vorgaengerNutzungsobjekt.addNutzung(Nutzung.BAUZAUN);
+
+            final AbrechnungEntity vorgaengerAbrechnung = new AbrechnungEntity();
+            vorgaengerAbrechnung.setProjektId(vorgaengerProjektId);
+            vorgaengerAbrechnung.setVersionsnummer(1);
+            vorgaengerAbrechnung.setGeschaeftspartnerId("1000000001");
+            vorgaengerAbrechnung.setZeitraumVon(VON);
+            vorgaengerAbrechnung.setZeitraumBis(BIS);
+            vorgaengerAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            vorgaengerPosition.setNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaengerAbrechnung.addNutzungsobjekt(vorgaengerNutzungsobjekt);
+            vorgaengerAbrechnung.addPosition(vorgaengerPosition);
+            abrechnungRepository.save(vorgaengerAbrechnung);
+
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false,
+                    List.of(new AbrechnungPositionRequestDTO(LocalDate.of(2026, 4, 2), LocalDate.of(2026, 6, 30),
+                            new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null,
+                    LocalDate.of(2026, 4, 2), LocalDate.of(2026, 6, 30), AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isBadRequest();
+
+            assertThat(abrechnungRepository.count()).isEqualTo(1);
+        }
+
+        @Test
+        void givenVorgaengerWithoutAbrechnung_thenReturnConflict() {
+            final AbrechnungNutzungsobjektRequestDTO nutzungsobjekt = new AbrechnungNutzungsobjektRequestDTO(null,
+                    Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false,
+                    List.of(new AbrechnungPositionRequestDTO(VON, BIS, new BigDecimal("12.00"), new BigDecimal("3.00"),
+                            new BigDecimal("36.00"))),
+                    List.of());
+            final AbrechnungRequestDTO requestDTO = new AbrechnungRequestDTO("1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, List.of(nutzungsobjekt));
+
+            restTestClient.post()
+                    .uri(ABRECHNUNG_PATH, projektId)
+                    .header(HttpHeaders.AUTHORIZATION, "Bearer writer")
+                    .body(requestDTO)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .exchange()
+                    .expectStatus().isEqualTo(HttpStatus.CONFLICT);
+
+            assertThat(abrechnungRepository.count()).isZero();
         }
 
     }

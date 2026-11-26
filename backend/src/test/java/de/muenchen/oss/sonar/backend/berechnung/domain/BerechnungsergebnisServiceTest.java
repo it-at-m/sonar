@@ -28,7 +28,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenNoVorabrechnung_thenStartAtLfdNrOneAndChargeTheWholeBetrag() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -38,7 +38,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.lfdNr()).isEqualTo(1);
             // Gebührenstufe 1 (20 m²) and Zeitindex 1 charge 1,50 € per m² for the single Woche.
@@ -51,7 +51,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenNoVorabrechnung_thenStartTheZeitraumOnTheBeginnOfTheMassnahme() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -61,7 +61,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.abrechnungszeitraumVon()).isEqualTo(VON);
             assertThat(ergebnis.abrechnungszeitraumBis()).isEqualTo(LocalDate.of(2026, 1, 7));
@@ -70,7 +70,7 @@ class BerechnungsergebnisServiceTest {
         @Test
         void givenVorabrechnung_thenContinueItsLfdNrAndChargeOnlyWhatItLeftOver() {
             final Vorabrechnung vorabrechnung = new Vorabrechnung(1, LocalDate.of(2025, 12, 31), new BigDecimal("50.00"));
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -80,7 +80,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, vorabrechnung, "mustermann"));
 
             assertThat(ergebnis.lfdNr()).isEqualTo(2);
             assertThat(ergebnis.gebuehrGesamt()).isEqualByComparingTo("72.00");
@@ -90,7 +90,7 @@ class BerechnungsergebnisServiceTest {
         @Test
         void givenVorabrechnung_thenStartTheZeitraumOnTheDayAfterIt() {
             final Vorabrechnung vorabrechnung = new Vorabrechnung(1, LocalDate.of(2026, 1, 3), new BigDecimal("50.00"));
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -100,14 +100,14 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, vorabrechnung, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, vorabrechnung, "mustermann"));
 
             assertThat(ergebnis.abrechnungszeitraumVon()).isEqualTo(LocalDate.of(2026, 1, 4));
         }
 
         @Test
         void givenNutzungsobjektWithoutMasten_thenLeaveItOutOfTheUeberspannungen() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition mitMast = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungPosition ohneMast = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
@@ -123,7 +123,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(ueberspannt, nurFlaeche));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.abrechnungenUeberspannungen())
                     .extracting(Ueberspannungsadressabrechnung::adressbezeichnung)
@@ -132,7 +132,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenAdresseBeginningLater_thenCountItsWochenFromTheEarliestBeginnOfAll() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition ersteWoche = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungPosition zweiteWoche = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 14),
@@ -147,7 +147,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(frueh, spaet));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, LocalDate.of(2026, 1, 14), null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), LocalDate.of(2026, 1, 14), null, "mustermann"));
 
             // The later Adresse lands in Woche 2, so both are charged once at 20 m² x 1,50 €.
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("60.00");
@@ -156,7 +156,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenPositionReachingBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 12, 31),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -166,7 +166,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("30.00");
             assertThat(ergebnis.abrechnungszeitraumBis()).isEqualTo(BERECHNUNGSDATUM);
@@ -174,7 +174,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenMastReachingBeyondTheBerechnungsdatum_thenChargeOnlyUpToIt() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -185,7 +185,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, null, "mustermann"));
 
             // Only Monat 1 has begun by the Berechnungsdatum, and the erste Mast costs 50,00 € per Monat.
             assertThat(ergebnis.gebuehrUeberspannungen()).isEqualByComparingTo("50.00");
@@ -194,7 +194,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenNutzungsobjektWithoutPosition_thenChargeNoFlaeche() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(), List.of());
@@ -202,7 +202,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.gebuehrFlaechen()).isEqualByComparingTo("0");
             assertThat(ergebnis.gebuehrGesamt()).isEqualByComparingTo(Projekt.VERWALTUNGSGEBUEHR);
@@ -212,7 +212,7 @@ class BerechnungsergebnisServiceTest {
 
         @Test
         void givenAbrechnung_thenWriteTheZusammenfassungAndTheBerechnungslog() {
-            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", VON, BIS, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false, false);
             final AbrechnungPosition position = new AbrechnungPosition(null, VON, LocalDate.of(2026, 1, 7),
                     new BigDecimal("10.00"), new BigDecimal("2.00"), new BigDecimal("20.00"));
             final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
@@ -222,7 +222,7 @@ class BerechnungsergebnisServiceTest {
                     VON, BIS, AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
 
             final Berechnungsergebnis ergebnis = BerechnungsergebnisService.berechne(
-                    BerechnungslaufService.berechne(projekt, abrechnung, BERECHNUNGSDATUM, null, "mustermann"));
+                    BerechnungslaufService.berechne(projekt, abrechnung, List.of(), BERECHNUNGSDATUM, null, "mustermann"));
 
             assertThat(ergebnis.zusammenfassung()).startsWith("Abrechnung 1 von Bauprojekt 2026-0001");
             assertThat(ergebnis.zusammenfassung()).contains("mustermann");

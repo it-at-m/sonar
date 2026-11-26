@@ -96,13 +96,12 @@ paths:
     put:
       tags:
       - projekt-controller
-      summary: Put a Projekt behind another Projekt in a Kette.
+      summary: Link a Projekt behind another Projekt.
       description: |-
-        Put a Projekt behind another Projekt in a Kette.
-         The Projekte of a Kette follow each other, and the Berechnung of a Projekt counts all its
-         Vorgaenger as if they and the Projekt were one. Only a Projekt that belongs to no Kette yet can
-         get a Vorgaenger, and only the last Projekt of a Kette can be that Vorgaenger, so a Kette stays a
-         straight line.
+        Link a Projekt behind another Projekt.
+         Linked Projekte follow each other, and the Berechnung of a Projekt counts all its Vorgaenger as
+         if they and the Projekt were one. Only an unlinked Projekt can get a Vorgaenger, and only a
+         Projekt without Nachfolger can be that Vorgaenger, so linked Projekte stay a straight line.
       operationId: updateVorgaengerProjekt
       parameters:
       - name: projektId
@@ -125,10 +124,9 @@ paths:
         "404":
           description: the Projekt or the Vorgaenger does not exist
         "409":
-          description: "the Projekt belongs to a Kette already, or the Vorgaenger\
-            \ has a Nachfolger"
+          description: "the Projekt is already linked, or the Vorgaenger has a Nachfolger"
         "200":
-          description: the Projekt with its Kette as a DTO
+          description: the Projekt with its linked Projekte as a DTO
           content:
             application/json:
               schema:
@@ -141,8 +139,8 @@ paths:
       summary: Release a Projekt from its Vorgaenger.
       description: |-
         Release a Projekt from its Vorgaenger.
-         Only the last Projekt of a Kette can be released, so a Kette shrinks from its end and never
-         breaks in two. A Projekt without Vorgaenger stays as it is.
+         Only a Projekt without Nachfolger can be released, so linked Projekte shrink from their end and
+         never break in two. A Projekt without Vorgaenger stays as it is.
       operationId: deleteVorgaengerProjekt
       parameters:
       - name: projektId
@@ -159,6 +157,38 @@ paths:
           description: the Projekt has a Nachfolger
         "204":
           description: No Content
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/verknuepfung-abgelehnt:
+    put:
+      tags:
+      - projekt-controller
+      summary: Decide that a Projekt gets no Vorgaenger.
+      description: |-
+        Decide that a Projekt gets no Vorgaenger.
+         Only an unlinked Projekt can still get a Vorgaenger, so only such a Projekt takes the decision.
+         It holds until the Projekt is put behind a Vorgaenger after all. Other Projekte can still take
+         the Projekt as their Vorgaenger.
+      operationId: updateVerknuepfungAbgelehnt
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt that gets no Vorgaenger
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "409":
+          description: the Projekt is already linked
+        "200":
+          description: the Projekt with the decision as a DTO
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/ProjektResponseDTO"
       security:
       - bearerAuth: []
   /theEntity:
@@ -230,8 +260,8 @@ paths:
          Fetches a paginated list of Projekte based on the provided page number and size.
          The optional search criteria are combined with AND and apply to the whole result, not just to
          the requested page. The same holds for the order, which is applied by the database.
-         Each Projekt comes with the other Projekte of its Kette, its Vorgaenger and its Nachfolger in
-         the order of the Kette.
+         Each Projekt comes with the Projekte linked to it: its Vorgaenger and its Nachfolger, in the
+         order in which they are linked.
       operationId: getProjekteByPageAndSize
       parameters:
       - name: pageNumber
@@ -318,8 +348,6 @@ paths:
          An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
          Per Adresse, the period of unerlaubte Nutzung needs both dates or neither.
          Either that period or tageUnerlaubteNutzung is given, never both.
-         The optional vorgaengerProjektId puts the new Projekt behind that Projekt in its Kette. Only
-         the last Projekt of a Kette can be that Vorgaenger.
       operationId: saveProjekt
       requestBody:
         description: the details of the Projekt to create
@@ -331,10 +359,6 @@ paths:
       responses:
         "400":
           description: the details of the Projekt are invalid
-        "404":
-          description: the Vorgaenger does not exist
-        "409":
-          description: the Vorgaenger has a Nachfolger
         "201":
           description: the created Projekt as a DTO
           content:
@@ -438,6 +462,8 @@ paths:
         Create a new Abrechnung for a Projekt.
          Creates the Abrechnung in one call. The end of a Zeitraum must not be before its beginn.
          An Adresse with a Hausnummer or a Flurstueck with a Gemarkung is allowed, never both.
+         The first Abrechnung of a Projekt with a Vorgaenger has to start on the day that
+         GET /projekt/{projektId}/abrechnung/anschluss names.
       operationId: saveAbrechnung
       parameters:
       - name: projektId
@@ -456,9 +482,13 @@ paths:
         required: true
       responses:
         "400":
-          description: the details of the Abrechnung are invalid
+          description: "the details of the Abrechnung are invalid, or it does not\
+            \ start the day after the Vorgaenger stops"
         "404":
           description: the Projekt does not exist
+        "409":
+          description: the Projekt has no Abrechnung yet and its Vorgaenger has none
+            either
         "201":
           description: the created Abrechnung as a DTO
           content:
@@ -653,8 +683,8 @@ paths:
       summary: Retrieve a single Projekt.
       description: |-
         Retrieve a single Projekt.
-         Fetches the Projekt together with its Adressen and the other Projekte of its Kette, its
-         Vorgaenger and its Nachfolger in the order of the Kette.
+         Fetches the Projekt together with its Adressen and the Projekte linked to it: its Vorgaenger
+         and its Nachfolger, in the order in which they are linked.
       operationId: getProjekt
       parameters:
       - name: projektId
@@ -673,6 +703,40 @@ paths:
             application/json:
               schema:
                 $ref: "#/components/schemas/ProjektResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/vorgaenger-vorschlaege:
+    get:
+      tags:
+      - projekt-controller
+      summary: Retrieve the Projekte that can become the Vorgaenger of a Projekt.
+      description: |-
+        Retrieve the Projekte that can become the Vorgaenger of a Projekt.
+         A Projekt can become the Vorgaenger when it has no Nachfolger and shares an Adresse with the
+         Projekt. Two Projekte share an Adresse when the Art, Adresse, Hausnummern, Flurstueck and
+         Gemarkung of one of their Adressen agree, regardless of case. The highest Projektnummer comes
+         first.
+      operationId: getVorgaengerVorschlaege
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt that looks for its Vorgaenger
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: "the Projekte that can become its Vorgaenger, represented as\
+            \ DTOs"
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/ProjektResponseDTO"
       security:
       - bearerAuth: []
   /projekt/{projektId}/abrechnung/{abrechnungId}:
@@ -742,6 +806,40 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/NutzungsobjektResponseDTO"
+      security:
+      - bearerAuth: []
+  /projekt/{projektId}/abrechnung/anschluss:
+    get:
+      tags:
+      - abrechnung-controller
+      summary: Retrieve what a new Abrechnung of a Projekt has to keep to.
+      description: |-
+        Retrieve what a new Abrechnung of a Projekt has to keep to.
+         The first Abrechnung of a Projekt with a Vorgaenger continues where the Vorgaenger stops. It has
+         to start the day after the latest zeitraumBis of the Abrechnungen of the Vorgaenger. Only the
+         newest version of each of these Abrechnungen counts. While the Vorgaenger has no Abrechnung, the
+         Projekt cannot get one either.
+         Any other Abrechnung may start on any day. This holds for the first Abrechnung of a Projekt
+         without Vorgaenger, for every later Abrechnung of a Projekt, and for every new version.
+      operationId: getAbrechnungsanschluss
+      parameters:
+      - name: projektId
+        in: path
+        description: the UUID of the Projekt the new Abrechnung belongs to
+        required: true
+        schema:
+          type: string
+          format: uuid
+      responses:
+        "404":
+          description: the Projekt does not exist
+        "200":
+          description: "whether an Abrechnung can be created, and the day it has to\
+            \ start, if any"
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/AbrechnungsanschlussResponseDTO"
       security:
       - bearerAuth: []
   /geschaeftspartner/{geschaeftspartnerId}:
@@ -945,6 +1043,14 @@ components:
         vorgaengerProjektId:
           type: string
           format: uuid
+    LinkedProjektResponseDTO:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+        projektnummer:
+          type: string
     ProjektAdresseResponseDTO:
       type: object
       properties:
@@ -1023,20 +1129,26 @@ components:
           format: uuid
         vorgaengerProjekte:
           type: array
+          description: |-
+            all Projekte before this one, from the first one to the direct
+                        Vorgaenger
           items:
-            $ref: "#/components/schemas/VerbundenesProjektResponseDTO"
+            $ref: "#/components/schemas/LinkedProjektResponseDTO"
         nachfolgerProjekte:
           type: array
+          description: "all Projekte after this one, from the direct Nachfolger to\
+            \ the last one"
           items:
-            $ref: "#/components/schemas/VerbundenesProjektResponseDTO"
-    VerbundenesProjektResponseDTO:
-      type: object
-      properties:
-        id:
-          type: string
-          format: uuid
-        projektnummer:
-          type: string
+            $ref: "#/components/schemas/LinkedProjektResponseDTO"
+        verknuepfungAbgelehnt:
+          type: boolean
+          description: whether someone decided that this Projekt gets no Vorgaenger
+        verknuepfungMoeglich:
+          type: boolean
+          description: whether a Projekt sharing an Adresse can become its Vorgaenger
+      description: |-
+        A linked Projekt never has verknuepfungMoeglich, because only an unlinked Projekt can get a
+         Vorgaenger.
     ProjektAdresseRequestDTO:
       required:
       - anzahlMahnungen
@@ -1129,9 +1241,6 @@ components:
           type: array
           items:
             $ref: "#/components/schemas/ProjektAdresseRequestDTO"
-        vorgaengerProjektId:
-          type: string
-          format: uuid
     AbrechnungMastRequestDTO:
       required:
       - beginn
@@ -1721,6 +1830,14 @@ components:
           type: boolean
         projektnummer:
           type: string
+    AbrechnungsanschlussResponseDTO:
+      type: object
+      properties:
+        anlegenMoeglich:
+          type: boolean
+        zeitraumVon:
+          type: string
+          format: date
     GeschaeftspartnerResponseDTO:
       type: object
       properties:

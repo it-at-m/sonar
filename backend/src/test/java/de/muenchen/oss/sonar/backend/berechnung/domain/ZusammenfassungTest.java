@@ -23,12 +23,13 @@ class ZusammenfassungTest {
 
         @Test
         void givenAbrechnung_thenHeadItWithTheProjektnummerAndTheErsteller() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false,
+                    false);
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
-                    1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"), false);
 
-            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 1,
-                    List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), List.of());
+            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", new Massnahmezeitraum(BEGINN, ENDE, 1),
+                    List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), List.of(), List.of());
 
             assertThat(zusammenfassung).startsWith("Abrechnung 1 von Bauprojekt 2026-0001");
             assertThat(zusammenfassung).contains("    Ersteller Abrechnung : mustermann");
@@ -39,14 +40,15 @@ class ZusammenfassungTest {
 
         @Test
         void givenAdressenOfBothKinds_thenGiveEachKindItsOwnBlock() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false,
+                    false);
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
-                    1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"), false);
             final Mast mast = new Mast(1, BEGINN, ENDE, 1);
 
-            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 1,
+            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", new Massnahmezeitraum(BEGINN, ENDE, 1),
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)),
-                    List.of(new Ueberspannungsadresse("Marienplatz 8", List.of(mast), 3)));
+                    List.of(new Ueberspannungsadresse("Marienplatz 8", List.of(mast), 3)), List.of());
 
             assertThat(zusammenfassung).contains("Flächen");
             assertThat(zusammenfassung).contains("Überspannungen");
@@ -56,22 +58,24 @@ class ZusammenfassungTest {
 
         @Test
         void givenNoAdresseWithMasten_thenLeaveTheUeberspannungenBlockOut() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false,
+                    false);
             final Flaeche flaeche = new Flaeche("Position 1", BEGINN, LocalDate.of(2026, 1, 7),
-                    1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"), false);
 
-            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 1,
-                    List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), List.of());
+            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", new Massnahmezeitraum(BEGINN, ENDE, 1),
+                    List.of(new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 1)), List.of(), List.of());
 
             assertThat(zusammenfassung).doesNotContain("Überspannungen");
         }
 
         @Test
         void givenNoAdresseAtAll_thenLeaveBothBlocksOut() {
-            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of());
+            final Projekt projekt = new Projekt(null, "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(), List.of(), false,
+                    false);
 
-            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", BEGINN, ENDE, 0,
-                    List.of(), List.of());
+            final String zusammenfassung = Zusammenfassung.schreibe(1, projekt, "mustermann", new Massnahmezeitraum(BEGINN, ENDE, 0),
+                    List.of(), List.of(), List.of());
 
             assertThat(zusammenfassung).doesNotContain("Flächen");
             assertThat(zusammenfassung).doesNotContain("Überspannungen");

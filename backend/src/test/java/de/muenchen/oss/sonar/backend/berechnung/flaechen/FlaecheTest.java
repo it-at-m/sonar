@@ -15,7 +15,7 @@ class FlaecheTest {
         @Test
         void givenZeitraum_thenCountBothBoundaries() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 7), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.dauerTage()).isEqualTo(7);
         }
@@ -27,7 +27,7 @@ class FlaecheTest {
         @Test
         void givenFullWochen_thenCountThem() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 14), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.angefangeneWochen()).isEqualTo(2);
         }
@@ -35,7 +35,7 @@ class FlaecheTest {
         @Test
         void givenAngefangeneWoche_thenCountItAsAWholeOne() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.angefangeneWochen()).isEqualTo(3);
         }
@@ -47,7 +47,7 @@ class FlaecheTest {
         @Test
         void givenAngefangeneWoche_thenEndInThatWoche() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.letzteWoche()).isEqualTo(3);
         }
@@ -55,7 +55,7 @@ class FlaecheTest {
         @Test
         void givenFlaecheStartingInALaterWoche_thenCountFromThere() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.letzteWoche()).isEqualTo(5);
         }
@@ -67,7 +67,7 @@ class FlaecheTest {
         @Test
         void givenBeginnAfterTheBerechnungsEnde_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.isInAbrechnungszeitraum()).isFalse();
         }
@@ -75,7 +75,7 @@ class FlaecheTest {
         @Test
         void givenBeginnOnTheBerechnungsEnde_thenReturnTrue() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 15), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.isInAbrechnungszeitraum()).isTrue();
         }
@@ -87,7 +87,7 @@ class FlaecheTest {
         @Test
         void givenFlaecheOfASingleTag_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 15), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.isLongerThanOneDay()).isFalse();
         }
@@ -95,7 +95,7 @@ class FlaecheTest {
         @Test
         void givenFlaecheOfTwoTage_thenReturnTrue() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 16), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(flaeche.isLongerThanOneDay()).isTrue();
         }

@@ -5,14 +5,11 @@ import static org.assertj.core.api.Assertions.assertThatExceptionOfType;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoInteractions;
 import static org.mockito.Mockito.when;
 
-import de.muenchen.oss.sonar.backend.common.Adressart;
-import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
-import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
-import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
@@ -49,6 +46,9 @@ class ProjektServiceTest {
     @Spy
     private final ProjektEntityMapper projektEntityMapper = Mappers.getMapper(ProjektEntityMapper.class);
 
+    @Mock
+    private VorgaengerService vorgaengerService;
+
     @InjectMocks
     private ProjektService unitUnderTest;
 
@@ -68,86 +68,55 @@ class ProjektServiceTest {
 
         @Test
         void givenPageNumberAndPageSize_thenReturnPageOfProjekte() {
-            final Pageable pageRequest = PageRequest.of(0, 10, DEFAULT_SORT);
+            final Pageable pageRequest = PageRequest.of(1, 10, DEFAULT_SORT);
 
-            final ProjektAdresseEntity ersteAdresse = new ProjektAdresseEntity();
-            ersteAdresse.setAnzahlMahnungen(2);
-            ersteAdresse.setSondernutzungErlaubt(false);
+            final ProjektEntity erstesProjektEntity = new ProjektEntity();
+            erstesProjektEntity.setProjektnummer("2026-0011");
+            erstesProjektEntity.setAbrechnungBeginn(BEGINN);
+            erstesProjektEntity.setAbrechnungEnde(ENDE);
 
-            final AdressdatenEmbeddable ersteAdressdaten = ersteAdresse.getAdressdaten();
-            ersteAdressdaten.setArt(Adressart.ADRESSE);
-            ersteAdressdaten.setAdresse("Marienplatz");
-            ersteAdressdaten.setHausnummerVon("8");
-            ersteAdresse.addNutzung(Nutzung.BAUZAUN);
-            ersteAdressdaten.setUnerlaubteNutzungVon(BEGINN);
-            ersteAdressdaten.setUnerlaubteNutzungBis(ENDE);
+            final ProjektEntity zweitesProjektEntity = new ProjektEntity();
+            zweitesProjektEntity.setProjektnummer("2026-0012");
+            zweitesProjektEntity.setAbrechnungBeginn(BEGINN);
+            zweitesProjektEntity.setAbrechnungEnde(ENDE);
 
-            final ProjektEntity erstesProjekt = new ProjektEntity();
-            erstesProjekt.setProjektnummer(DEFAULT_PROJEKTNUMMER);
-            erstesProjekt.setAbrechnungBeginn(BEGINN);
-            erstesProjekt.setAbrechnungEnde(ENDE);
-            erstesProjekt.addAdresse(ersteAdresse);
+            final Projekt erstesProjekt = new Projekt(null, "2026-0011", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(),
+                    List.of(), false, false);
+            final Projekt zweitesProjekt = new Projekt(null, "2026-0012", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(),
+                    List.of(), false, false);
 
-            final ProjektAdresseEntity zweiteAdresse = new ProjektAdresseEntity();
-            zweiteAdresse.setAnzahlMahnungen(2);
-            zweiteAdresse.setSondernutzungErlaubt(false);
-
-            final AdressdatenEmbeddable zweiteAdressdaten = zweiteAdresse.getAdressdaten();
-            zweiteAdressdaten.setArt(Adressart.ADRESSE);
-            zweiteAdressdaten.setAdresse("Marienplatz");
-            zweiteAdressdaten.setHausnummerVon("8");
-            zweiteAdresse.addNutzung(Nutzung.BAUZAUN);
-            zweiteAdressdaten.setUnerlaubteNutzungVon(BEGINN);
-            zweiteAdressdaten.setUnerlaubteNutzungBis(ENDE);
-
-            final ProjektEntity zweitesProjekt = new ProjektEntity();
-            zweitesProjekt.setProjektnummer(DEFAULT_PROJEKTNUMMER);
-            zweitesProjekt.setAbrechnungBeginn(BEGINN);
-            zweitesProjekt.setAbrechnungEnde(ENDE);
-            zweitesProjekt.addAdresse(zweiteAdresse);
-
-            final List<ProjektEntity> projekte = List.of(erstesProjekt, zweitesProjekt);
+            final List<ProjektEntity> projektEntities = List.of(erstesProjektEntity, zweitesProjektEntity);
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest)))
-                    .thenReturn(new PageImpl<>(projekte, pageRequest, projekte.size()));
+                    .thenReturn(new PageImpl<>(projektEntities, pageRequest, 12));
+            when(vorgaengerService.toProjekte(projektEntities)).thenReturn(List.of(erstesProjekt, zweitesProjekt));
 
-            final Page<Projekt> result = unitUnderTest.getAllProjekte(0, 10, null, null, null, null, null);
+            final Page<Projekt> result = unitUnderTest.getAllProjekte(1, 10, null, null, null, null, null);
 
-            verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest));
-            assertThat(result.getTotalElements()).isEqualTo(projekte.size());
-            assertThat(result.getContent()).hasSize(2);
-            assertThat(result.getContent().getFirst().projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
-            assertThat(result.getContent().getFirst().adressen()).hasSize(1);
+            assertThat(result.getContent()).containsExactly(erstesProjekt, zweitesProjekt);
+            assertThat(result.getPageable()).isEqualTo(pageRequest);
+            assertThat(result.getTotalElements()).isEqualTo(12);
         }
 
         @Test
         void givenFilter_thenSearchTheRequestedPage() {
             final Pageable pageRequest = PageRequest.of(2, 25, DEFAULT_SORT);
 
-            final ProjektAdresseEntity adresse = new ProjektAdresseEntity();
-            adresse.setAnzahlMahnungen(2);
-            adresse.setSondernutzungErlaubt(false);
-
-            final AdressdatenEmbeddable adressdaten = adresse.getAdressdaten();
-            adressdaten.setArt(Adressart.ADRESSE);
-            adressdaten.setAdresse("Marienplatz");
-            adressdaten.setHausnummerVon("8");
-            adresse.addNutzung(Nutzung.BAUZAUN);
-            adressdaten.setUnerlaubteNutzungVon(BEGINN);
-            adressdaten.setUnerlaubteNutzungBis(ENDE);
-
             final ProjektEntity projektEntity = new ProjektEntity();
             projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
             projektEntity.setAbrechnungBeginn(BEGINN);
             projektEntity.setAbrechnungEnde(ENDE);
-            projektEntity.addAdresse(adresse);
+
+            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null, List.of(),
+                    List.of(), false, false);
 
             when(projektRepository.findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest)))
-                    .thenReturn(new PageImpl<>(List.of(projektEntity), pageRequest, 1));
+                    .thenReturn(new PageImpl<>(List.of(projektEntity), pageRequest, 51));
+            when(vorgaengerService.toProjekte(List.of(projektEntity))).thenReturn(List.of(projekt));
 
             final Page<Projekt> result = unitUnderTest.getAllProjekte(2, 25, "2026-", BEGINN, ENDE, null, null);
 
             verify(projektRepository).findAll(ArgumentMatchers.<Specification<ProjektEntity>>any(), eq(pageRequest));
-            assertThat(result.getContent()).hasSize(1);
+            assertThat(result.getContent()).containsExactly(projekt);
         }
 
         @Test
@@ -185,36 +154,24 @@ class ProjektServiceTest {
     @Nested
     class GetProjekt {
         @Test
-        void givenKnownId_thenReturnProjektWithItsAdressen() {
+        void givenKnownId_thenReturnTheProjekt() {
             final UUID projektId = UUID.randomUUID();
-
-            final ProjektAdresseEntity adresseEntity = new ProjektAdresseEntity();
-            adresseEntity.setAnzahlMahnungen(2);
-            adresseEntity.setSondernutzungErlaubt(false);
-
-            final AdressdatenEmbeddable adressdaten = adresseEntity.getAdressdaten();
-            adressdaten.setArt(Adressart.ADRESSE);
-            adressdaten.setAdresse("Marienplatz");
-            adressdaten.setHausnummerVon("8");
-            adresseEntity.addNutzung(Nutzung.BAUZAUN);
-            adressdaten.setUnerlaubteNutzungVon(BEGINN);
-            adressdaten.setUnerlaubteNutzungBis(ENDE);
 
             final ProjektEntity projektEntity = new ProjektEntity();
             projektEntity.setId(projektId);
             projektEntity.setProjektnummer(DEFAULT_PROJEKTNUMMER);
             projektEntity.setAbrechnungBeginn(BEGINN);
             projektEntity.setAbrechnungEnde(ENDE);
-            projektEntity.addAdresse(adresseEntity);
+
+            final Projekt projekt = new Projekt(projektId, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(), null,
+                    List.of(), List.of(), false, false);
 
             when(projektRepository.findById(projektId)).thenReturn(Optional.of(projektEntity));
+            when(vorgaengerService.toProjekt(projektEntity)).thenReturn(projekt);
 
             final Projekt result = unitUnderTest.getProjekt(projektId);
 
-            assertThat(result.id()).isEqualTo(projektId);
-            assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
-            assertThat(result.adressen()).hasSize(1);
-            assertThat(result.adressen().getFirst().adresse()).isEqualTo("Marienplatz");
+            assertThat(result).isSameAs(projekt);
         }
 
         @Test
@@ -225,33 +182,7 @@ class ProjektServiceTest {
             assertThatExceptionOfType(NotFoundException.class)
                     .isThrownBy(() -> unitUnderTest.getProjekt(projektId))
                     .withMessageContaining(projektId.toString());
-        }
-    }
-
-    @Nested
-    class CreateProjekt {
-        @Test
-        void givenProjekt_thenReturnSavedProjekt() {
-            final ProjektAdresse adresse = new ProjektAdresse(
-                    null, Adressart.FLURSTUECK, null, null, null, "1234/5", "Sendling", List.of(Nutzung.CONTAINER), null,
-                    BEGINN, ENDE, null, 1, true);
-            final Projekt projekt = new Projekt(null, DEFAULT_PROJEKTNUMMER, BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
-
-            final UUID savedId = UUID.randomUUID();
-            when(projektRepository.save(any(ProjektEntity.class))).thenAnswer(invocation -> {
-                final ProjektEntity toSave = invocation.getArgument(0);
-                toSave.setId(savedId);
-                return toSave;
-            });
-
-            final Projekt result = unitUnderTest.createProjekt(projekt);
-
-            verify(projektRepository).save(any(ProjektEntity.class));
-            assertThat(result.id()).isEqualTo(savedId);
-            assertThat(result.projektnummer()).isEqualTo(DEFAULT_PROJEKTNUMMER);
-            assertThat(result.adressen()).hasSize(1);
-            assertThat(result.adressen().getFirst().flurstueck()).isEqualTo("1234/5");
-            assertThat(result.adressen().getFirst().sondernutzungErlaubt()).isTrue();
+            verifyNoInteractions(vorgaengerService);
         }
     }
 }

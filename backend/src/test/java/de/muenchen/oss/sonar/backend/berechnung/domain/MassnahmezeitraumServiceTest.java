@@ -20,7 +20,7 @@ class MassnahmezeitraumServiceTest {
         @Test
         void givenFlaecheBeginningBeforeTheMasten_thenStartOnTheFlaeche() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 7),
-                    1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"), false);
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
             final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(
@@ -33,7 +33,7 @@ class MassnahmezeitraumServiceTest {
         @Test
         void givenMastenEndingAfterTheFlaechen_thenEndOnTheMasten() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 7),
-                    1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"), false);
             final Mast mast = new Mast(1, LocalDate.of(2026, 3, 1), LocalDate.of(2026, 5, 31), 1);
 
             final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(
@@ -46,9 +46,9 @@ class MassnahmezeitraumServiceTest {
         @Test
         void givenSeveralFlaechenadressen_thenRunAsManyWochenAsTheLongestOfThem() {
             final Flaeche kurz = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 7),
-                    1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"), false);
             final Flaeche lang = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 2, 4),
-                    1, new BigDecimal("20"), new BigDecimal("20"));
+                    1, new BigDecimal("20"), new BigDecimal("20"), false);
 
             final Massnahmezeitraum zeitraum = MassnahmezeitraumService.berechne(
                     List.of(new Flaechenadresse("Marienplatz 8", false, List.of(kurz), 1),

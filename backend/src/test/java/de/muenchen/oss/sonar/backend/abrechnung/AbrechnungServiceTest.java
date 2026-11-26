@@ -12,12 +12,15 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnung;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.Abrechnungsanschluss;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.AdressdatenEmbeddable;
+import de.muenchen.oss.sonar.backend.common.BadRequestException;
 import de.muenchen.oss.sonar.backend.common.ConflictException;
 import de.muenchen.oss.sonar.backend.common.NotFoundException;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.projekt.ProjektService;
+import de.muenchen.oss.sonar.backend.projekt.VorgaengerService;
 import de.muenchen.oss.sonar.backend.widerspruch.WiderspruchEntity;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -55,6 +58,9 @@ class AbrechnungServiceTest {
 
     @Mock
     private ProjektService projektService;
+
+    @Mock
+    private VorgaengerService vorgaengerService;
 
     @Mock
     private NutzungsobjektService nutzungsobjektService;
@@ -400,6 +406,95 @@ class AbrechnungServiceTest {
     }
 
     @Nested
+    class GetNewestAbrechnungenOfProjekt {
+
+        @Test
+        void givenProjekt_thenRequestAllNewestVersionsOrderedByZeitraumVonAndId() {
+            final ArgumentCaptor<Pageable> pageableCaptor = ArgumentCaptor.forClass(Pageable.class);
+            when(abrechnungRepository.findNewestVersionsByProjektId(eq(PROJEKT_ID), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(List.of()));
+
+            unitUnderTest.getNewestAbrechnungenOfProjekt(PROJEKT_ID);
+
+            verify(abrechnungRepository).findNewestVersionsByProjektId(eq(PROJEKT_ID), pageableCaptor.capture());
+            assertThat(pageableCaptor.getValue().isUnpaged()).isTrue();
+            assertThat(pageableCaptor.getValue().getSort()).isEqualTo(Sort.by(Sort.Direction.ASC, "zeitraumVon", "id"));
+        }
+
+        @Test
+        void givenNewestVersions_thenReturnEachOfThemWithItsOwnPositionen() {
+            final AbrechnungPositionEntity erstePosition = new AbrechnungPositionEntity();
+            erstePosition.setBeginn(VON);
+            erstePosition.setEnde(BIS);
+            erstePosition.setLaenge(new BigDecimal("12.00"));
+            erstePosition.setBreite(new BigDecimal("3.00"));
+            erstePosition.setFlaeche(new BigDecimal("36.00"));
+
+            final NutzungsobjektEntity erstesNutzungsobjekt = new NutzungsobjektEntity();
+            erstesNutzungsobjekt.setId(UUID.randomUUID());
+            erstesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            erstesNutzungsobjekt.getAdressdaten().setAdresse("Marienplatz");
+            erstesNutzungsobjekt.getAdressdaten().setHausnummerVon("8");
+
+            final UUID ersteAbrechnungId = UUID.randomUUID();
+            final AbrechnungEntity ersteAbrechnung = new AbrechnungEntity();
+            ersteAbrechnung.setId(ersteAbrechnungId);
+            ersteAbrechnung.setProjektId(PROJEKT_ID);
+            ersteAbrechnung.setVersionsnummer(1);
+            ersteAbrechnung.setGeschaeftspartnerId("1000000001");
+            ersteAbrechnung.setZeitraumVon(VON);
+            ersteAbrechnung.setZeitraumBis(BIS);
+            ersteAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            erstePosition.setNutzungsobjekt(erstesNutzungsobjekt);
+            ersteAbrechnung.addNutzungsobjekt(erstesNutzungsobjekt);
+            ersteAbrechnung.addPosition(erstePosition);
+
+            final AbrechnungPositionEntity zweitePosition = new AbrechnungPositionEntity();
+            zweitePosition.setBeginn(VON);
+            zweitePosition.setEnde(BIS);
+            zweitePosition.setLaenge(new BigDecimal("15.00"));
+            zweitePosition.setBreite(new BigDecimal("3.00"));
+            zweitePosition.setFlaeche(new BigDecimal("45.00"));
+
+            final NutzungsobjektEntity zweitesNutzungsobjekt = new NutzungsobjektEntity();
+            zweitesNutzungsobjekt.setId(UUID.randomUUID());
+            zweitesNutzungsobjekt.getAdressdaten().setArt(Adressart.ADRESSE);
+            zweitesNutzungsobjekt.getAdressdaten().setAdresse("Sendlinger Straße");
+            zweitesNutzungsobjekt.getAdressdaten().setHausnummerVon("1");
+
+            final UUID zweiteAbrechnungId = UUID.randomUUID();
+            final AbrechnungEntity zweiteAbrechnung = new AbrechnungEntity();
+            zweiteAbrechnung.setId(zweiteAbrechnungId);
+            zweiteAbrechnung.setProjektId(PROJEKT_ID);
+            zweiteAbrechnung.setVersionsnummer(2);
+            zweiteAbrechnung.setVorgaengerAbrechnungId(UUID.randomUUID());
+            zweiteAbrechnung.setGeschaeftspartnerId("1000000002");
+            zweiteAbrechnung.setZeitraumVon(VON);
+            zweiteAbrechnung.setZeitraumBis(BIS);
+            zweiteAbrechnung.setAbrechnungsArt(AbrechnungsArt.ENDABRECHNUNG);
+            zweitePosition.setNutzungsobjekt(zweitesNutzungsobjekt);
+            zweiteAbrechnung.addNutzungsobjekt(zweitesNutzungsobjekt);
+            zweiteAbrechnung.addPosition(zweitePosition);
+
+            when(abrechnungRepository.findNewestVersionsByProjektId(eq(PROJEKT_ID), any(Pageable.class)))
+                    .thenReturn(new PageImpl<>(List.of(ersteAbrechnung, zweiteAbrechnung)));
+
+            final List<Abrechnung> result = unitUnderTest.getNewestAbrechnungenOfProjekt(PROJEKT_ID);
+
+            assertThat(result).extracting(Abrechnung::id).containsExactly(ersteAbrechnungId, zweiteAbrechnungId);
+            assertThat(result).extracting(Abrechnung::neuereVersionVorhanden).containsExactly(false, false);
+            assertThat(result.getFirst().nutzungsobjekte()).singleElement()
+                    .satisfies(nutzungsobjekt -> assertThat(nutzungsobjekt.positionen())
+                            .extracting(AbrechnungPosition::flaeche)
+                            .containsExactly(new BigDecimal("36.00")));
+            assertThat(result.getLast().nutzungsobjekte()).singleElement()
+                    .satisfies(nutzungsobjekt -> assertThat(nutzungsobjekt.positionen())
+                            .extracting(AbrechnungPosition::flaeche)
+                            .containsExactly(new BigDecimal("45.00")));
+        }
+    }
+
+    @Nested
     class CreateAbrechnung {
         @Test
         void givenAbrechnung_thenReturnSavedAbrechnung() {
@@ -557,6 +652,142 @@ class AbrechnungServiceTest {
             assertThatThrownBy(() -> unitUnderTest.createAbrechnung(abrechnung))
                     .isInstanceOf(NotFoundException.class);
             verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
+        }
+
+        @Test
+        void givenFirstAbrechnungStartingTheDayAfterTheVorgaenger_thenSaveIt() {
+            final AbrechnungPosition position = new AbrechnungPosition(null, BIS.plusDays(1), LocalDate.of(2026, 6, 30),
+                    new BigDecimal("12.00"), new BigDecimal("3.00"), new BigDecimal("36.00"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
+                    null, null, null, null, false, List.of(position), List.of());
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null,
+                    BIS.plusDays(1), LocalDate.of(2026, 6, 30), AbrechnungsArt.ENDABRECHNUNG, null, false, List.of(nutzungsobjekt));
+
+            final UUID vorgaengerProjektId = UUID.randomUUID();
+            final AbrechnungEntity vorgaengerAbrechnung = new AbrechnungEntity();
+            vorgaengerAbrechnung.setZeitraumBis(BIS);
+            final Pageable latestZeitraumBis = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "zeitraumBis"));
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(vorgaengerService.getVorgaengerProjektId(PROJEKT_ID)).thenReturn(vorgaengerProjektId);
+            when(abrechnungRepository.existsByProjektId(PROJEKT_ID)).thenReturn(false);
+            when(abrechnungRepository.findNewestVersionsByProjektId(vorgaengerProjektId, latestZeitraumBis))
+                    .thenReturn(new PageImpl<>(List.of(vorgaengerAbrechnung)));
+            when(abrechnungRepository.save(any(AbrechnungEntity.class))).thenAnswer(invocation -> {
+                final AbrechnungEntity toSave = invocation.getArgument(0);
+                toSave.setId(UUID.randomUUID());
+                // Saving hands out the ids, and the Positionen are read back below the Nutzungsobjekt they name.
+                toSave.getNutzungsobjekte().forEach(gespeichertesNutzungsobjekt -> gespeichertesNutzungsobjekt.setId(UUID.randomUUID()));
+                toSave.getPositionen().forEach(gespeichertePosition -> gespeichertePosition.setId(UUID.randomUUID()));
+                return toSave;
+            });
+
+            final Abrechnung result = unitUnderTest.createAbrechnung(abrechnung);
+
+            assertThat(result.zeitraumVon()).isEqualTo(BIS.plusDays(1));
+        }
+
+        @Test
+        void givenFirstAbrechnungStartingOnAnotherDay_thenThrowBadRequest() {
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null,
+                    BIS.plusDays(2), LocalDate.of(2026, 6, 30), AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
+
+            final UUID vorgaengerProjektId = UUID.randomUUID();
+            final AbrechnungEntity vorgaengerAbrechnung = new AbrechnungEntity();
+            vorgaengerAbrechnung.setZeitraumBis(BIS);
+            final Pageable latestZeitraumBis = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "zeitraumBis"));
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(vorgaengerService.getVorgaengerProjektId(PROJEKT_ID)).thenReturn(vorgaengerProjektId);
+            when(abrechnungRepository.existsByProjektId(PROJEKT_ID)).thenReturn(false);
+            when(abrechnungRepository.findNewestVersionsByProjektId(vorgaengerProjektId, latestZeitraumBis))
+                    .thenReturn(new PageImpl<>(List.of(vorgaengerAbrechnung)));
+
+            assertThatThrownBy(() -> unitUnderTest.createAbrechnung(abrechnung))
+                    .isInstanceOf(BadRequestException.class)
+                    .hasMessageContaining(BIS.plusDays(1).toString());
+            verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
+        }
+
+        @Test
+        void givenVorgaengerWithoutAbrechnung_thenThrowConflict() {
+            final Abrechnung abrechnung = new Abrechnung(null, PROJEKT_ID, 0, null, "1000000001", false, null, null, VON, BIS,
+                    AbrechnungsArt.ENDABRECHNUNG, null, false, List.of());
+
+            final UUID vorgaengerProjektId = UUID.randomUUID();
+            final Pageable latestZeitraumBis = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "zeitraumBis"));
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(vorgaengerService.getVorgaengerProjektId(PROJEKT_ID)).thenReturn(vorgaengerProjektId);
+            when(abrechnungRepository.existsByProjektId(PROJEKT_ID)).thenReturn(false);
+            when(abrechnungRepository.findNewestVersionsByProjektId(vorgaengerProjektId, latestZeitraumBis)).thenReturn(Page.empty());
+
+            assertThatThrownBy(() -> unitUnderTest.createAbrechnung(abrechnung))
+                    .isInstanceOf(ConflictException.class);
+            verify(abrechnungRepository, never()).save(any(AbrechnungEntity.class));
+        }
+    }
+
+    @Nested
+    class GetAbrechnungsanschluss {
+        @Test
+        void givenProjektWithoutVorgaenger_thenAllowAnyDay() {
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(vorgaengerService.getVorgaengerProjektId(PROJEKT_ID)).thenReturn(null);
+
+            final Abrechnungsanschluss result = unitUnderTest.getAbrechnungsanschluss(PROJEKT_ID);
+
+            assertThat(result).isEqualTo(new Abrechnungsanschluss(true, null));
+            verify(abrechnungRepository, never()).findNewestVersionsByProjektId(any(UUID.class), any(Pageable.class));
+        }
+
+        @Test
+        void givenVorgaengerWithAbrechnungen_thenStartTheDayAfterTheirLatestZeitraumBis() {
+            final UUID vorgaengerProjektId = UUID.randomUUID();
+            final AbrechnungEntity vorgaengerAbrechnung = new AbrechnungEntity();
+            vorgaengerAbrechnung.setZeitraumBis(LocalDate.of(2026, 12, 31));
+            final Pageable latestZeitraumBis = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "zeitraumBis"));
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(vorgaengerService.getVorgaengerProjektId(PROJEKT_ID)).thenReturn(vorgaengerProjektId);
+            when(abrechnungRepository.existsByProjektId(PROJEKT_ID)).thenReturn(false);
+            when(abrechnungRepository.findNewestVersionsByProjektId(vorgaengerProjektId, latestZeitraumBis))
+                    .thenReturn(new PageImpl<>(List.of(vorgaengerAbrechnung)));
+
+            final Abrechnungsanschluss result = unitUnderTest.getAbrechnungsanschluss(PROJEKT_ID);
+
+            assertThat(result).isEqualTo(new Abrechnungsanschluss(true, LocalDate.of(2027, 1, 1)));
+        }
+
+        @Test
+        void givenVorgaengerWithoutAbrechnung_thenRefuseTheFirstAbrechnung() {
+            final UUID vorgaengerProjektId = UUID.randomUUID();
+            final Pageable latestZeitraumBis = PageRequest.of(0, 1, Sort.by(Sort.Direction.DESC, "zeitraumBis"));
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(vorgaengerService.getVorgaengerProjektId(PROJEKT_ID)).thenReturn(vorgaengerProjektId);
+            when(abrechnungRepository.existsByProjektId(PROJEKT_ID)).thenReturn(false);
+            when(abrechnungRepository.findNewestVersionsByProjektId(vorgaengerProjektId, latestZeitraumBis)).thenReturn(Page.empty());
+
+            final Abrechnungsanschluss result = unitUnderTest.getAbrechnungsanschluss(PROJEKT_ID);
+
+            assertThat(result).isEqualTo(new Abrechnungsanschluss(false, null));
+        }
+
+        @Test
+        void givenProjektWithOwnAbrechnung_thenAllowAnyDay() {
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(true);
+            when(vorgaengerService.getVorgaengerProjektId(PROJEKT_ID)).thenReturn(UUID.randomUUID());
+            when(abrechnungRepository.existsByProjektId(PROJEKT_ID)).thenReturn(true);
+
+            final Abrechnungsanschluss result = unitUnderTest.getAbrechnungsanschluss(PROJEKT_ID);
+
+            assertThat(result).isEqualTo(new Abrechnungsanschluss(true, null));
+            verify(abrechnungRepository, never()).findNewestVersionsByProjektId(any(UUID.class), any(Pageable.class));
+        }
+
+        @Test
+        void givenUnknownProjekt_thenThrowNotFound() {
+            when(projektService.existsProjekt(PROJEKT_ID)).thenReturn(false);
+
+            assertThatThrownBy(() -> unitUnderTest.getAbrechnungsanschluss(PROJEKT_ID))
+                    .isInstanceOf(NotFoundException.class);
         }
     }
 

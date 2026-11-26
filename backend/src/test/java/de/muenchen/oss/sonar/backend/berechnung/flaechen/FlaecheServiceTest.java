@@ -14,13 +14,15 @@ class FlaecheServiceTest {
     class From {
 
         @Test
-        void givenPosition_thenNameItAfterItsPlaceInTheAdresse() {
+        void givenPositionOfAnotherProjekt_thenKeepItsBezeichnungAndMarkIt() {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 2, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 2 aus Projekt 2026-0001", true, LocalDate.of(2026, 12, 31),
+                    LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
-            assertThat(flaeche.bezeichnung()).isEqualTo("Position 2");
+            assertThat(flaeche.bezeichnung()).isEqualTo("Position 2 aus Projekt 2026-0001");
+            assertThat(flaeche.isFromOtherProjekt()).isTrue();
         }
 
         @Test
@@ -28,7 +30,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 2, 15), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 2, 15), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.berechnungsEnde()).isEqualTo(LocalDate.of(2026, 2, 15));
         }
@@ -38,7 +41,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 20),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 2, 15), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 2, 15), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.berechnungsEnde()).isEqualTo(LocalDate.of(2026, 1, 20));
         }
@@ -48,7 +52,7 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 20),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, null, LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, null, LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
 
             assertThat(flaeche.berechnungsEnde()).isEqualTo(LocalDate.of(2026, 1, 20));
         }
@@ -58,7 +62,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("50.00"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.gesamtflaecheAdresse()).hasToString("50");
         }
@@ -68,7 +73,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("50.50"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.gesamtflaecheAdresse()).hasToString("50.5");
         }
@@ -78,7 +84,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.ersteWoche()).isEqualTo(1);
         }
@@ -88,7 +95,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 7), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.ersteWoche()).isEqualTo(1);
         }
@@ -98,7 +106,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 8), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.ersteWoche()).isEqualTo(2);
         }
@@ -108,7 +117,8 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("100"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1), BigDecimal.ZERO);
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+                    BigDecimal.ZERO);
 
             assertThat(flaeche.letzteWoche()).isEqualTo(3);
         }
@@ -118,7 +128,7 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("150"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
                     new BigDecimal("100"));
 
             assertThat(flaeche.flaechenaenderung()).hasToString("50");
@@ -129,7 +139,7 @@ class FlaecheServiceTest {
             final AbrechnungPosition position = new AbrechnungPosition(null, LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 15),
                     BigDecimal.TEN, BigDecimal.TEN, new BigDecimal("60"));
 
-            final Flaeche flaeche = FlaecheService.berechne(position, 1, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
+            final Flaeche flaeche = FlaecheService.berechne(position, "Position 1", false, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1),
                     new BigDecimal("100"));
 
             assertThat(flaeche.flaechenaenderung()).hasToString("-40");
@@ -142,7 +152,7 @@ class FlaecheServiceTest {
         @Test
         void givenWocheBeforeTheErsteWoche_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(FlaecheService.hasTakenEffectBy(flaeche, 2)).isFalse();
         }
@@ -150,7 +160,7 @@ class FlaecheServiceTest {
         @Test
         void givenErsteWoche_thenReturnTrue() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(FlaecheService.hasTakenEffectBy(flaeche, 3)).isTrue();
         }
@@ -158,7 +168,7 @@ class FlaecheServiceTest {
         @Test
         void givenWocheAfterTheLetzteWoche_thenStillReturnTrue() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(FlaecheService.hasTakenEffectBy(flaeche, 6)).isTrue();
         }
@@ -166,7 +176,7 @@ class FlaecheServiceTest {
         @Test
         void givenFlaecheOutsideTheAbrechnungszeitraum_thenReturnFalse() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 2, 1), LocalDate.of(2026, 1, 15), 5,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             assertThat(FlaecheService.hasTakenEffectBy(flaeche, 5)).isFalse();
         }

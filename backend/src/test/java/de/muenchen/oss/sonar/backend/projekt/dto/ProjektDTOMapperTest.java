@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
+import de.muenchen.oss.sonar.backend.projekt.domain.LinkedProjekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.ProjektAdresse;
 import java.time.LocalDate;
@@ -31,7 +32,7 @@ class ProjektDTOMapperTest {
                     UUID.randomUUID(), Adressart.ADRESSE, "Marienplatz", "8", null, null, null, List.of(Nutzung.BAUZAUN), null,
                     BEGINN, ENDE, 90, 2, true);
             final Projekt projekt = new Projekt(
-                    UUID.randomUUID(), "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse));
+                    UUID.randomUUID(), "2026-0001", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(adresse), null, List.of(), List.of(), false, false);
 
             final ProjektResponseDTO result = projektDTOMapper.toDTO(projekt);
 
@@ -56,6 +57,24 @@ class ProjektDTOMapperTest {
             assertThat(adresseDTO.tageUnerlaubteNutzung()).isEqualTo(adresse.tageUnerlaubteNutzung());
             assertThat(adresseDTO.anzahlMahnungen()).isEqualTo(adresse.anzahlMahnungen());
             assertThat(adresseDTO.sondernutzungErlaubt()).isEqualTo(adresse.sondernutzungErlaubt());
+        }
+
+        @Test
+        void givenLinkedProjekt_thenReturnsDTOWithItsPointerAndTheLinkedProjekte() {
+            final UUID ersterId = UUID.randomUUID();
+            final UUID zweiterId = UUID.randomUUID();
+            final UUID vierterId = UUID.randomUUID();
+            final Projekt projekt = new Projekt(UUID.randomUUID(), "2026-0003", BEGINN, ENDE, Projekt.VERWALTUNGSGEBUEHR, List.of(),
+                    zweiterId, List.of(new LinkedProjekt(ersterId, "2026-0001"), new LinkedProjekt(zweiterId, "2026-0002")),
+                    List.of(new LinkedProjekt(vierterId, "2026-0004")), false, false);
+
+            final ProjektResponseDTO result = projektDTOMapper.toDTO(projekt);
+
+            assertThat(result.vorgaengerProjektId()).isEqualTo(zweiterId);
+            assertThat(result.vorgaengerProjekte()).containsExactly(
+                    new LinkedProjektResponseDTO(ersterId, "2026-0001"),
+                    new LinkedProjektResponseDTO(zweiterId, "2026-0002"));
+            assertThat(result.nachfolgerProjekte()).containsExactly(new LinkedProjektResponseDTO(vierterId, "2026-0004"));
         }
     }
 
@@ -92,6 +111,9 @@ class ProjektDTOMapperTest {
             assertThat(adresse.anzahlMahnungen()).isEqualTo(adresseDTO.anzahlMahnungen());
             assertThat(adresse.sondernutzungErlaubt()).isEqualTo(adresseDTO.sondernutzungErlaubt());
             assertThat(adresse.tageUnerlaubteNutzung()).isEqualTo(90);
+            assertThat(result.vorgaengerProjektId()).isNull();
+            assertThat(result.vorgaengerProjekte()).isEmpty();
+            assertThat(result.nachfolgerProjekte()).isEmpty();
         }
     }
 

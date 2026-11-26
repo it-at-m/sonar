@@ -27,7 +27,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(spaetere, fruehere), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, List.of(), LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.flaechen()).extracting(Flaeche::bezeichnung, Flaeche::beginn)
                     .containsExactly(
@@ -45,7 +45,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(erste, zweite), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, List.of(), LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.flaechen()).extracting(flaeche -> flaeche.flaechenaenderung().toString())
                     .containsExactly("100", "50");
@@ -61,7 +61,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(kuerzere, laengere), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, List.of(), LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.letzteWoche()).isEqualTo(5);
         }
@@ -74,7 +74,7 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, true, List.of(position), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, List.of(), LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.adressbezeichnung()).isEqualTo("Marienplatz 8");
             assertThat(adresse.isAufschlag50Prozent()).isTrue();
@@ -86,10 +86,59 @@ class FlaechenadresseServiceTest {
                     null, Adressart.ADRESSE, "Marienplatz", "8", null, null, null, null, null,
                     null, null, null, null, false, List.of(), List.of());
 
-            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt, List.of(), LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 1));
 
             assertThat(adresse.flaechen()).isEmpty();
             assertThat(adresse.letzteWoche()).isZero();
+        }
+
+        @Test
+        void givenVorgaengerPositionWithLessFlaeche_thenStartOnlyTheAdditionalFlaecheAnew() {
+            final AbrechnungPosition eigenePosition = new AbrechnungPosition(null, LocalDate.of(2026, 4, 20), LocalDate.of(2026, 6, 28),
+                    BigDecimal.TEN, new BigDecimal("40"), new BigDecimal("400"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Musterstrasse", "1", null, null, null, null, null,
+                    null, null, null, null, false, List.of(eigenePosition), List.of());
+            final AbrechnungPosition vorgaengerPosition = new AbrechnungPosition(null, LocalDate.of(2026, 1, 5), LocalDate.of(2026, 4, 19),
+                    BigDecimal.TEN, new BigDecimal("30"), new BigDecimal("300"));
+
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt,
+                    List.of(new VorgaengerPosition("2026-0001", vorgaengerPosition)), LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 5));
+
+            assertThat(adresse.flaechen()).extracting(flaeche -> flaeche.flaechenaenderung().toString())
+                    .containsExactly("300", "100");
+        }
+
+        @Test
+        void givenOwnAndVorgaengerPositionOnTheSameBeginn_thenPutTheOwnOneLast() {
+            final AbrechnungPosition eigenePosition = new AbrechnungPosition(null, LocalDate.of(2026, 1, 5), LocalDate.of(2026, 2, 1),
+                    BigDecimal.TEN, new BigDecimal("30"), new BigDecimal("300"));
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    null, Adressart.ADRESSE, "Musterstrasse", "1", null, null, null, null, null,
+                    null, null, null, null, false, List.of(eigenePosition), List.of());
+            final AbrechnungPosition vorgaengerPosition = new AbrechnungPosition(null, LocalDate.of(2026, 1, 5), LocalDate.of(2026, 2, 1),
+                    BigDecimal.TEN, new BigDecimal("20"), new BigDecimal("200"));
+
+            final Flaechenadresse adresse = FlaechenadresseService.berechne(nutzungsobjekt,
+                    List.of(new VorgaengerPosition("2026-0001", vorgaengerPosition)), LocalDate.of(2026, 12, 31), LocalDate.of(2026, 1, 5));
+
+            assertThat(adresse.flaechen()).extracting(Flaeche::bezeichnung)
+                    .containsExactly("Position 1 aus Projekt 2026-0001", "Position 2");
+        }
+    }
+
+    @Nested
+    class IsChargedInOtherProjekt {
+
+        @Test
+        void givenVorgaengerPositionBeginningAfterTheBerechnungsdatum_thenKeepChargingHere() {
+            final Flaeche eigeneFlaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 5), LocalDate.of(2026, 2, 28), 1,
+                    new BigDecimal("300"), new BigDecimal("300"), false);
+            final Flaeche vorgaengerFlaeche = new Flaeche("Position 2 aus Projekt 2026-0001", LocalDate.of(2026, 3, 2),
+                    LocalDate.of(2026, 2, 28), 9, new BigDecimal("300"), BigDecimal.ZERO, true);
+            final Flaechenadresse adresse = new Flaechenadresse("Musterstrasse 1", false, List.of(eigeneFlaeche, vorgaengerFlaeche), 9);
+
+            assertThat(FlaechenadresseService.isChargedInOtherProjekt(adresse, 9)).isFalse();
         }
     }
 
@@ -99,7 +148,7 @@ class FlaechenadresseServiceTest {
         @Test
         void givenSingleFlaeche_thenContributeItsFlaechenaenderung() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
             final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 5);
 
             assertThat(FlaechenadresseService.beitraege(adresse, 1)).extracting(beitrag -> beitrag.flaecheQm().toString())
@@ -109,9 +158,9 @@ class FlaechenadresseServiceTest {
         @Test
         void givenFlaechenreduzierung_thenTakeTheQuadratmeterFromTheFruehereFlaeche() {
             final Flaeche fruehere = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
             final Flaeche reduzierende = new Flaeche("Position 2", LocalDate.of(2026, 1, 29), LocalDate.of(2026, 3, 31), 5,
-                    new BigDecimal("60"), new BigDecimal("-40"));
+                    new BigDecimal("60"), new BigDecimal("-40"), false);
             final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(fruehere, reduzierende), 13);
 
             assertThat(FlaechenadresseService.beitraege(adresse, 5)).extracting(beitrag -> beitrag.flaecheQm().toString())
@@ -121,11 +170,11 @@ class FlaechenadresseServiceTest {
         @Test
         void givenFlaechenreduzierungBeyondTheErsteFlaeche_thenTakeTheRestFromTheNextOne() {
             final Flaeche erste = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("40"), new BigDecimal("40"));
+                    new BigDecimal("40"), new BigDecimal("40"), false);
             final Flaeche zweite = new Flaeche("Position 2", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 3, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("60"));
+                    new BigDecimal("100"), new BigDecimal("60"), false);
             final Flaeche reduzierende = new Flaeche("Position 3", LocalDate.of(2026, 1, 29), LocalDate.of(2026, 3, 31), 5,
-                    new BigDecimal("20"), new BigDecimal("-80"));
+                    new BigDecimal("20"), new BigDecimal("-80"), false);
             final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(erste, zweite, reduzierende), 13);
 
             assertThat(FlaechenadresseService.beitraege(adresse, 5)).extracting(beitrag -> beitrag.flaecheQm().toString())
@@ -135,9 +184,9 @@ class FlaechenadresseServiceTest {
         @Test
         void givenWocheBeforeTheFlaechenreduzierung_thenLeaveTheFruehereFlaecheWhole() {
             final Flaeche fruehere = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
             final Flaeche reduzierende = new Flaeche("Position 2", LocalDate.of(2026, 1, 29), LocalDate.of(2026, 3, 31), 5,
-                    new BigDecimal("60"), new BigDecimal("-40"));
+                    new BigDecimal("60"), new BigDecimal("-40"), false);
             final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(fruehere, reduzierende), 13);
 
             assertThat(FlaechenadresseService.beitraege(adresse, 4)).extracting(beitrag -> beitrag.flaecheQm().toString())
@@ -147,7 +196,7 @@ class FlaechenadresseServiceTest {
         @Test
         void givenWoche_thenPassItAndTheLetzteWocheOfTheAdresseOn() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 1, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
             final Flaechenadresse adresse = new Flaechenadresse("Marienplatz 8", false, List.of(flaeche), 5);
 
             assertThat(FlaechenadresseService.beitraege(adresse, 3)).extracting(Flaechenbeitrag::woche, Flaechenbeitrag::letzteWocheAdresse)

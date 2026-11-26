@@ -12,7 +12,9 @@ import de.muenchen.oss.sonar.backend.berechnung.domain.BerechnungsergebnisServic
 import de.muenchen.oss.sonar.backend.berechnung.domain.Berechnungslauf;
 import de.muenchen.oss.sonar.backend.berechnung.domain.BerechnungslaufService;
 import de.muenchen.oss.sonar.backend.berechnung.domain.Vorabrechnung;
+import de.muenchen.oss.sonar.backend.berechnung.domain.VorgaengerProjekt;
 import de.muenchen.oss.sonar.backend.common.Adressart;
+import de.muenchen.oss.sonar.backend.projekt.domain.LinkedProjekt;
 import de.muenchen.oss.sonar.backend.projekt.domain.Projekt;
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -61,7 +63,7 @@ class BerechnungslaufTestdatenTest {
 
     private static Berechnungslauf toBerechnungslauf(final AbrechnungTestfall testfall) {
         final JsonNode input = testfall.input();
-        return BerechnungslaufService.berechne(toProjekt(input), toAbrechnung(input), abrechnungsdatum(input),
+        return BerechnungslaufService.berechne(toProjekt(input), toAbrechnung(input), toVorgaengerProjekteWithNutzungsobjekte(input), abrechnungsdatum(input),
                 toVorabrechnung(testfall.letzteAbrechnung()), input.get("username").asString());
     }
 
@@ -71,7 +73,25 @@ class BerechnungslaufTestdatenTest {
                 zeitraumVon(input),
                 abrechnungsdatum(input),
                 input.get("verwaltungsgebuehren").decimalValue(),
-                List.of());
+                List.of(),
+                null,
+                toVorgaengerProjekte(input), List.of(), false, false);
+    }
+
+    private static List<LinkedProjekt> toVorgaengerProjekte(final JsonNode input) {
+        final List<LinkedProjekt> vorgaengerProjekte = new ArrayList<>();
+        for (final JsonNode vorgaengerProjekt : input.path("vorgaengerProjekte")) {
+            vorgaengerProjekte.add(new LinkedProjekt(UUID.randomUUID(), vorgaengerProjekt.get("projektNummer").asString()));
+        }
+        return vorgaengerProjekte;
+    }
+
+    private static List<VorgaengerProjekt> toVorgaengerProjekteWithNutzungsobjekte(final JsonNode input) {
+        final List<VorgaengerProjekt> vorgaengerProjekte = new ArrayList<>();
+        for (final JsonNode vorgaengerProjekt : input.path("vorgaengerProjekte")) {
+            vorgaengerProjekte.add(new VorgaengerProjekt(vorgaengerProjekt.get("projektNummer").asString(), toNutzungsobjekte(vorgaengerProjekt)));
+        }
+        return vorgaengerProjekte;
     }
 
     private static Abrechnung toAbrechnung(final JsonNode input) {
@@ -106,24 +126,34 @@ class BerechnungslaufTestdatenTest {
         return LocalDate.parse(input.get("abrechnungsdatum").asString());
     }
 
-    private static List<AbrechnungNutzungsobjekt> toNutzungsobjekte(final JsonNode input) {
+    private static List<AbrechnungNutzungsobjekt> toNutzungsobjekte(final JsonNode projekt) {
         final List<AbrechnungNutzungsobjekt> nutzungsobjekte = new ArrayList<>();
-        for (final JsonNode adresse : input.get("adressen")) {
-            nutzungsobjekte.add(toNutzungsobjekt(adresse.get("adresse").asString(),
+        for (final JsonNode adresse : projekt.path("adressen")) {
+            nutzungsobjekte.add(toNutzungsobjekt(nutzungsobjektId(adresse), adresse.get("adresse").asString(),
                     adresse.get("aufschlag50prozent").asBoolean(), toPositionen(adresse), List.of()));
         }
-        for (final JsonNode adresse : input.get("adressenUeberspannung")) {
-            nutzungsobjekte.add(toNutzungsobjekt(adresse.get("adresse").asString(), false, List.of(), toMasten(adresse)));
+        for (final JsonNode adresse : projekt.path("adressenUeberspannung")) {
+            nutzungsobjekte.add(toNutzungsobjekt(nutzungsobjektId(adresse), adresse.get("adresse").asString(), false, List.of(),
+                    toMasten(adresse)));
         }
         return nutzungsobjekte;
     }
 
-    private static AbrechnungNutzungsobjekt toNutzungsobjekt(final String adressname, final boolean aufschlag50prozent,
+    /**
+     * The same id in the input and in a Vorgaenger stands for a Nutzungsobjekt that the input took
+     * over from it.
+     */
+    private static UUID nutzungsobjektId(final JsonNode adresse) {
+        final JsonNode nutzungsobjektId = adresse.path("nutzungsobjektId");
+        return nutzungsobjektId.isMissingNode() ? UUID.randomUUID() : UUID.fromString(nutzungsobjektId.asString());
+    }
+
+    private static AbrechnungNutzungsobjekt toNutzungsobjekt(final UUID nutzungsobjektId, final String adressname, final boolean aufschlag50prozent,
             final List<AbrechnungPosition> positionen, final List<AbrechnungMast> masten) {
         final int letztesLeerzeichen = adressname.lastIndexOf(' ');
         final String strasse = letztesLeerzeichen < 0 ? adressname : adressname.substring(0, letztesLeerzeichen);
         final String hausnummer = letztesLeerzeichen < 0 ? null : adressname.substring(letztesLeerzeichen + 1);
-        return new AbrechnungNutzungsobjekt(UUID.randomUUID(), Adressart.ADRESSE, strasse, hausnummer,
+        return new AbrechnungNutzungsobjekt(nutzungsobjektId, Adressart.ADRESSE, strasse, hausnummer,
                 null, null, null, null, null, null, null, null, null, aufschlag50prozent, positionen, masten);
     }
 

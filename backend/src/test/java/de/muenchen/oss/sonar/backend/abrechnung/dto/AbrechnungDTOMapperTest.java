@@ -9,6 +9,7 @@ import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungMast;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungNutzungsobjekt;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungPosition;
 import de.muenchen.oss.sonar.backend.abrechnung.domain.AbrechnungVersion;
+import de.muenchen.oss.sonar.backend.abrechnung.domain.NutzungsobjektSuggestion;
 import de.muenchen.oss.sonar.backend.common.Adressart;
 import de.muenchen.oss.sonar.backend.common.Nutzung;
 import de.muenchen.oss.sonar.backend.widerspruch.domain.Widerspruch;
@@ -91,6 +92,21 @@ class AbrechnungDTOMapperTest {
 
             assertThat(result.id()).isEqualTo(abrechnungVersion.id());
             assertThat(result.versionsnummer()).isEqualTo(2);
+        }
+
+        @Test
+        void givenNutzungsobjektSuggestion_thenCarryItsVorgaengerProjektnummerAlong() {
+            final AbrechnungNutzungsobjekt nutzungsobjekt = new AbrechnungNutzungsobjekt(
+                    UUID.fromString("123e4567-e89b-12d3-a456-426614174001"), Adressart.ADRESSE, "Marienplatz", "8", null, null, null,
+                    List.of(Nutzung.BAUZAUN), null, null, null, null, "Aus Projekt 2026-0001", true, List.of(), List.of());
+
+            final NutzungsobjektResponseDTO result = abrechnungDTOMapper.toDTO(new NutzungsobjektSuggestion(nutzungsobjekt, "2026-0001"));
+
+            assertThat(result.id()).isEqualTo(UUID.fromString("123e4567-e89b-12d3-a456-426614174001"));
+            assertThat(result.adresse()).isEqualTo("Marienplatz");
+            assertThat(result.bemerkung()).isEqualTo("Aus Projekt 2026-0001");
+            assertThat(result.aufschlag50prozent()).isTrue();
+            assertThat(result.projektnummer()).isEqualTo("2026-0001");
         }
     }
 

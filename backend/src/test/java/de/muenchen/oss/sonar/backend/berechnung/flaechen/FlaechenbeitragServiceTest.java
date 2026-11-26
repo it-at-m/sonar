@@ -15,7 +15,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenFlaecheOfASingleTag_thenReturnEmpty() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 1, 15), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 3, 13);
 
@@ -25,7 +25,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenErsteWocheOfAGrowingFlaeche_thenReportTheFlaechenerweiterung() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 1, 13);
 
@@ -35,7 +35,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenErsteWocheOfAShrinkingFlaeche_thenReportTheFlaechenreduzierung() {
             final Flaeche flaeche = new Flaeche("Position 2", LocalDate.of(2026, 1, 29), LocalDate.of(2026, 3, 31), 5,
-                    new BigDecimal("60"), new BigDecimal("-40"));
+                    new BigDecimal("60"), new BigDecimal("-40"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, BigDecimal.ZERO, 5, 13);
 
@@ -45,7 +45,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenErsteWocheOfTheWochenlaufBeforeTheFlaecheBegins_thenReturnEmpty() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 15), LocalDate.of(2026, 3, 31), 3,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 1, 13);
 
@@ -55,7 +55,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenUnchangedFlaechenzeitindex_thenReturnEmpty() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 5, 53);
 
@@ -65,7 +65,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenWocheThatMovesTheFlaecheOn_thenReportTheWechsel() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 12, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 14, 53);
 
@@ -76,7 +76,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenWocheAfterTheLetzteWocheOfTheAdresse_thenReportTheFlaecheAsGone() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, new BigDecimal("100"), 14, 13);
 
@@ -86,7 +86,7 @@ class FlaechenbeitragServiceTest {
         @Test
         void givenFlaecheThatWasAlreadyReducedAway_thenReturnEmpty() {
             final Flaeche flaeche = new Flaeche("Position 1", LocalDate.of(2026, 1, 1), LocalDate.of(2026, 3, 31), 1,
-                    new BigDecimal("100"), new BigDecimal("100"));
+                    new BigDecimal("100"), new BigDecimal("100"), false);
 
             final Flaechenbeitrag beitrag = new Flaechenbeitrag(flaeche, BigDecimal.ZERO, 5, 13);
 
